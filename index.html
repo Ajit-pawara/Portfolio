@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -294,14 +294,27 @@
 
         <!-- Resume / Contact / Dossier Download -->
         <section id="resume" class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><i data-lucide="file-check"></i> Security Dossier & Contact Core</h2>
-                <button class="btn btn-secondary print-hide" id="print-resume-btn"><i data-lucide="printer"></i> Download PDF Resume</button>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <h2 class="section-title" style="margin: 0;"><i data-lucide="file-check"></i> Security Dossier & Contact Core</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary print-hide" id="toggle-resume-view-btn" style="display: none; align-items: center; gap: 6px;"><i data-lucide="eye-off"></i> Hide Dossier</button>
+                    <button class="btn btn-secondary print-hide" id="print-resume-btn" style="display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="printer"></i> Download PDF Resume</button>
+                </div>
             </div>
 
             <div class="dossier-layout">
+                <!-- Toggle Expand Card -->
+                <div class="resume-expand-card card print-hide" id="resume-toggle-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; cursor: pointer; border: 1px dashed var(--color-cyan); background-color: rgba(0, 217, 255, 0.02); transition: all 0.2s ease;">
+                    <div style="font-size: 2.2rem; color: var(--color-cyan); margin-bottom: 12px;">
+                        <i data-lucide="file-text"></i>
+                    </div>
+                    <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-primary); margin-bottom: 4px;">Interactive Cyber Dossier</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); max-width: 320px; margin: 4px 0 16px 0;">Expand to view education achievements, professional roadmap history, and verified technical credentials.</p>
+                    <button class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="eye"></i> Expand Dossier</button>
+                </div>
+
                 <!-- Printed Resume Layout -->
-                <div class="resume-sheet card" id="printable-resume">
+                <div class="resume-sheet card" id="printable-resume" style="display: none;">
                     <div class="sheet-header">
                         <div class="header-main">
                             <h2 id="resume-name">Ajit Pawara</h2>
@@ -587,6 +600,6 @@ git push origin main</code></pre>
     </div>
 
     <!-- Script Entry -->
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
 </body>
 </html>

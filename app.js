@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupModalEvents();
     setupContactForm();
     checkFirstTimeSetup();
+    initScrollSpy();
+    setupResumeToggle();
 });
 
 // Load Database
@@ -1384,4 +1386,60 @@ async function getLiveSiteLink(repoName) {
     }
     
     return null;
+}
+
+// Scroll Spy: Highlight active nav link on scroll
+function initScrollSpy() {
+    const sections = document.querySelectorAll("section[id]");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    const observerOptions = {
+        root: null,
+        rootMargin: "-20% 0px -60% 0px", // Detect section in active viewport window
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute("id");
+                
+                navLinks.forEach((link) => {
+                    link.classList.remove("active");
+                    if (link.getAttribute("href") === `#${id}`) {
+                        link.classList.add("active");
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach((section) => {
+        observer.observe(section);
+    });
+}
+
+// Toggle Resume Dossier view
+function setupResumeToggle() {
+    const toggleCard = document.getElementById("resume-toggle-card");
+    const resumeSheet = document.getElementById("printable-resume");
+    const hideBtn = document.getElementById("toggle-resume-view-btn");
+    
+    if (!toggleCard || !resumeSheet || !hideBtn) return;
+    
+    toggleCard.addEventListener("click", () => {
+        toggleCard.style.display = "none";
+        resumeSheet.style.display = "block";
+        hideBtn.style.display = "inline-flex";
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    });
+    
+    hideBtn.addEventListener("click", () => {
+        toggleCard.style.display = "flex";
+        resumeSheet.style.display = "none";
+        hideBtn.style.display = "none";
+        document.getElementById("resume").scrollIntoView({ behavior: "smooth" });
+    });
 }

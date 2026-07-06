@@ -1959,6 +1959,12 @@ textarea.form-control {
     #resume {
         display: block !important;
     }
+    #printable-resume {
+        display: block !important;
+    }
+    #resume-toggle-card {
+        display: none !important;
+    }
     .print-hide, .top-banner, .main-header, .nav-links, .nav-actions, .hero-ctas, .challenge-container, .skills-layout-grid, .certs-grid, .projects-layout-grid, .social-cards-grid, .roadmap-timeline, .contact-console, .main-footer, .modal-overlay, #first-time-banner, #hero {
         display: none !important;
     }
@@ -2201,9 +2207,11 @@ textarea.form-control {
 }
 
 /* Overall responsiveness, text layout cleanups, and scrollability fixes */
-html, body {
-    overflow-x: hidden;
+html {
     scroll-behavior: smooth;
+}
+body {
+    overflow-x: hidden;
 }
 
 /* Stack challenge container on tablets/mobiles */
