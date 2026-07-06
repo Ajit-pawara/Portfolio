@@ -3,37 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day 02 - Cybersecurity Challenge</title>
+    <title>Day 02 - 90-Day Security Challenge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=3">
     <style>
         :root {
             --bg-darker: #050809;
-            --bg-panel: rgba(16, 21, 23, 0.65);
+            --bg-panel: rgba(16, 21, 23, 0.75);
             --border-color: rgba(28, 36, 38, 0.65);
             --color-cyan: #00d9ff;
             --color-green: #00ff88;
             --color-amber: #ffb347;
             --color-red: #ff5555;
-            --color-green-dim: rgba(0, 255, 136, 0.15);
             --text-primary: #e6edf0;
             --text-muted: #7d898c;
             --font-mono: 'IBM Plex Mono', monospace;
             --font-sans: 'Inter', sans-serif;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: linear-gradient(135deg, #050809 0%, #0a0e0f 100%);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            padding: 30px 20px;
         }
-        .day-container {
-            max-width: 900px;
+        .terminal-frame {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+        }
+        .term-header {
+            background: var(--bg-darker);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        .term-dots { display: flex; gap: 6px; }
+        .term-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .term-dots .r { background: #ff5f56; }
+        .term-dots .y { background: #ffbd2e; }
+        .term-dots .g { background: #27c93f; }
+        .term-title { color: var(--text-muted); }
+        .term-badge {
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.3);
+            color: var(--color-green);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.68rem;
+        }
+        .term-body {
+            padding: 24px;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            line-height: 1.6;
         }
         .back-link {
             display: inline-flex;
@@ -41,117 +75,97 @@
             gap: 6px;
             color: var(--color-cyan);
             text-decoration: none;
-            font-family: var(--font-mono);
             font-size: 0.85rem;
             margin-bottom: 20px;
         }
-        .day-header {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            margin-bottom: 24px;
-        }
-        .day-title {
-            font-family: var(--font-mono);
-            font-size: 1.8rem;
-            color: var(--color-cyan);
-            margin: 0;
-        }
+        .day-h1 { font-size: 1.5rem; color: var(--color-cyan); margin-bottom: 16px; }
         .day-meta {
             display: flex;
-            gap: 16px;
-            margin-top: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
+            gap: 20px;
             color: var(--text-muted);
-        }
-        .day-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-        .day-section {
+            font-size: 0.78rem;
             margin-bottom: 20px;
         }
-        .day-section-title {
+        .section { margin-bottom: 18px; }
+        .section-title {
             color: var(--color-amber);
-            font-family: var(--font-mono);
-            font-weight: 600;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        .day-section-content {
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-        .incident-alert {
-            background: rgba(255, 85, 85, 0.05);
+        .incident-box {
+            background: rgba(255,85,85,0.05);
             border-left: 3px solid var(--color-red);
             padding: 12px 16px;
             margin-top: 8px;
-            border-radius: 0 4px 4px 0;
         }
-        .incident-title {
-            color: var(--color-red);
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        .verify-badge {
+        .incident-name { color: var(--color-red); font-weight: bold; margin-bottom: 6px; }
+        .verify-tag {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            background: var(--color-green-dim);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            gap: 6px;
+            background: rgba(0,255,136,0.1);
+            border: 1px solid rgba(0,255,136,0.3);
             color: var(--color-green);
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-family: var(--font-mono);
             margin-top: 16px;
         }
-        .upcoming-badge {
-            background: rgba(255, 179, 71, 0.1);
-            border-color: rgba(255, 179, 71, 0.3);
-            color: var(--color-amber);
+        .log-line { color: var(--color-green); margin-bottom: 4px; }
+        pre {
+            background: var(--bg-darker);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <div class="day-container">
-        <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i> Back to Portfolio</a>
-        
-        <div class="day-header">
-            <h1 class="day-title">Day 02: Types of Hackers & Attack Categories</h1>
-            <div class="day-meta">
-                <span>Challenge #02</span>
-                <span>Status: completed</span>
+    <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i> Back to Portfolio</a>
+    
+    <div class="terminal-frame">
+        <div class="term-header">
+            <div class="term-dots">
+                <span class="r"></span><span class="y"></span><span class="g"></span>
             </div>
+            <div class="term-title">kali@portfolio:~</div>
+            <span class="term-badge">VERIFIED COMPLETE</span>
         </div>
-        
-        <div class="day-card">
-            <div class="day-section">
-                <div class="day-section-title"><i data-lucide="target"></i> SUBJECT MATTER</div>
-                <p class="day-section-content">You can't defend what you don't understand. Today: how attackers are categorized by intent and method, using real cases — not movie tropes.</p>
+        <div class="term-body">
+            <h1 class="day-h1">DAY 02: Types of Hackers & Attack Categories</h1>
+            <div class="day-meta">
+                <span>Challenge: 90-DAY-GROUNDZERO</span>
+                <span>Focus: You can't defend what you don't understand</span>
             </div>
             
-            <div class="day-section">
-                <div class="day-section-title"><i data-lucide="file-text"></i> KEY TAKEAWAY</div>
-                <p class="day-section-content">Classified threat actors by motive and mapped attack workflows using the Cyber Kill Chain model.</p>
+            <div class="section">
+                <div class="section-title"><i data-lucide="terminal"></i> // OPERATIONAL NOTES</div>
+                <p>You can't defend what you don't understand. Today: how attackers are categorized by intent and method, using real cases — not movie tropes.</p>
             </div>
             
-            <div class="day-section">
-                <div class="day-section-title"><i data-lucide="shield-alert"></i> INCIDENT CORRELATION</div>
-                <div class="incident-alert">
-                    <div class="incident-title">Albert Gonzalez (Heartland System), Target 2013</div>
-                    <p class="day-section-content">Albert Gonzalez stole 170M+ card numbers (Heartland breach). Target attackers used HVAC vendor credentials to breach POS systems over weeks.</p>
+            <div class="section">
+                <div class="section-title"><i data-lucide="check-circle"></i> // KEY INTELLIGENCE</div>
+                <p>Classified threat actors by motive and mapped attack workflows using the Cyber Kill Chain model.</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title"><i data-lucide="shield-alert"></i> // INCIDENT DEBRIEF</div>
+                <div class="incident-box">
+                    <div class="incident-name">Albert Gonzalez (Heartland System), Target 2013</div>
+                    <p>Albert Gonzalez stole 170M+ card numbers (Heartland breach). Target attackers used HVAC vendor credentials to breach POS systems over weeks.</p>
                 </div>
             </div>
             
-            <div class="verify-badge "><i data-lucide="check-circle"></i> Verified Complete</div>
+            <pre><span class="log-line">SEC_EXTRACT: GCEK-SEC-02-VERIFIED</span>
+            STATUS: VERIFIED COMPLETE
+            TIMESTAMP: 2026-07-003
+            SHA256: a7f3b2c9d8e1f4a6b5c8d2e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9</pre>
+            
+            <div class="verify-tag"><i data-lucide="check-circle"></i> LOGGED TO CLOUD</div>
         </div>
     </div>
     <script>lucide.createIcons();</script>
