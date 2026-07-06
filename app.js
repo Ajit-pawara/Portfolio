@@ -123,6 +123,7 @@ function renderAll() {
     renderRoadmap();
     renderResumeSheet();
     lucide.createIcons();
+    renderDefaultViewer();
 }
 
 // Navigation Tab Controls (SPA subpages)
@@ -224,9 +225,10 @@ function renderChallengeGrid() {
     const daysArray = challenge.days || [];
 
     for (let dayNum = 1; dayNum <= challenge.totalDays; dayNum++) {
-        const cell = document.createElement("div");
+        const cell = document.createElement("a");
         cell.className = "day-cell";
         cell.textContent = String(dayNum).padStart(2, '0');
+        cell.href = `day${String(dayNum).padStart(2, '0')}.html`;
         
         // Find existing day in array
         const dayData = daysArray.find(d => d.day === dayNum);
@@ -240,14 +242,7 @@ function renderChallengeGrid() {
         }
 
         cell.setAttribute("data-day", dayNum);
-        cell.addEventListener("click", () => inspectChallengeDay(dayNum, dayData));
         grid.appendChild(cell);
-    }
-
-    // Default inspect current or last completed day
-    const defaultInspect = daysArray.find(d => d.day === challenge.currentDay) || daysArray[0];
-    if (defaultInspect) {
-        inspectChallengeDay(defaultInspect.day, defaultInspect);
     }
 }
 
@@ -307,15 +302,33 @@ function inspectChallengeDay(dayNum, dayData) {
                     <h4>Day ${dayNum}: ${isNext ? 'Awaiting Log Submission' : 'Classified Track Checkpoint'}</h4>
                     <span class="day-status-pill upcoming">${isNext ? 'Active Focus' : 'Classified'}</span>
                 </div>
-                <div class="viewer-subtitle">${isNext ? 'Current Roadmap day target.' : 'Future checkpoint sequence.'}</div>
+                <div class="viewer-subtitle">${isNext ? 'Current roadmap day target.' : 'Future checkpoint sequence.'}</div>
             </div>
             
             <div class="viewer-section">
                 <p style="color: var(--text-muted);">[INFO] Daily log entries represent hands-on lesson checkpoints. Days 11-90 will expand on Python automation, active network enumeration, vulnerability scanners (Nmap/Nessus), and SOC operations logs.</p>
+                <p style="margin-top: 12px; font-size: 0.85rem;"><a href="day${String(dayNum).padStart(2, '0')}.html" style="color: var(--color-cyan); text-decoration: none;">Click to view preview page →</a></p>
             </div>
         `;
     }
     lucide.createIcons();
+}
+
+function renderDefaultViewer() {
+    const viewer = document.getElementById("day-viewer-content");
+    if (!viewer) return;
+    viewer.innerHTML = `
+        <div class="viewer-day-header">
+            <div class="viewer-title-line">
+                <h4>Select a Day from the Grid</h4>
+                <span class="day-status-pill complete">READY</span>
+            </div>
+            <div class="viewer-subtitle">Click any day cell to view detailed security notes.</div>
+        </div>
+        <div class="viewer-section">
+            <p style="color: var(--text-muted);">Each completed day logs technical insights, incident correlations, and verified learning outcomes.</p>
+        </div>
+    `;
 }
 
 // ChartJS Skills radar map
