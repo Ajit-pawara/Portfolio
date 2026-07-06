@@ -1129,7 +1129,22 @@ async function openCodeViewer(repoUrl) {
         document.getElementById("inspector-code-block").innerHTML = `<code class="language-javascript">// Select a file to view code contents</code>`;
         document.getElementById("btn-copy-code").style.display = "none";
         
+        // Hide live site button by default while we fetch
+        const liveBtn = document.getElementById("inspector-live-btn");
+        if (liveBtn) liveBtn.style.display = "none";
+        
+        // Load tree
         await loadDirectory("");
+        
+        // Fetch and show live demo link
+        if (liveBtn) {
+            getLiveSiteLink(repoName).then(link => {
+                if (link) {
+                    liveBtn.href = link;
+                    liveBtn.style.display = "inline-flex";
+                }
+            });
+        }
     }
 }
 
@@ -1275,4 +1290,72 @@ async function loadFileContent(fileItem) {
     } catch (err) {
         codeBlock.textContent = `// [ERROR] Unable to retrieve file contents.\n// Please check the link on GitHub:\n// https://github.com/Ajit-pawara/${currentRepo}/blob/main/${fileItem.path}`;
     }
+}
+
+// Find live site link in repository
+async function getLiveSiteLink(repoName) {
+    let liveUrl = null;
+    
+    // 1. Try fetching repository metadata for homepage
+    try {
+        const res = await fetch(`https://api.github.com/repos/Ajit-pawara/${repoName}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.homepage) {
+                liveUrl = data.homepage;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to fetch repository metadata", e);
+    }
+    
+    if (liveUrl) return liveUrl;
+    
+    // 2. Try fetching README.md and parsing for links
+    const branches = ["main", "master"];
+    for (const branch of branches) {
+        try {
+            const readmeUrl = `https://raw.githubusercontent.com/Ajit-pawara/${repoName}/${branch}/README.md`;
+            const res = await fetch(readmeUrl);
+            if (res.ok) {
+                const text = await res.text();
+                
+                // Regex to find markdown links: [Link Name](URL)
+                const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+                let match;
+                const linksFound = [];
+                
+                while ((match = mdLinkRegex.exec(text)) !== null) {
+                    const label = match[1].toLowerCase();
+                    const url = match[2];
+                    linksFound.push({ label, url });
+                }
+                
+                // Prioritize links with keywords like "live", "demo", "website", "deploy"
+                const priorityKeywords = ["live", "demo", "website", "deploy", "link", "visit", "url", "app"];
+                for (const kw of priorityKeywords) {
+                    const found = linksFound.find(l => l.label.includes(kw));
+                    if (found) {
+                        return found.url;
+                    }
+                }
+                
+                // Secondary check: look for any github.io link in the README
+                const githubIoMatch = text.match(/https?:\/\/[a-zA-Z0-9_-]+\.github\.io\/[a-zA-Z0-9_-]*/);
+                if (githubIoMatch) {
+                    return githubIoMatch[0];
+                }
+                
+                // Fallback: if there's any external link (excluding github.com/Ajit-pawara/Portfolio or github.com/Ajit-pawara/{this-repo}), take the first one
+                const anyExternal = linksFound.find(l => !l.url.includes("github.com") && !l.url.includes("actions"));
+                if (anyExternal) {
+                    return anyExternal.url;
+                }
+            }
+        } catch (e) {
+            // Try next branch
+        }
+    }
+    
+    return null;
 }
