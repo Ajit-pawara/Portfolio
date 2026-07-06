@@ -1676,11 +1676,21 @@ body {
 @media (max-width: 600px) {
     .modal-tabs {
         width: 100%;
-        height: 60px;
+        height: 52px;
         flex-direction: row;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding: 6px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .modal-tab-btn {
+        flex-shrink: 0;
     }
 }
 

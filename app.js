@@ -453,6 +453,7 @@ function renderCertifications() {
 }
 
 // Render Projects list
+// Render Projects list
 function renderProjects() {
     const container = document.getElementById("projects-list");
     if (!container) return;
@@ -469,6 +470,9 @@ function renderProjects() {
             tagsHtml += `<span class="proj-tag-badge">${t}</span>`;
         });
 
+        // Unique ID for toggle target
+        const safeId = p.title.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+
         card.innerHTML = `
             <div>
                 <div class="proj-header">
@@ -476,11 +480,17 @@ function renderProjects() {
                     <span class="proj-role">${p.role}</span>
                 </div>
                 <p class="description">${p.description}</p>
-                <div class="contribution">
+                
+                <div class="details-toggle-btn" data-target="${safeId}" style="display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; color: var(--color-cyan); font-size: 0.72rem; font-family: var(--font-mono); cursor: pointer; border: 1px dashed rgba(0, 217, 255, 0.3); padding: 2px 6px; border-radius: 4px; background: rgba(0, 217, 255, 0.05);">
+                    <i data-lucide="chevron-down" class="toggle-icon-${safeId}"></i> <span class="toggle-text-${safeId}">Show Contribution</span>
+                </div>
+                
+                <div class="contribution" id="contrib-${safeId}" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
                     <strong>Specific Contribution:</strong>
                     ${p.contribution}
                 </div>
-                <div class="project-tags">${tagsHtml}</div>
+                
+                <div class="project-tags" style="margin-top: 12px;">${tagsHtml}</div>
             </div>
             
             <div class="proj-footer-link" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; margin-top: 14px;">
@@ -491,21 +501,37 @@ function renderProjects() {
         
         // Add click listener to card (except when clicking links or buttons inside it)
         card.addEventListener("click", (e) => {
-            if (e.target.closest("a") || e.target.closest("button")) {
+            if (e.target.closest("a") || e.target.closest("button") || e.target.closest(".details-toggle-btn")) {
                 return;
             }
             if (p.link) {
                 openCodeViewer(p.link);
             }
         });
-        
-        // Add click listener to button
-        const btn = card.querySelector(".inspect-code-btn");
-        if (btn) {
-            btn.addEventListener("click", (e) => {
+
+        // Add click listener specifically to toggle button
+        const toggleBtn = card.querySelector(".details-toggle-btn");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (p.link) {
-                    openCodeViewer(p.link);
+                const targetId = toggleBtn.getAttribute("data-target");
+                const targetDiv = card.querySelector(`#contrib-${targetId}`);
+                const icon = card.querySelector(`.toggle-icon-${targetId}`);
+                const text = card.querySelector(`.toggle-text-${targetId}`);
+                
+                if (targetDiv.style.display === "none") {
+                    targetDiv.style.display = "block";
+                    text.textContent = "Hide Contribution";
+                    icon.setAttribute("data-lucide", "chevron-up");
+                } else {
+                    targetDiv.style.display = "none";
+                    text.textContent = "Show Contribution";
+                    icon.setAttribute("data-lucide", "chevron-down");
+                }
+                
+                // Re-render Lucide icons
+                if (window.lucide) {
+                    lucide.createIcons();
                 }
             });
         }
