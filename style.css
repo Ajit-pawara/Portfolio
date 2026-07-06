@@ -2180,11 +2180,116 @@ textarea.form-control {
     font-size: 0.75rem;
     line-height: 1.5;
     color: #e6edf0;
-    white-space: pre-wrap;
-    word-break: break-all;
+    white-space: pre;
+    word-break: normal;
+    overflow-x: auto;
 }
 
 .file-tree-back-item {
     font-weight: bold;
     color: var(--color-cyan);
+}
+
+/* Overall responsiveness, text layout cleanups, and scrollability fixes */
+html, body {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Stack challenge container on tablets/mobiles */
+@media (max-width: 900px) {
+    .challenge-container {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Stacking and centering updates on mobile */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 14px;
+    }
+    
+    .nav-links {
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-left: 0;
+    }
+    
+    .nav-link {
+        font-size: 0.72rem;
+        padding: 4px 8px;
+    }
+
+    .profile-summary {
+        flex-direction: column;
+        align-items: center !important;
+        text-align: center;
+    }
+
+    .avatar-info-wrapper {
+        flex-direction: column;
+        align-items: center !important;
+    }
+
+    .info-block {
+        text-align: center;
+    }
+
+    .academic-badge {
+        justify-content: center;
+    }
+
+    .status-and-intern {
+        align-items: center !important;
+        width: 100%;
+    }
+
+    .intern-status-badge {
+        text-align: center;
+        justify-content: center;
+    }
+
+    .status-alert-box {
+        justify-content: center;
+    }
+
+    .hero-ctas {
+        justify-content: center;
+    }
+
+    .sheet-body {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Tighter font scaling for tiny screens */
+@media (max-width: 500px) {
+    .glow-title {
+        font-size: 1.4rem !important;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.85rem !important;
+    }
+
+    .section-title {
+        font-size: 1.2rem !important;
+    }
+
+    .card {
+        padding: 14px;
+    }
+
+    .projects-layout-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Improve project cards columns scaling */
+.projects-layout-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
 }
