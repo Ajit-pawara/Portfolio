@@ -24,7 +24,7 @@ async function loadPortfolioData() {
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
-            if (parsed && parsed.schemaVersion === 8) {
+            if (parsed && parsed.schemaVersion === 9) {
                 portfolioData = parsed;
                 return;
             } else {
@@ -228,7 +228,7 @@ function renderChallengeGrid() {
         const cell = document.createElement("a");
         cell.className = "day-cell";
         cell.textContent = String(dayNum).padStart(2, '0');
-        cell.href = `day${String(dayNum).padStart(2, '0')}.html`;
+        cell.href = `https://ajit-pawara.github.io/Cyber_Security_90days/day${String(dayNum).padStart(2, '0')}.html`;
         
         // Find existing day in array
         const dayData = daysArray.find(d => d.day === dayNum);
@@ -462,6 +462,7 @@ function renderProjects() {
     projects.forEach(p => {
         const card = document.createElement("div");
         card.className = "project-card card";
+        card.style.cursor = "pointer";
         
         let tagsHtml = "";
         p.tags?.forEach(t => {
@@ -482,11 +483,33 @@ function renderProjects() {
                 <div class="project-tags">${tagsHtml}</div>
             </div>
             
-            <div class="proj-footer-link">
-                <a href="${p.link || '#'}" target="_blank" class="link-anchor"><i data-lucide="git-branch"></i> Source Code</a>
-                <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);">Verified Artifact ✓</span>
+            <div class="proj-footer-link" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; margin-top: 14px;">
+                <button class="btn btn-primary btn-sm inspect-code-btn" data-link="${p.link || ''}"><i data-lucide="terminal"></i> Browse Code</button>
+                <a href="${p.link || '#'}" target="_blank" class="link-anchor" style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="external-link"></i> GitHub</a>
             </div>
         `;
+        
+        // Add click listener to card (except when clicking links or buttons inside it)
+        card.addEventListener("click", (e) => {
+            if (e.target.closest("a") || e.target.closest("button")) {
+                return;
+            }
+            if (p.link) {
+                openCodeViewer(p.link);
+            }
+        });
+        
+        // Add click listener to button
+        const btn = card.querySelector(".inspect-code-btn");
+        if (btn) {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (p.link) {
+                    openCodeViewer(p.link);
+                }
+            });
+        }
+        
         container.appendChild(card);
     });
 }
@@ -652,6 +675,22 @@ function setupModalEvents() {
     const closeBtn = document.getElementById("admin-close-btn");
     const cancelBtn = document.getElementById("btn-modal-cancel");
     const saveBtn = document.getElementById("btn-modal-save");
+
+    // Code Viewer Modal elements
+    const codeViewerModal = document.getElementById("code-viewer-modal");
+    const codeViewerCloseBtn = document.getElementById("code-viewer-close-btn");
+    
+    if (codeViewerCloseBtn && codeViewerModal) {
+        codeViewerCloseBtn.addEventListener("click", () => {
+            codeViewerModal.classList.remove("active");
+        });
+        
+        codeViewerModal.addEventListener("click", (e) => {
+            if (e.target === codeViewerModal) {
+                codeViewerModal.classList.remove("active");
+            }
+        });
+    }
 
     const authView = document.getElementById("modal-auth-view");
     const editorView = document.getElementById("modal-editor-view");
@@ -1064,4 +1103,176 @@ function checkFirstTimeSetup() {
         banner.classList.add("hidden");
         localStorage.setItem("setup_dismissed", "true");
     });
+}
+
+// Code Viewer Logic
+let currentRepo = "";
+let currentPath = "";
+
+async function openCodeViewer(repoUrl) {
+    if (!repoUrl || !repoUrl.includes("github.com/Ajit-pawara")) {
+        alert("This project does not have a valid GitHub repository linked.");
+        return;
+    }
+    
+    // Extract repository name
+    const parts = repoUrl.split("/");
+    const repoName = parts[parts.length - 1] || parts[parts.length - 2];
+    currentRepo = repoName;
+    currentPath = "";
+    
+    const modal = document.getElementById("code-viewer-modal");
+    if (modal) {
+        modal.classList.add("active");
+        document.getElementById("inspector-repo-name").textContent = repoName;
+        document.getElementById("inspector-file-path").textContent = "Select a file from the explorer";
+        document.getElementById("inspector-code-block").innerHTML = `<code class="language-javascript">// Select a file to view code contents</code>`;
+        document.getElementById("btn-copy-code").style.display = "none";
+        
+        await loadDirectory("");
+    }
+}
+
+async function loadDirectory(path) {
+    const treeContainer = document.getElementById("inspector-file-tree");
+    if (!treeContainer) return;
+    
+    treeContainer.innerHTML = `<div class="terminal-loader"><span class="pulse-indicator"></span> Loading repository tree...</div>`;
+    
+    try {
+        const url = `https://api.github.com/repos/Ajit-pawara/${currentRepo}/contents/${path}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        
+        // Sort: directories first, then files
+        data.sort((a, b) => {
+            if (a.type === b.type) return a.name.localeCompare(b.name);
+            return a.type === "dir" ? -1 : 1;
+        });
+        
+        treeContainer.innerHTML = "";
+        
+        // If we are in a subdirectory, add a ".." item to go up
+        if (path) {
+            const backItem = document.createElement("div");
+            backItem.className = "file-tree-item file-tree-back-item directory";
+            backItem.innerHTML = `<i data-lucide="chevron-left"></i> .. (Back)`;
+            backItem.addEventListener("click", () => {
+                const parts = path.split("/");
+                parts.pop();
+                const parentPath = parts.join("/");
+                currentPath = parentPath;
+                loadDirectory(parentPath);
+            });
+            treeContainer.appendChild(backItem);
+        }
+        
+        data.forEach(item => {
+            const el = document.createElement("div");
+            el.className = `file-tree-item ${item.type === "dir" ? "directory" : "file"}`;
+            
+            const icon = item.type === "dir" ? "folder" : "file-code";
+            el.innerHTML = `<i data-lucide="${icon}"></i> ${item.name}`;
+            
+            el.addEventListener("click", () => {
+                // Highlight item
+                document.querySelectorAll(".file-tree-item").forEach(x => x.classList.remove("active"));
+                el.classList.add("active");
+                
+                if (item.type === "dir") {
+                    currentPath = item.path;
+                    loadDirectory(item.path);
+                } else {
+                    loadFileContent(item);
+                }
+            });
+            
+            treeContainer.appendChild(el);
+        });
+        
+        lucide.createIcons();
+        
+    } catch (err) {
+        console.error(err);
+        treeContainer.innerHTML = `
+            <div style="color: var(--color-red); padding: 8px; font-family: var(--font-mono); font-size: 0.7rem; line-height: 1.4;">
+                <p>[ERROR] Failed to load directory.</p>
+                <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">GitHub API rate limits may apply, or the repository might be private.</p>
+                <a href="https://github.com/Ajit-pawara/${currentRepo}" target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 8px; display: inline-flex; font-size: 0.65rem;">
+                    View on GitHub
+                </a>
+            </div>
+        `;
+    }
+}
+
+async function loadFileContent(fileItem) {
+    const codeBlock = document.getElementById("inspector-code-block");
+    const filePathLabel = document.getElementById("inspector-file-path");
+    const copyBtn = document.getElementById("btn-copy-code");
+    
+    if (!codeBlock) return;
+    
+    filePathLabel.textContent = fileItem.path;
+    codeBlock.textContent = `// [LOADING] Fetching ${fileItem.name} contents...`;
+    copyBtn.style.display = "none";
+    
+    try {
+        let fileContent = "";
+        let success = false;
+        
+        const branches = ["main", "master"];
+        for (const branch of branches) {
+            try {
+                const rawUrl = `https://raw.githubusercontent.com/Ajit-pawara/${currentRepo}/${branch}/${fileItem.path}`;
+                const res = await fetch(rawUrl);
+                if (res.ok) {
+                    fileContent = await res.text();
+                    success = true;
+                    break;
+                }
+            } catch (e) {
+                // Ignore and try next branch
+            }
+        }
+        
+        if (!success) {
+            const apiRes = await fetch(fileItem.url);
+            if (apiRes.ok) {
+                const apiData = await apiRes.json();
+                if (apiData.encoding === "base64") {
+                    fileContent = atob(apiData.content.replace(/\n/g, ''));
+                    success = true;
+                }
+            }
+        }
+        
+        if (success) {
+            if (fileContent.includes("\u0000") || fileContent.length > 500000) {
+                codeBlock.textContent = `// [INFO] Binary file or content too large to preview in code shell.`;
+                return;
+            }
+            
+            codeBlock.textContent = fileContent;
+            copyBtn.style.display = "inline-flex";
+            
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(fileContent);
+                const prevHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = `<i data-lucide="check"></i> Copied!`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    copyBtn.innerHTML = prevHtml;
+                    lucide.createIcons();
+                }, 2000);
+            };
+        } else {
+            throw new Error("Could not fetch file content");
+        }
+    } catch (err) {
+        codeBlock.textContent = `// [ERROR] Unable to retrieve file contents.\n// Please check the link on GitHub:\n// https://github.com/Ajit-pawara/${currentRepo}/blob/main/${fileItem.path}`;
+    }
 }

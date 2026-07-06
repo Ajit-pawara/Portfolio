@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "profile": {
     "name": "Ajit Pawara",
     "fullName": "Ajit Ranjit Pawara",
@@ -135,7 +135,7 @@
         "JavaScript",
         "Firebase"
       ],
-      "link": "https://github.com/Ajit-pawara",
+      "link": "https://github.com/Ajit-pawara/GCTrack",
       "role": "Lead Developer"
     },
     {
@@ -147,21 +147,69 @@
         "CSS",
         "JavaScript"
       ],
-      "link": "https://github.com/Ajit-pawara",
+      "link": "https://github.com/Ajit-pawara/Portfolio",
       "role": "Full-Stack Developer & Designer"
     },
     {
-      "title": "Portfolio",
-      "description": "A cybersecurity-themed static portfolio that renders content from a local JSON database.",
-      "contribution": "Implemented dynamic project rendering and JSON export/sync flow using the admin editor.",
+      "title": "Cybersecurity 90-Day Challenge Tracker",
+      "description": "A comprehensive public logging repository for tracking daily learning progress, labs, and security concepts completed during a 90-day security challenge.",
+      "contribution": "Authored individual day logs detailing key concepts (CIA triad, subnetting, enumeration) and mapped incident correlations.",
       "tags": [
-        "JavaScript",
+        "Markdown",
+        "Security",
+        "Documentation",
+        "Git"
+      ],
+      "link": "https://github.com/Ajit-pawara/Cyber_Security_90days",
+      "role": "Security Student"
+    },
+    {
+      "title": "Library Management System",
+      "description": "A lightweight web application for managing library catalogues, tracking book issuing, and maintaining member records.",
+      "contribution": "Designed the cataloging interfaces, user registration layouts, and state management for tracking book status.",
+      "tags": [
         "HTML",
         "CSS",
-        "JSON"
+        "JavaScript"
       ],
-      "link": "https://github.com/Ajit-pawara/Portfolio",
+      "link": "https://github.com/Ajit-pawara/Library_management_system",
+      "role": "Frontend Developer"
+    },
+    {
+      "title": "College Resource Sharing Hub",
+      "description": "A collaborative student platform for sharing course notes, lecture materials, and academic resources across departments.",
+      "contribution": "Built dynamic file upload layouts, categorization filters, and resource display grids.",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "link": "https://github.com/Ajit-pawara/College_resourse_sharing-",
       "role": "Developer"
+    },
+    {
+      "title": "BreedSense Dog Classifier",
+      "description": "An interactive application utilizing web layouts and algorithms to identify and catalog dog breeds with a focus on CSS animations.",
+      "contribution": "Implemented the styling rules, responsive animal card grids, and transition animations for breed discovery.",
+      "tags": [
+        "CSS",
+        "JavaScript",
+        "HTML"
+      ],
+      "link": "https://github.com/Ajit-pawara/BreedSense",
+      "role": "UI Engineer"
+    },
+    {
+      "title": "Database Management System Labs",
+      "description": "A collection of relational database schemas, SQL query optimizations, and normalization procedures implemented for college lab work.",
+      "contribution": "Designed schemas, wrote advanced queries, structured tables, and performed normalization tasks.",
+      "tags": [
+        "SQL",
+        "HTML",
+        "Database"
+      ],
+      "link": "https://github.com/Ajit-pawara/DBMS",
+      "role": "Database Student"
     }
   ],
   "achievements": [
