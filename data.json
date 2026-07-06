@@ -129,7 +129,12 @@
       "title": "General Championship Scoreboard",
       "description": "Developed a web app for managing a college championship scoreboard with team registrations and updates. Features a real-time database and secure authentication.",
       "contribution": "Designed and built the real-time database schema, user authentication logic, and frontend championship scoreboard updates.",
-      "tags": ["HTML", "CSS", "JavaScript", "Firebase"],
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Firebase"
+      ],
       "link": "https://github.com/Ajit-pawara",
       "role": "Lead Developer"
     },
@@ -137,9 +142,26 @@
       "title": "Personal Portfolio Website",
       "description": "Developed a personal portfolio website to showcase projects, achievements, and cybersecurity progress with a sleek hacker aesthetic.",
       "contribution": "Created responsive glassmorphic UI components, configured secure settings data forms, and integrated real-time dynamic JSON rendering.",
-      "tags": ["HTML", "CSS", "JavaScript"],
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
       "link": "https://github.com/Ajit-pawara",
       "role": "Full-Stack Developer & Designer"
+    },
+    {
+      "title": "Portfolio",
+      "description": "A cybersecurity-themed static portfolio that renders content from a local JSON database.",
+      "contribution": "Implemented dynamic project rendering and JSON export/sync flow using the admin editor.",
+      "tags": [
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "JSON"
+      ],
+      "link": "https://github.com/Ajit-pawara/Portfolio",
+      "role": "Developer"
     }
   ],
   "achievements": [
