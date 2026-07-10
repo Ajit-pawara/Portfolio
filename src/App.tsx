@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Terminal, Calendar, Cpu, GitBranch, Share2, FileText, Sliders, ShieldAlert, 
-  GraduationCap, Grid, ShieldCheck, Compass, Shield, Code2, 
+  Grid, ShieldCheck, Compass, Shield, Code2, 
   Activity, Layers, Award, GitMerge, Users, FileCheck, 
-  Printer, EyeOff, Eye, Mail, MapPin, Send, Copy, Folder, FileCode, KeyRound, 
+  Printer, EyeOff, Eye, Mail, Send, Copy, Folder, FileCode, KeyRound, 
   User, Zap, Download, Plus, Trash2, Save, RefreshCw, ChevronLeft, 
-  Briefcase, AtSign, MessageSquare, Maximize
+  AtSign, MessageSquare, Maximize
 } from 'lucide-react';
 import initialData from './data.json';
 
@@ -200,8 +200,8 @@ function App() {
       if (stored) {
         const parsed = JSON.parse(stored);
         // Upgrade legacy schema checks
-        if (parsed.challenge && !parsed.challenge.tracks) {
-          throw new Error("Old schema detected, run initialization");
+        if (parsed.schemaVersion !== initialData.schemaVersion || (parsed.challenge && !parsed.challenge.tracks)) {
+          throw new Error("Old schema or version mismatch detected, resetting to defaults");
         }
         return parsed;
       }
@@ -286,15 +286,254 @@ function App() {
     }, 40);
     return () => clearInterval(interval);
   }, []);
-
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLDivElement>, targetId: string) => {
     e.preventDefault();
     setActiveTab(targetId);
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
+
+  // Scrollspy and manual scroll intercept snapping to next/prev 100vh section
+  useEffect(() => {
+    let isScrolling = false;
+    const sections = ['hero', 'challenge', 'skills', 'certifications', 'projects', 'community', 'resume'];
+
+    // IntersectionObserver fallback for scrollspy
+    const observerOptions = {
+      root: null,
+      rootMargin: '-30% 0px -50% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      // Only update tab from observer if the user is scrolling natively (like dragging scrollbar)
+      // and not currently in our JS snapping transition
+      if (isScrolling) return;
+      
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveTab(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    // Touch/Wheel scroll snapping logic
+    const handleWheel = (e: WheelEvent) => {
+      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
+        return;
+      }
+
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      // Check if mouse is over an element that has internal scrolling
+      let target = e.target as HTMLElement | null;
+      let hasScrollableParent = false;
+      while (target && target !== document.body) {
+        const style = window.getComputedStyle(target);
+        const isScrollable = (target.scrollHeight > target.clientHeight) && 
+                            (style.overflowY === 'auto' || style.overflowY === 'scroll');
+        if (isScrollable) {
+          const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 5;
+          const isAtTop = target.scrollTop <= 5;
+          if (e.deltaY > 0 && !isAtBottom) {
+            hasScrollableParent = true;
+            break;
+          }
+          if (e.deltaY < 0 && !isAtTop) {
+            hasScrollableParent = true;
+            break;
+          }
+        }
+        target = target.parentElement;
+      }
+
+      if (hasScrollableParent) return;
+
+      e.preventDefault();
+
+      if (isScrolling) return;
+
+      const currentIndex = sections.indexOf(activeTab);
+      if (currentIndex === -1) return;
+
+      let nextIndex = currentIndex;
+      if (e.deltaY > 0) {
+        if (currentIndex < sections.length - 1) {
+          nextIndex = currentIndex + 1;
+        }
+      } else if (e.deltaY < 0) {
+        if (currentIndex > 0) {
+          nextIndex = currentIndex - 1;
+        }
+      }
+
+      if (nextIndex !== currentIndex) {
+        isScrolling = true;
+        const targetId = sections[nextIndex];
+        setActiveTab(targetId);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+        setTimeout(() => {
+          isScrolling = false;
+        }, 800);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
+        return;
+      }
+
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      if (isScrolling) return;
+
+      const currentIndex = sections.indexOf(activeTab);
+      if (currentIndex === -1) return;
+
+      let nextIndex = currentIndex;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) {
+        e.preventDefault();
+        if (currentIndex < sections.length - 1) {
+          nextIndex = currentIndex + 1;
+        }
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) {
+        e.preventDefault();
+        if (currentIndex > 0) {
+          nextIndex = currentIndex - 1;
+        }
+      }
+
+      if (nextIndex !== currentIndex) {
+        isScrolling = true;
+        const targetId = sections[nextIndex];
+        setActiveTab(targetId);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+        setTimeout(() => {
+          isScrolling = false;
+        }, 800);
+      }
+    };
+
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
+        return;
+      }
+
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY;
+
+      if (Math.abs(deltaY) < 50) return;
+      if (isScrolling) return;
+
+      // Check if swipe is inside a scrollable container
+      let target = e.target as HTMLElement | null;
+      let hasScrollableParent = false;
+      while (target && target !== document.body) {
+        const style = window.getComputedStyle(target);
+        const isScrollable = (target.scrollHeight > target.clientHeight) && 
+                            (style.overflowY === 'auto' || style.overflowY === 'scroll');
+        if (isScrollable) {
+          const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 5;
+          const isAtTop = target.scrollTop <= 5;
+          if (deltaY > 0 && !isAtBottom) {
+            hasScrollableParent = true;
+            break;
+          }
+          if (deltaY < 0 && !isAtTop) {
+            hasScrollableParent = true;
+            break;
+          }
+        }
+        target = target.parentElement;
+      }
+
+      if (hasScrollableParent) return;
+
+      const currentIndex = sections.indexOf(activeTab);
+      if (currentIndex === -1) return;
+
+      let nextIndex = currentIndex;
+      if (deltaY > 0) {
+        if (currentIndex < sections.length - 1) {
+          nextIndex = currentIndex + 1;
+        }
+      } else {
+        if (currentIndex > 0) {
+          nextIndex = currentIndex - 1;
+        }
+      }
+
+      if (nextIndex !== currentIndex) {
+        isScrolling = true;
+        const targetId = sections[nextIndex];
+        setActiveTab(targetId);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+        setTimeout(() => {
+          isScrolling = false;
+        }, 800);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.unobserve(el);
+      });
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [activeTab, isAdminOpen, isCodeInspectorOpen, isRoadmapOpen, isFullscreenPreviewOpen, isResumeExpanded]);
 
   // Update selected day when switching tracks
   useEffect(() => {
@@ -574,7 +813,7 @@ function App() {
         )}
 
         {/* Hero Section / Shell Window */}
-        <section id="hero" className="hero-section" style={{ display: activeTab === 'hero' ? undefined : 'none' }}>
+        <section id="hero" className="hero-section">
             <div className="terminal-window">
               <div className="terminal-header">
                 <div className="window-actions">
@@ -590,19 +829,7 @@ function App() {
                   <span className="shell-prompt">robin@kali:~$</span> {typedText}
                   {!isTypingFinished && <span className="blinking-cursor">|</span>}
                 </div>
-                
-                {isTypingFinished && (
-                  <div className="shell-output" style={{
-                    color: 'var(--text-muted)',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.9rem',
-                    marginTop: '4px',
-                    marginBottom: '16px',
-                    paddingLeft: '4px'
-                  }}>
-                    {db.profile?.name ? db.profile.name.toLowerCase().replace(/\s+/g, '_') : 'ajit_pawara'}
-                  </div>
-                )}
+
                 
                 {isTypingFinished && (
                   <div className="hero-details" style={{ marginTop: '20px' }}>
@@ -625,7 +852,7 @@ function App() {
                         flexShrink: 0,
                         backgroundColor: 'var(--bg-darker)'
                       }}>
-                        <img src="profile.jpg" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src="profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                       <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
                         <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
@@ -660,7 +887,7 @@ function App() {
           </section>
 
         {/* Learning Tracker centerpiece */}
-        <section id="challenge" className="content-section" style={{ display: activeTab === 'challenge' ? undefined : 'none' }}>
+        <section id="challenge" className="content-section">
           <div className="section-header-block" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <h2 className="section-title"><Calendar /> Learning Tracker</h2>
@@ -699,7 +926,7 @@ function App() {
                   <GitBranch /> View Challenge Repo
                 </a>
               )}
-              {activeTrackId === 'cybersecurity' && (
+              {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && (
                 <button onClick={() => setIsRoadmapOpen(true)} className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <Compass /> View Interactive Roadmap
                 </button>
@@ -743,7 +970,7 @@ function App() {
                         onClick={() => {
                           setSelectedDayNum(dayNum);
                           // Default to showing html preview for completed days if active
-                          if (dayNum <= activeTrack.currentDay && activeTrackId === 'cybersecurity' && dayNum <= 10) {
+                          if (dayNum <= activeTrack.currentDay && (activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && dayNum <= 10) {
                             setActiveViewerTab("preview");
                           } else {
                             setActiveViewerTab("log");
@@ -798,7 +1025,7 @@ function App() {
               <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column' }}>
                 {activeViewerTab === 'preview' ? (
                   <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
-                    {activeTrackId === 'cybersecurity' && selectedDayNum <= 10 ? (
+                    {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && selectedDayNum <= 10 ? (
                       <>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
                           <button 
@@ -913,7 +1140,7 @@ function App() {
         </section>
 
         {/* Technical Skills Map */}
-        <section id="skills" className="content-section" style={{ display: activeTab === 'skills' ? undefined : 'none' }}>
+        <section id="skills" className="content-section">
           <div className="section-header-block" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
             <div>
               <h2 className="section-title"><ShieldCheck /> Technical Skill Vectors & Method</h2>
@@ -942,7 +1169,7 @@ function App() {
               >
                 <Compass style={{ width: '14px', height: '14px' }} /> Learning Philosophy
               </button>
-              {activeTrackId === 'cybersecurity' && (
+              {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && (
                 <button 
                   onClick={() => setActiveSkillsTab("pathways")} 
                   className={`btn btn-sm ${activeSkillsTab === 'pathways' ? 'btn-primary' : 'btn-secondary'}`}
@@ -1020,7 +1247,7 @@ function App() {
               </div>
             )}
 
-            {activeSkillsTab === 'pathways' && activeTrackId === 'cybersecurity' && (
+            {activeSkillsTab === 'pathways' && (activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && (
               <div className="pathways-card card" style={{ maxWidth: '850px', margin: '0 auto', padding: '24px' }}>
                 <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '10px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Zap style={{ color: 'var(--color-cyan)' }} /> Cybersecurity Career Pathways Explorer
@@ -1117,7 +1344,7 @@ function App() {
         </section>
 
         {/* Certifications */}
-        <section id="certifications" className="content-section" style={{ display: activeTab === 'certifications' ? undefined : 'none' }}>
+        <section id="certifications" className="content-section">
           <div className="section-header-block" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
             <div>
               <h2 className="section-title" style={{ margin: 0 }}><Award /> Verified Certifications & Credentials</h2>
@@ -1168,7 +1395,7 @@ function App() {
         </section>
 
         {/* Projects Showcase */}
-        <section id="projects" className="content-section" style={{ display: activeTab === 'projects' ? undefined : 'none' }}>
+        <section id="projects" className="content-section">
           <div className="section-header-block">
             <h2 className="section-title"><GitMerge /> Software Projects Registry</h2>
             <p className="section-description">A curated index of security modules, utility applications, and static assets engineered individually.</p>
@@ -1293,7 +1520,7 @@ function App() {
         </section>
 
         {/* Find Me Platform Hub */}
-        <section id="community" className="content-section" style={{ display: activeTab === 'community' ? undefined : 'none' }}>
+        <section id="community" className="content-section">
           <div className="section-header-block" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
             <div>
               <h2 className="section-title"><Users /> Platform Hub & Logs</h2>
@@ -1356,7 +1583,7 @@ function App() {
 
 
         {/* Printable Resume Section */}
-        <section id="resume" className="content-section" style={{ display: activeTab === 'resume' ? undefined : 'none' }}>
+        <section id="resume" className="content-section">
           <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
             <h2 className="section-title" style={{ margin: 0 }}><FileCheck /> Security Dossier & Contact</h2>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -1400,90 +1627,304 @@ function App() {
 
             {/* Printable Resume layout */}
             {isResumeExpanded && (
-              <div className="resume-sheet card" style={{ display: 'block' }}>
-                <div className="sheet-header">
-                  <div className="header-main">
-                    <h2>{db.profile?.fullName || db.profile?.name}</h2>
-                    <p className="sheet-title">{db.profile?.title}</p>
-                    <div className="sheet-institution">
-                      {db.profile?.institution}
-                      {db.profile?.rollNo && (
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '8px' }}>
-                          (Roll No: {db.profile.rollNo})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="header-details">
-                    <div><Mail /> <span>{db.profile?.email}</span></div>
-                    <div><MapPin /> <span>{db.profile?.location}</span></div>
+              <div className="resume-sheet card" style={{
+                display: 'block',
+                padding: '40px',
+                fontFamily: 'var(--font-sans)',
+                backgroundColor: 'var(--bg-panel)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+                borderRadius: '6px'
+              }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                  <h1 style={{
+                    fontSize: '2.2rem',
+                    fontWeight: '800',
+                    margin: '0 0 8px 0',
+                    letterSpacing: '1px',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-primary)'
+                  }}>
+                    AJIT PAWARA
+                  </h1>
+                  <div style={{
+                    fontSize: '0.88rem',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    flexWrap: 'wrap',
+                    alignItems: 'center'
+                  }}>
+                    <span>Karad</span>
+                    <span>|</span>
+                    <a href="mailto:ajitdawar1729@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
+                      ajitdawar1729@gmail.com
+                    </a>
+                    <span>|</span>
+                    <a href="https://www.linkedin.com/in/ajit-pawara-69541a305/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline', fontWeight: '500' }}>
+                      LinkedIn
+                    </a>
+                    <span>|</span>
+                    <a href="https://github.com/Ajit-pawara" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline', fontWeight: '500' }}>
+                      GitHub
+                    </a>
+                    <span>|</span>
+                    <span>9322076276</span>
                   </div>
                 </div>
-                
-                <hr className="sheet-divider" />
 
-                <div className="sheet-body">
-                  <div className="sheet-column-main">
-                    <div className="sheet-section">
-                      <h4><Briefcase /> EXPERIENCE & LAB WORK</h4>
-                      <div className="sheet-timeline">
-                        {db.experience?.map((exp: any, idx: number) => (
-                          <div key={idx} style={{ marginBottom: '12px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                              <span>{exp.role}</span>
-                              <span style={{ color: 'var(--color-cyan)', fontSize: '0.8rem' }}>{exp.period}</span>
-                            </div>
-                            <div style={{ fontStyle: 'italic', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{exp.organization}</div>
-                            <p style={{ fontSize: '0.8rem', margin: '4px 0 0 0' }}>{exp.description}</p>
-                          </div>
-                        ))}
-                      </div>
+                <hr style={{ border: 'none', height: '3px', backgroundColor: '#c29a53', margin: '0 0 20px 0' }} />
+
+                {/* SUMMARY */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    borderBottom: '1.5px solid #c29a53',
+                    paddingBottom: '3px',
+                    marginBottom: '8px',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    SUMMARY
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: 0, lineHeight: '1.5' }}>
+                    IT student passionate about cybersecurity, modern responsive design, and real-world coding challenges. Currently learning ethical hacking and DSA in Java to enhance problem-solving skills. Actively seeking opportunities to apply and grow these skills through internships, workshops, and collaborative projects.
+                  </p>
+                </div>
+
+                {/* SKILLS ROW */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '20px' }}>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      PROFESSIONAL SKILLS
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                      <div>Design Understanding</div>
+                      <div>UI Design</div>
+                      <div>Team Collaboration</div>
+                      <div>Time Management</div>
                     </div>
-                    <div className="sheet-section">
-                      <h4><GraduationCap /> EDUCATION</h4>
-                      <div className="sheet-timeline">
-                        {db.education?.map((edu: any, idx: number) => (
-                          <div key={idx} style={{ marginBottom: '12px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                              <span>{edu.degree}</span>
-                              <span style={{ color: 'var(--color-cyan)', fontSize: '0.8rem' }}>{edu.period}</span>
-                            </div>
-                            <div style={{ fontStyle: 'italic', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{edu.school}</div>
-                            <p style={{ fontSize: '0.8rem', margin: '4px 0 0 0' }}>{edu.description}</p>
-                          </div>
-                        ))}
+                  </div>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      TECHNICAL SKILLS
+                    </h3>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div><strong>Cybersecurity:</strong> Learning ethical hacking & tools</div>
+                      <div><strong>Languages:</strong> C, C++, Java (DSA – learning)</div>
+                      <div><strong>Web:</strong> HTML, CSS, JavaScript (Basic)</div>
+                      <div><strong>Backend:</strong> Firebase (Basic)</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* PROJECTS */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    borderBottom: '1.5px solid #c29a53',
+                    paddingBottom: '3px',
+                    marginBottom: '8px',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    PROJECTS
+                  </h3>
+                  
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>General Championship scoreboard</strong>
+                      <a href="https://github.com/Ajit-pawara/GCTrack" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      Developed a web app for managing a college championship scoreboard with team registrations and updates. Built using HTML, CSS, JavaScript, and Firebase for real-time database and authentication.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Personal Portfolio website</strong>
+                      <a href="https://github.com/Ajit-pawara/Portfolio" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      Developed a personal portfolio website to showcase projects and skills. Built with HTML, CSS, and JavaScript, featuring responsive design and modern UI for a professional online presence.
+                    </p>
+                  </div>
+                </div>
+
+                {/* CERTIFICATION & PRACTICE */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '20px' }}>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      CERTIFICATION
+                    </h3>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div>Solutions Architecture Job Simulation</div>
+                      <div>Cybersecurity Analyst Job Simulation</div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      PRACTICE PLATFORMS
+                    </h3>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>• TryHackMe</span>
+                        <a href="https://tryhackme.com/p/Robinx" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                          (link)
+                        </a>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>• HackerRank</span>
+                        <a href="https://www.hackerrank.com/profile/ajitdawar1729" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                          (link)
+                        </a>
                       </div>
                     </div>
                   </div>
-                  <div className="sheet-column-side">
-                    <div className="sheet-section">
-                      <h4><Cpu /> CAPABILITIES</h4>
-                      <div className="sheet-tags-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {db.skills?.map((s: any, idx: number) => (
-                          <span key={idx} style={{
-                            backgroundColor: 'var(--bg-darker)',
-                            border: '1px solid var(--border-color)',
-                            padding: '2px 6px',
-                            fontSize: '0.72rem',
-                            borderRadius: '4px',
-                            color: 'var(--text-primary)'
-                          }}>
-                            {s.name} ({s.level}%)
-                          </span>
-                        ))}
-                      </div>
+                </div>
+
+                {/* EXPERIENCE */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    borderBottom: '1.5px solid #c29a53',
+                    paddingBottom: '3px',
+                    marginBottom: '8px',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    EXPERIENCE
+                  </h3>
+                  {/* Empty as per screenshot */}
+                </div>
+
+                {/* EDUCATION */}
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    borderBottom: '1.5px solid #c29a53',
+                    paddingBottom: '3px',
+                    marginBottom: '8px',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    EDUCATION
+                  </h3>
+                  
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Bachelor of Technology in Information Technology</strong>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>2024-2028</span>
                     </div>
-                    <div className="sheet-section" style={{ marginTop: '16px' }}>
-                      <h4><Award /> CREDENTIALS</h4>
-                      <ul className="sheet-certs-list" style={{ listStyle: 'none', padding: 0 }}>
-                        <li style={{ fontSize: '0.8rem', marginBottom: '4px' }}>Active Study: <strong>CompTIA Security+</strong></li>
-                        <li style={{ fontSize: '0.8rem', marginBottom: '4px' }}>Learning Tracker Checkins: <strong>Verified</strong></li>
-                        {db.certifications?.map((c: any, idx: number) => (
-                          <li key={idx} style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
-                            {c.name} ({c.provider})
-                          </li>
-                        ))}
-                      </ul>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Government College of Engineering, Karad | Maharashtra</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>CGPA: 7.55</div>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Higher Secondary Education (HSC)</strong>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>2022-2024</span>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Hps and Jr College, Dondaicha | Maharashtra State Board 2024</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Grade: 79.00%</div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Secondary School Certificate (SSC)</strong>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>2016-2022</span>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Hast Public School, Dondaicha | Maharashtra State Board 2022</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Grade: 95.20%</div>
+                  </div>
+                </div>
+
+                {/* VOLUNTEER WORK & ACHIEVEMENTS */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      VOLUNTEER WORK
+                    </h3>
+                    {/* Empty as per screenshot */}
+                  </div>
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      borderBottom: '1.5px solid #c29a53',
+                      paddingBottom: '3px',
+                      marginBottom: '8px',
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      ACHIEVEMENTS
+                    </h3>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div>• Zonal-Level Volleyball Player (2024)</div>
+                      <div>• State-Level Hockey Player (2023)</div>
+                      <div>• State-Level Floor-ball Player (2023)</div>
                     </div>
                   </div>
                 </div>
@@ -1535,16 +1976,15 @@ function App() {
               </div>
             </div>
           </div>
+          {/* Footer */}
+          <footer className="main-footer print-hide" style={{ marginTop: '60px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+            <div className="footer-content">
+              <p>&copy; 2026 Ajit Pawara. Secured Static Operator Portfolio.</p>
+              <p className="footer-note">Designed in compliance with terminal operations dashboard spec. Hit Settings to customize database schema.</p>
+            </div>
+          </footer>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="main-footer print-hide">
-        <div className="footer-content">
-          <p>&copy; 2026 Ajit Pawara. Secured Static Operator Portfolio.</p>
-          <p className="footer-note">Designed in compliance with terminal operations dashboard spec. Hit Settings to customize database schema.</p>
-        </div>
-      </footer>
 
       {/* Code Viewer Modal */}
       {isCodeInspectorOpen && (

@@ -4,7 +4,7 @@ export function getSeoData() {
         description:
             'Cybersecurity learning portfolio, learning tracker, skills dashboard, and engineering projects of Ajit Pawara.',
         url: 'https://ajit-pawara.github.io/portfolio/',
-        imageUrl: '/profile.jpg',
+        imageUrl: '/profile.png',
         siteName: 'Ajit Pawara',
         twitterHandle: '@Ajit-pawara',
     };
