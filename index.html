@@ -1,605 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajit Pawara | Cybersecurity Operator Portfolio & 90-Day Challenge</title>
-    <meta name="description" content="Cybersecurity learning portfolio, 90-day progress tracker, skills dashboard, and engineering projects of Ajit Pawara.">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    
-    <!-- Chart.js for Radar Skill Map -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css?v=7">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ajit Pawara | Cybersecurity Operator Portfolio & Learning Tracker</title>
+  <meta name="description"
+    content="Cybersecurity learning portfolio, learning tracker, skills dashboard, and engineering projects of Ajit Pawara." />
+
+  <!-- Scorable SEO / Social Share Meta -->
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://ajit-pawara.github.io/portfolio/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ajit Pawara" />
+  <meta property="og:title" content="Ajit Pawara | Cybersecurity Operator Portfolio & Learning Tracker" />
+  <meta property="og:description"
+    content="Cybersecurity learning portfolio, learning tracker, skills dashboard, and engineering projects of Ajit Pawara." />
+  <meta property="og:url" content="https://ajit-pawara.github.io/portfolio/" />
+  <meta property="og:image" content="https://ajit-pawara.github.io/portfolio/profile.jpg" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ajit Pawara | Cybersecurity Operator Portfolio & Learning Tracker" />
+  <meta name="twitter:description"
+    content="Cybersecurity learning portfolio, learning tracker, skills dashboard, and engineering projects of Ajit Pawara." />
+  <meta name="twitter:image" content="https://ajit-pawara.github.io/portfolio/profile.jpg" />
+
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Ajit Pawara",
+        "url": "https://ajit-pawara.github.io/portfolio/",
+        "jobTitle": "Cybersecurity Operator",
+        "sameAs": [
+          "https://www.linkedin.com/in/ajit-pawara-69541a305/",
+          "https://github.com/Ajit-pawara",
+          "https://www.instagram.com/robin_igl",
+          "https://www.threads.net/@robin_igl",
+          "https://www.reddit.com/user/Robin_iii/"
+        ]
+      }
+    </script>
+
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ajit Pawara",
+        "url": "https://ajit-pawara.github.io/portfolio/"
+      }
+    </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body>
-
-    <!-- Top Cyber Status Banner -->
-    <div class="top-banner">
-        <div class="banner-left">
-            <span class="pulse-indicator"></span>
-            <span class="status-text">SEC-OPS: ACTIVE ROADMAP MODE</span>
-        </div>
-        <div class="banner-center">
-            <span class="terminal-text">TARGET: COMPTIA SECURITY+ / PRACTICAL ETHICAL HACKING</span>
-        </div>
-        <div class="banner-right">
-            <span id="live-time">SYS_TIME: 2026-07-06 09:30:00</span>
-            <span class="ip-mock">IP: 192.168.1.137</span>
-        </div>
-    </div>
-
-    <!-- Main Navigation Header -->
-    <header class="main-header">
-        <nav class="nav-container">
-            <div class="logo">
-                <span class="logo-bracket">&lt;</span>
-                <span class="logo-text">AJIT_SEC</span>
-                <span class="logo-bracket">/&gt;</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#hero" class="nav-link active"><i data-lucide="terminal"></i> whoami</a></li>
-                <li><a href="#challenge" class="nav-link"><i data-lucide="calendar"></i> 90-Day Tracker</a></li>
-                <li><a href="#skills" class="nav-link"><i data-lucide="cpu"></i> Skills Map</a></li>
-                <li><a href="#projects" class="nav-link"><i data-lucide="git-branch"></i> Projects</a></li>
-                <li><a href="#community" class="nav-link"><i data-lucide="share-2"></i> Find Me</a></li>
-                <li><a href="#resume" class="nav-link"><i data-lucide="file-text"></i> Dossier</a></li>
-            </ul>
-            <div class="nav-actions">
-                <button class="btn btn-secondary" id="edit-mode-btn"><i data-lucide="sliders"></i> Settings</button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="workspace">
-
-        <!-- Setup Warning Banner -->
-        <div id="first-time-banner" class="hidden" style="background-color: rgba(255, 179, 71, 0.1); border: 1px solid var(--color-amber); padding: 12px 16px; border-radius: 6px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-amber); line-height: 1.4;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="shield-alert" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
-                <span><strong>[DATABASE UNCONFIGURED]</strong> Local profile details are running on template values. Click <strong>Settings</strong> and authenticate as <strong>root</strong> to log daily certificates and education achievements.</span>
-            </div>
-            <button id="close-first-time-btn" style="background: transparent; border: none; color: var(--color-amber); font-size: 1.1rem; cursor: pointer; line-height: 1; margin-left: 12px; padding: 0 4px;">&times;</button>
-        </div>
-
-        <!-- Hero Section / Shell Window -->
-        <section id="hero" class="hero-section">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <div class="window-actions">
-                        <span class="dot close"></span>
-                        <span class="dot minimize"></span>
-                        <span class="dot maximize"></span>
-                    </div>
-                    <div class="terminal-title">robin@kali:~</div>
-                    <div class="terminal-env">bash</div>
-                </div>
-                <div class="terminal-body hero-body">
-                    <div class="shell-line">
-                        <span class="shell-prompt">robin@kali:~$</span> <span id="typed-whoami" class="typed-text"></span><span class="blinking-cursor">|</span>
-                    </div>
-                    
-                    <div id="hero-details" class="hero-details hidden">
-                        <div class="profile-summary" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
-                            <div class="avatar-info-wrapper" style="display: flex; gap: 18px; align-items: center; flex-wrap: wrap;">
-                                <div class="profile-avatar-container" style="position: relative; width: 84px; height: 84px; border-radius: 50%; overflow: hidden; border: 2px solid var(--color-cyan); box-shadow: 0 0 15px rgba(0, 217, 255, 0.25); flex-shrink: 0; background-color: var(--bg-darker);">
-                                    <img src="profile.jpg" alt="Ajit Avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                                <div class="info-block">
-                                    <h1 class="glow-title" id="dash-name" style="margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">Ajit Pawara</h1>
-                                    <p class="hero-subtitle" id="dash-subtitle" style="margin: 2px 0 0 0; color: var(--color-cyan); font-size: 0.95rem;">B.Tech IT Student at GCEK & Aspiring Security Specialist</p>
-                                    <div class="academic-badge" id="dash-academy" style="margin-top: 6px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-                                        <i data-lucide="graduation-cap" style="width: 14px; height: 14px;"></i> Government College of Engineering, Karad | Roll: 24141050
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="status-and-intern" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
-                                <div class="intern-status-badge">
-                                    <i data-lucide="check-square"></i> STATUS: OPEN FOR CYBERSECURITY INTERNSHIPS
-                                </div>
-                                <div class="status-alert-box" style="margin: 0; display: flex; align-items: center; gap: 6px;">
-                                    <span class="status-marker neon-green"></span>
-                                    <span class="status-desc" id="dash-status">ACTIVE RUN: 90-Day Cybersecurity Public Learning Challenge (Day 9/90 Complete)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="hero-paragraph">
-                            I am a second-year Information Technology undergraduate actively engineering my way into the cybersecurity landscape. Driven by the philosophy of <strong>building in public</strong>, I document my learning progress daily to validate my skill acquisition and support the growing security community.
-                        </p>
-
-                        <div class="hero-ctas">
-                            <a href="#challenge" class="btn btn-primary"><i data-lucide="calendar"></i> View 90-Day Challenge</a>
-                            <a href="#projects" class="btn btn-secondary"><i data-lucide="folder-git-2"></i> Inspect Shipped Projects</a>
-                            <a href="#resume" class="btn btn-tertiary"><i data-lucide="mail"></i> Get In Touch</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 90-Day Cybersecurity Challenge centerpiece -->
-        <section id="challenge" class="content-section">
-            <div class="section-header-block" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-                <div>
-                    <h2 class="section-title"><i data-lucide="calendar-range"></i> 90-Day Cybersecurity Progress Tracker</h2>
-                    <p class="section-description">A real-time contribution map showing daily roadmap checkpoints. Hover/click on cells to reveal details in the secure operations log.</p>
-                </div>
-                <a href="https://github.com/Ajit-pawara/Cyber_Security_90days" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 4px;">
-                    <i data-lucide="github"></i> View Challenge Repo
-                </a>
-            </div>
-
-            <div class="challenge-container">
-                <!-- Visual contribution graph -->
-                <div class="challenge-grid-card card">
-                    <div class="card-header-bar">
-                        <h3><i data-lucide="grid"></i> Challenge contribution grid</h3>
-                        <div class="grid-legend">
-                            <span class="legend-item"><span class="legend-cell complete"></span> Completed</span>
-                            <span class="legend-item"><span class="legend-cell active"></span> Active/Current</span>
-                            <span class="legend-item"><span class="legend-cell upcoming"></span> Upcoming</span>
-                        </div>
-                    </div>
-                    
-                    <div class="grid-wrapper">
-                        <!-- Generated dynamically by app.js (90 cells) -->
-                        <div class="contribution-grid" id="day-grid"></div>
-                    </div>
-
-                    <div class="grid-summary-footer">
-                        <span>Current Run: <strong>9 / 90 Days</strong> (10% Course Completion)</span>
-                        <span>Track Specialization: <strong>General Security & Networking Fundamentals</strong></span>
-                    </div>
-                </div>
-
-                <!-- Interactive Terminal Detail Viewer -->
-                <div class="terminal-window challenge-viewer">
-                    <div class="terminal-header">
-                        <div class="window-actions">
-                            <span class="dot close"></span>
-                            <span class="dot minimize"></span>
-                            <span class="dot maximize"></span>
-                        </div>
-                        <div class="terminal-title">secops-viewer --log-day=9</div>
-                        <span class="terminal-badge">LIVE_LOG</span>
-                    </div>
-                    <div class="terminal-body viewer-body" id="day-viewer-content">
-                        <!-- Filled dynamically by app.js -->
-                        <div class="terminal-loader">
-                            <span class="loader-icon pulse"></span> Loading system logs for day 9...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Technical Skills Map & Radar -->
-        <section id="skills" class="content-section">
-            <h2 class="section-title"><i data-lucide="shield-check"></i> Technical Skill Vectors & Method</h2>
-            
-            <div class="skills-layout-grid">
-                <!-- Learning Philosophy details -->
-                <div class="philosophy-card card">
-                    <h3><i data-lucide="compass"></i> Learning Philosophy (70-20-10)</h3>
-                    <p class="philosophy-intro">I don't believe in passive tutorial hell. My training methodology allocates focus across three action-oriented pillars:</p>
-                    
-                    <div class="philosophy-metrics">
-                        <div class="phi-box">
-                            <div class="phi-value neon-cyan">70%</div>
-                            <div class="phi-label">Hands-On Labs</div>
-                            <div class="phi-desc">Active build/attack tasks (TryHackMe, HTB, custom script setups).</div>
-                        </div>
-                        <div class="phi-box">
-                            <div class="phi-value neon-green">20%</div>
-                            <div class="phi-label">Structured Theory</div>
-                            <div class="phi-desc">Core protocols, documentation study, RFC audits.</div>
-                        </div>
-                        <div class="phi-box">
-                            <div class="phi-value neon-orange">10%</div>
-                            <div class="phi-label">Teaching Others</div>
-                            <div class="phi-desc">Documenting insights publicly to reinforce understanding.</div>
-                        </div>
-                    </div>
-
-                    <div class="platforms-bar">
-                        <span class="platform-title">ACTIVE LAB PLATFORMS:</span>
-                        <span class="platform-badge"><i data-lucide="shield"></i> TryHackMe</span>
-                        <span class="platform-badge"><i data-lucide="code-2"></i> HackerRank</span>
-                    </div>
-                </div>
-
-                <!-- Radar Chart from ChartJS -->
-                <div class="chart-card card">
-                    <h3><i data-lucide="activity"></i> Skill Distribution Radar</h3>
-                    <div class="radar-wrapper">
-                        <canvas id="skillsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Tools & Skills Grid -->
-                <div class="tools-card card">
-                    <h3><i data-lucide="layers"></i> Tactical Skill Matrices</h3>
-                    <div class="skills-horizontal-list" id="skills-list">
-                        <!-- Populated dynamically by app.js -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Certifications & Credentials Grid -->
-        <section id="certifications" class="content-section">
-            <h2 class="section-title"><i data-lucide="award"></i> Verified Certifications & Credentials</h2>
-            <div class="certs-grid" id="certs-list">
-                <!-- Populated dynamically by app.js -->
-            </div>
-        </section>
-
-        <!-- Projects Showcase -->
-        <section id="projects" class="content-section">
-            <div class="section-header-block">
-                <h2 class="section-title"><i data-lucide="git-merge"></i> Offensive & Defensive Projects Dossier</h2>
-                <p class="section-description">A catalog of software applications and technical assets built to solve real engineering problems.</p>
-            </div>
-            
-            <div class="projects-layout-grid" id="projects-list">
-                <!-- Populated dynamically by app.js -->
-            </div>
-        </section>
-
-        <!-- Find Me / Build in Public Community Grid -->
-        <section id="community" class="content-section">
-            <div class="section-header-block">
-                <h2 class="section-title"><i data-lucide="users"></i> Build-in-Public & Platform Hub</h2>
-                <p class="section-description">I document my journey across multiple media channels. Here is what I share and where to track it.</p>
-            </div>
-
-            <div class="social-cards-grid" id="social-grid">
-                <!-- Populated dynamically by app.js -->
-            </div>
-
-            <!-- Discipline Feature Box (Volleyball) -->
-            <div class="sports-feature-box card">
-                <div class="sports-icon-wrapper">
-                    <i data-lucide="dribbble" class="ball-icon"></i>
-                </div>
-                <div class="sports-info">
-                    <h4>Sports & Discipline Background: Volleyball (Zonal/State level)</h4>
-                    <p>
-                        Competing in volleyball at the zonal and state level has instilled deep discipline, tactical coordination, and team-oriented resilience in me. I carry these operational traits into software engineering and threat mitigation.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Roadmap Timeline -->
-        <section id="roadmap" class="content-section">
-            <h2 class="section-title"><i data-lucide="milestone"></i> Learning Roadmap Timeline</h2>
-            <div class="roadmap-wrapper">
-                <div class="roadmap-timeline" id="roadmap-list">
-                    <!-- Populated dynamically by app.js -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Resume / Contact / Dossier Download -->
-        <section id="resume" class="content-section">
-            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <h2 class="section-title" style="margin: 0;"><i data-lucide="file-check"></i> Security Dossier & Contact Core</h2>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-secondary print-hide" id="toggle-resume-view-btn" style="display: none; align-items: center; gap: 6px;"><i data-lucide="eye-off"></i> Hide Dossier</button>
-                    <button class="btn btn-secondary print-hide" id="print-resume-btn" style="display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="printer"></i> Download PDF Resume</button>
-                </div>
-            </div>
-
-            <div class="dossier-layout">
-                <!-- Toggle Expand Card -->
-                <div class="resume-expand-card card print-hide" id="resume-toggle-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; cursor: pointer; border: 1px dashed var(--color-cyan); background-color: rgba(0, 217, 255, 0.02); transition: all 0.2s ease;">
-                    <div style="font-size: 2.2rem; color: var(--color-cyan); margin-bottom: 12px;">
-                        <i data-lucide="file-text"></i>
-                    </div>
-                    <h3 style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-primary); margin-bottom: 4px;">Interactive Cyber Dossier</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); max-width: 320px; margin: 4px 0 16px 0;">Expand to view education achievements, professional roadmap history, and verified technical credentials.</p>
-                    <button class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="eye"></i> Expand Dossier</button>
-                </div>
-
-                <!-- Printed Resume Layout -->
-                <div class="resume-sheet card" id="printable-resume" style="display: none;">
-                    <div class="sheet-header">
-                        <div class="header-main">
-                            <h2 id="resume-name">Ajit Pawara</h2>
-                            <p class="sheet-title" id="resume-title">IT Undergrad & Aspiring Security Analyst</p>
-                            <div class="sheet-institution" id="resume-institution">Government College of Engineering, Karad</div>
-                        </div>
-                        <div class="header-details">
-                            <div><i data-lucide="mail"></i> <span id="resume-email">ajitpawara@example.com</span></div>
-                            <div><i data-lucide="map-pin"></i> <span id="resume-location">Karad, Maharashtra, India</span></div>
-                            <div><i data-lucide="terminal"></i> Roll No: <span id="resume-roll">24141050</span></div>
-                        </div>
-                    </div>
-                    
-                    <hr class="sheet-divider">
-
-                    <div class="sheet-body">
-                        <div class="sheet-column-main">
-                            <div class="sheet-section">
-                                <h4><i data-lucide="briefcase"></i> EXPERIENCE / ROADMAP HISTORY</h4>
-                                <div class="sheet-timeline" id="resume-experience-list">
-                                    <!-- Populated dynamically by app.js -->
-                                </div>
-                            </div>
-                            <div class="sheet-section">
-                                <h4><i data-lucide="graduation-cap"></i> EDUCATION</h4>
-                                <div class="sheet-timeline" id="resume-education-list">
-                                    <!-- Populated dynamically by app.js -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sheet-column-side">
-                            <div class="sheet-section">
-                                <h4><i data-lucide="cpu"></i> TECHNICAL CAPABILITIES</h4>
-                                <div class="sheet-tags-list" id="resume-skills-list">
-                                    <!-- Populated dynamically by app.js -->
-                                </div>
-                            </div>
-                            <div class="sheet-section">
-                                <h4><i data-lucide="award"></i> CERTIFIED CREDENTIALS</h4>
-                                <ul class="sheet-certs-list" id="resume-certs-list">
-                                    <!-- Populated dynamically by app.js -->
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact Console -->
-                <div class="terminal-window contact-console">
-                    <div class="terminal-header">
-                        <div class="window-actions">
-                            <span class="dot close"></span>
-                            <span class="dot minimize"></span>
-                            <span class="dot maximize"></span>
-                        </div>
-                        <div class="terminal-title">contact-operator --port=1337</div>
-                        <span class="terminal-badge secure">SECURE_LINK</span>
-                    </div>
-                    <div class="terminal-body console-body">
-                        <p class="console-greet">// Submit an encrypted message directly to Ajit Pawara</p>
-                        
-                        <form id="contact-form" class="console-form">
-                            <div class="form-line">
-                                <span class="form-prefix">&gt; name:</span>
-                                <input type="text" id="contact-name" placeholder="Enter full name" required class="console-input">
-                            </div>
-                            <div class="form-line">
-                                <span class="form-prefix">&gt; email:</span>
-                                <input type="email" id="contact-email" placeholder="Enter contact email" required class="console-input">
-                            </div>
-                            <div class="form-line">
-                                <span class="form-prefix">&gt; message:</span>
-                                <textarea id="contact-msg" placeholder="Write security review request / query..." required class="console-textarea" rows="4"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary form-submit"><i data-lucide="send"></i> Transmit Message</button>
-                        </form>
-                        <div id="contact-status" class="contact-status-msg"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="main-footer print-hide">
-        <div class="footer-content">
-            <p>&copy; 2026 Ajit Pawara. Secured Static Operator Portfolio.</p>
-            <p class="footer-note">Designed in compliance with terminal operations dashboard spec. Hit Settings to customize database schema.</p>
-        </div>
-    </footer>
-
-    <!-- Code Viewer Modal -->
-    <div class="modal-overlay" id="code-viewer-modal">
-        <div class="modal-container code-viewer-container">
-            <div class="modal-header">
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                    <h3><i data-lucide="terminal"></i> Repository Code Inspector</h3>
-                    <a href="#" target="_blank" class="btn btn-primary btn-sm" id="inspector-live-btn" style="display: none; padding: 4px 10px; font-size: 0.72rem; align-items: center; gap: 4px; background-color: var(--color-cyan); color: var(--bg-darker);">
-                        <i data-lucide="globe"></i> Open Live Site
-                    </a>
-                </div>
-                <button class="modal-close" id="code-viewer-close-btn">&times;</button>
-            </div>
-            <div class="code-viewer-layout">
-                <!-- Repository Sidebar -->
-                <div class="code-viewer-sidebar">
-                    <div class="repo-meta-header">
-                        <span class="repo-name-label" id="inspector-repo-name">repo-name</span>
-                        <span class="repo-branch-label">main</span>
-                    </div>
-                    <div class="file-tree-container" id="inspector-file-tree">
-                        <div class="terminal-loader">Loading repository structure...</div>
-                    </div>
-                </div>
-                <!-- Code Area -->
-                <div class="code-viewer-main">
-                    <div class="code-header-bar">
-                        <span class="active-file-path" id="inspector-file-path">Select a file from the explorer</span>
-                        <button class="btn btn-secondary btn-sm" id="btn-copy-code" style="display: none; padding: 4px 8px; font-size: 0.7rem; align-items: center; gap: 4px;"><i data-lucide="copy"></i> Copy Code</button>
-                    </div>
-                    <div class="code-content-wrapper">
-                        <pre id="inspector-code-block"><code class="language-javascript">// Select a file to view code contents</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Panel Settings Modal -->
-    <div class="modal-overlay" id="admin-modal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3><i data-lucide="sliders"></i> Operator Database Configuration Panel</h3>
-                <button class="modal-close" id="admin-close-btn">&times;</button>
-            </div>
-            <!-- Root Login Terminal Screen -->
-            <div class="modal-auth-console" id="modal-auth-view">
-                <div class="terminal-body auth-terminal" style="padding: 24px;">
-                    <p class="auth-line" style="color: var(--text-muted); margin-bottom: 10px;">// SYSTEM ADMINISTRATION PORT AUTHENTICATION REQUIRED</p>
-                    <p class="auth-line" style="margin-bottom: 8px;">kali login: <strong style="color: var(--color-green);">root</strong></p>
-                    <form id="auth-form" class="auth-form-inline">
-                        <div class="form-line" style="display: flex; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 12px;">
-                            <span class="form-prefix" style="color: var(--color-cyan); margin-right: 8px; font-family: var(--font-mono); font-size: 0.8rem;">Password:</span>
-                            <input type="password" id="auth-password" class="console-input" autofocus required placeholder="Enter root password" style="background: transparent; border: none; outline: none; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8rem; width: 100%;">
-                        </div>
-                        <div class="auth-actions-row" style="display: flex; align-items: center; gap: 12px;">
-                            <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="key-round"></i> Authenticate</button>
-                            <span class="auth-hint" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">(Hint: password is <strong>root</strong>)</span>
-                        </div>
-                    </form>
-                    <div id="auth-error-msg" style="margin-top: 12px; font-size: 0.75rem; font-family: var(--font-mono); color: var(--color-red);"></div>
-                </div>
-            </div>
-            
-            <div class="modal-layout hidden" id="modal-editor-view">
-                <!-- Modal Sidebar -->
-                <div class="modal-tabs">
-                    <button class="modal-tab-btn active" data-tab="tab-profile"><i data-lucide="user"></i> Operator Profile</button>
-                    <button class="modal-tab-btn" data-tab="tab-challenge"><i data-lucide="calendar"></i> 90-Day Tracker</button>
-                    <button class="modal-tab-btn" data-tab="tab-skills"><i data-lucide="zap"></i> Technical Matrix</button>
-                    <button class="modal-tab-btn" data-tab="tab-projects"><i data-lucide="folder"></i> Project Dossier</button>
-                    <button class="modal-tab-btn modal-tab-export" data-tab="tab-export"><i data-lucide="download"></i> Commit & Sync</button>
-                </div>
-
-                <!-- Modal Content Panels -->
-                <div class="modal-content-panel">
-                    
-                    <!-- Tab: Profile -->
-                    <div class="modal-tab-content active" id="tab-profile">
-                        <h4>Operator Identity Information</h4>
-                        <div class="form-group">
-                            <label for="input-name">Alias Name</label>
-                            <input type="text" id="input-name" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-fullname">Full Name (Resume)</label>
-                            <input type="text" id="input-fullname" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-title">Professional Title</label>
-                            <input type="text" id="input-title" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-institution">College/Institution</label>
-                            <input type="text" id="input-institution" class="form-control">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="input-roll">Roll Number</label>
-                                <input type="text" id="input-roll" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="input-location">Location</label>
-                                <input type="text" id="input-location" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-bio">Bio Statement</label>
-                            <textarea id="input-bio" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-email">Primary Contact Email</label>
-                            <input type="email" id="input-email" class="form-control">
-                        </div>
-                    </div>
-
-                    <!-- Tab: Challenge Tracker -->
-                    <div class="modal-tab-content" id="tab-challenge">
-                        <div class="section-subtitle-container">
-                            <h4>90-Day Challenge Logger</h4>
-                            <button class="btn btn-primary btn-sm" id="btn-add-challenge-day"><i data-lucide="plus"></i> Log New Day</button>
-                        </div>
-                        <div class="editor-list-container" id="editor-challenge-list">
-                            <!-- Dynamic list of day log inputs -->
-                        </div>
-                    </div>
-
-                    <!-- Tab: Skills -->
-                    <div class="modal-tab-content" id="tab-skills">
-                        <div class="section-subtitle-container">
-                            <h4>Skill Matrices</h4>
-                            <button class="btn btn-primary btn-sm" id="btn-add-skill"><i data-lucide="plus"></i> Register Skill</button>
-                        </div>
-                        <div class="editor-list-container" id="editor-skills-list">
-                            <!-- Dynamic skills fields -->
-                        </div>
-                    </div>
-
-                    <!-- Tab: Projects -->
-                    <div class="modal-tab-content" id="tab-projects">
-                        <div class="section-subtitle-container">
-                            <h4>Project Registry</h4>
-                            <button class="btn btn-primary btn-sm" id="btn-add-project"><i data-lucide="plus"></i> Add Project</button>
-                        </div>
-                        <div class="editor-list-container" id="editor-projects-list">
-                            <!-- Dynamic project fields -->
-                        </div>
-                    </div>
-
-                    <!-- Tab: Export Database -->
-                    <div class="modal-tab-content" id="tab-export">
-                        <h4>Sync Local Storage with Code Repository</h4>
-                        <div class="modal-alert-box info">
-                            <i data-lucide="info"></i>
-                            <div>
-                                <p><strong>How static state persistence works:</strong></p>
-                                <p>Modifications saved in this editor persist in local storage draft. To synchronize these changes with your GitHub Pages deployment, export the database schema, overwrite the local <code>data.json</code> file, and push changes.</p>
-                            </div>
-                        </div>
-
-                        <div class="export-actions">
-                            <button class="btn btn-primary btn-lg" id="btn-export-json"><i data-lucide="download"></i> Download data.json</button>
-                            <button class="btn btn-secondary btn-lg" id="btn-reset-data"><i data-lucide="refresh-cw"></i> Reset Database</button>
-                        </div>
-
-                        <div class="git-instructions">
-                            <h5>Deploy Guidelines:</h5>
-                            <ol>
-                                <li>Download the database by clicking <strong>"Download data.json"</strong>.</li>
-                                <li>Overwrite <code>data.json</code> inside your local repository folder.</li>
-                                <li>Perform standard Git synchronization:
-                                    <pre><code>git add data.json
-git commit -m "update: portfolio operator database"
-git push origin main</code></pre>
-                                </li>
-                            </ol>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-                <span class="save-status-text" id="save-status">State: changes cached locally.</span>
-                <div class="modal-footer-buttons">
-                    <button class="btn btn-secondary" id="btn-modal-cancel">Close Panel</button>
-                    <button class="btn btn-primary" id="btn-modal-save"><i data-lucide="save"></i> Commit Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Script Entry -->
-    <script src="app.js?v=7"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
+
 </html>
