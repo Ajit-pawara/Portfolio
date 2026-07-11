@@ -336,14 +336,7 @@ function App() {
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
   const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
 
-  // Automatically switch tabs when a new day is selected and its availability is verified
-  useEffect(() => {
-    if (iframeExists === true) {
-      setActiveViewerTab("preview");
-    } else if (iframeExists === false) {
-      setActiveViewerTab("log");
-    }
-  }, [iframeExists]);
+
 
   // Section collapse states to keep view clean and tidy
   const [activeSkillsTab, setActiveSkillsTab] = useState<"radar" | "philosophy" | "list" | "pathways">("radar");
@@ -889,6 +882,11 @@ function App() {
                         className={cellClass} 
                         onClick={() => {
                           setSelectedDayNum(dayNum);
+                          if (dayNum <= activeTrack.currentDay) {
+                            setActiveViewerTab("preview");
+                          } else {
+                            setActiveViewerTab("log");
+                          }
                         }}
                       >
                         {String(dayNum).padStart(2, '0')}
