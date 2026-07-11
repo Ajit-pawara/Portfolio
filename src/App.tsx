@@ -335,6 +335,7 @@ function App() {
   const [activeViewerTab, setActiveViewerTab] = useState<"log" | "preview">("log");
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
   const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
+  const [isRevisionDropdownOpen, setIsRevisionDropdownOpen] = useState(false);
 
 
 
@@ -844,6 +845,107 @@ function App() {
               >
                 <Compass style={{ width: '14px', height: '14px' }} /> View Interactive Roadmap
               </button>
+            )}
+            {activeTrackId === 'cybersecurity' && activeTrack.repoUrl && (
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <button 
+                  onClick={() => setIsRevisionDropdownOpen(!isRevisionDropdownOpen)} 
+                  className="btn btn-secondary" 
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    gap: '6px', 
+                    height: '36px',
+                    padding: '0 14px',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'nowrap',
+                    boxSizing: 'border-box',
+                    borderColor: 'var(--color-amber)',
+                    color: 'var(--color-amber)'
+                  }}
+                >
+                  <Zap style={{ width: '14px', height: '14px' }} /> Revision Files
+                </button>
+                {isRevisionDropdownOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    left: 0,
+                    backgroundColor: 'var(--bg-darker)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '4px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    zIndex: 100,
+                    minWidth: '220px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '6px 0'
+                  }}>
+                    <button
+                      onClick={() => {
+                        setSelectedDayNum(10);
+                        setShowRevision(true);
+                        setActiveViewerTab("preview");
+                        setIsRevisionDropdownOpen(false);
+                        setTimeout(() => {
+                          document.querySelector('.challenge-viewer')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                      }}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: activeTrack.currentDay >= 10 ? 'var(--text-primary)' : 'var(--text-muted)',
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '0.75rem',
+                        cursor: activeTrack.currentDay >= 10 ? 'pointer' : 'not-allowed',
+                        fontFamily: 'var(--font-mono)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%'
+                      }}
+                      disabled={activeTrack.currentDay < 10}
+                    >
+                      <span>Phase 1 Revision (Days 1–10)</span>
+                      {activeTrack.currentDay >= 10 && <span style={{ color: 'var(--color-green)', fontSize: '0.65rem' }}>● Ready</span>}
+                    </button>
+                    <button
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '0.75rem',
+                        cursor: 'not-allowed',
+                        fontFamily: 'var(--font-mono)',
+                        width: '100%'
+                      }}
+                      disabled
+                    >
+                      Phase 2 Revision (Days 11–20)
+                    </button>
+                    <button
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '0.75rem',
+                        cursor: 'not-allowed',
+                        fontFamily: 'var(--font-mono)',
+                        width: '100%'
+                      }}
+                      disabled
+                    >
+                      Phase 3 Revision (Days 21–30)
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
