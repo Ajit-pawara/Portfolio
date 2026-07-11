@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 12,
+  "schemaVersion": 13,
   "profile": {
     "name": "Ajit Pawara",
     "fullName": "Ajit Ranjit Pawara",
@@ -223,9 +223,9 @@
       "cybersecurity": {
         "name": "Cybersecurity & Ethical Hacking",
         "repoUrl": "https://github.com/Ajit-pawara/Cyber_Security_90days",
-        "currentDay": 11,
+        "currentDay": 12,
         "totalDays": 90,
-        "completedDays": 11,
+        "completedDays": 12,
         "days": [
           {
             "day": 1,
@@ -333,6 +333,15 @@
             "takeaway": "Audited Registry Run keys for persistence, identified core Windows process trees, and parsed Event IDs for logon anomalies and log clearing events.",
             "incidentName": "SolarWinds SUNBURST Attack (2020)",
             "incidentDetail": "Malicious code injected into trusted SolarWinds DLLs evaded detection by mimicking normal update processes and abusing weak event log monitoring configurations.",
+            "status": "completed"
+          },
+          {
+            "day": 13,
+            "title": "Virtualization & Your Home Security Lab",
+            "subtitle": "Every lab you've done on TryHackMe runs in someone else's environment. Today you build your own — a personal isolated network where you can break, attack, defend, and experiment freely with zero risk to anything real.",
+            "takeaway": "Designed and deployed an isolated home security lab using VirtualBox with Kali Linux (attacker) and Metasploitable 2 (target) on a Host-Only virtual network; used for authorized vulnerability assessment and penetration testing practice.",
+            "incidentName": "L1 Terminal Fault (L1TF) (CVE-2018-3646)",
+            "incidentDetail": "A hardware vulnerability in Intel processors that allows a malicious virtual machine running in a guest environment to read memory belonging to the hypervisor or other guest virtual machines.",
             "status": "completed"
           }
         ]
