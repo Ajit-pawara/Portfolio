@@ -323,10 +323,18 @@ function App() {
     return localStorage.getItem("custom_data_saved") !== "true" && localStorage.getItem("setup_dismissed") !== "true";
   });
 
-  // HTML Live Previews and Roadmap modal states
   const [activeViewerTab, setActiveViewerTab] = useState<"log" | "preview">("log");
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
   const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
+
+  // Automatically switch tabs when a new day is selected and its availability is verified
+  useEffect(() => {
+    if (iframeExists === true) {
+      setActiveViewerTab("preview");
+    } else if (iframeExists === false) {
+      setActiveViewerTab("log");
+    }
+  }, [iframeExists]);
 
   // Section collapse states to keep view clean and tidy
   const [activeSkillsTab, setActiveSkillsTab] = useState<"radar" | "philosophy" | "list" | "pathways">("radar");
@@ -372,9 +380,8 @@ function App() {
     }
   };
 
-  // Scrollspy and manual scroll intercept snapping to next/prev 100vh section
+  // Scrollspy to update active tab based on scroll position
   useEffect(() => {
-    let isScrolling = false;
     const sections = ['hero', 'challenge', 'skills', 'certifications', 'projects', 'community', 'resume'];
 
     // IntersectionObserver fallback for scrollspy
@@ -385,10 +392,6 @@ function App() {
     };
 
     const observer = new IntersectionObserver((entries) => {
-      // Only update tab from observer if the user is scrolling natively (like dragging scrollbar)
-      // and not currently in our JS snapping transition
-      if (isScrolling) return;
-      
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           setActiveTab(entry.target.id);
@@ -401,213 +404,13 @@ function App() {
       if (el) observer.observe(el);
     });
 
-    // Touch/Wheel scroll snapping logic
-    const handleWheel = (e: WheelEvent) => {
-      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
-        return;
-      }
-
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
-        return;
-      }
-
-      // Check if mouse is over an element that has internal scrolling
-      let target = e.target as HTMLElement | null;
-      let hasScrollableParent = false;
-      while (target && target !== document.body) {
-        const style = window.getComputedStyle(target);
-        const isScrollable = (target.scrollHeight > target.clientHeight) && 
-                            (style.overflowY === 'auto' || style.overflowY === 'scroll');
-        if (isScrollable) {
-          const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 5;
-          const isAtTop = target.scrollTop <= 5;
-          if (e.deltaY > 0 && !isAtBottom) {
-            hasScrollableParent = true;
-            break;
-          }
-          if (e.deltaY < 0 && !isAtTop) {
-            hasScrollableParent = true;
-            break;
-          }
-        }
-        target = target.parentElement;
-      }
-
-      if (hasScrollableParent) return;
-
-      e.preventDefault();
-
-      if (isScrolling) return;
-
-      const currentIndex = sections.indexOf(activeTab);
-      if (currentIndex === -1) return;
-
-      let nextIndex = currentIndex;
-      if (e.deltaY > 0) {
-        if (currentIndex < sections.length - 1) {
-          nextIndex = currentIndex + 1;
-        }
-      } else if (e.deltaY < 0) {
-        if (currentIndex > 0) {
-          nextIndex = currentIndex - 1;
-        }
-      }
-
-      if (nextIndex !== currentIndex) {
-        isScrolling = true;
-        const targetId = sections[nextIndex];
-        setActiveTab(targetId);
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-        setTimeout(() => {
-          isScrolling = false;
-        }, 800);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
-        return;
-      }
-
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
-        return;
-      }
-
-      if (isScrolling) return;
-
-      const currentIndex = sections.indexOf(activeTab);
-      if (currentIndex === -1) return;
-
-      let nextIndex = currentIndex;
-      if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) {
-        e.preventDefault();
-        if (currentIndex < sections.length - 1) {
-          nextIndex = currentIndex + 1;
-        }
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) {
-        e.preventDefault();
-        if (currentIndex > 0) {
-          nextIndex = currentIndex - 1;
-        }
-      }
-
-      if (nextIndex !== currentIndex) {
-        isScrolling = true;
-        const targetId = sections[nextIndex];
-        setActiveTab(targetId);
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-        setTimeout(() => {
-          isScrolling = false;
-        }, 800);
-      }
-    };
-
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isAdminOpen || isCodeInspectorOpen || isRoadmapOpen || isFullscreenPreviewOpen) {
-        return;
-      }
-
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
-        return;
-      }
-
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchStartY - touchEndY;
-
-      if (Math.abs(deltaY) < 50) return;
-      if (isScrolling) return;
-
-      // Check if swipe is inside a scrollable container
-      let target = e.target as HTMLElement | null;
-      let hasScrollableParent = false;
-      while (target && target !== document.body) {
-        const style = window.getComputedStyle(target);
-        const isScrollable = (target.scrollHeight > target.clientHeight) && 
-                            (style.overflowY === 'auto' || style.overflowY === 'scroll');
-        if (isScrollable) {
-          const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 5;
-          const isAtTop = target.scrollTop <= 5;
-          if (deltaY > 0 && !isAtBottom) {
-            hasScrollableParent = true;
-            break;
-          }
-          if (deltaY < 0 && !isAtTop) {
-            hasScrollableParent = true;
-            break;
-          }
-        }
-        target = target.parentElement;
-      }
-
-      if (hasScrollableParent) return;
-
-      const currentIndex = sections.indexOf(activeTab);
-      if (currentIndex === -1) return;
-
-      let nextIndex = currentIndex;
-      if (deltaY > 0) {
-        if (currentIndex < sections.length - 1) {
-          nextIndex = currentIndex + 1;
-        }
-      } else {
-        if (currentIndex > 0) {
-          nextIndex = currentIndex - 1;
-        }
-      }
-
-      if (nextIndex !== currentIndex) {
-        isScrolling = true;
-        const targetId = sections[nextIndex];
-        setActiveTab(targetId);
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-        setTimeout(() => {
-          isScrolling = false;
-        }, 800);
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('keydown', handleKeyDown, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-
     return () => {
       sections.forEach((id) => {
         const el = document.getElementById(id);
         if (el) observer.unobserve(el);
       });
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [activeTab, isAdminOpen, isCodeInspectorOpen, isRoadmapOpen, isFullscreenPreviewOpen, isResumeExpanded]);
+  }, []);
 
   // Update selected day when switching tracks
   useEffect(() => {
@@ -962,50 +765,84 @@ function App() {
 
         {/* Learning Tracker centerpiece */}
         <section id="challenge" className="content-section">
-          <div className="section-header-block" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <h2 className="section-title"><Calendar /> Learning Tracker</h2>
-              <p className="section-description">A real-time progress tracker. Select different tracks via the dropdown menu, and click on cells to inspect logs in the Secure Operations log panel.</p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
-              <select 
-                value={activeTrackId} 
-                onChange={(e) => {
-                  const updated = { ...db };
-                  updated.challenge.activeTrack = e.target.value;
-                  saveChanges(updated);
-                }}
-                className="form-control"
+          <div className="section-header-block">
+            <h2 className="section-title"><Calendar /> Learning Tracker</h2>
+            <p className="section-description">A real-time progress tracker. Select different tracks via the dropdown menu, and click on cells to inspect logs in the Secure Operations log panel.</p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <select 
+              value={activeTrackId} 
+              onChange={(e) => {
+                const updated = { ...db };
+                updated.challenge.activeTrack = e.target.value;
+                saveChanges(updated);
+              }}
+              className="form-control"
+              style={{ 
+                backgroundColor: 'var(--bg-darker)', 
+                border: '1px solid var(--border-color)', 
+                color: 'var(--color-cyan)', 
+                padding: '0 12px', 
+                borderRadius: '4px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.8rem',
+                outline: 'none',
+                cursor: 'pointer',
+                height: '36px',
+                width: 'auto',
+                minWidth: '280px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                boxSizing: 'border-box'
+              }}
+            >
+              {Object.keys(db.challenge?.tracks || {}).map(trackKey => (
+                <option key={trackKey} value={trackKey}>
+                  {db.challenge.tracks[trackKey].name}
+                </option>
+              ))}
+            </select>
+
+            {activeTrack.repoUrl && (
+              <a 
+                href={activeTrack.repoUrl} 
+                target="_blank" 
+                className="btn btn-secondary" 
                 style={{ 
-                  backgroundColor: 'var(--bg-darker)', 
-                  border: '1px solid var(--border-color)', 
-                  color: 'var(--color-cyan)', 
-                  padding: '6px 12px', 
-                  borderRadius: '4px',
-                  fontFamily: 'var(--font-mono)',
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: '6px', 
+                  height: '36px',
+                  padding: '0 14px',
                   fontSize: '0.8rem',
-                  outline: 'none',
-                  cursor: 'pointer'
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box'
                 }}
               >
-                {Object.keys(db.challenge?.tracks || {}).map(trackKey => (
-                  <option key={trackKey} value={trackKey}>
-                    {db.challenge.tracks[trackKey].name}
-                  </option>
-                ))}
-              </select>
-
-              {activeTrack.repoUrl && (
-                <a href={activeTrack.repoUrl} target="_blank" className="btn btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <GitBranch /> View Challenge Repo
-                </a>
-              )}
-              {activeTrack && activeTrack.repoUrl && (
-                <button onClick={() => setIsRoadmapOpen(true)} className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <Compass /> View Interactive Roadmap
-                </button>
-              )}
-            </div>
+                <GitBranch style={{ width: '14px', height: '14px' }} /> View Challenge Repo
+              </a>
+            )}
+            {activeTrack && activeTrack.repoUrl && (
+              <button 
+                onClick={() => setIsRoadmapOpen(true)} 
+                className="btn btn-primary" 
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: '6px', 
+                  height: '36px',
+                  padding: '0 14px',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <Compass style={{ width: '14px', height: '14px' }} /> View Interactive Roadmap
+              </button>
+            )}
           </div>
 
           <div className="challenge-container">
@@ -1043,12 +880,6 @@ function App() {
                         className={cellClass} 
                         onClick={() => {
                           setSelectedDayNum(dayNum);
-                          // Default to showing html preview for completed days if active
-                          if (dayNum <= activeTrack.currentDay && activeTrack.repoUrl) {
-                            setActiveViewerTab("preview");
-                          } else {
-                            setActiveViewerTab("log");
-                          }
                         }}
                       >
                         {String(dayNum).padStart(2, '0')}
@@ -1096,7 +927,7 @@ function App() {
                 </div>
                 <span className="terminal-badge">LIVE_LOG</span>
               </div>
-              <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column', maxHeight: activeViewerTab === 'preview' ? '780px' : '380px' }}>
                 {activeViewerTab === 'preview' ? (
                   <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
                     {activeTrack && activeTrack.repoUrl ? (
@@ -1143,7 +974,7 @@ function App() {
                               src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
                               style={{
                                 width: '100%',
-                                height: '420px',
+                                height: '650px',
                                 border: '1px solid var(--border-color)',
                                 backgroundColor: '#ffffff',
                                 borderRadius: '4px',

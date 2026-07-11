@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 11,
+  "schemaVersion": 12,
   "profile": {
     "name": "Ajit Pawara",
     "fullName": "Ajit Ranjit Pawara",
@@ -223,9 +223,9 @@
       "cybersecurity": {
         "name": "Cybersecurity & Ethical Hacking",
         "repoUrl": "https://github.com/Ajit-pawara/Cyber_Security_90days",
-        "currentDay": 9,
+        "currentDay": 11,
         "totalDays": 90,
-        "completedDays": 9,
+        "completedDays": 11,
         "days": [
           {
             "day": 1,
@@ -315,7 +315,25 @@
             "takeaway": "Wrote basic network and parser scripts in Python. Evaluated risks of downloading package dependencies.",
             "incidentName": "PyPI typosquatting package attacks (2022-2023)",
             "incidentDetail": "Attackers uploaded typosquatted packages like 'request' (instead of requests) to PyPI. Installing them executed scripts to steal tokens/wallets.",
-            "status": "upcoming"
+            "status": "completed"
+          },
+          {
+            "day": 11,
+            "title": "Python for Security II: Sockets & Automation",
+            "subtitle": "Build network tools from scratch using Python sockets — the interface behind port scanners, reverse shells, and automated traffic engines.",
+            "takeaway": "Constructed banner-grabbing and multi-threaded port scanning tools in Python; analyzed offensive automation signatures using the Mirai botnet architecture.",
+            "incidentName": "Mirai Botnet DDoS Campaign (2016)",
+            "incidentDetail": "Automated socket-based scanning over Telnet port 23 allowed Mirai to compromise millions of default-configured IoT devices, bringing down DNS providers globally.",
+            "status": "completed"
+          },
+          {
+            "day": 12,
+            "title": "Windows Internals: Registry, Processes & Event Logs",
+            "subtitle": "Discover where attackers hide, how they persist, and how defenders detect them using core Windows Registry paths and default event logs.",
+            "takeaway": "Audited Registry Run keys for persistence, identified core Windows process trees, and parsed Event IDs for logon anomalies and log clearing events.",
+            "incidentName": "SolarWinds SUNBURST Attack (2020)",
+            "incidentDetail": "Malicious code injected into trusted SolarWinds DLLs evaded detection by mimicking normal update processes and abusing weak event log monitoring configurations.",
+            "status": "completed"
           }
         ]
       },
