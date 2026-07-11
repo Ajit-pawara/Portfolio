@@ -264,6 +264,36 @@ function App() {
   const activeTrackId = db.challenge?.activeTrack || "cybersecurity";
   const activeTrack = db.challenge?.tracks?.[activeTrackId] || { name: "Cybersecurity & Ethical Hacking", currentDay: 9, totalDays: 90, days: [] };
   const [selectedDayNum, setSelectedDayNum] = useState<number>(activeTrack.currentDay);
+
+  // Remote HTML presence check
+  const [iframeExists, setIframeExists] = useState<boolean | null>(null);
+  const [checkingIframe, setCheckingIframe] = useState<boolean>(false);
+
+  useEffect(() => {
+    const url = getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum);
+    if (!url) {
+      setIframeExists(false);
+      return;
+    }
+    
+    setCheckingIframe(true);
+    setIframeExists(null);
+    
+    fetch(url, { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          setIframeExists(true);
+        } else {
+          setIframeExists(false);
+        }
+      })
+      .catch(() => {
+        setIframeExists(false);
+      })
+      .finally(() => {
+        setCheckingIframe(false);
+      });
+  }, [activeTrackId, selectedDayNum, activeTrack]);
   
   // Settings & Authentication modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -1071,27 +1101,87 @@ function App() {
                   <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
                     {activeTrack && activeTrack.repoUrl ? (
                       <>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
-                          <button 
-                            onClick={() => setIsFullscreenPreviewOpen(true)}
-                            className="btn btn-secondary btn-sm"
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}
-                          >
-                            <Maximize style={{ width: '12px', height: '12px' }} /> Open Fullscreen
-                          </button>
-                        </div>
-                        <iframe 
-                          src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
-                          style={{
-                            width: '100%',
-                            height: '420px',
-                            border: '1px solid var(--border-color)',
-                            backgroundColor: '#ffffff',
+                        {checkingIframe ? (
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            minHeight: '380px',
+                            border: '1px dashed var(--border-color)',
                             borderRadius: '4px',
-                            colorScheme: 'light'
-                          }}
-                          title={`Day ${selectedDayNum} HTML Preview`}
-                        />
+                            backgroundColor: 'var(--bg-darker)',
+                            color: 'var(--color-cyan)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.8rem'
+                          }}>
+                            <style>{`
+                              @keyframes spin {
+                                from { transform: rotate(0deg); }
+                                to { transform: rotate(360deg); }
+                              }
+                              .loader-spin {
+                                animation: spin 1s linear infinite;
+                              }
+                            `}</style>
+                            <RefreshCw className="loader-spin" style={{ width: '24px', height: '24px', marginBottom: '10px' }} />
+                            <span>Verifying remote lab presence on GitHub...</span>
+                          </div>
+                        ) : iframeExists ? (
+                          <>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+                              <button 
+                                onClick={() => setIsFullscreenPreviewOpen(true)}
+                                className="btn btn-secondary btn-sm"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}
+                              >
+                                <Maximize style={{ width: '12px', height: '12px' }} /> Open Fullscreen
+                              </button>
+                            </div>
+                            <iframe 
+                              src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
+                              style={{
+                                width: '100%',
+                                height: '420px',
+                                border: '1px solid var(--border-color)',
+                                backgroundColor: '#ffffff',
+                                borderRadius: '4px',
+                                colorScheme: 'light'
+                              }}
+                              title={`Day ${selectedDayNum} HTML Preview`}
+                            />
+                          </>
+                        ) : (
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            minHeight: '380px',
+                            border: '1px dashed var(--border-color)',
+                            borderRadius: '4px',
+                            padding: '24px',
+                            textAlign: 'center',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.8rem',
+                            lineHeight: 1.5,
+                            backgroundColor: 'var(--bg-darker)'
+                          }}>
+                            <Compass style={{ color: 'var(--color-amber)', width: '32px', height: '32px', marginBottom: '12px' }} />
+                            <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem', display: 'block', marginBottom: '6px' }}>
+                              [AWAITING UPLOAD] Day {selectedDayNum} Lab Preview
+                            </span>
+                            <span style={{ fontSize: '0.78rem', maxWidth: '440px', color: 'var(--text-muted)', display: 'block', marginBottom: '12px' }}>
+                              The HTML log file for Day {selectedDayNum} hasn't been uploaded to GitHub yet, or is still building on GitHub Pages.
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--color-green)', fontWeight: 500, backgroundColor: 'rgba(0, 255, 136, 0.05)', padding: '6px 12px', borderRadius: '4px', border: '1px solid rgba(0, 255, 136, 0.15)' }}>
+                              ⚡ This preview will automatically load here as soon as the file arrives in your repository!
+                            </span>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <div style={{
