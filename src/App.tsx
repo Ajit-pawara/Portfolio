@@ -192,6 +192,50 @@ function RadarChart({ skills }: { skills: any[] }) {
   );
 }
 
+// Helper to construct the dynamic preview URL for a track and day
+const getTrackIframeUrl = (trackId: string, track: any, dayNum: number) => {
+  if (!track || !track.repoUrl) return "";
+  try {
+    const url = new URL(track.repoUrl);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    if (pathParts.length >= 2) {
+      const owner = pathParts[0];
+      const repo = pathParts[1];
+      
+      let fileName = "";
+      if (trackId === 'cybersecurity') {
+        fileName = `day${String(dayNum).padStart(2, '0')}.html`;
+      } else if (trackId === 'java_dsa') {
+        fileName = `DSAday${dayNum}.html`;
+      } else {
+        fileName = `day${dayNum}.html`;
+      }
+      
+      return `https://${owner.toLowerCase()}.github.io/${repo}/${fileName}`;
+    }
+  } catch (e) {
+    console.error("Error generating iframe URL:", e);
+  }
+  return "";
+};
+
+// Helper to construct the roadmap URL for a track
+const getTrackRoadmapUrl = (track: any) => {
+  if (!track || !track.repoUrl) return "";
+  try {
+    const url = new URL(track.repoUrl);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    if (pathParts.length >= 2) {
+      const owner = pathParts[0];
+      const repo = pathParts[1];
+      return `https://${owner.toLowerCase()}.github.io/${repo}/A%20roadmap.html`;
+    }
+  } catch (e) {
+    console.error("Error generating roadmap URL:", e);
+  }
+  return "";
+};
+
 function App() {
   // Load State from LocalStorage fallback to imported JSON
   const [db, setDb] = useState(() => {
@@ -926,7 +970,7 @@ function App() {
                   <GitBranch /> View Challenge Repo
                 </a>
               )}
-              {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && (
+              {activeTrack && activeTrack.repoUrl && (
                 <button onClick={() => setIsRoadmapOpen(true)} className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <Compass /> View Interactive Roadmap
                 </button>
@@ -970,7 +1014,7 @@ function App() {
                         onClick={() => {
                           setSelectedDayNum(dayNum);
                           // Default to showing html preview for completed days if active
-                          if (dayNum <= activeTrack.currentDay && (activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && dayNum <= 10) {
+                          if (dayNum <= activeTrack.currentDay && activeTrack.repoUrl) {
                             setActiveViewerTab("preview");
                           } else {
                             setActiveViewerTab("log");
@@ -1025,7 +1069,7 @@ function App() {
               <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column' }}>
                 {activeViewerTab === 'preview' ? (
                   <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
-                    {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && selectedDayNum <= 10 ? (
+                    {activeTrack && activeTrack.repoUrl ? (
                       <>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
                           <button 
@@ -1037,7 +1081,7 @@ function App() {
                           </button>
                         </div>
                         <iframe 
-                          src={`https://ajit-pawara.github.io/Cyber_Security_90days/day${String(selectedDayNum).padStart(2, '0')}.html`} 
+                          src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
                           style={{
                             width: '100%',
                             height: '420px',
@@ -1068,8 +1112,8 @@ function App() {
                         backgroundColor: 'var(--bg-darker)'
                       }}>
                         <ShieldAlert style={{ color: 'var(--color-amber)', width: '28px', height: '28px', marginBottom: '10px' }} />
-                        <span>[INFO] HTML Page Previews are currently only configured for Cybersecurity Track Days 1 to 10.</span>
-                        <span style={{ fontSize: '0.72rem', marginTop: '6px' }}>Future roadmap logs will load automatically upon publishing to repository.</span>
+                        <span>[INFO] HTML Page Previews require a repository configured for this track.</span>
+                        <span style={{ fontSize: '0.72rem', marginTop: '6px' }}>Configure the repoUrl in your track settings to enable auto-loading.</span>
                       </div>
                     )}
                   </div>
@@ -2099,7 +2143,7 @@ function App() {
             </div>
             <div className="modal-body" style={{ flex: 1, padding: 0, overflow: 'hidden', height: 'calc(100% - 60px)' }}>
               <iframe 
-                src="https://ajit-pawara.github.io/Cyber_Security_90days/A%20roadmap.html" 
+                src={getTrackRoadmapUrl(activeTrack)} 
                 style={{ width: '100%', height: '100%', border: 'none', backgroundColor: '#fff', borderRadius: '0 0 6px 6px' }}
                 title="Roadmap HTML Preview"
               />
@@ -2123,7 +2167,7 @@ function App() {
             </div>
             <div className="modal-body" style={{ flex: 1, padding: 0, overflow: 'hidden' }}>
               <iframe 
-                src={`https://ajit-pawara.github.io/Cyber_Security_90days/day${String(selectedDayNum).padStart(2, '0')}.html`} 
+                src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
                 style={{ width: '100%', height: '100%', border: 'none', backgroundColor: '#fff' }}
                 title={`Day ${selectedDayNum} Fullscreen Preview`}
               />

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "profile": {
     "name": "Ajit Pawara",
     "fullName": "Ajit Ranjit Pawara",
@@ -321,6 +321,7 @@
       },
       "java_dsa": {
         "name": "Java & DSA Masterclass",
+        "repoUrl": "https://github.com/Ajit-pawara/Java_DSA",
         "currentDay": 5,
         "totalDays": 90,
         "completedDays": 5,
