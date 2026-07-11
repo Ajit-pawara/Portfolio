@@ -343,6 +343,699 @@
             "incidentName": "L1 Terminal Fault (L1TF) (CVE-2018-3646)",
             "incidentDetail": "A hardware vulnerability in Intel processors that allows a malicious virtual machine running in a guest environment to read memory belonging to the hypervisor or other guest virtual machines.",
             "status": "completed"
+          },
+          {
+            "day": 14,
+            "title": "Security Topic Day 14",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 14",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 15,
+            "title": "Security Topic Day 15",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 15",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 16,
+            "title": "Security Topic Day 16",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 16",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 17,
+            "title": "Security Topic Day 17",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 17",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 18,
+            "title": "Security Topic Day 18",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 18",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 19,
+            "title": "Security Topic Day 19",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 19",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 20,
+            "title": "Security Topic Day 20",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 20",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 21,
+            "title": "Security Topic Day 21",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 21",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 22,
+            "title": "Security Topic Day 22",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 22",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 23,
+            "title": "Security Topic Day 23",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 23",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 24,
+            "title": "Security Topic Day 24",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 24",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 25,
+            "title": "Security Topic Day 25",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 25",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 26,
+            "title": "Security Topic Day 26",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 26",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 27,
+            "title": "Security Topic Day 27",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 27",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 28,
+            "title": "Security Topic Day 28",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 28",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 29,
+            "title": "Security Topic Day 29",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 29",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 30,
+            "title": "Security Topic Day 30",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 30",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 31,
+            "title": "Security Topic Day 31",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 31",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 32,
+            "title": "Security Topic Day 32",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 32",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 33,
+            "title": "Security Topic Day 33",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 33",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 34,
+            "title": "Security Topic Day 34",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 34",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 35,
+            "title": "Security Topic Day 35",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 35",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 36,
+            "title": "Security Topic Day 36",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 36",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 37,
+            "title": "Security Topic Day 37",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 37",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 38,
+            "title": "Security Topic Day 38",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 38",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 39,
+            "title": "Security Topic Day 39",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 39",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 40,
+            "title": "Security Topic Day 40",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 40",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 41,
+            "title": "Security Topic Day 41",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 41",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 42,
+            "title": "Security Topic Day 42",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 42",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 43,
+            "title": "Security Topic Day 43",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 43",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 44,
+            "title": "Security Topic Day 44",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 44",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 45,
+            "title": "Security Topic Day 45",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 45",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 46,
+            "title": "Security Topic Day 46",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 46",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 47,
+            "title": "Security Topic Day 47",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 47",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 48,
+            "title": "Security Topic Day 48",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 48",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 49,
+            "title": "Security Topic Day 49",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 49",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 50,
+            "title": "Security Topic Day 50",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 50",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 51,
+            "title": "Security Topic Day 51",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 51",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 52,
+            "title": "Security Topic Day 52",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 52",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 53,
+            "title": "Security Topic Day 53",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 53",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 54,
+            "title": "Security Topic Day 54",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 54",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 55,
+            "title": "Security Topic Day 55",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 55",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 56,
+            "title": "Security Topic Day 56",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 56",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 57,
+            "title": "Security Topic Day 57",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 57",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 58,
+            "title": "Security Topic Day 58",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 58",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 59,
+            "title": "Security Topic Day 59",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 59",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 60,
+            "title": "Security Topic Day 60",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 60",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 61,
+            "title": "Security Topic Day 61",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 61",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 62,
+            "title": "Security Topic Day 62",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 62",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 63,
+            "title": "Security Topic Day 63",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 63",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 64,
+            "title": "Security Topic Day 64",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 64",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 65,
+            "title": "Security Topic Day 65",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 65",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 66,
+            "title": "Security Topic Day 66",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 66",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 67,
+            "title": "Security Topic Day 67",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 67",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 68,
+            "title": "Security Topic Day 68",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 68",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 69,
+            "title": "Security Topic Day 69",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 69",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 70,
+            "title": "Security Topic Day 70",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 70",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 71,
+            "title": "Security Topic Day 71",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 71",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 72,
+            "title": "Security Topic Day 72",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 72",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 73,
+            "title": "Security Topic Day 73",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 73",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 74,
+            "title": "Security Topic Day 74",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 74",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 75,
+            "title": "Security Topic Day 75",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 75",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 76,
+            "title": "Security Topic Day 76",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 76",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 77,
+            "title": "Security Topic Day 77",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 77",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 78,
+            "title": "Security Topic Day 78",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 78",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 79,
+            "title": "Security Topic Day 79",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 79",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 80,
+            "title": "Security Topic Day 80",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 80",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 81,
+            "title": "Security Topic Day 81",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 81",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 82,
+            "title": "Security Topic Day 82",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 82",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 83,
+            "title": "Security Topic Day 83",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 83",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 84,
+            "title": "Security Topic Day 84",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 84",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 85,
+            "title": "Security Topic Day 85",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 85",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 86,
+            "title": "Security Topic Day 86",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 86",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 87,
+            "title": "Security Topic Day 87",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 87",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 88,
+            "title": "Security Topic Day 88",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 88",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 89,
+            "title": "Security Topic Day 89",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 89",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
+          },
+          {
+            "day": 90,
+            "title": "Security Topic Day 90",
+            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 90",
+            "takeaway": "Pending learning task",
+            "incidentName": "Upcoming Lab",
+            "incidentDetail": "To be done.",
+            "status": "upcoming"
           }
         ]
       },
