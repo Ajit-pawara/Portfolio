@@ -193,7 +193,7 @@ function RadarChart({ skills }: { skills: any[] }) {
 }
 
 // Helper to construct the dynamic preview URL for a track and day
-const getTrackIframeUrl = (trackId: string, track: any, dayNum: number) => {
+const getTrackIframeUrl = (trackId: string, track: any, dayNum: number, showRevision: boolean = false) => {
   if (!track || !track.repoUrl) return "";
   try {
     const url = new URL(track.repoUrl);
@@ -203,7 +203,10 @@ const getTrackIframeUrl = (trackId: string, track: any, dayNum: number) => {
       const repo = pathParts[1];
       
       let fileName = "";
-      if (trackId === 'cybersecurity') {
+      if (showRevision && dayNum % 10 === 0) {
+        const startDay = dayNum - 9;
+        fileName = `revision_day${startDay}_${dayNum}.html`;
+      } else if (trackId === 'cybersecurity') {
         fileName = `day${String(dayNum).padStart(2, '0')}.html`;
       } else if (trackId === 'java_dsa') {
         fileName = `DSAday${dayNum}.html`;
@@ -268,9 +271,15 @@ function App() {
   // Remote HTML presence check
   const [iframeExists, setIframeExists] = useState<boolean | null>(null);
   const [checkingIframe, setCheckingIframe] = useState<boolean>(false);
+  const [showRevision, setShowRevision] = useState<boolean>(false);
+
+  // Reset revision state when switching days/tracks
+  useEffect(() => {
+    setShowRevision(false);
+  }, [activeTrackId, selectedDayNum]);
 
   useEffect(() => {
-    const url = getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum);
+    const url = getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision);
     if (!url) {
       setIframeExists(false);
       return;
@@ -293,7 +302,7 @@ function App() {
       .finally(() => {
         setCheckingIframe(false);
       });
-  }, [activeTrackId, selectedDayNum, activeTrack]);
+  }, [activeTrackId, selectedDayNum, activeTrack, showRevision]);
   
   // Settings & Authentication modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -906,28 +915,58 @@ function App() {
                     <span className="dot minimize"></span>
                     <span className="dot maximize"></span>
                   </div>
-                  <div className="terminal-title">secops-viewer --log-day={selectedDayNum}</div>
+                  <div className="terminal-title">secops-viewer --log-day={selectedDayNum}{showRevision ? '-revision' : ''}</div>
                 </div>
                 
                 <div className="terminal-tabs" style={{ display: 'flex', gap: '6px', marginLeft: 'auto', marginRight: '12px' }}>
                   <button 
-                    onClick={() => setActiveViewerTab("log")} 
-                    className={`btn btn-sm ${activeViewerTab === 'log' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => {
+                      setActiveViewerTab("log");
+                      setShowRevision(false);
+                    }} 
+                    className={`btn btn-sm ${activeViewerTab === 'log' && !showRevision ? 'btn-primary' : 'btn-secondary'}`}
                     style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
                     <FileText style={{ width: '12px', height: '12px' }} /> Log View
                   </button>
                   <button 
-                    onClick={() => setActiveViewerTab("preview")} 
-                    className={`btn btn-sm ${activeViewerTab === 'preview' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => {
+                      setActiveViewerTab("preview");
+                      setShowRevision(false);
+                    }} 
+                    className={`btn btn-sm ${activeViewerTab === 'preview' && !showRevision ? 'btn-primary' : 'btn-secondary'}`}
                     style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
                     <Eye style={{ width: '12px', height: '12px' }} /> HTML Preview
                   </button>
+                  {selectedDayNum % 10 === 0 && (
+                    <button 
+                      onClick={() => {
+                        const nextShow = !showRevision;
+                        setShowRevision(nextShow);
+                        if (nextShow) {
+                          setActiveViewerTab("preview");
+                        }
+                      }} 
+                      className={`btn btn-sm ${showRevision ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ 
+                        padding: '3px 8px', 
+                        fontSize: '0.7rem', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '4px',
+                        backgroundColor: showRevision ? 'var(--color-amber)' : undefined,
+                        color: showRevision ? 'var(--bg-darker)' : undefined,
+                        borderColor: showRevision ? 'transparent' : undefined
+                      }}
+                    >
+                      <Zap style={{ width: '12px', height: '12px' }} /> {showRevision ? 'Standard Day' : 'Revision File'}
+                    </button>
+                  )}
                 </div>
                 <span className="terminal-badge">LIVE_LOG</span>
               </div>
-              <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column', maxHeight: activeViewerTab === 'preview' ? '780px' : '380px' }}>
+              <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column', maxHeight: activeViewerTab === 'preview' ? '780px' : '380px', overflowY: activeViewerTab === 'preview' ? 'hidden' : 'auto' }}>
                 {activeViewerTab === 'preview' ? (
                   <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
                     {activeTrack && activeTrack.repoUrl ? (
@@ -971,16 +1010,16 @@ function App() {
                               </button>
                             </div>
                             <iframe 
-                              src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
+                              src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision)} 
                               style={{
                                 width: '100%',
                                 height: '650px',
                                 border: '1px solid var(--border-color)',
-                                backgroundColor: '#ffffff',
+                                backgroundColor: 'transparent',
                                 borderRadius: '4px',
-                                colorScheme: 'light'
+                                colorScheme: 'dark'
                               }}
-                              title={`Day ${selectedDayNum} HTML Preview`}
+                              title={showRevision ? `Phase Revision HTML Preview` : `Day ${selectedDayNum} HTML Preview`}
                             />
                           </>
                         ) : (
@@ -1043,7 +1082,9 @@ function App() {
                     <div className="viewer-day-header">
                       <div className="viewer-title-line">
                         <h4>Day {selectedDayNum}: {selectedDayLog.title}</h4>
-                        <span className="day-status-pill complete">Verified Complete</span>
+                        <span className={`day-status-pill ${selectedDayNum <= activeTrack.currentDay ? 'complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'active' : 'upcoming'}`}>
+                          {selectedDayNum <= activeTrack.currentDay ? 'Verified Complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Upcoming'}
+                        </span>
                       </div>
                       <div className="viewer-subtitle">{selectedDayLog.subtitle}</div>
                     </div>
@@ -2082,15 +2123,15 @@ function App() {
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Eye style={{ color: 'var(--color-cyan)', width: '20px', height: '20px' }} />
-                <h3 style={{ margin: 0 }}>Day {selectedDayNum} Lab Preview (Fullscreen Mode)</h3>
+                <h3 style={{ margin: 0 }}>{showRevision ? 'Phase Revision' : `Day ${selectedDayNum}`} Lab Preview (Fullscreen Mode)</h3>
               </div>
               <button className="modal-close" onClick={() => setIsFullscreenPreviewOpen(false)}>&times;</button>
             </div>
             <div className="modal-body" style={{ flex: 1, padding: 0, overflow: 'hidden' }}>
               <iframe 
-                src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum)} 
-                style={{ width: '100%', height: '100%', border: 'none', backgroundColor: '#fff' }}
-                title={`Day ${selectedDayNum} Fullscreen Preview`}
+                src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision)} 
+                style={{ width: '100%', height: '100%', border: 'none', backgroundColor: 'transparent', colorScheme: 'dark' }}
+                title={showRevision ? `Phase Revision Fullscreen Preview` : `Day ${selectedDayNum} Fullscreen Preview`}
               />
             </div>
           </div>
