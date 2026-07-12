@@ -16,6 +16,8 @@
 | **Projects** | Expandable cards with live GitHub code inspector. |
 | **Admin Panel** | Authenticated editor for profile, tracks, skills, projects. |
 
+> More challenge tracks coming soon — DSA, hacking, and more.
+
 ### Stack
 
 ```
