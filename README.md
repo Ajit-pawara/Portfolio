@@ -1,26 +1,26 @@
-<pre align="center">
-  ___  ___  ___  _  _ _   _
- | _ )| _ )| _ )| \| | | | |
- | _ \| _ \| _ \| .` | |_| |
- |___/|___/|___/|_|\_|\___/
-</pre>
+```
+> PORTFOLIO::INIT
+> A terminal-inspired interactive portfolio built with React & TypeScript
+```
 
-<p align="center">
-  <b>terminal · themed · portfolio</b>
-  <br>
-  <sub>React 19  •  TypeScript 6  •  Vite 8</sub>
-</p>
+🌐 **Live**: [https://ajit-pawara.github.io/Portfolio/](https://ajit-pawara.github.io/Portfolio/)
 
 ---
 
-### What's Inside
+### Features
 
-| Feature | What It Does |
-|---------|-------------|
-| **90-Day Challenge Tracker** | Grid of 90 days with logs, HTML previews, revision summaries. Days 1–10 open; 11+ passkey-gated. |
-| **Skills Radar** | Interactive SVG chart + career pathways (Offensive, Defensive, DevSecOps). |
+| Component | Details |
+|-----------|---------|
+| **90-Day Tracker** | Interactive grid with day logs, HTML previews, revision summaries. Days 1–10 open; 11+ passkey-gated. |
+| **Skills Radar** | SVG chart + career pathways (Offensive, Defensive, DevSecOps). |
 | **Projects** | Expandable cards with live GitHub code inspector. |
-| **Admin Panel** | Authenticated panel to edit profile, tracks, skills, and projects. |
+| **Admin Panel** | Authenticated editor for profile, tracks, skills, projects. |
+
+### Stack
+
+```
+React 19    TypeScript 6    Vite 8    Tailwind CSS 4    Framer Motion
+```
 
 ### Quick Start
 
@@ -41,23 +41,23 @@ npx tsc -b
 
 ```
 Portfolio/
-├── public/         # Static assets
+├── public/
 ├── src/
-│   ├── App.tsx     # Main component
-│   ├── data.json   # Content database
-│   ├── index.css   # Terminal styles
-│   └── main.tsx    # Entry point
-├── docs/           # Production build
+│   ├── App.tsx
+│   ├── data.json
+│   ├── index.css
+│   └── main.tsx
+├── docs/
 ├── index.html
 └── vite.config.ts
 ```
 
 ### Contact
 
-Reach out through the social links on the site.
+Reach out through the links on the site.
 
 ---
 
-<p align="center">
-  <sub>© 2026 Robin</sub>
-</p>
+```
+> PORTFOLIO::EOF
+```
