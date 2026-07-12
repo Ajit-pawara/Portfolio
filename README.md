@@ -1,21 +1,15 @@
-```
-┌─────────────────────────────────────────────┐
-│                                             │
-│   ██████  ██████  ██████   ████  ██████     │
-│   ██   ██ ██   ██ ██   ██   ██  ██   ██    │
-│   ██████  ██████  ██████    ██  ██    ██    │
-│   ██   ██ ██   ██ ██   ██   ██  ██   ██    │
-│   ██   ██ ██████  ██████   ████ ██████     │
-│                                             │
-│   TERMINAL-THEMED PORTFOLIO                 │
-│   React 19  •  TypeScript 6  •  Vite 8     │
-│                                             │
-└─────────────────────────────────────────────┘
-```
+<pre align="center">
+  ___  ___  ___  _  _ _   _
+ | _ )| _ )| _ )| \| | | | |
+ | _ \| _ \| _ \| .` | |_| |
+ |___/|___/|___/|_|\_|\___/
+</pre>
 
-A terminal-inspired interactive portfolio — challenge tracker, skills radar, project showcase, and admin panel with a cybersecurity aesthetic.
-
-🌐 **Live**: [https://ajit-pawara.github.io/Portfolio/](https://ajit-pawara.github.io/Portfolio/)
+<p align="center">
+  <b>terminal · themed · portfolio</b>
+  <br>
+  <sub>React 19  •  TypeScript 6  •  Vite 8</sub>
+</p>
 
 ---
 
@@ -23,16 +17,10 @@ A terminal-inspired interactive portfolio — challenge tracker, skills radar, p
 
 | Feature | What It Does |
 |---------|-------------|
-| **90-Day Challenge Tracker** | Grid of 90 days with logs, HTML previews, and revision summaries. Days 1–10 are open; days 11+ require a passkey. |
+| **90-Day Challenge Tracker** | Grid of 90 days with logs, HTML previews, revision summaries. Days 1–10 open; 11+ passkey-gated. |
 | **Skills Radar** | Interactive SVG chart + career pathways (Offensive, Defensive, DevSecOps). |
 | **Projects** | Expandable cards with live GitHub code inspector. |
 | **Admin Panel** | Authenticated panel to edit profile, tracks, skills, and projects. |
-
-### Tech Stack
-
-```
-React 19    TypeScript 6    Vite 8    Tailwind CSS 4    Framer Motion
-```
 
 ### Quick Start
 
@@ -44,10 +32,7 @@ npm run dev
 ```
 
 ```bash
-# Build for production (outputs to docs/)
-npm run build
-
-# Lint & type-check
+npm run build    # outputs to docs/
 npm run lint
 npx tsc -b
 ```
@@ -56,13 +41,13 @@ npx tsc -b
 
 ```
 Portfolio/
-├── public/         # Static assets (images, favicon)
+├── public/         # Static assets
 ├── src/
-│   ├── App.tsx     # Main application (~3100 lines)
-│   ├── data.json   # Content database (profile, projects, tracks)
-│   ├── index.css   # Terminal-themed styles
-│   └── main.tsx    # React entry point
-├── docs/           # Production build → GitHub Pages
+│   ├── App.tsx     # Main component
+│   ├── data.json   # Content database
+│   ├── index.css   # Terminal styles
+│   └── main.tsx    # Entry point
+├── docs/           # Production build
 ├── index.html
 └── vite.config.ts
 ```
