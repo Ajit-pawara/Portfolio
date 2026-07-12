@@ -56,6 +56,11 @@ Portfolio/
 
 ### Contact
 
+```
+[?] Found a bug? Want a feature? Need the passkey?
+[>] Drop a message on any platform below.
+```
+
 - **LinkedIn** → [linkedin.com/in/ajit-pawara-69541a305](https://linkedin.com/in/ajit-pawara-69541a305)
 - **GitHub** → [github.com/Ajit-pawara](https://github.com/Ajit-pawara)
 - **Instagram** → [instagram.com/robin_igl](https://instagram.com/robin_igl)
