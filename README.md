@@ -54,7 +54,16 @@ Portfolio/
 
 ### Contact
 
-Reach out through the links on the site.
+```
+LinkedIn   → https://linkedin.com/in/ajit-pawara-69541a305
+GitHub     → https://github.com/Ajit-pawara
+Instagram  → https://instagram.com/robin_igl
+Threads    → https://threads.net/@robin_igl
+Reddit     → https://reddit.com/user/Robin_iii
+TryHackMe  → https://tryhackme.com/p/Robinx
+HackTheBox → https://app.hackthebox.com/users/robin0x
+HackerRank → https://hackerrank.com/profile/ajitdawar1729
+```
 
 ---
 
