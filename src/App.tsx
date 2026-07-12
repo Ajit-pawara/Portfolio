@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Terminal, Calendar, Cpu, GitBranch, Share2, FileText, Sliders, ShieldAlert, 
-  Grid, ShieldCheck, Compass, Shield, Code2, 
-  Activity, Layers, Award, GitMerge, Users, FileCheck, 
-  Printer, EyeOff, Eye, Mail, Send, Copy, Folder, FileCode, KeyRound, 
-  User, Zap, Download, Plus, Trash2, Save, RefreshCw, ChevronLeft, 
+import {
+  Terminal, Calendar, Cpu, GitBranch, Share2, FileText, Sliders, ShieldAlert,
+  Grid, ShieldCheck, Compass, Shield, Code2,
+  Activity, Layers, Award, GitMerge, Users, FileCheck,
+  Printer, EyeOff, Eye, Mail, Send, Copy, Folder, FileCode, KeyRound,
+  User, Zap, Download, Plus, Trash2, Save, RefreshCw, ChevronLeft,
   AtSign, MessageSquare, Menu, X
 } from 'lucide-react';
 import initialData from './data.json';
@@ -80,11 +80,11 @@ function RadarChart({ skills }: { skills: any[] }) {
   const size = 320;
   const center = size / 2;
   const radius = size * 0.38;
-  
+
   if (!skills || skills.length === 0) return null;
-  
+
   const angleStep = (Math.PI * 2) / skills.length;
-  
+
   // Concentric background grid lines
   const levels = [0.2, 0.4, 0.6, 0.8, 1];
   const gridPolygons = levels.map(level => {
@@ -104,83 +104,83 @@ function RadarChart({ skills }: { skills: any[] }) {
     const y = center + Math.sin(angle) * radius * valueRatio;
     return { x, y, name: s.name, level: s.level };
   });
-  
+
   const dataPolygonString = dataPoints.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
     <svg width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} className="radar-svg" style={{ maxWidth: '100%', maxHeight: '310px', display: 'block', margin: '0 auto' }}>
       {/* Grid rings */}
       {gridPolygons.map((points, idx) => (
-        <polygon 
-          key={idx} 
-          points={points} 
-          fill="none" 
-          stroke="var(--border-color)" 
-          strokeWidth="1" 
+        <polygon
+          key={idx}
+          points={points}
+          fill="none"
+          stroke="var(--border-color)"
+          strokeWidth="1"
         />
       ))}
-      
+
       {/* Radar axes */}
       {skills.map((_, i) => {
         const angle = i * angleStep - Math.PI / 2;
         const ax = center + Math.cos(angle) * radius;
         const ay = center + Math.sin(angle) * radius;
         return (
-          <line 
-            key={i} 
-            x1={center} 
-            y1={center} 
-            x2={ax} 
-            y2={ay} 
-            stroke="var(--border-color)" 
-            strokeWidth="1" 
+          <line
+            key={i}
+            x1={center}
+            y1={center}
+            x2={ax}
+            y2={ay}
+            stroke="var(--border-color)"
+            strokeWidth="1"
           />
         );
       })}
-      
+
       {/* Filled data polygon */}
-      <polygon 
-        points={dataPolygonString} 
-        fill="rgba(0, 217, 255, 0.12)" 
-        stroke="var(--color-cyan)" 
-        strokeWidth="2" 
+      <polygon
+        points={dataPolygonString}
+        fill="rgba(0, 217, 255, 0.12)"
+        stroke="var(--color-cyan)"
+        strokeWidth="2"
         filter="drop-shadow(0 0 6px rgba(0, 217, 255, 0.35))"
       />
-      
+
       {/* Individual point handles */}
       {dataPoints.map((p, i) => (
-        <circle 
-          key={i} 
-          cx={p.x} 
-          cy={p.y} 
-          r="4" 
-          fill="var(--bg-dark)" 
-          stroke="var(--color-cyan)" 
-          strokeWidth="2" 
+        <circle
+          key={i}
+          cx={p.x}
+          cy={p.y}
+          r="4"
+          fill="var(--bg-dark)"
+          stroke="var(--color-cyan)"
+          strokeWidth="2"
         />
       ))}
-      
+
       {/* Labels */}
       {skills.map((s, i) => {
         const angle = i * angleStep - Math.PI / 2;
         const tx = center + Math.cos(angle) * (radius + 20);
         const ty = center + Math.sin(angle) * (radius + 10);
-        
+
         let textAnchor: "start" | "middle" | "end" = "middle";
         if (Math.cos(angle) > 0.1) textAnchor = "start";
         else if (Math.cos(angle) < -0.1) textAnchor = "end";
-        
+
         const labelText = s.name.split(' ')[0] || s.name;
-        
+
         return (
-          <text 
-            key={i} 
-            x={tx} 
-            y={ty} 
-            fill="var(--text-muted)" 
-            fontSize="9" 
+          <text
+            key={i}
+            x={tx}
+            y={ty}
+            fill="var(--text-muted)"
+            fontSize="9"
             fontWeight="bold"
-            fontFamily="var(--font-mono)" 
+            fontFamily="var(--font-mono)"
             textAnchor={textAnchor}
             dominantBaseline="middle"
           >
@@ -201,7 +201,7 @@ const getTrackIframeUrl = (trackId: string, track: any, dayNum: number, showRevi
     if (pathParts.length >= 2) {
       const owner = pathParts[0];
       const repo = pathParts[1];
-      
+
       let fileName = "";
       if (showRevision && dayNum % 10 === 0) {
         const startDay = dayNum - 9;
@@ -213,7 +213,7 @@ const getTrackIframeUrl = (trackId: string, track: any, dayNum: number, showRevi
       } else {
         fileName = `day${dayNum}.html`;
       }
-      
+
       return `https://${owner.toLowerCase()}.github.io/${repo}/${fileName}`;
     }
   } catch (e) {
@@ -308,7 +308,7 @@ function App() {
       setIframeExists(false);
       return;
     }
-    
+
     // Determine the exact filename corresponding to the current state
     let fileName = "";
     if (isRev && checkDay % 10 === 0) {
@@ -359,7 +359,13 @@ function App() {
       setIframeExists(false);
     }
   }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval]);
-  
+
+  // Content password protection (days 11-90 require "ignite")
+  const [isContentLocked, setIsContentLocked] = useState(() => sessionStorage.getItem("content_unlocked") !== "true");
+  const [contentPassword, setContentPassword] = useState("");
+  const [contentAuthError, setContentAuthError] = useState("");
+  const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
+
   // Settings & Authentication modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem("root_authorized") === "true");
@@ -379,7 +385,7 @@ function App() {
 
   // Resume layout toggles
   const [isResumeExpanded, setIsResumeExpanded] = useState(false);
-  
+
   // Collapsed projects
   const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
 
@@ -484,6 +490,20 @@ function App() {
     }, 3000);
   };
 
+  const handleContentAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (contentPassword === "ignite") {
+      sessionStorage.setItem("content_unlocked", "true");
+      setIsContentLocked(false);
+      setContentPassword("");
+      setContentAuthError("");
+      setIsPasswordPromptOpen(false);
+    } else {
+      setContentAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+      setContentPassword("");
+    }
+  };
+
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "root@robin") {
@@ -512,7 +532,7 @@ function App() {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      
+
       data.sort((a: any, b: any) => {
         if (a.type === b.type) return a.name.localeCompare(b.name);
         return a.type === "dir" ? -1 : 1;
@@ -532,7 +552,7 @@ function App() {
     try {
       let fileContent = "";
       let success = false;
-      
+
       const branches = ["main", "master"];
       for (const branch of branches) {
         try {
@@ -547,7 +567,7 @@ function App() {
           // try next branch
         }
       }
-      
+
       if (!success) {
         const apiRes = await fetch(fileItem.url);
         if (apiRes.ok) {
@@ -640,20 +660,7 @@ function App() {
 
   return (
     <>
-      {/* Top Cyber Status Banner */}
-      <div className="top-banner">
-        <div className="banner-left">
-          <span className="pulse-indicator"></span>
-          <span className="status-text">SEC-OPS: ACTIVE ROADMAP MODE</span>
-        </div>
-        <div className="banner-center">
-          <span className="terminal-text">TARGET: COMPTIA SECURITY+ / PRACTICAL ETHICAL HACKING</span>
-        </div>
-        <div className="banner-right">
-          <span id="live-time">SYS_TIME: 2026-07-07 12:00:00</span>
-          <span className="ip-mock">IP: 192.168.1.137</span>
-        </div>
-      </div>
+
 
       {/* Main Navigation Header */}
       <header className="main-header">
@@ -663,9 +670,9 @@ function App() {
             <span className="logo-text">ROBIN</span>
             <span className="logo-bracket">/&gt;</span>
           </div>
-          
-          <button 
-            className="mobile-menu-toggle" 
+
+          <button
+            className="mobile-menu-toggle"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle navigation menu"
           >
@@ -710,8 +717,8 @@ function App() {
                 </a>
               </li>
               <li>
-                <button 
-                  onClick={() => { setIsAdminOpen(true); setIsMobileMenuOpen(false); }} 
+                <button
+                  onClick={() => { setIsAdminOpen(true); setIsMobileMenuOpen(false); }}
                   className="nav-link"
                 >
                   <Sliders /> Settings
@@ -761,77 +768,77 @@ function App() {
 
         {/* Hero Section / Shell Window */}
         <section id="hero" className="hero-section">
-            <div className="terminal-window">
-              <div className="terminal-header">
-                <div className="window-actions">
-                  <span className="dot close"></span>
-                  <span className="dot minimize"></span>
-                  <span className="dot maximize"></span>
-                </div>
-                <div className="terminal-title">robin@kali:~</div>
-                <div className="terminal-env">bash</div>
+          <div className="terminal-window">
+            <div className="terminal-header">
+              <div className="window-actions">
+                <span className="dot close"></span>
+                <span className="dot minimize"></span>
+                <span className="dot maximize"></span>
               </div>
-              <div className="terminal-body hero-body">
-                <div className="shell-line">
-                  <span className="shell-prompt">robin@kali:~$</span> {typedText}
-                  {!isTypingFinished && <span className="blinking-cursor">|</span>}
-                </div>
+              <div className="terminal-title">robin@kali:~</div>
+              <div className="terminal-env">bash</div>
+            </div>
+            <div className="terminal-body hero-body">
+              <div className="shell-line">
+                <span className="shell-prompt">robin@kali:~$</span> {typedText}
+                {!isTypingFinished && <span className="blinking-cursor">|</span>}
+              </div>
 
-                
-                {isTypingFinished && (
-                  <div className="hero-details" style={{ marginTop: '20px' }}>
-                    <div className="profile-summary" style={{ 
-                      display: 'flex', 
-                      gap: '24px', 
-                      alignItems: 'center', 
-                      flexWrap: 'wrap', 
-                      animation: 'heroReveal 0.55s ease both', 
-                      animationDelay: '0.05s' 
+
+              {isTypingFinished && (
+                <div className="hero-details" style={{ marginTop: '20px' }}>
+                  <div className="profile-summary" style={{
+                    display: 'flex',
+                    gap: '24px',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    animation: 'heroReveal 0.55s ease both',
+                    animationDelay: '0.05s'
+                  }}>
+                    <div className="profile-avatar-container" style={{
+                      position: 'relative',
+                      width: '96px',
+                      height: '96px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      border: '2.5px solid var(--color-cyan)',
+                      boxShadow: '0 0 20px rgba(0, 217, 255, 0.3)',
+                      flexShrink: 0,
+                      backgroundColor: 'var(--bg-darker)'
                     }}>
-                      <div className="profile-avatar-container" style={{
-                        position: 'relative',
-                        width: '96px',
-                        height: '96px',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '2.5px solid var(--color-cyan)',
-                        boxShadow: '0 0 20px rgba(0, 217, 255, 0.3)',
-                        flexShrink: 0,
-                        backgroundColor: 'var(--bg-darker)'
-                      }}>
-                         <img src="../profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
-                        <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-                          {db.profile?.name}
-                        </h1>
-                        <p className="hero-subtitle" style={{ margin: '4px 0 12px 0', color: 'var(--color-cyan)', fontSize: '1rem', fontWeight: 500 }}>
-                          {db.profile?.title} @ {db.profile?.institution}
-                        </p>
-                        <p className="hero-bio" style={{ 
-                          margin: 0, 
-                          fontSize: '0.88rem', 
-                          color: 'var(--text-muted)', 
-                          lineHeight: '1.5',
-                          fontFamily: 'var(--font-sans)',
-                          borderLeft: '2px solid var(--border-color)',
-                          paddingLeft: '12px'
-                        }}>
-                          {db.profile?.bio}
-                        </p>
-                      </div>
+                      <img src="../profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
-
-                    <div className="hero-ctas" style={{ marginTop: '20px', animation: 'heroReveal 0.55s ease both', animationDelay: '0.35s' }}>
-                      <a href="#challenge" className="btn btn-primary" onClick={(e) => handleNavClick(e, 'challenge')}><Calendar /> View Learning Tracker</a>
-                      <a href="#projects" className="btn btn-secondary" onClick={(e) => handleNavClick(e, 'projects')}><Folder /> Inspect Shipped Projects</a>
-                      <a href="#resume" className="btn btn-tertiary" onClick={(e) => handleNavClick(e, 'resume')}><Mail /> Get In Touch</a>
+                    <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
+                      <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+                        {db.profile?.name}
+                      </h1>
+                      <p className="hero-subtitle" style={{ margin: '4px 0 12px 0', color: 'var(--color-cyan)', fontSize: '1rem', fontWeight: 500 }}>
+                        {db.profile?.title} @ {db.profile?.institution}
+                      </p>
+                      <p className="hero-bio" style={{
+                        margin: 0,
+                        fontSize: '0.88rem',
+                        color: 'var(--text-muted)',
+                        lineHeight: '1.5',
+                        fontFamily: 'var(--font-sans)',
+                        borderLeft: '2px solid var(--border-color)',
+                        paddingLeft: '12px'
+                      }}>
+                        {db.profile?.bio}
+                      </p>
                     </div>
                   </div>
-                )}
-              </div>
+
+                  <div className="hero-ctas" style={{ marginTop: '20px', animation: 'heroReveal 0.55s ease both', animationDelay: '0.35s' }}>
+                    <a href="#challenge" className="btn btn-primary" onClick={(e) => handleNavClick(e, 'challenge')}><Calendar /> View Learning Tracker</a>
+                    <a href="#projects" className="btn btn-secondary" onClick={(e) => handleNavClick(e, 'projects')}><Folder /> Inspect Shipped Projects</a>
+                    <a href="#resume" className="btn btn-tertiary" onClick={(e) => handleNavClick(e, 'resume')}><Mail /> Get In Touch</a>
+                  </div>
+                </div>
+              )}
             </div>
-          </section>
+          </div>
+        </section>
 
         {/* Learning Tracker centerpiece */}
         <section id="challenge" className="content-section">
@@ -841,19 +848,19 @@ function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-            <select 
-              value={activeTrackId} 
+            <select
+              value={activeTrackId}
               onChange={(e) => {
                 const updated = { ...db };
                 updated.challenge.activeTrack = e.target.value;
                 saveChanges(updated);
               }}
               className="form-control"
-              style={{ 
-                backgroundColor: 'var(--bg-darker)', 
-                border: '1px solid var(--border-color)', 
-                color: 'var(--color-cyan)', 
-                padding: '0 12px', 
+              style={{
+                backgroundColor: 'var(--bg-darker)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--color-cyan)',
+                padding: '0 12px',
                 borderRadius: '4px',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.8rem',
@@ -875,15 +882,15 @@ function App() {
             </select>
 
             {activeTrack.repoUrl && (
-              <a 
-                href={activeTrack.repoUrl} 
-                target="_blank" 
-                className="btn btn-secondary" 
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
+              <a
+                href={activeTrack.repoUrl}
+                target="_blank"
+                className="btn btn-secondary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px', 
+                  gap: '6px',
                   height: '36px',
                   padding: '0 14px',
                   fontSize: '0.8rem',
@@ -895,14 +902,14 @@ function App() {
               </a>
             )}
             {activeTrack && activeTrack.repoUrl && (
-              <button 
-                onClick={() => setIsRoadmapOpen(true)} 
-                className="btn btn-primary" 
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
+              <button
+                onClick={() => setIsRoadmapOpen(true)}
+                className="btn btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px', 
+                  gap: '6px',
                   height: '36px',
                   padding: '0 14px',
                   fontSize: '0.8rem',
@@ -914,20 +921,20 @@ function App() {
               </button>
             )}
             {activeTrack && activeTrack.repoUrl && (
-              <button 
+              <button
                 onClick={() => {
                   setActiveViewerTab("revision");
                   if (!selectedRevisionInterval) {
                     setSelectedRevisionInterval(10);
                   }
                   setIsFullscreenPreviewOpen(true);
-                }} 
+                }}
                 className="btn btn-secondary"
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px', 
+                  gap: '6px',
                   height: '36px',
                   padding: '0 14px',
                   fontSize: '0.8rem',
@@ -939,17 +946,17 @@ function App() {
               </button>
             )}
             {activeTrack && activeTrack.repoUrl && (
-              <button 
+              <button
                 onClick={() => {
                   setActiveViewerTab("project");
                   setIsFullscreenPreviewOpen(true);
-                }} 
+                }}
                 className="btn btn-secondary"
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px', 
+                  gap: '6px',
                   height: '36px',
                   padding: '0 14px',
                   fontSize: '0.8rem',
@@ -973,12 +980,12 @@ function App() {
                   <span className="legend-item"><span className="legend-cell upcoming"></span> Pending</span>
                 </div>
               </div>
-              
+
               <div className="grid-wrapper">
                 <div className="contribution-grid">
                   {Array.from({ length: activeTrack.totalDays || 90 }, (_, index) => {
                     const dayNum = index + 1;
-                    
+
                     let cellClass = "day-cell";
                     if (dayNum <= activeTrack.currentDay) {
                       cellClass += " complete";
@@ -992,12 +999,17 @@ function App() {
                     }
 
                     return (
-                      <div 
-                        key={dayNum} 
-                        className={cellClass} 
+                      <div
+                        key={dayNum}
+                        className={cellClass}
                         onClick={() => {
-                          setSelectedDayNum(dayNum);
-                          setIsDayOptionModalOpen(true);
+                          if (dayNum > 10 && isContentLocked) {
+                            setSelectedDayNum(dayNum);
+                            setIsPasswordPromptOpen(true);
+                          } else {
+                            setSelectedDayNum(dayNum);
+                            setIsDayOptionModalOpen(true);
+                          }
                         }}
                       >
                         {String(dayNum).padStart(2, '0')}
@@ -1024,32 +1036,32 @@ function App() {
               <h2 className="section-title"><ShieldCheck /> Technical Skill Vectors & Method</h2>
               <p className="section-description">Interactive capabilities matrix. Select views below to audit skill radar, matrices, or learning philosophy.</p>
             </div>
-            
+
             <div className="terminal-tabs" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button 
-                onClick={() => setActiveSkillsTab("radar")} 
+              <button
+                onClick={() => setActiveSkillsTab("radar")}
                 className={`btn btn-sm ${activeSkillsTab === 'radar' ? 'btn-primary' : 'btn-secondary'}`}
                 style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <Activity style={{ width: '14px', height: '14px' }} /> Skill Radar Chart
               </button>
-              <button 
-                onClick={() => setActiveSkillsTab("list")} 
+              <button
+                onClick={() => setActiveSkillsTab("list")}
                 className={`btn btn-sm ${activeSkillsTab === 'list' ? 'btn-primary' : 'btn-secondary'}`}
                 style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <Layers style={{ width: '14px', height: '14px' }} /> Tactical Metrics
               </button>
-              <button 
-                onClick={() => setActiveSkillsTab("philosophy")} 
+              <button
+                onClick={() => setActiveSkillsTab("philosophy")}
                 className={`btn btn-sm ${activeSkillsTab === 'philosophy' ? 'btn-primary' : 'btn-secondary'}`}
                 style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
                 <Compass style={{ width: '14px', height: '14px' }} /> Learning Philosophy
               </button>
               {(activeTrackId === 'cybersecurity' || activeTrackId === 'java_dsa') && (
-                <button 
-                  onClick={() => setActiveSkillsTab("pathways")} 
+                <button
+                  onClick={() => setActiveSkillsTab("pathways")}
                   className={`btn btn-sm ${activeSkillsTab === 'pathways' ? 'btn-primary' : 'btn-secondary'}`}
                   style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
@@ -1058,7 +1070,7 @@ function App() {
               )}
             </div>
           </div>
-          
+
           <div className="skills-interactive-container">
             {activeSkillsTab === 'radar' && (
               <div className="chart-card card" style={{ maxWidth: '650px', margin: '0 auto', padding: '24px' }}>
@@ -1077,7 +1089,7 @@ function App() {
                   <Compass style={{ color: 'var(--color-cyan)' }} /> Learning Philosophy (70-20-10)
                 </h3>
                 <p className="philosophy-intro" style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>My training methodology allocates focus across three action-oriented pillars:</p>
-                
+
                 <div className="philosophy-metrics" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '20px' }}>
                   <div className="phi-box" style={{ border: '1px solid var(--border-color)', padding: '16px', borderRadius: '6px', backgroundColor: 'var(--bg-darker)' }}>
                     <div className="phi-value neon-cyan" style={{ fontSize: '1.8rem', fontWeight: 'bold', fontFamily: 'var(--font-mono)' }}>{db.philosophy?.handsOn}%</div>
@@ -1138,7 +1150,7 @@ function App() {
                   {specializedPathways.map((p) => {
                     const isSelected = selectedPathway === p.id;
                     return (
-                      <div 
+                      <div
                         key={p.id}
                         onClick={() => setSelectedPathway(isSelected ? null : p.id)}
                         style={{
@@ -1175,7 +1187,7 @@ function App() {
                     }}>
                       <h4 style={{ color: 'var(--color-cyan)', margin: '0 0 8px 0', fontSize: '1rem' }}>{pathway.title}</h4>
                       <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.4, marginBottom: '16px' }}>{pathway.description}</p>
-                      
+
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
                         <div>
                           <h5 style={{ margin: '0 0 8px 0', fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>CORE SKILL VECTOR TARGETS:</h5>
@@ -1183,7 +1195,7 @@ function App() {
                             {pathway.skills.map((s, idx) => <li key={idx}>{s}</li>)}
                           </ul>
                         </div>
-                        
+
                         <div>
                           <h5 style={{ margin: '0 0 8px 0', fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>RECOMMENDED TOOLKITS & LABS:</h5>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -1228,8 +1240,8 @@ function App() {
               <h2 className="section-title" style={{ margin: 0 }}><Award /> Verified Certifications & Credentials</h2>
               <p className="section-description" style={{ margin: '4px 0 0 0' }}>Cryptographic verification profiles and training completions.</p>
             </div>
-            <button 
-              onClick={() => setIsCertsExpanded(!isCertsExpanded)} 
+            <button
+              onClick={() => setIsCertsExpanded(!isCertsExpanded)}
               className="btn btn-secondary btn-sm"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
@@ -1278,19 +1290,19 @@ function App() {
             <h2 className="section-title"><GitMerge /> Software Projects Registry</h2>
             <p className="section-description">A curated index of security modules, utility applications, and static assets engineered individually.</p>
           </div>
-          
+
           <div className="projects-layout-grid">
             {db.projects?.map((p: any, idx: number) => {
               const isExpanded = !!expandedProjects[p.title];
               return (
-                <div 
-                  key={idx} 
-                  className={`project-card card ${isExpanded ? 'expanded' : 'collapsed'}`} 
+                <div
+                  key={idx}
+                  className={`project-card card ${isExpanded ? 'expanded' : 'collapsed'}`}
                   onClick={() => toggleProjectExpansion(p.title)}
-                  style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: isExpanded ? '12px' : '0px', 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: isExpanded ? '12px' : '0px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease-in-out'
                   }}
@@ -1311,16 +1323,16 @@ function App() {
                       </span>
                     </div>
                   </div>
-                  
+
                   {isExpanded && (
-                    <div 
-                      className="project-details-expanded" 
-                      onClick={(e) => e.stopPropagation()} 
-                      style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '12px', 
-                        borderTop: '1px solid var(--border-color)', 
+                    <div
+                      className="project-details-expanded"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                        borderTop: '1px solid var(--border-color)',
                         paddingTop: '12px',
                         animation: 'fadeIn 0.2s ease-in-out'
                       }}
@@ -1338,11 +1350,11 @@ function App() {
                           Role: {p.role}
                         </span>
                       </div>
-                      
+
                       <p className="project-description" style={{ fontSize: '0.86rem', color: 'var(--text-muted)', margin: 0 }}>
                         {p.description}
                       </p>
-                      
+
                       <div className="project-contrib-panel" style={{
                         padding: '10px',
                         backgroundColor: 'var(--bg-darker)',
@@ -1372,17 +1384,17 @@ function App() {
                       </div>
 
                       <div style={{ marginTop: 'auto', paddingTop: '10px', display: 'flex', gap: '10px', borderTop: '1px solid var(--border-color)' }}>
-                        <button 
+                        <button
                           onClick={() => openCodeViewer(p.link)}
                           className="btn btn-secondary btn-sm"
                           style={{ flex: 1, justifyContent: 'center' }}
                         >
                           <Terminal /> Source Code Inspector
                         </button>
-                        <a 
-                          href={p.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
+                        <a
+                          href={p.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="btn btn-tertiary btn-sm"
                           style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                         >
@@ -1404,7 +1416,7 @@ function App() {
               <h2 className="section-title"><Users /> Platform Hub & Logs</h2>
               <p className="section-description">I document my journey daily across multiple media streams and training networks.</p>
             </div>
-            <button 
+            <button
               onClick={() => setIsVolleyballExpanded(!isVolleyballExpanded)}
               className="btn btn-secondary btn-sm"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
@@ -1633,7 +1645,7 @@ function App() {
                   }}>
                     PROJECTS
                   </h3>
-                  
+
                   <div style={{ marginBottom: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                       <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>General Championship scoreboard</strong>
@@ -1740,7 +1752,7 @@ function App() {
                   }}>
                     EDUCATION
                   </h3>
-                  
+
                   <div style={{ marginBottom: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                       <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Bachelor of Technology in Information Technology</strong>
@@ -1822,7 +1834,7 @@ function App() {
               </div>
               <div className="terminal-body console-body">
                 <p className="console-greet">// Submit an encrypted message directly to Ajit Pawara</p>
-                
+
                 <form onSubmit={(e) => {
                   e.preventDefault();
                   const statusEl = document.getElementById("contact-status");
@@ -1889,7 +1901,7 @@ function App() {
               </div>
               <button className="modal-close" onClick={() => setIsCodeInspectorOpen(false)}>&times;</button>
             </div>
-            
+
             <div className="code-viewer-layout">
               {/* Explorer Sidebar */}
               <div className="code-viewer-sidebar">
@@ -1903,7 +1915,7 @@ function App() {
                   ) : (
                     <>
                       {inspectorPath && (
-                        <div 
+                        <div
                           className="file-tree-item file-tree-back-item directory"
                           onClick={() => {
                             const parts = inspectorPath.split("/");
@@ -1916,7 +1928,7 @@ function App() {
                         </div>
                       )}
                       {inspectorFiles.map((item, idx) => (
-                        <div 
+                        <div
                           key={idx}
                           onClick={() => {
                             if (item.type === 'dir') {
@@ -1940,7 +1952,7 @@ function App() {
               <div className="code-viewer-main">
                 <div className="code-header-bar">
                   <span className="active-file-path">{inspectorPath || 'Select a file'}</span>
-                  <button 
+                  <button
                     onClick={() => {
                       navigator.clipboard.writeText(inspectorCode);
                       alert('Copied to clipboard!');
@@ -1976,8 +1988,8 @@ function App() {
               <button className="modal-close" onClick={() => setIsRoadmapOpen(false)}>&times;</button>
             </div>
             <div className="modal-body" style={{ flex: 1, padding: 0, overflow: 'hidden', height: 'calc(100% - 60px)' }}>
-              <iframe 
-                src={getTrackRoadmapUrl(activeTrack)} 
+              <iframe
+                src={getTrackRoadmapUrl(activeTrack)}
                 style={{ width: '100%', height: '100%', border: 'none', backgroundColor: '#fff', borderRadius: '0 0 6px 6px' }}
                 title="Roadmap HTML Preview"
               />
@@ -1998,7 +2010,7 @@ function App() {
               Choose how you want to inspect this daily checkpoint.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button 
+              <button
                 className="btn btn-primary"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px' }}
                 onClick={() => {
@@ -2009,7 +2021,7 @@ function App() {
               >
                 <FileText style={{ width: '16px', height: '16px' }} /> Read Written Log
               </button>
-              <button 
+              <button
                 className="btn btn-secondary"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px' }}
                 onClick={() => {
@@ -2035,26 +2047,26 @@ function App() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Eye style={{ color: 'var(--color-cyan)', width: '20px', height: '20px' }} />
                 <h3 style={{ margin: 0 }}>
-                  {activeViewerTab === 'revision' 
-                    ? `Days ${selectedRevisionInterval-9}–${selectedRevisionInterval} Revision` 
+                  {activeViewerTab === 'revision'
+                    ? `Days ${selectedRevisionInterval - 9}–${selectedRevisionInterval} Revision`
                     : activeViewerTab === 'project'
-                    ? 'Project Workspace'
-                    : `Day ${selectedDayNum}`} Lab Details
+                      ? 'Project Workspace'
+                      : `Day ${selectedDayNum}`} Lab Details
                 </h3>
               </div>
-              
+
               {/* Header tabs inside modal for log/preview mode */}
               {(activeViewerTab === "log" || activeViewerTab === "preview") && (
                 <div className="terminal-tabs" style={{ display: 'flex', gap: '6px', marginLeft: 'auto', marginRight: '16px' }}>
-                  <button 
-                    onClick={() => setActiveViewerTab("log")} 
+                  <button
+                    onClick={() => setActiveViewerTab("log")}
                     className={`btn btn-sm ${activeViewerTab === 'log' ? 'btn-primary' : 'btn-secondary'}`}
                     style={{ padding: '4px 10px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
                     <FileText style={{ width: '12px', height: '12px' }} /> Log View
                   </button>
-                  <button 
-                    onClick={() => setActiveViewerTab("preview")} 
+                  <button
+                    onClick={() => setActiveViewerTab("preview")}
                     className={`btn btn-sm ${activeViewerTab === 'preview' ? 'btn-primary' : 'btn-secondary'}`}
                     style={{ padding: '4px 10px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
                   >
@@ -2065,10 +2077,10 @@ function App() {
 
               <button className="modal-close" onClick={() => setIsFullscreenPreviewOpen(false)}>&times;</button>
             </div>
-            
-            <div className="modal-body" style={{ 
-              flex: 1, 
-              padding: activeViewerTab === 'log' ? '20px' : '0', 
+
+            <div className="modal-body" style={{
+              flex: 1,
+              padding: activeViewerTab === 'log' ? '20px' : '0',
               overflowY: activeViewerTab === 'log' ? 'auto' : 'hidden',
               backgroundColor: 'var(--bg-dark)',
               color: 'var(--text-primary)',
@@ -2096,8 +2108,8 @@ function App() {
                           <span>Verifying remote lab presence on GitHub...</span>
                         </div>
                       ) : iframeExists ? (
-                        <iframe 
-                          src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, false)} 
+                        <iframe
+                          src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, false)}
                           style={{
                             width: '100%',
                             height: '100%',
@@ -2164,12 +2176,16 @@ function App() {
                       const label = `Days ${start}–${val}`;
                       const isUnlocked = activeTrack.currentDay >= start;
                       const isActive = selectedRevisionInterval === val;
+                      const needsPass = val >= 20 && isContentLocked;
                       return (
                         <button
                           key={val}
                           onClick={() => {
                             if (isUnlocked) {
                               setSelectedRevisionInterval(val);
+                              if (needsPass) {
+                                setIsPasswordPromptOpen(true);
+                              }
                             }
                           }}
                           className={`btn btn-sm ${isActive ? 'btn-primary' : 'btn-secondary'}`}
@@ -2208,8 +2224,8 @@ function App() {
                             <span>Verifying remote lab presence on GitHub...</span>
                           </div>
                         ) : iframeExists ? (
-                          <iframe 
-                            src={getTrackIframeUrl(activeTrackId, activeTrack, selectedRevisionInterval, true)} 
+                          <iframe
+                            src={getTrackIframeUrl(activeTrackId, activeTrack, selectedRevisionInterval, true)}
                             style={{
                               width: '100%',
                               height: '100%',
@@ -2304,12 +2320,12 @@ function App() {
                     </div>
                     <div className="viewer-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '16px' }}>{selectedDayLog.subtitle}</div>
                   </div>
-                  
+
                   <div className="viewer-section" style={{ marginBottom: '16px' }}>
                     <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Key Learning Takeaway:</div>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>{selectedDayLog.takeaway}</p>
                   </div>
-                  
+
                   <div className="viewer-section" style={{ marginBottom: '16px' }}>
                     <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; incident Correlation / Lab:</div>
                     <div className="viewer-incident-box" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', padding: '10px', backgroundColor: 'var(--bg-darker)' }}>
@@ -2319,7 +2335,7 @@ function App() {
                       <div className="viewer-incident-body" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.4 }}>{selectedDayLog.incidentDetail}</div>
                     </div>
                   </div>
-                  
+
                   <div className="viewer-section">
                     <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Operational Audit Code:</div>
                     <pre style={{
@@ -2362,6 +2378,66 @@ function App() {
         </div>
       )}
 
+      {/* Password Prompt Modal for Days 11-90 (rendered after fullscreen modal to stack on top) */}
+      {isPasswordPromptOpen && (
+        <div className="modal-overlay active" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsPasswordPromptOpen(false);
+            setContentAuthError("");
+            setContentPassword("");
+          }
+        }}>
+          <div className="modal-container" style={{
+            maxWidth: '420px', padding: '32px 24px 24px', textAlign: 'center',
+            backgroundColor: 'var(--bg-dark)', border: '1px solid rgba(0, 217, 255, 0.3)', borderRadius: '6px'
+          }}>
+            <KeyRound style={{ width: '40px', height: '40px', color: 'var(--color-cyan)', marginBottom: '12px' }} />
+            <h3 style={{ marginBottom: '6px', fontSize: '1.15rem', color: 'var(--text-primary)' }}>
+              &#x1f512; Content Locked
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '4px' }}>
+              Day {selectedDayNum} requires a security passkey to access.
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '20px' }}>
+              Enter the passkey to unlock all protected material for this session.
+            </p>
+            <form onSubmit={handleContentAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+              <input
+                type="password"
+                value={contentPassword}
+                onChange={(e) => setContentPassword(e.target.value)}
+                placeholder="Enter passkey"
+                style={{
+                  width: '100%', maxWidth: '280px', padding: '10px 14px', fontSize: '0.9rem',
+                  backgroundColor: 'var(--bg-darker)', border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)', borderRadius: '4px', fontFamily: 'var(--font-mono)',
+                  textAlign: 'center', outline: 'none', boxSizing: 'border-box'
+                }}
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '280px' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}>
+                  Unlock
+                </button>
+                <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
+                  onClick={() => {
+                    setIsPasswordPromptOpen(false);
+                    setContentAuthError("");
+                    setContentPassword("");
+                  }}>
+                  Cancel
+                </button>
+              </div>
+              {contentAuthError && (
+                <p style={{ color: 'var(--color-red)', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', margin: 0 }}>
+                  {contentAuthError}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Admin Panel Settings Modal */}
       {isAdminOpen && (
         <div className="modal-overlay active" onClick={(e) => {
@@ -2374,7 +2450,7 @@ function App() {
             </div>
 
             {/* Login verification screen */}
-             {activeTrack.currentDay > 10 && !isAuthorized ? (
+            {activeTrack.currentDay > 10 && !isAuthorized ? (
               <div className="modal-auth-console">
                 <div className="terminal-body auth-terminal" style={{ padding: '24px' }}>
                   <p className="auth-line" style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>
@@ -2386,15 +2462,15 @@ function App() {
                   <form onSubmit={handleAuthSubmit} className="auth-form-inline">
                     <div className="form-line" style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px', marginBottom: '12px' }}>
                       <span className="form-prefix" style={{ color: 'var(--color-cyan)', marginRight: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>Password:</span>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="console-input" 
-                        autoFocus 
-                        required 
-                        placeholder="Enter root password" 
-                        style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', width: '100%' }} 
+                        className="console-input"
+                        autoFocus
+                        required
+                        placeholder="Enter root password"
+                        style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', width: '100%' }}
                       />
                     </div>
                     <div className="auth-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -2416,32 +2492,32 @@ function App() {
               <div className="modal-layout">
                 {/* Modal Sidebar */}
                 <div className="modal-tabs">
-                  <button 
-                    onClick={() => setActiveEditorTab("profile")} 
+                  <button
+                    onClick={() => setActiveEditorTab("profile")}
                     className={`modal-tab-btn ${activeEditorTab === 'profile' ? 'active' : ''}`}
                   >
                     <User /> Operator Profile
                   </button>
-                  <button 
-                    onClick={() => setActiveEditorTab("challenge")} 
+                  <button
+                    onClick={() => setActiveEditorTab("challenge")}
                     className={`modal-tab-btn ${activeEditorTab === 'challenge' ? 'active' : ''}`}
                   >
                     <Calendar /> Learning Tracker
                   </button>
-                  <button 
-                    onClick={() => setActiveEditorTab("skills")} 
+                  <button
+                    onClick={() => setActiveEditorTab("skills")}
                     className={`modal-tab-btn ${activeEditorTab === 'skills' ? 'active' : ''}`}
                   >
                     <Zap /> Technical Matrix
                   </button>
-                  <button 
-                    onClick={() => setActiveEditorTab("projects")} 
+                  <button
+                    onClick={() => setActiveEditorTab("projects")}
                     className={`modal-tab-btn ${activeEditorTab === 'projects' ? 'active' : ''}`}
                   >
                     <Folder /> Project Dossier
                   </button>
-                  <button 
-                    onClick={() => setActiveEditorTab("export")} 
+                  <button
+                    onClick={() => setActiveEditorTab("export")}
                     className={`modal-tab-btn modal-tab-export ${activeEditorTab === 'export' ? 'active' : ''}`}
                   >
                     <Download /> Commit & Sync
@@ -2455,108 +2531,108 @@ function App() {
                       <h4>Operator Identity Information</h4>
                       <div className="form-group">
                         <label>Alias Name</label>
-                        <input 
-                          type="text" 
-                          value={db.profile?.name || ""} 
+                        <input
+                          type="text"
+                          value={db.profile?.name || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.name = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                         />
                       </div>
                       <div className="form-group">
                         <label>Full Name (Resume)</label>
-                        <input 
-                          type="text" 
-                          value={db.profile?.fullName || ""} 
+                        <input
+                          type="text"
+                          value={db.profile?.fullName || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.fullName = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                         />
                       </div>
                       <div className="form-group">
                         <label>Professional Title</label>
-                        <input 
-                          type="text" 
-                          value={db.profile?.title || ""} 
+                        <input
+                          type="text"
+                          value={db.profile?.title || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.title = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                         />
                       </div>
                       <div className="form-group">
                         <label>College/Institution</label>
-                        <input 
-                          type="text" 
-                          value={db.profile?.institution || ""} 
+                        <input
+                          type="text"
+                          value={db.profile?.institution || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.institution = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                         />
                       </div>
                       <div className="form-row">
                         <div className="form-group">
                           <label>Roll Number</label>
-                          <input 
-                            type="text" 
-                            value={db.profile?.rollNo || ""} 
+                          <input
+                            type="text"
+                            value={db.profile?.rollNo || ""}
                             onChange={(e) => {
                               const updated = { ...db };
                               updated.profile.rollNo = e.target.value;
                               setDb(updated);
                             }}
-                            className="form-control" 
+                            className="form-control"
                           />
                         </div>
                         <div className="form-group">
                           <label>Location</label>
-                          <input 
-                            type="text" 
-                            value={db.profile?.location || ""} 
+                          <input
+                            type="text"
+                            value={db.profile?.location || ""}
                             onChange={(e) => {
                               const updated = { ...db };
                               updated.profile.location = e.target.value;
                               setDb(updated);
                             }}
-                            className="form-control" 
+                            className="form-control"
                           />
                         </div>
                       </div>
                       <div className="form-group">
                         <label>Bio Statement</label>
-                        <textarea 
-                          value={db.profile?.bio || ""} 
+                        <textarea
+                          value={db.profile?.bio || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.bio = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                           rows={3}
                         ></textarea>
                       </div>
                       <div className="form-group">
                         <label>Primary Contact Email</label>
-                        <input 
-                          type="email" 
-                          value={db.profile?.email || ""} 
+                        <input
+                          type="email"
+                          value={db.profile?.email || ""}
                           onChange={(e) => {
                             const updated = { ...db };
                             updated.profile.email = e.target.value;
                             setDb(updated);
                           }}
-                          className="form-control" 
+                          className="form-control"
                         />
                       </div>
                     </div>
@@ -2567,19 +2643,19 @@ function App() {
                       <div className="section-subtitle-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <h4 style={{ margin: 0 }}>Learning Tracker Logger</h4>
-                          <select 
-                            value={activeTrackId} 
+                          <select
+                            value={activeTrackId}
                             onChange={(e) => {
                               const updated = { ...db };
                               updated.challenge.activeTrack = e.target.value;
                               setDb(updated);
                             }}
                             className="form-control"
-                            style={{ 
-                              backgroundColor: 'var(--bg-darker)', 
-                              border: '1px solid var(--border-color)', 
-                              color: 'var(--color-cyan)', 
-                              padding: '2px 8px', 
+                            style={{
+                              backgroundColor: 'var(--bg-darker)',
+                              border: '1px solid var(--border-color)',
+                              color: 'var(--color-cyan)',
+                              padding: '2px 8px',
                               borderRadius: '4px',
                               fontFamily: 'var(--font-mono)',
                               fontSize: '0.75rem',
@@ -2594,7 +2670,7 @@ function App() {
                             ))}
                           </select>
                         </div>
-                        <button 
+                        <button
                           onClick={() => {
                             const updated = { ...db };
                             const track = updated.challenge.tracks[activeTrackId];
@@ -2626,87 +2702,87 @@ function App() {
                             <div className="form-row">
                               <div className="form-group" style={{ flex: 1 }}>
                                 <label>Day Number</label>
-                                <input 
-                                  type="number" 
-                                  value={d.day} 
+                                <input
+                                  type="number"
+                                  value={d.day}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.challenge.tracks[activeTrackId].days[idx].day = parseInt(e.target.value) || 0;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                               <div className="form-group" style={{ flex: 3 }}>
                                 <label>Topic Title</label>
-                                <input 
-                                  type="text" 
-                                  value={d.title} 
+                                <input
+                                  type="text"
+                                  value={d.title}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.challenge.tracks[activeTrackId].days[idx].title = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                             </div>
                             <div className="form-group">
                               <label>Subtitle / Description</label>
-                              <input 
-                                type="text" 
-                                value={d.subtitle || ''} 
+                              <input
+                                type="text"
+                                value={d.subtitle || ''}
                                 onChange={(e) => {
                                   const updated = { ...db };
                                   updated.challenge.tracks[activeTrackId].days[idx].subtitle = e.target.value;
                                   setDb(updated);
                                 }}
-                                className="form-control" 
+                                className="form-control"
                               />
                             </div>
                             <div className="form-group">
                               <label>Key Takeaway</label>
-                              <input 
-                                type="text" 
-                                value={d.takeaway || ''} 
+                              <input
+                                type="text"
+                                value={d.takeaway || ''}
                                 onChange={(e) => {
                                   const updated = { ...db };
                                   updated.challenge.tracks[activeTrackId].days[idx].takeaway = e.target.value;
                                   setDb(updated);
                                 }}
-                                className="form-control" 
+                                className="form-control"
                               />
                             </div>
                             <div className="form-row">
                               <div className="form-group">
                                 <label>Incident Name</label>
-                                <input 
-                                  type="text" 
-                                  value={d.incidentName || ''} 
+                                <input
+                                  type="text"
+                                  value={d.incidentName || ''}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.challenge.tracks[activeTrackId].days[idx].incidentName = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                               <div className="form-group">
                                 <label>Incident Detail</label>
-                                <input 
-                                  type="text" 
-                                  value={d.incidentDetail || ''} 
+                                <input
+                                  type="text"
+                                  value={d.incidentDetail || ''}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.challenge.tracks[activeTrackId].days[idx].incidentDetail = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                             </div>
                             <div className="editor-item-actions">
-                              <button 
+                              <button
                                 onClick={() => {
                                   const updated = { ...db };
                                   updated.challenge.tracks[activeTrackId].days.splice(idx, 1);
@@ -2727,7 +2803,7 @@ function App() {
                     <div className="modal-tab-content active">
                       <div className="section-subtitle-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                         <h4 style={{ margin: 0 }}>Skill Matrices</h4>
-                        <button 
+                        <button
                           onClick={() => {
                             const updated = { ...db };
                             updated.skills.push({ name: "New Skill Vector", level: 50, category: "General" });
@@ -2745,36 +2821,36 @@ function App() {
                             <div className="form-row">
                               <div className="form-group" style={{ flex: 2 }}>
                                 <label>Skill Name</label>
-                                <input 
-                                  type="text" 
-                                  value={s.name} 
+                                <input
+                                  type="text"
+                                  value={s.name}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.skills[idx].name = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                               <div className="form-group" style={{ flex: 1 }}>
                                 <label>Level (%)</label>
-                                <input 
-                                  type="number" 
-                                  value={s.level} 
+                                <input
+                                  type="number"
+                                  value={s.level}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.skills[idx].level = parseInt(e.target.value) || 0;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                   min={0}
                                   max={100}
                                 />
                               </div>
                               <div className="form-group" style={{ flex: 1 }}>
                                 <label>Category</label>
-                                <select 
-                                  value={s.category} 
+                                <select
+                                  value={s.category}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.skills[idx].category = e.target.value;
@@ -2790,7 +2866,7 @@ function App() {
                               </div>
                             </div>
                             <div className="editor-item-actions">
-                              <button 
+                              <button
                                 onClick={() => {
                                   const updated = { ...db };
                                   updated.skills.splice(idx, 1);
@@ -2811,7 +2887,7 @@ function App() {
                     <div className="modal-tab-content active">
                       <div className="section-subtitle-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                         <h4 style={{ margin: 0 }}>Project Registry</h4>
-                        <button 
+                        <button
                           onClick={() => {
                             const updated = { ...db };
                             updated.projects.push({
@@ -2836,87 +2912,87 @@ function App() {
                             <div className="form-row">
                               <div className="form-group" style={{ flex: 2 }}>
                                 <label>Project Title</label>
-                                <input 
-                                  type="text" 
-                                  value={p.title} 
+                                <input
+                                  type="text"
+                                  value={p.title}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.projects[idx].title = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                               <div className="form-group" style={{ flex: 1 }}>
                                 <label>Role</label>
-                                <input 
-                                  type="text" 
-                                  value={p.role || ''} 
+                                <input
+                                  type="text"
+                                  value={p.role || ''}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.projects[idx].role = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                             </div>
                             <div className="form-group">
                               <label>Description</label>
-                              <textarea 
-                                value={p.description} 
+                              <textarea
+                                value={p.description}
                                 onChange={(e) => {
                                   const updated = { ...db };
                                   updated.projects[idx].description = e.target.value;
                                   setDb(updated);
                                 }}
-                                className="form-control" 
+                                className="form-control"
                                 rows={2}
                               ></textarea>
                             </div>
                             <div className="form-group">
                               <label>Specific Contribution</label>
-                              <input 
-                                type="text" 
-                                value={p.contribution || ''} 
+                              <input
+                                type="text"
+                                value={p.contribution || ''}
                                 onChange={(e) => {
                                   const updated = { ...db };
                                   updated.projects[idx].contribution = e.target.value;
                                   setDb(updated);
                                 }}
-                                className="form-control" 
+                                className="form-control"
                               />
                             </div>
                             <div className="form-row">
                               <div className="form-group">
                                 <label>Tags (Comma separated)</label>
-                                <input 
-                                  type="text" 
-                                  value={p.tags ? p.tags.join(', ') : ''} 
+                                <input
+                                  type="text"
+                                  value={p.tags ? p.tags.join(', ') : ''}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.projects[idx].tags = e.target.value.split(',').map((t: string) => t.trim());
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                               <div className="form-group">
                                 <label>Git Link</label>
-                                <input 
-                                  type="text" 
-                                  value={p.link || '#'} 
+                                <input
+                                  type="text"
+                                  value={p.link || '#'}
                                   onChange={(e) => {
                                     const updated = { ...db };
                                     updated.projects[idx].link = e.target.value;
                                     setDb(updated);
                                   }}
-                                  className="form-control" 
+                                  className="form-control"
                                 />
                               </div>
                             </div>
                             <div className="editor-item-actions">
-                              <button 
+                              <button
                                 onClick={() => {
                                   const updated = { ...db };
                                   updated.projects.splice(idx, 1);
@@ -2954,7 +3030,7 @@ function App() {
                       </div>
 
                       <div className="export-actions" style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
-                        <button 
+                        <button
                           onClick={() => {
                             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
                             const dlAnchorElem = document.createElement('a');
@@ -2966,8 +3042,8 @@ function App() {
                         >
                           <Download /> Download data.json
                         </button>
-                        
-                        <button 
+
+                        <button
                           onClick={() => {
                             if (window.confirm("Reset local modifications and reload defaults?")) {
                               localStorage.removeItem("cyber_portfolio_db");
@@ -2995,8 +3071,8 @@ function App() {
                               marginTop: '6px',
                               color: 'var(--color-green)'
                             }}><code>git add data.json
-git commit -m "update: portfolio database"
-git push origin main</code></pre>
+                              git commit -m "update: portfolio database"
+                              git push origin main</code></pre>
                           </li>
                         </ol>
                       </div>
