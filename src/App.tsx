@@ -806,7 +806,7 @@ function App() {
                       flexShrink: 0,
                       backgroundColor: 'var(--bg-darker)'
                     }}>
-                      <img src="../profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src="./profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                     <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
                       <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
