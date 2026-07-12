@@ -1,51 +1,18 @@
 ```
+ROOT@ROBIN:~$ whoami
+Robin
 
-  ██████   ██████  ██████  ██ ███    ██
- ██   ██ ██    ██ ██   ██ ██ ████   ██
- ██████  ██    ██ ██████  ██ ██ ██  ██
- ██   ██ ██    ██ ██   ██ ██ ██  ██ ██
- ██████   ██████  ██   ██ ██ ██   ████
+ROOT@ROBIN:~$ ls -la
+drwxr-xr-x  7 root root  4096 Jan  1  2026 .
+drwxr-xr-x  3 root root  4096 Jan  1  2026 ..
+-rw-r--r--  1 root root   867 Jan  1  2026 README.md
+drwxr-xr-x  2 root root  4096 Jan  1  2026 public
+drwxr-xr-x  2 root root  4096 Jan  1  2026 src
+drwxr-xr-x  3 root root  4096 Jan  1  2026 docs
+-rw-r--r--  1 root root   351 Jan  1  2026 package.json
+-rw-r--r--  1 root root   128 Jan  1  2026 vite.config.ts
 
-```
-
-```
-$ whoami
-unauthorized
-```
-
----
-
-```
-$ ls
-```
-
-- 🔒 Classified
-- 🔒 Classified
-- 🔒 Classified
-- 🔒 Classified
-- 🔒 Classified
-- 🔒 Classified
-- 🔒 Classified
-
----
-
-```
-$ curl -s https://ajit-pawara.github.io/Portfolio/
-```
-
-```
-── ░▒▓█ CONNECTION ESTABLISHED █▓▒░ ──
-
-  Access the terminal at the link above.
-  For inquiries, reach out through the available channels.
-
-── ░▒▓█ CONNECTION CLOSED █▓▒░ ──
-```
-
----
-
-```
-$ cat setup.sh
+ROOT@ROBIN:~$ cat setup.sh
 ```
 
 ```bash
@@ -56,17 +23,21 @@ npm run dev
 ```
 
 ```
-BUILD     → npm run build
-LINT      → npm run lint
-TYPECHECK → npx tsc -b
+ROOT@ROBIN:~$ cat build.sh
 ```
 
----
+```bash
+npm run build
+npm run lint
+npx tsc -b
+```
 
 ```
-$ echo "EOF"
-```
+ROOT@ROBIN:~$ uname -a
+react 19  |  typescript 6  |  vite 8  |  tailwind 4
 
-<p align="center">
-  <sub>React 19 • TypeScript 6 • Vite 8 • Tailwind CSS 4</sub>
-</p>
+ROOT@ROBIN:~$ cat contact.txt
+[*] reach out through the links on the site
+
+ROOT@ROBIN:~$ exit
+```
