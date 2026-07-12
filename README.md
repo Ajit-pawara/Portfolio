@@ -183,13 +183,13 @@ Portfolio/
 ## $ cat auth_config.txt
 
 ```
-┌──────────────────────┬────────────────┬──────────────────────┐
-│  ZONE                │  PASSWORD      │  SCOPE               │
-├──────────────────────┼────────────────┼──────────────────────┤
-│  Days 11-90 Tracker  │  ignite        │  Session (tab close) │
-│  Revision Files 11+  │  ignite        │  Session (tab close) │
-│  Admin Panel         │  root@robin    │  Session (tab close) │
-└──────────────────────┴────────────────┴──────────────────────┘
+┌──────────────────────┬──────────────────────────────────────┐
+│  ZONE                │  ACCESS                              │
+├──────────────────────┼──────────────────────────────────────┤
+│  Days 11-90 Tracker  │  🔒 Contact for passkey             │
+│  Revision Files 11+  │  🔒 Contact for passkey             │
+│  Admin Panel         │  🔒 Contact for passkey             │
+└──────────────────────┴──────────────────────────────────────┘
 ```
 
 ---
@@ -199,5 +199,5 @@ Portfolio/
 <p align="center">
   <sub>Built with React 19 • TypeScript 6 • Vite 8 • Tailwind CSS 4</sub>
   <br>
-  <sub>© 2026 Ajit Pawara. Licensed under MIT.</sub>
+  <sub>© 2026 Ajit Pawara. All rights reserved.</sub>
 </p>
