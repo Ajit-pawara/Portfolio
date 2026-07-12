@@ -5,7 +5,7 @@ import {
   Activity, Layers, Award, GitMerge, Users, FileCheck, 
   Printer, EyeOff, Eye, Mail, Send, Copy, Folder, FileCode, KeyRound, 
   User, Zap, Download, Plus, Trash2, Save, RefreshCw, ChevronLeft, 
-  AtSign, MessageSquare, Maximize
+  AtSign, MessageSquare, Menu, X
 } from 'lucide-react';
 import initialData from './data.json';
 
@@ -239,6 +239,8 @@ const getTrackRoadmapUrl = (track: any) => {
   return "";
 };
 
+const DEFAULT_TRACK = { name: "Cybersecurity & Ethical Hacking", currentDay: 9, totalDays: 90, days: [], repoUrl: "" };
+
 function App() {
   // Load State from LocalStorage fallback to imported JSON
   const [db, setDb] = useState(() => {
@@ -259,50 +261,104 @@ function App() {
   });
 
   const [activeTab, setActiveTab] = useState("hero");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [isTypingFinished, setIsTypingFinished] = useState(false);
   const whoamiString = "whoami";
 
   // Tracker interaction
   const activeTrackId = db.challenge?.activeTrack || "cybersecurity";
-  const activeTrack = db.challenge?.tracks?.[activeTrackId] || { name: "Cybersecurity & Ethical Hacking", currentDay: 9, totalDays: 90, days: [] };
+  const activeTrack = db.challenge?.tracks?.[activeTrackId] || DEFAULT_TRACK;
   const [selectedDayNum, setSelectedDayNum] = useState<number>(activeTrack.currentDay);
 
   // Remote HTML presence check
   const [iframeExists, setIframeExists] = useState<boolean | null>(null);
   const [checkingIframe, setCheckingIframe] = useState<boolean>(false);
-  const [showRevision, setShowRevision] = useState<boolean>(false);
+  const [activeViewerTab, setActiveViewerTab] = useState<"log" | "preview" | "revision" | "project">("log");
+  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
+  const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
+  const [selectedRevisionInterval, setSelectedRevisionInterval] = useState<number>(10);
+  const [isDayOptionModalOpen, setIsDayOptionModalOpen] = useState(false);
+
+  // Auto scroll active tab into view in horizontal containers without scrolling the window vertically
+  useEffect(() => {
+    const activeEl = document.querySelector('.terminal-tabs .btn-primary, .revision-tabs-container .active') as HTMLElement;
+    if (activeEl && activeEl.parentElement) {
+      const container = activeEl.parentElement;
+      const elementOffset = activeEl.offsetLeft;
+      const elementWidth = activeEl.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      container.scrollTo({
+        left: elementOffset - (containerWidth / 2) + (elementWidth / 2),
+        behavior: 'smooth'
+      });
+    }
+  }, [activeViewerTab, selectedRevisionInterval]);
 
   // Reset revision state when switching days/tracks
   useEffect(() => {
-    setShowRevision(false);
+    setActiveViewerTab("log");
   }, [activeTrackId, selectedDayNum]);
 
   useEffect(() => {
-    const url = getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision);
-    if (!url) {
+    const isRev = activeViewerTab === "revision";
+    const checkDay = isRev ? selectedRevisionInterval : selectedDayNum;
+    const iframeUrl = getTrackIframeUrl(activeTrackId, activeTrack, checkDay, isRev);
+    if (!iframeUrl || !activeTrack.repoUrl) {
       setIframeExists(false);
       return;
     }
     
-    setCheckingIframe(true);
-    setIframeExists(null);
-    
-    fetch(url, { method: 'HEAD' })
-      .then(res => {
-        if (res.ok) {
-          setIframeExists(true);
-        } else {
-          setIframeExists(false);
-        }
-      })
-      .catch(() => {
+    // Determine the exact filename corresponding to the current state
+    let fileName = "";
+    if (isRev && checkDay % 10 === 0) {
+      const startDay = checkDay - 9;
+      fileName = `revision_day${startDay}_${checkDay}.html`;
+    } else if (activeTrackId === 'cybersecurity') {
+      fileName = `day${String(checkDay).padStart(2, '0')}.html`;
+    } else if (activeTrackId === 'java_dsa') {
+      fileName = `DSAday${checkDay}.html`;
+    } else {
+      fileName = `day${checkDay}.html`;
+    }
+
+    try {
+      const repoUrlObj = new URL(activeTrack.repoUrl);
+      const pathParts = repoUrlObj.pathname.split('/').filter(Boolean);
+      if (pathParts.length >= 2) {
+        const owner = pathParts[0];
+        const repo = pathParts[1];
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`;
+
+        setCheckingIframe(true);
+        setIframeExists(null);
+
+        fetch(apiUrl, { method: 'GET' })
+          .then(res => {
+            if (res.ok) {
+              setIframeExists(true);
+            } else if (res.status === 403) {
+              // Rate limit reached for anonymous API access; assume file exists and let the iframe try loading it
+              setIframeExists(true);
+            } else {
+              setIframeExists(false);
+            }
+          })
+          .catch(() => {
+            // Network error/offline, fallback to false
+            setIframeExists(false);
+          })
+          .finally(() => {
+            setCheckingIframe(false);
+          });
+      } else {
         setIframeExists(false);
-      })
-      .finally(() => {
-        setCheckingIframe(false);
-      });
-  }, [activeTrackId, selectedDayNum, activeTrack, showRevision]);
+      }
+    } catch (e) {
+      console.error("Error checking file existence via API:", e);
+      setIframeExists(false);
+    }
+  }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval]);
   
   // Settings & Authentication modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -332,10 +388,7 @@ function App() {
     return localStorage.getItem("custom_data_saved") !== "true" && localStorage.getItem("setup_dismissed") !== "true";
   });
 
-  const [activeViewerTab, setActiveViewerTab] = useState<"log" | "preview">("log");
-  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
-  const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
-  const [isRevisionDropdownOpen, setIsRevisionDropdownOpen] = useState(false);
+
 
 
 
@@ -433,7 +486,7 @@ function App() {
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "root") {
+    if (password === "root@robin") {
       sessionStorage.setItem("root_authorized", "true");
       setIsAuthorized(true);
       setAuthError("");
@@ -605,52 +658,66 @@ function App() {
       {/* Main Navigation Header */}
       <header className="main-header">
         <nav className="nav-container">
-          <div className="logo" style={{ cursor: 'pointer' }} onClick={(e) => handleNavClick(e as any, 'hero')}>
+          <div className="logo" style={{ cursor: 'pointer' }} onClick={(e) => { handleNavClick(e as any, 'hero'); setIsMobileMenuOpen(false); }}>
             <span className="logo-bracket">&lt;</span>
-            <span className="logo-text">AJIT_SEC</span>
+            <span className="logo-text">ROBIN</span>
             <span className="logo-bracket">/&gt;</span>
           </div>
-          <ul className="nav-links">
-            <li>
-              <a href="#hero" className={`nav-link ${activeTab === 'hero' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'hero')}>
-                <Terminal /> whoami
-              </a>
-            </li>
-            <li>
-              <a href="#challenge" className={`nav-link ${activeTab === 'challenge' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'challenge')}>
-                <Calendar /> Learning Tracker
-              </a>
-            </li>
-            <li>
-              <a href="#skills" className={`nav-link ${activeTab === 'skills' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'skills')}>
-                <Cpu /> Skills Map
-              </a>
-            </li>
-            <li>
-              <a href="#certifications" className={`nav-link ${activeTab === 'certifications' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'certifications')}>
-                <Award /> Certifications
-              </a>
-            </li>
-            <li>
-              <a href="#projects" className={`nav-link ${activeTab === 'projects' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'projects')}>
-                <GitBranch /> Projects
-              </a>
-            </li>
-            <li>
-              <a href="#community" className={`nav-link ${activeTab === 'community' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'community')}>
-                <Share2 /> Find Me
-              </a>
-            </li>
-            <li>
-              <a href="#resume" className={`nav-link ${activeTab === 'resume' ? 'active' : ''}`} onClick={(e) => handleNavClick(e, 'resume')}>
-                <FileText /> Dossier
-              </a>
-            </li>
-          </ul>
-          <div className="nav-actions">
-            <button className="btn btn-secondary" onClick={() => setIsAdminOpen(true)}>
-              <Sliders /> Settings
-            </button>
+          
+          <button 
+            className="mobile-menu-toggle" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
+          </button>
+
+          <div className={`nav-menu-wrapper ${isMobileMenuOpen ? 'open' : ''}`}>
+            <ul className="nav-links">
+              <li>
+                <a href="#hero" className={`nav-link ${activeTab === 'hero' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'hero'); setIsMobileMenuOpen(false); }}>
+                  <Terminal /> Whoami
+                </a>
+              </li>
+              <li>
+                <a href="#challenge" className={`nav-link ${activeTab === 'challenge' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'challenge'); setIsMobileMenuOpen(false); }}>
+                  <Calendar /> Learning Tracker
+                </a>
+              </li>
+              <li>
+                <a href="#skills" className={`nav-link ${activeTab === 'skills' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'skills'); setIsMobileMenuOpen(false); }}>
+                  <Cpu /> Skills Map
+                </a>
+              </li>
+              <li>
+                <a href="#certifications" className={`nav-link ${activeTab === 'certifications' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'certifications'); setIsMobileMenuOpen(false); }}>
+                  <Award /> Certifications
+                </a>
+              </li>
+              <li>
+                <a href="#projects" className={`nav-link ${activeTab === 'projects' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'projects'); setIsMobileMenuOpen(false); }}>
+                  <GitBranch /> Projects
+                </a>
+              </li>
+              <li>
+                <a href="#community" className={`nav-link ${activeTab === 'community' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'community'); setIsMobileMenuOpen(false); }}>
+                  <Share2 /> Find Me
+                </a>
+              </li>
+              <li>
+                <a href="#resume" className={`nav-link ${activeTab === 'resume' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'resume'); setIsMobileMenuOpen(false); }}>
+                  <FileText /> Dossier
+                </a>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { setIsAdminOpen(true); setIsMobileMenuOpen(false); }} 
+                  className="nav-link"
+                >
+                  <Sliders /> Settings
+                </button>
+              </li>
+            </ul>
           </div>
         </nav>
       </header>
@@ -846,106 +913,52 @@ function App() {
                 <Compass style={{ width: '14px', height: '14px' }} /> View Interactive Roadmap
               </button>
             )}
-            {activeTrackId === 'cybersecurity' && activeTrack.repoUrl && (
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <button 
-                  onClick={() => setIsRevisionDropdownOpen(!isRevisionDropdownOpen)} 
-                  className="btn btn-secondary" 
-                  style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    gap: '6px', 
-                    height: '36px',
-                    padding: '0 14px',
-                    fontSize: '0.8rem',
-                    whiteSpace: 'nowrap',
-                    boxSizing: 'border-box',
-                    borderColor: 'var(--color-amber)',
-                    color: 'var(--color-amber)'
-                  }}
-                >
-                  <Zap style={{ width: '14px', height: '14px' }} /> Revision Files
-                </button>
-                {isRevisionDropdownOpen && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '40px',
-                    left: 0,
-                    backgroundColor: 'var(--bg-darker)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                    zIndex: 100,
-                    minWidth: '220px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: '6px 0'
-                  }}>
-                    <button
-                      onClick={() => {
-                        setSelectedDayNum(10);
-                        setShowRevision(true);
-                        setActiveViewerTab("preview");
-                        setIsRevisionDropdownOpen(false);
-                        setTimeout(() => {
-                          document.querySelector('.challenge-viewer')?.scrollIntoView({ behavior: 'smooth' });
-                        }, 100);
-                      }}
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: activeTrack.currentDay >= 10 ? 'var(--text-primary)' : 'var(--text-muted)',
-                        padding: '8px 12px',
-                        textAlign: 'left',
-                        fontSize: '0.75rem',
-                        cursor: activeTrack.currentDay >= 10 ? 'pointer' : 'not-allowed',
-                        fontFamily: 'var(--font-mono)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%'
-                      }}
-                      disabled={activeTrack.currentDay < 10}
-                    >
-                      <span>Phase 1 Revision (Days 1–10)</span>
-                      {activeTrack.currentDay >= 10 && <span style={{ color: 'var(--color-green)', fontSize: '0.65rem' }}>● Ready</span>}
-                    </button>
-                    <button
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        padding: '8px 12px',
-                        textAlign: 'left',
-                        fontSize: '0.75rem',
-                        cursor: 'not-allowed',
-                        fontFamily: 'var(--font-mono)',
-                        width: '100%'
-                      }}
-                      disabled
-                    >
-                      Phase 2 Revision (Days 11–20)
-                    </button>
-                    <button
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        padding: '8px 12px',
-                        textAlign: 'left',
-                        fontSize: '0.75rem',
-                        cursor: 'not-allowed',
-                        fontFamily: 'var(--font-mono)',
-                        width: '100%'
-                      }}
-                      disabled
-                    >
-                      Phase 3 Revision (Days 21–30)
-                    </button>
-                  </div>
-                )}
-              </div>
+            {activeTrack && activeTrack.repoUrl && (
+              <button 
+                onClick={() => {
+                  setActiveViewerTab("revision");
+                  if (!selectedRevisionInterval) {
+                    setSelectedRevisionInterval(10);
+                  }
+                  setIsFullscreenPreviewOpen(true);
+                }} 
+                className="btn btn-secondary"
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: '6px', 
+                  height: '36px',
+                  padding: '0 14px',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <Zap style={{ width: '14px', height: '14px' }} /> Revision
+              </button>
+            )}
+            {activeTrack && activeTrack.repoUrl && (
+              <button 
+                onClick={() => {
+                  setActiveViewerTab("project");
+                  setIsFullscreenPreviewOpen(true);
+                }} 
+                className="btn btn-secondary"
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: '6px', 
+                  height: '36px',
+                  padding: '0 14px',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <FileCode style={{ width: '14px', height: '14px' }} /> Project
+              </button>
             )}
           </div>
 
@@ -984,11 +997,7 @@ function App() {
                         className={cellClass} 
                         onClick={() => {
                           setSelectedDayNum(dayNum);
-                          if (dayNum <= activeTrack.currentDay) {
-                            setActiveViewerTab("preview");
-                          } else {
-                            setActiveViewerTab("log");
-                          }
+                          setIsDayOptionModalOpen(true);
                         }}
                       >
                         {String(dayNum).padStart(2, '0')}
@@ -1003,243 +1012,6 @@ function App() {
                   <strong>{activeTrack.completedDays} / {activeTrack.totalDays} Days Completed</strong>
                 </span>
                 <span>Active Track: <strong>{activeTrack.name}</strong></span>
-              </div>
-            </div>
-
-            {/* Operations Log detail viewer */}
-            <div className="terminal-window challenge-viewer">
-              <div className="terminal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div className="window-actions" style={{ marginRight: '12px' }}>
-                    <span className="dot close"></span>
-                    <span className="dot minimize"></span>
-                    <span className="dot maximize"></span>
-                  </div>
-                  <div className="terminal-title">secops-viewer --log-day={selectedDayNum}{showRevision ? '-revision' : ''}</div>
-                </div>
-                
-                <div className="terminal-tabs" style={{ display: 'flex', gap: '6px', marginLeft: 'auto', marginRight: '12px' }}>
-                  <button 
-                    onClick={() => {
-                      setActiveViewerTab("log");
-                      setShowRevision(false);
-                    }} 
-                    className={`btn btn-sm ${activeViewerTab === 'log' && !showRevision ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <FileText style={{ width: '12px', height: '12px' }} /> Log View
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setActiveViewerTab("preview");
-                      setShowRevision(false);
-                    }} 
-                    className={`btn btn-sm ${activeViewerTab === 'preview' && !showRevision ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ padding: '3px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <Eye style={{ width: '12px', height: '12px' }} /> HTML Preview
-                  </button>
-                  {selectedDayNum % 10 === 0 && (
-                    <button 
-                      onClick={() => {
-                        const nextShow = !showRevision;
-                        setShowRevision(nextShow);
-                        if (nextShow) {
-                          setActiveViewerTab("preview");
-                        }
-                      }} 
-                      className={`btn btn-sm ${showRevision ? 'btn-primary' : 'btn-secondary'}`}
-                      style={{ 
-                        padding: '3px 8px', 
-                        fontSize: '0.7rem', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '4px',
-                        backgroundColor: showRevision ? 'var(--color-amber)' : undefined,
-                        color: showRevision ? 'var(--bg-darker)' : undefined,
-                        borderColor: showRevision ? 'transparent' : undefined
-                      }}
-                    >
-                      <Zap style={{ width: '12px', height: '12px' }} /> {showRevision ? 'Standard Day' : 'Revision File'}
-                    </button>
-                  )}
-                </div>
-                <span className="terminal-badge">LIVE_LOG</span>
-              </div>
-              <div className="terminal-body viewer-body" style={{ display: 'flex', flexDirection: 'column', maxHeight: activeViewerTab === 'preview' ? '780px' : '380px', overflowY: activeViewerTab === 'preview' ? 'hidden' : 'auto' }}>
-                {activeViewerTab === 'preview' ? (
-                  <div style={{ flex: 1, minHeight: '380px', display: 'flex', flexDirection: 'column' }}>
-                    {activeTrack && activeTrack.repoUrl ? (
-                      <>
-                        {checkingIframe ? (
-                          <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flex: 1,
-                            minHeight: '380px',
-                            border: '1px dashed var(--border-color)',
-                            borderRadius: '4px',
-                            backgroundColor: 'var(--bg-darker)',
-                            color: 'var(--color-cyan)',
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '0.8rem'
-                          }}>
-                            <style>{`
-                              @keyframes spin {
-                                from { transform: rotate(0deg); }
-                                to { transform: rotate(360deg); }
-                              }
-                              .loader-spin {
-                                animation: spin 1s linear infinite;
-                              }
-                            `}</style>
-                            <RefreshCw className="loader-spin" style={{ width: '24px', height: '24px', marginBottom: '10px' }} />
-                            <span>Verifying remote lab presence on GitHub...</span>
-                          </div>
-                        ) : iframeExists ? (
-                          <>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
-                              <button 
-                                onClick={() => setIsFullscreenPreviewOpen(true)}
-                                className="btn btn-secondary btn-sm"
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', padding: '3px 8px' }}
-                              >
-                                <Maximize style={{ width: '12px', height: '12px' }} /> Open Fullscreen
-                              </button>
-                            </div>
-                            <iframe 
-                              src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision)} 
-                              style={{
-                                width: '100%',
-                                height: '650px',
-                                border: '1px solid var(--border-color)',
-                                backgroundColor: 'transparent',
-                                borderRadius: '4px',
-                                colorScheme: 'dark'
-                              }}
-                              title={showRevision ? `Phase Revision HTML Preview` : `Day ${selectedDayNum} HTML Preview`}
-                            />
-                          </>
-                        ) : (
-                          <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flex: 1,
-                            minHeight: '380px',
-                            border: '1px dashed var(--border-color)',
-                            borderRadius: '4px',
-                            padding: '24px',
-                            textAlign: 'center',
-                            color: 'var(--text-muted)',
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '0.8rem',
-                            lineHeight: 1.5,
-                            backgroundColor: 'var(--bg-darker)'
-                          }}>
-                            <Compass style={{ color: 'var(--color-amber)', width: '32px', height: '32px', marginBottom: '12px' }} />
-                            <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem', display: 'block', marginBottom: '6px' }}>
-                              [AWAITING UPLOAD] Day {selectedDayNum} Lab Preview
-                            </span>
-                            <span style={{ fontSize: '0.78rem', maxWidth: '440px', color: 'var(--text-muted)', display: 'block', marginBottom: '12px' }}>
-                              The HTML log file for Day {selectedDayNum} hasn't been uploaded to GitHub yet, or is still building on GitHub Pages.
-                            </span>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--color-green)', fontWeight: 500, backgroundColor: 'rgba(0, 255, 136, 0.05)', padding: '6px 12px', borderRadius: '4px', border: '1px solid rgba(0, 255, 136, 0.15)' }}>
-                              ⚡ This preview will automatically load here as soon as the file arrives in your repository!
-                            </span>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flex: 1,
-                        minHeight: '380px',
-                        border: '1px dashed var(--border-color)',
-                        borderRadius: '4px',
-                        padding: '24px',
-                        textAlign: 'center',
-                        color: 'var(--text-muted)',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.8rem',
-                        lineHeight: 1.5,
-                        backgroundColor: 'var(--bg-darker)'
-                      }}>
-                        <ShieldAlert style={{ color: 'var(--color-amber)', width: '28px', height: '28px', marginBottom: '10px' }} />
-                        <span>[INFO] HTML Page Previews require a repository configured for this track.</span>
-                        <span style={{ fontSize: '0.72rem', marginTop: '6px' }}>Configure the repoUrl in your track settings to enable auto-loading.</span>
-                      </div>
-                    )}
-                  </div>
-                ) : selectedDayLog ? (
-                  <>
-                    <div className="viewer-day-header">
-                      <div className="viewer-title-line">
-                        <h4>Day {selectedDayNum}: {selectedDayLog.title}</h4>
-                        <span className={`day-status-pill ${selectedDayNum <= activeTrack.currentDay ? 'complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'active' : 'upcoming'}`}>
-                          {selectedDayNum <= activeTrack.currentDay ? 'Verified Complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Upcoming'}
-                        </span>
-                      </div>
-                      <div className="viewer-subtitle">{selectedDayLog.subtitle}</div>
-                    </div>
-                    
-                    <div className="viewer-section">
-                      <div className="viewer-section-title">&gt; Key Learning Takeaway:</div>
-                      <p>{selectedDayLog.takeaway}</p>
-                    </div>
-                    
-                    <div className="viewer-section">
-                      <div className="viewer-section-title">&gt; incident Correlation / Lab:</div>
-                      <div className="viewer-incident-box">
-                        <div className="viewer-incident-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <ShieldAlert style={{ width: '12px', height: '12px' }} /> {selectedDayLog.incidentName}
-                        </div>
-                        <div className="viewer-incident-body">{selectedDayLog.incidentDetail}</div>
-                      </div>
-                    </div>
-                    
-                    <div className="viewer-section">
-                      <div className="viewer-section-title">&gt; Operational Audit Code:</div>
-                      <pre style={{
-                        color: 'var(--color-green)',
-                        backgroundColor: 'var(--bg-darker)',
-                        padding: '6px',
-                        borderRadius: '4px',
-                        fontSize: '0.72rem',
-                        border: '1px solid var(--border-color)',
-                        marginTop: '4px',
-                        fontFamily: 'var(--font-mono)'
-                      }}>
-                        <code>SEC_LOG_VERIFIED: GCEK-IT-{selectedDayNum}-OK</code>
-                      </pre>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="viewer-day-header">
-                      <div className="viewer-title-line">
-                        <h4>Day {selectedDayNum}: {selectedDayNum === activeTrack.currentDay + 1 ? 'Awaiting Log Submission' : 'Classified Track Checkpoint'}</h4>
-                        <span className="day-status-pill upcoming">
-                          {selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Classified'}
-                        </span>
-                      </div>
-                      <div className="viewer-subtitle">
-                        {selectedDayNum === activeTrack.currentDay + 1 ? 'Current roadmap day target.' : 'Future checkpoint sequence.'}
-                      </div>
-                    </div>
-                    <div className="viewer-section">
-                      <p style={{ color: 'var(--text-muted)' }}>
-                        [INFO] Daily log entries represent hands-on lesson checkpoints. Future log updates will expand on automation, security diagnostics, and custom scripts logs.
-                      </p>
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -2215,6 +1987,45 @@ function App() {
       )}
 
       {/* Fullscreen HTML Preview Modal */}
+      {/* Day Selector Option Modal */}
+      {isDayOptionModalOpen && (
+        <div className="modal-overlay active" onClick={(e) => {
+          if (e.target === e.currentTarget) setIsDayOptionModalOpen(false);
+        }}>
+          <div className="modal-container" style={{ maxWidth: '420px', padding: '24px', textAlign: 'center', backgroundColor: 'var(--bg-dark)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+            <h3 style={{ marginBottom: '8px', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Select View Mode for Day {selectedDayNum}</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '20px' }}>
+              Choose how you want to inspect this daily checkpoint.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                className="btn btn-primary"
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px' }}
+                onClick={() => {
+                  setActiveViewerTab("log");
+                  setIsDayOptionModalOpen(false);
+                  setIsFullscreenPreviewOpen(true);
+                }}
+              >
+                <FileText style={{ width: '16px', height: '16px' }} /> Read Written Log
+              </button>
+              <button 
+                className="btn btn-secondary"
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px' }}
+                onClick={() => {
+                  setActiveViewerTab("preview");
+                  setIsDayOptionModalOpen(false);
+                  setIsFullscreenPreviewOpen(true);
+                }}
+              >
+                <Eye style={{ width: '16px', height: '16px' }} /> View HTML Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen HTML Preview / Log Modal */}
       {isFullscreenPreviewOpen && (
         <div className="modal-overlay active" onClick={(e) => {
           if (e.target === e.currentTarget) setIsFullscreenPreviewOpen(false);
@@ -2223,16 +2034,329 @@ function App() {
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Eye style={{ color: 'var(--color-cyan)', width: '20px', height: '20px' }} />
-                <h3 style={{ margin: 0 }}>{showRevision ? 'Phase Revision' : `Day ${selectedDayNum}`} Lab Preview (Fullscreen Mode)</h3>
+                <h3 style={{ margin: 0 }}>
+                  {activeViewerTab === 'revision' 
+                    ? `Days ${selectedRevisionInterval-9}–${selectedRevisionInterval} Revision` 
+                    : activeViewerTab === 'project'
+                    ? 'Project Workspace'
+                    : `Day ${selectedDayNum}`} Lab Details
+                </h3>
               </div>
+              
+              {/* Header tabs inside modal for log/preview mode */}
+              {(activeViewerTab === "log" || activeViewerTab === "preview") && (
+                <div className="terminal-tabs" style={{ display: 'flex', gap: '6px', marginLeft: 'auto', marginRight: '16px' }}>
+                  <button 
+                    onClick={() => setActiveViewerTab("log")} 
+                    className={`btn btn-sm ${activeViewerTab === 'log' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ padding: '4px 10px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <FileText style={{ width: '12px', height: '12px' }} /> Log View
+                  </button>
+                  <button 
+                    onClick={() => setActiveViewerTab("preview")} 
+                    className={`btn btn-sm ${activeViewerTab === 'preview' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ padding: '4px 10px', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <Eye style={{ width: '12px', height: '12px' }} /> HTML Preview
+                  </button>
+                </div>
+              )}
+
               <button className="modal-close" onClick={() => setIsFullscreenPreviewOpen(false)}>&times;</button>
             </div>
-            <div className="modal-body" style={{ flex: 1, padding: 0, overflow: 'hidden' }}>
-              <iframe 
-                src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, showRevision)} 
-                style={{ width: '100%', height: '100%', border: 'none', backgroundColor: 'transparent', colorScheme: 'dark' }}
-                title={showRevision ? `Phase Revision Fullscreen Preview` : `Day ${selectedDayNum} Fullscreen Preview`}
-              />
+            
+            <div className="modal-body" style={{ 
+              flex: 1, 
+              padding: activeViewerTab === 'log' ? '20px' : '0', 
+              overflowY: activeViewerTab === 'log' ? 'auto' : 'hidden',
+              backgroundColor: 'var(--bg-dark)',
+              color: 'var(--text-primary)',
+              fontFamily: activeViewerTab === 'log' ? 'var(--font-mono)' : 'inherit',
+              overscrollBehavior: 'contain'
+            }}>
+              {activeViewerTab === 'preview' ? (
+                <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {activeTrack && activeTrack.repoUrl ? (
+                    <>
+                      {checkingIframe ? (
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flex: 1,
+                          height: '100%',
+                          backgroundColor: 'var(--bg-darker)',
+                          color: 'var(--color-cyan)',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.8rem'
+                        }}>
+                          <RefreshCw className="loader-spin" style={{ width: '24px', height: '24px', marginBottom: '10px' }} />
+                          <span>Verifying remote lab presence on GitHub...</span>
+                        </div>
+                      ) : iframeExists ? (
+                        <iframe 
+                          src={getTrackIframeUrl(activeTrackId, activeTrack, selectedDayNum, false)} 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            backgroundColor: 'transparent',
+                            colorScheme: 'dark'
+                          }}
+                          title={`Day ${selectedDayNum} HTML Preview`}
+                        />
+                      ) : (
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flex: 1,
+                          padding: '24px',
+                          textAlign: 'center',
+                          color: 'var(--text-muted)',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.8rem',
+                          lineHeight: 1.5,
+                          backgroundColor: 'var(--bg-darker)'
+                        }}>
+                          <Compass style={{ color: 'var(--color-amber)', width: '32px', height: '32px', marginBottom: '12px' }} />
+                          <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem', display: 'block', marginBottom: '6px' }}>
+                            [AWAITING UPLOAD] Day {selectedDayNum} Lab Preview
+                          </span>
+                          <span style={{ fontSize: '0.78rem', maxWidth: '440px', color: 'var(--text-muted)', display: 'block', marginBottom: '12px' }}>
+                            The HTML log file for Day {selectedDayNum} hasn't been uploaded to GitHub yet, or is still building on GitHub Pages.
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-green)', fontWeight: 500, backgroundColor: 'rgba(0, 255, 136, 0.05)', padding: '6px 12px', borderRadius: '4px', border: '1px solid rgba(0, 255, 136, 0.15)' }}>
+                            ⚡ This preview will automatically load here as soon as the file arrives in your repository!
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flex: 1,
+                      padding: '24px',
+                      textAlign: 'center',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.8rem',
+                      lineHeight: 1.5,
+                      backgroundColor: 'var(--bg-darker)'
+                    }}>
+                      <ShieldAlert style={{ color: 'var(--color-amber)', width: '28px', height: '28px', marginBottom: '10px' }} />
+                      <span>[INFO] HTML Page Previews require a repository configured for this track.</span>
+                      <span style={{ fontSize: '0.72rem', marginTop: '6px' }}>Configure the repoUrl in your track settings to enable auto-loading.</span>
+                    </div>
+                  )}
+                </div>
+              ) : activeViewerTab === 'revision' ? (
+                <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <div className="revision-tabs-container" style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
+                    {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(val => {
+                      const start = val - 9;
+                      const label = `Days ${start}–${val}`;
+                      const isUnlocked = activeTrack.currentDay >= start;
+                      const isActive = selectedRevisionInterval === val;
+                      return (
+                        <button
+                          key={val}
+                          onClick={() => {
+                            if (isUnlocked) {
+                              setSelectedRevisionInterval(val);
+                            }
+                          }}
+                          className={`btn btn-sm ${isActive ? 'btn-primary' : 'btn-secondary'}`}
+                          style={{
+                            padding: '4px 10px',
+                            fontSize: '0.72rem',
+                            fontFamily: 'var(--font-mono)',
+                            cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                            opacity: isUnlocked ? 1 : 0.4,
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                          }}
+                          disabled={!isUnlocked}
+                        >
+                          {label} {!isUnlocked && "🔒"}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    {activeTrack && activeTrack.repoUrl ? (
+                      <>
+                        {checkingIframe ? (
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            backgroundColor: 'var(--bg-darker)',
+                            color: 'var(--color-cyan)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.8rem'
+                          }}>
+                            <RefreshCw className="loader-spin" style={{ width: '24px', height: '24px', marginBottom: '10px' }} />
+                            <span>Verifying remote lab presence on GitHub...</span>
+                          </div>
+                        ) : iframeExists ? (
+                          <iframe 
+                            src={getTrackIframeUrl(activeTrackId, activeTrack, selectedRevisionInterval, true)} 
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              colorScheme: 'dark'
+                            }}
+                            title={`Days ${selectedRevisionInterval - 9}-${selectedRevisionInterval} Revision Preview`}
+                          />
+                        ) : (
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            padding: '24px',
+                            textAlign: 'center',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.8rem',
+                            lineHeight: 1.5,
+                            backgroundColor: 'var(--bg-darker)'
+                          }}>
+                            <Compass style={{ color: 'var(--color-amber)', width: '32px', height: '32px', marginBottom: '12px' }} />
+                            <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem', display: 'block', marginBottom: '6px' }}>
+                              [AWAITING UPLOAD] Days {selectedRevisionInterval - 9}–{selectedRevisionInterval} Revision Preview
+                            </span>
+                            <span style={{ fontSize: '0.78rem', maxWidth: '440px', color: 'var(--text-muted)', display: 'block', marginBottom: '12px' }}>
+                              The revision HTML log file for Days {selectedRevisionInterval - 9}–{selectedRevisionInterval} hasn't been uploaded to GitHub yet, or is still building.
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--color-green)', fontWeight: 500, backgroundColor: 'rgba(0, 255, 136, 0.05)', padding: '6px 12px', borderRadius: '4px', border: '1px solid rgba(0, 255, 136, 0.15)' }}>
+                              ⚡ This preview will automatically load here as soon as the file arrives in your repository!
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 1,
+                        padding: '24px',
+                        textAlign: 'center',
+                        color: 'var(--text-muted)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.8rem',
+                        lineHeight: 1.5,
+                        backgroundColor: 'var(--bg-darker)'
+                      }}>
+                        <ShieldAlert style={{ color: 'var(--color-amber)', width: '28px', height: '28px', marginBottom: '10px' }} />
+                        <span>[INFO] HTML Page Previews require a repository configured for this track.</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : activeViewerTab === 'project' ? (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                  padding: '40px 20px',
+                  textAlign: 'center',
+                  color: 'var(--text-muted)',
+                  fontFamily: 'var(--font-mono)',
+                  backgroundColor: 'var(--bg-darker)',
+                  height: '100%'
+                }}>
+                  <FileCode style={{ color: 'var(--color-cyan)', width: '48px', height: '48px', marginBottom: '16px' }} />
+                  <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1.1rem', display: 'block', marginBottom: '12px' }}>
+                    [PROJECT INTEGRATION PORT]
+                  </span>
+                  <span style={{ fontSize: '0.9rem', maxWidth: '520px', display: 'block', marginBottom: '16px', lineHeight: 1.6 }}>
+                    This workspace is reserved for project files and repository assets. The code and live builds will be mapped to this view soon!
+                  </span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--color-amber)', border: '1px solid rgba(245, 158, 11, 0.2)', padding: '6px 14px', borderRadius: '4px', backgroundColor: 'rgba(245, 158, 11, 0.05)', fontWeight: 500 }}>
+                    ⚡ Repository connection: PENDING ACTIVE UPLOAD
+                  </span>
+                </div>
+              ) : selectedDayLog ? (
+                <div style={{ padding: '10px 20px' }}>
+                  <div className="viewer-day-header">
+                    <div className="viewer-title-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
+                      <h4 style={{ color: 'var(--text-primary)', margin: 0 }}>Day {selectedDayNum}: {selectedDayLog.title}</h4>
+                      <span className={`day-status-pill ${selectedDayNum <= activeTrack.currentDay ? 'complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'active' : 'upcoming'}`}>
+                        {selectedDayNum <= activeTrack.currentDay ? 'Verified Complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Upcoming'}
+                      </span>
+                    </div>
+                    <div className="viewer-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '16px' }}>{selectedDayLog.subtitle}</div>
+                  </div>
+                  
+                  <div className="viewer-section" style={{ marginBottom: '16px' }}>
+                    <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Key Learning Takeaway:</div>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>{selectedDayLog.takeaway}</p>
+                  </div>
+                  
+                  <div className="viewer-section" style={{ marginBottom: '16px' }}>
+                    <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; incident Correlation / Lab:</div>
+                    <div className="viewer-incident-box" style={{ border: '1px solid var(--border-color)', borderRadius: '4px', padding: '10px', backgroundColor: 'var(--bg-darker)' }}>
+                      <div className="viewer-incident-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-red)', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '4px' }}>
+                        <ShieldAlert style={{ width: '14px', height: '14px' }} /> {selectedDayLog.incidentName}
+                      </div>
+                      <div className="viewer-incident-body" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.4 }}>{selectedDayLog.incidentDetail}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="viewer-section">
+                    <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Operational Audit Code:</div>
+                    <pre style={{
+                      color: 'var(--color-green)',
+                      backgroundColor: 'var(--bg-darker)',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      border: '1px solid var(--border-color)',
+                      marginTop: '4px',
+                      fontFamily: 'var(--font-mono)',
+                      margin: 0
+                    }}>
+                      <code>SEC_LOG_VERIFIED: GCEK-IT-{selectedDayNum}-OK</code>
+                    </pre>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '10px 20px' }}>
+                  <div className="viewer-day-header">
+                    <div className="viewer-title-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
+                      <h4 style={{ color: 'var(--text-primary)', margin: 0 }}>Day {selectedDayNum}: {selectedDayNum === activeTrack.currentDay + 1 ? 'Awaiting Log Submission' : 'Classified Track Checkpoint'}</h4>
+                      <span className="day-status-pill upcoming">
+                        {selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Classified'}
+                      </span>
+                    </div>
+                    <div className="viewer-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '12px' }}>
+                      {selectedDayNum === activeTrack.currentDay + 1 ? 'Current roadmap day target.' : 'Future checkpoint sequence.'}
+                    </div>
+                  </div>
+                  <div className="viewer-section">
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>
+                      [INFO] Daily log entries represent hands-on lesson checkpoints. Future log updates will expand on automation, security diagnostics, and custom scripts logs.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2250,7 +2374,7 @@ function App() {
             </div>
 
             {/* Login verification screen */}
-            {!isAuthorized ? (
+             {activeTrack.currentDay > 10 && !isAuthorized ? (
               <div className="modal-auth-console">
                 <div className="terminal-body auth-terminal" style={{ padding: '24px' }}>
                   <p className="auth-line" style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>
@@ -2276,7 +2400,7 @@ function App() {
                     <div className="auth-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <button type="submit" className="btn btn-primary btn-sm"><KeyRound /> Authenticate</button>
                       <span className="auth-hint" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        (Hint: password is <strong>root</strong>)
+                        (Hint: password is <strong>root@robin</strong>)
                       </span>
                     </div>
                   </form>
@@ -2883,7 +3007,7 @@ git push origin main</code></pre>
             )}
 
             {/* Modal Footer */}
-            {isAuthorized && (
+            {(isAuthorized || activeTrack.currentDay <= 10) && (
               <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span className="save-status-text" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{saveStatus}</span>
                 <div className="modal-footer-buttons" style={{ display: 'flex', gap: '8px' }}>
