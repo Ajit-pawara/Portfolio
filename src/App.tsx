@@ -366,6 +366,13 @@ function App() {
   const [contentAuthError, setContentAuthError] = useState("");
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
 
+  // Certifications password protection (requires "@Ajit1729@")
+  const [isCertsUnlocked, setIsCertsUnlocked] = useState(() => sessionStorage.getItem("certs_unlocked") === "true");
+  const [certsPassword, setCertsPassword] = useState("");
+  const [certsAuthError, setCertsAuthError] = useState("");
+  const [isCertsPromptOpen, setIsCertsPromptOpen] = useState(false);
+  const [pendingCertUrl, setPendingCertUrl] = useState<string | null>(null);
+
   // Settings & Authentication modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(() => sessionStorage.getItem("root_authorized") === "true");
@@ -490,29 +497,80 @@ function App() {
     }, 3000);
   };
 
-  const handleContentAuthSubmit = (e: React.FormEvent) => {
+  // Helper to hash password using SHA-256
+  const hashPassword = async (pwd: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(pwd);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const CONTENT_HASH_URL = "https://gist.githubusercontent.com/ajit-pawara/REPLACE_WITH_CONTENT_GIST_ID/raw";
+
+  const handleContentAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (contentPassword === "ignite") {
-      sessionStorage.setItem("content_unlocked", "true");
-      setIsContentLocked(false);
-      setContentPassword("");
-      setContentAuthError("");
-      setIsPasswordPromptOpen(false);
-    } else {
-      setContentAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+    const hashed = await hashPassword(contentPassword);
+    try {
+      const res = await fetch(CONTENT_HASH_URL);
+      if (!res.ok) throw new Error("Failed to fetch hash");
+      const expectedHash = (await res.text()).trim();
+      if (hashed === expectedHash) {
+        sessionStorage.setItem("content_unlocked", "true");
+        setIsContentLocked(false);
+        setContentPassword("");
+        setContentAuthError("");
+        setIsPasswordPromptOpen(false);
+      } else {
+        setContentAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+        setContentPassword("");
+      }
+    } catch {
+      setContentAuthError("[ERROR] UNABLE TO VERIFY CREDENTIALS. CHECK NETWORK.");
       setContentPassword("");
     }
   };
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "root@robin") {
+    const hashed = await hashPassword(password);
+    if (hashed === "d4f7f87af4a1d68fc8d586d455136d1958fa4844f0abeb7ee72f7edb16d4b686") { // root@robin
       sessionStorage.setItem("root_authorized", "true");
       setIsAuthorized(true);
       setAuthError("");
     } else {
       setAuthError("[ERROR] ACCESS DENIED: INVALID PRIVILEGED PASSWORD MATRIX.");
       setPassword("");
+    }
+  };
+
+  const CERTS_HASH_URL = "https://gist.githubusercontent.com/ajit-pawara/REPLACE_WITH_YOUR_GIST_ID/raw";
+
+  const handleCertsAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const hashed = await hashPassword(certsPassword);
+    try {
+      const res = await fetch(CERTS_HASH_URL);
+      if (!res.ok) throw new Error("Failed to fetch hash");
+      const expectedHash = (await res.text()).trim();
+      if (hashed === expectedHash) {
+        sessionStorage.setItem("certs_unlocked", "true");
+        setIsCertsUnlocked(true);
+        setCertsPassword("");
+        setCertsAuthError("");
+        setIsCertsPromptOpen(false);
+        setIsCertsExpanded(true);
+        if (pendingCertUrl) {
+          window.open(pendingCertUrl, "_blank");
+          setPendingCertUrl(null);
+        }
+      } else {
+        setCertsAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+        setCertsPassword("");
+      }
+    } catch {
+      setCertsAuthError("[ERROR] UNABLE TO VERIFY CREDENTIALS. CHECK NETWORK.");
+      setCertsPassword("");
     }
   };
 
@@ -1241,7 +1299,13 @@ function App() {
               <p className="section-description" style={{ margin: '4px 0 0 0' }}>Cryptographic verification profiles and training completions.</p>
             </div>
             <button
-              onClick={() => setIsCertsExpanded(!isCertsExpanded)}
+              onClick={() => {
+                if (isCertsUnlocked) {
+                  setIsCertsExpanded(!isCertsExpanded);
+                } else {
+                  setIsCertsPromptOpen(true);
+                }
+              }}
               className="btn btn-secondary btn-sm"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
@@ -1265,7 +1329,13 @@ function App() {
               ))}
             </div>
           ) : (
-            <div className="card" onClick={() => setIsCertsExpanded(true)} style={{
+            <div className="card" onClick={() => {
+              if (isCertsUnlocked) {
+                setIsCertsExpanded(true);
+              } else {
+                setIsCertsPromptOpen(true);
+              }
+            }} style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -1422,7 +1492,7 @@ function App() {
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               {isVolleyballExpanded ? <EyeOff /> : <Eye />}
-              {isVolleyballExpanded ? "Hide Sports Background" : "Show Sports Background"}
+              {isVolleyballExpanded ? "Hide Sports & Academy Background" : "Show Sports & Academy Background"}
             </button>
           </div>
 
@@ -1459,11 +1529,35 @@ function App() {
               <div className="sports-icon-wrapper">
                 <VolleyballIcon className="ball-icon" />
               </div>
-              <div className="sports-info">
-                <h4>Sports & Discipline Background: Volleyball (Zonal/State level)</h4>
-                <p>
+              <div className="sports-info" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <h4 style={{ margin: 0 }}>Sports & Discipline Background: Volleyball (Zonal/State level)</h4>
+                <p style={{ margin: 0 }}>
                   Competing in volleyball at the zonal and state level has instilled deep discipline, tactical coordination, and team-oriented resilience in me. I carry these operational traits into software engineering and threat mitigation.
                 </p>
+                <div style={{ marginTop: '4px' }}>
+                  <button
+                    onClick={() => {
+                      if (isCertsUnlocked) {
+                        window.open("https://drive.google.com/drive/folders/1rOXaHBZRyLMgpFS_KPmBEjNy85cXFlAM?usp=drive_link", "_blank");
+                      } else {
+                        setPendingCertUrl("https://drive.google.com/drive/folders/1rOXaHBZRyLMgpFS_KPmBEjNy85cXFlAM?usp=drive_link");
+                        setIsCertsPromptOpen(true);
+                      }
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      textDecoration: 'none',
+                      fontSize: '0.8rem',
+                      padding: '6px 12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Award style={{ width: '14px', height: '14px' }} /> View Sports & Academic Certifications
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -2431,6 +2525,68 @@ function App() {
               {contentAuthError && (
                 <p style={{ color: 'var(--color-red)', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', margin: 0 }}>
                   {contentAuthError}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Certifications Password Prompt Modal */}
+      {isCertsPromptOpen && (
+        <div className="modal-overlay active" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsCertsPromptOpen(false);
+            setCertsAuthError("");
+            setCertsPassword("");
+            setPendingCertUrl(null);
+          }
+        }}>
+          <div className="modal-container" style={{
+            maxWidth: '420px', padding: '32px 24px 24px', textAlign: 'center',
+            backgroundColor: 'var(--bg-dark)', border: '1px solid rgba(0, 217, 255, 0.3)', borderRadius: '6px'
+          }}>
+            <KeyRound style={{ width: '40px', height: '40px', color: 'var(--color-cyan)', marginBottom: '12px' }} />
+            <h3 style={{ marginBottom: '6px', fontSize: '1.15rem', color: 'var(--text-primary)' }}>
+              &#x1f512; Credentials Decryption Required
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '4px' }}>
+              Viewing certifications registry requires a secure authorization passkey.
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '20px' }}>
+              Please enter credentials to unlock all verified certificate files.
+            </p>
+            <form onSubmit={handleCertsAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+              <input
+                type="password"
+                value={certsPassword}
+                onChange={(e) => setCertsPassword(e.target.value)}
+                placeholder="Enter authorization passkey"
+                style={{
+                  width: '100%', maxWidth: '280px', padding: '10px 14px', fontSize: '0.9rem',
+                  backgroundColor: 'var(--bg-darker)', border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)', borderRadius: '4px', fontFamily: 'var(--font-mono)',
+                  textAlign: 'center', outline: 'none', boxSizing: 'border-box'
+                }}
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '280px' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}>
+                  Decrypt
+                </button>
+                <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
+                  onClick={() => {
+                    setIsCertsPromptOpen(false);
+                    setCertsAuthError("");
+                    setCertsPassword("");
+                    setPendingCertUrl(null);
+                  }}>
+                  Cancel
+                </button>
+              </div>
+              {certsAuthError && (
+                <p style={{ color: 'var(--color-red)', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', margin: 0 }}>
+                  {certsAuthError}
                 </p>
               )}
             </form>
