@@ -265,6 +265,9 @@ function App() {
   const [typedText, setTypedText] = useState("");
   const [isTypingFinished, setIsTypingFinished] = useState(false);
   const whoamiString = "whoami";
+  const [whoamiOutput, setWhoamiOutput] = useState("");
+  const [isOutputTyping, setIsOutputTyping] = useState(false);
+  const [isOutputFinished, setIsOutputFinished] = useState(false);
 
   // Tracker interaction
   const activeTrackId = db.challenge?.activeTrack || "cybersecurity";
@@ -437,6 +440,35 @@ function App() {
     }, 40);
     return () => clearInterval(interval);
   }, []);
+
+  // Typed effect for whoami output
+  useEffect(() => {
+    if (!isTypingFinished) return;
+    const name = db.profile?.name || "unknown";
+    const title = db.profile?.title || "operator";
+    const institution = db.profile?.institution || "unknown";
+    const bio = db.profile?.bio || "";
+    const outputLines = [
+      `uid=1000(${name.toLowerCase().replace(/\s+/g, '_')}) gid=1000(${name.toLowerCase().replace(/\s+/g, '_')}) groups=1000(${name.toLowerCase().replace(/\s+/g, '_')})`,
+      `name=${name}`,
+      `title=${title} @ ${institution}`,
+      `bio=${bio}`,
+    ];
+    const fullOutput = outputLines.join("\n") + "\n";
+    setIsOutputTyping(true);
+    let charIndex = 0;
+    const interval = setInterval(() => {
+      if (charIndex < fullOutput.length) {
+        setWhoamiOutput(fullOutput.slice(0, charIndex + 1));
+        charIndex++;
+      } else {
+        clearInterval(interval);
+        setIsOutputTyping(false);
+        setIsOutputFinished(true);
+      }
+    }, 20);
+    return () => clearInterval(interval);
+  }, [isTypingFinished, db.profile]);
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLDivElement>, targetId: string) => {
     e.preventDefault();
     setActiveTab(targetId);
@@ -845,53 +877,71 @@ function App() {
 
               {isTypingFinished && (
                 <div className="hero-details" style={{ marginTop: '20px' }}>
-                  <div className="profile-summary" style={{
-                    display: 'flex',
-                    gap: '24px',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    animation: 'heroReveal 0.55s ease both',
-                    animationDelay: '0.05s'
-                  }}>
-                    <div className="profile-avatar-container" style={{
-                      position: 'relative',
-                      width: '96px',
-                      height: '96px',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      border: '2.5px solid var(--color-cyan)',
-                      boxShadow: '0 0 20px rgba(0, 217, 255, 0.3)',
-                      flexShrink: 0,
-                      backgroundColor: 'var(--bg-darker)'
+                  {whoamiOutput && (
+                    <pre className="whoami-output" style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.85rem',
+                      color: 'var(--color-green)',
+                      margin: 0,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      lineHeight: '1.6'
                     }}>
-                      <img src="./profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
-                      <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-                        {db.profile?.name}
-                      </h1>
-                      <p className="hero-subtitle" style={{ margin: '4px 0 12px 0', color: 'var(--color-cyan)', fontSize: '1rem', fontWeight: 500 }}>
-                        {db.profile?.title} @ {db.profile?.institution}
-                      </p>
-                      <p className="hero-bio" style={{
-                        margin: 0,
-                        fontSize: '0.88rem',
-                        color: 'var(--text-muted)',
-                        lineHeight: '1.5',
-                        fontFamily: 'var(--font-sans)',
-                        borderLeft: '2px solid var(--border-color)',
-                        paddingLeft: '12px'
-                      }}>
-                        {db.profile?.bio}
-                      </p>
-                    </div>
-                  </div>
+                      {whoamiOutput}{isOutputTyping && <span className="blinking-cursor">|</span>}
+                    </pre>
+                  )}
 
-                  <div className="hero-ctas" style={{ marginTop: '20px', animation: 'heroReveal 0.55s ease both', animationDelay: '0.35s' }}>
-                    <a href="#challenge" className="btn btn-primary" onClick={(e) => handleNavClick(e, 'challenge')}><Calendar /> View Learning Tracker</a>
-                    <a href="#projects" className="btn btn-secondary" onClick={(e) => handleNavClick(e, 'projects')}><Folder /> Inspect Shipped Projects</a>
-                    <a href="#resume" className="btn btn-tertiary" onClick={(e) => handleNavClick(e, 'resume')}><Mail /> Get In Touch</a>
-                  </div>
+                  {isOutputFinished && (
+                    <>
+                      <div className="profile-summary" style={{
+                        display: 'flex',
+                        gap: '24px',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        marginTop: '16px',
+                        animation: 'heroReveal 0.55s ease both'
+                      }}>
+                        <div className="profile-avatar-container" style={{
+                          position: 'relative',
+                          width: '96px',
+                          height: '96px',
+                          borderRadius: '50%',
+                          overflow: 'hidden',
+                          border: '2.5px solid var(--color-cyan)',
+                          boxShadow: '0 0 20px rgba(0, 217, 255, 0.3)',
+                          flexShrink: 0,
+                          backgroundColor: 'var(--bg-darker)'
+                        }}>
+                          <img src="./profile.png" alt="Ajit Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                        <div className="info-block" style={{ flex: '1', minWidth: '250px' }}>
+                          <h1 className="glow-title" style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+                            {db.profile?.name}
+                          </h1>
+                          <p className="hero-subtitle" style={{ margin: '4px 0 12px 0', color: 'var(--color-cyan)', fontSize: '1rem', fontWeight: 500 }}>
+                            {db.profile?.title} @ {db.profile?.institution}
+                          </p>
+                          <p className="hero-bio" style={{
+                            margin: 0,
+                            fontSize: '0.88rem',
+                            color: 'var(--text-muted)',
+                            lineHeight: '1.5',
+                            fontFamily: 'var(--font-sans)',
+                            borderLeft: '2px solid var(--border-color)',
+                            paddingLeft: '12px'
+                          }}>
+                            {db.profile?.bio}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="hero-ctas" style={{ marginTop: '20px', animation: 'heroReveal 0.55s ease both' }}>
+                        <a href="#challenge" className="btn btn-primary" onClick={(e) => handleNavClick(e, 'challenge')}><Calendar /> View Learning Tracker</a>
+                        <a href="#projects" className="btn btn-secondary" onClick={(e) => handleNavClick(e, 'projects')}><Folder /> Inspect Shipped Projects</a>
+                        <a href="#resume" className="btn btn-tertiary" onClick={(e) => handleNavClick(e, 'resume')}><Mail /> Get In Touch</a>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
