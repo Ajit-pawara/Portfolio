@@ -54,6 +54,10 @@ Portfolio/
 └── vite.config.ts
 ```
 
+### Certificates
+
+I've also added **Sports** and other **Certificates** to the portfolio. If you want to view them, contact me for the **passkey** (also required for **Day 11 onward**).
+
 ### Contact
 
 ```
