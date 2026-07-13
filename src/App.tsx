@@ -522,7 +522,7 @@ function App() {
         setContentAuthError("");
         setIsPasswordPromptOpen(false);
       } else {
-        setContentAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+        setContentAuthError("[ERROR] ACCESS DENIED: INVALID CONTENT PASSWORD MATRIX.");
         setContentPassword("");
       }
     } catch {
@@ -565,7 +565,7 @@ function App() {
           setPendingCertUrl(null);
         }
       } else {
-        setCertsAuthError("[ERROR] ACCESS DENIED: INVALID PASSWORD MATRIX.");
+        setCertsAuthError("[ERROR] ACCESS DENIED: INVALID REGISTRY PASSWORD MATRIX.");
         setCertsPassword("");
       }
     } catch {
