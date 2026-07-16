@@ -414,7 +414,7 @@ function App() {
   const [activeSkillsTab, setActiveSkillsTab] = useState<"radar" | "philosophy" | "list" | "pathways">("radar");
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
   const [isCertsExpanded, setIsCertsExpanded] = useState(false);
-  const [isVolleyballExpanded, setIsVolleyballExpanded] = useState(false);
+  const [isVolleyballExpanded, setIsVolleyballExpanded] = useState(true);
 
   // Force a clean reset to the top on refresh (prevent browser scroll restoration
   // from landing on the Dossier/resume section and the scrollspy locking onto it)
@@ -610,7 +610,7 @@ function App() {
     const hashed = await hashPassword(certsPassword);
     
     // Offline / Hardcoded fallback check
-    if (hashed === "42531af0ba3a89ddaff8515844413fbea89d40e87ca3e3a5497984a7ed40bbaa") {
+    if (hashed === "c568d0c96043c60f9924afb1c1271325cee7f2fd886d59e30eb829fbdd07516d") {
       sessionStorage.setItem("certs_unlocked", "true");
       setIsCertsUnlocked(true);
       setCertsPassword("");
@@ -2382,7 +2382,33 @@ function App() {
                     })}
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    {activeTrack && activeTrack.repoUrl ? (
+                    {selectedRevisionInterval >= 20 && isContentLocked ? (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 1,
+                        padding: '24px',
+                        textAlign: 'center',
+                        color: 'var(--text-muted)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.8rem',
+                        lineHeight: 1.5,
+                        backgroundColor: 'var(--bg-darker)'
+                      }}>
+                        <KeyRound style={{ color: 'var(--color-cyan)', width: '36px', height: '36px', marginBottom: '12px' }} />
+                        <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem', display: 'block', marginBottom: '6px' }}>
+                          [LOCKED] Days {selectedRevisionInterval - 9}–{selectedRevisionInterval} Revision Content
+                        </span>
+                        <span style={{ fontSize: '0.78rem', maxWidth: '440px', color: 'var(--text-muted)', display: 'block', marginBottom: '16px' }}>
+                          This revision block is cryptographically locked. Enter the session passkey to decrypt.
+                        </span>
+                        <button onClick={() => setIsPasswordPromptOpen(true)} className="btn btn-primary btn-sm" style={{ padding: '6px 16px' }}>
+                          Enter Passkey
+                        </button>
+                      </div>
+                    ) : activeTrack && activeTrack.repoUrl ? (
                       <>
                         {checkingIframe ? (
                           <div style={{
