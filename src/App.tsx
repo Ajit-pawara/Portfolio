@@ -556,7 +556,21 @@ function App() {
   const handleContentAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const hashed = await hashPassword(contentPassword);
+    
+    // Offline / Hardcoded fallback for default password 'ignite'
+    if (hashed === "5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c") {
+      sessionStorage.setItem("content_unlocked", "true");
+      setIsContentLocked(false);
+      setContentPassword("");
+      setContentAuthError("");
+      setIsPasswordPromptOpen(false);
+      return;
+    }
+
     try {
+      if (CONTENT_HASH_URL.includes("REPLACE_WITH_CONTENT_GIST_ID")) {
+        throw new Error("Gist not configured");
+      }
       const res = await fetch(CONTENT_HASH_URL);
       if (!res.ok) throw new Error("Failed to fetch hash");
       const expectedHash = (await res.text()).trim();
@@ -571,7 +585,7 @@ function App() {
         setContentPassword("");
       }
     } catch {
-      setContentAuthError("[ERROR] UNABLE TO VERIFY CREDENTIALS. CHECK NETWORK.");
+      setContentAuthError("[ERROR] ACCESS DENIED: INVALID CONTENT PASSWORD MATRIX.");
       setContentPassword("");
     }
   };
@@ -594,7 +608,26 @@ function App() {
   const handleCertsAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const hashed = await hashPassword(certsPassword);
+    
+    // Offline / Hardcoded fallback for default password '@Ajit1729@'
+    if (hashed === "42531af0ba3a89ddaff8515844413fbea89d40e87ca3e3a5497984a7ed40bbaa") {
+      sessionStorage.setItem("certs_unlocked", "true");
+      setIsCertsUnlocked(true);
+      setCertsPassword("");
+      setCertsAuthError("");
+      setIsCertsPromptOpen(false);
+      setIsCertsExpanded(true);
+      if (pendingCertUrl) {
+        window.open(pendingCertUrl, "_blank");
+        setPendingCertUrl(null);
+      }
+      return;
+    }
+
     try {
+      if (CERTS_HASH_URL.includes("REPLACE_WITH_YOUR_GIST_ID")) {
+        throw new Error("Gist not configured");
+      }
       const res = await fetch(CERTS_HASH_URL);
       if (!res.ok) throw new Error("Failed to fetch hash");
       const expectedHash = (await res.text()).trim();
@@ -614,7 +647,7 @@ function App() {
         setCertsPassword("");
       }
     } catch {
-      setCertsAuthError("[ERROR] UNABLE TO VERIFY CREDENTIALS. CHECK NETWORK.");
+      setCertsAuthError("[ERROR] ACCESS DENIED: INVALID REGISTRY PASSWORD MATRIX.");
       setCertsPassword("");
     }
   };
