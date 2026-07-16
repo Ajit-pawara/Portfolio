@@ -1043,7 +1043,13 @@ function App() {
             )}
             {activeTrack && activeTrack.repoUrl && (
               <button
-                onClick={() => setIsRoadmapOpen(true)}
+                onClick={() => {
+                  if (isContentLocked) {
+                    setIsPasswordPromptOpen(true);
+                  } else {
+                    setIsRoadmapOpen(true);
+                  }
+                }}
                 className="btn btn-primary"
                 style={{
                   display: 'inline-flex',
@@ -1088,8 +1094,12 @@ function App() {
             {activeTrack && activeTrack.repoUrl && (
               <button
                 onClick={() => {
-                  setActiveViewerTab("project");
-                  setIsFullscreenPreviewOpen(true);
+                  if (isContentLocked) {
+                    setIsPasswordPromptOpen(true);
+                  } else {
+                    setActiveViewerTab("project");
+                    setIsFullscreenPreviewOpen(true);
+                  }
                 }}
                 className="btn btn-secondary"
                 style={{
