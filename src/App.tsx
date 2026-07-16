@@ -365,13 +365,13 @@ function App() {
     }
   }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval]);
 
-  // Content password protection (days 11-90 require "ignite")
+  // Content password protection
   const [isContentLocked, setIsContentLocked] = useState(() => sessionStorage.getItem("content_unlocked") !== "true");
   const [contentPassword, setContentPassword] = useState("");
   const [contentAuthError, setContentAuthError] = useState("");
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
 
-  // Certifications password protection (requires "@Ajit1729@")
+  // Certifications password protection
   const [isCertsUnlocked, setIsCertsUnlocked] = useState(() => sessionStorage.getItem("certs_unlocked") === "true");
   const [certsPassword, setCertsPassword] = useState("");
   const [certsAuthError, setCertsAuthError] = useState("");
@@ -557,7 +557,7 @@ function App() {
     e.preventDefault();
     const hashed = await hashPassword(contentPassword);
     
-    // Offline / Hardcoded fallback for default password 'ignite'
+    // Offline / Hardcoded fallback check
     if (hashed === "5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c") {
       sessionStorage.setItem("content_unlocked", "true");
       setIsContentLocked(false);
@@ -593,7 +593,7 @@ function App() {
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const hashed = await hashPassword(password);
-    if (hashed === "d4f7f87af4a1d68fc8d586d455136d1958fa4844f0abeb7ee72f7edb16d4b686") { // root@robin
+    if (hashed === "d4f7f87af4a1d68fc8d586d455136d1958fa4844f0abeb7ee72f7edb16d4b686") {
       sessionStorage.setItem("root_authorized", "true");
       setIsAuthorized(true);
       setAuthError("");
@@ -609,7 +609,7 @@ function App() {
     e.preventDefault();
     const hashed = await hashPassword(certsPassword);
     
-    // Offline / Hardcoded fallback for default password '@Ajit1729@'
+    // Offline / Hardcoded fallback check
     if (hashed === "42531af0ba3a89ddaff8515844413fbea89d40e87ca3e3a5497984a7ed40bbaa") {
       sessionStorage.setItem("certs_unlocked", "true");
       setIsCertsUnlocked(true);
@@ -2714,7 +2714,7 @@ function App() {
                     <div className="auth-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <button type="submit" className="btn btn-primary btn-sm"><KeyRound /> Authenticate</button>
                       <span className="auth-hint" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        (Hint: password is <strong>root@robin</strong>)
+                        (Enter root password to proceed)
                       </span>
                     </div>
                   </form>
