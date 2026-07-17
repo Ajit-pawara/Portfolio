@@ -274,7 +274,71 @@ function App() {
   // Tracker interaction
   const activeTrackId = db.challenge?.activeTrack || "cybersecurity";
   const activeTrack = db.challenge?.tracks?.[activeTrackId] || DEFAULT_TRACK;
-  const [selectedDayNum, setSelectedDayNum] = useState<number>(activeTrack.currentDay);
+
+  // Remote files list state for auto-detecting current day based on HTML files
+  const [existingFiles, setExistingFiles] = useState<string[]>([]);
+  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!activeTrack || !activeTrack.repoUrl) {
+      setExistingFiles([]);
+      return;
+    }
+    try {
+      const url = new URL(activeTrack.repoUrl);
+      const pathParts = url.pathname.split('/').filter(Boolean);
+      if (pathParts.length >= 2) {
+        const owner = pathParts[0];
+        const repo = pathParts[1];
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+        setLoadingFiles(true);
+        fetch(apiUrl)
+          .then(res => {
+            if (res.ok) return res.json();
+            throw new Error("Failed to fetch repository contents");
+          })
+          .then(data => {
+            if (Array.isArray(data)) {
+              const files = data.filter((item: any) => item.type === 'file').map((item: any) => item.name);
+              setExistingFiles(files);
+            }
+          })
+          .catch(err => {
+            console.error("Error fetching repository contents:", err);
+          })
+          .finally(() => {
+            setLoadingFiles(false);
+          });
+      }
+    } catch (e) {
+      console.error("Error parsing repository URL:", e);
+    }
+  }, [activeTrackId, activeTrack.repoUrl]);
+
+  // Compute the current active day dynamically based on existing HTML files in the repo.
+  // The highest day file number indicates the current running day.
+  const computedCurrentDay = (() => {
+    let maxDay = 0;
+    existingFiles.forEach(file => {
+      let match;
+      if (activeTrackId === 'cybersecurity') {
+        match = file.match(/^day(\d+)\.html$/i);
+      } else if (activeTrackId === 'java_dsa') {
+        match = file.match(/^DSAday(\d+)\.html$/i);
+      } else {
+        match = file.match(/^day(\d+)\.html$/i);
+      }
+      if (match) {
+        const day = parseInt(match[1], 10);
+        if (day > maxDay) {
+          maxDay = day;
+        }
+      }
+    });
+    return maxDay > 0 ? maxDay : (activeTrack.currentDay + 1);
+  })();
+
+  const [selectedDayNum, setSelectedDayNum] = useState<number>(computedCurrentDay);
 
   // Remote HTML presence check
   const [iframeExists, setIframeExists] = useState<boolean | null>(null);
@@ -526,10 +590,10 @@ function App() {
     };
   }, []);
 
-  // Update selected day when switching tracks
+  // Update selected day when switching tracks or computed current day changes
   useEffect(() => {
-    setSelectedDayNum(activeTrack.currentDay);
-  }, [activeTrackId, activeTrack.currentDay]);
+    setSelectedDayNum(computedCurrentDay);
+  }, [activeTrackId, computedCurrentDay]);
 
   // Save changes locally
   const saveChanges = (newDb: any) => {
@@ -1123,7 +1187,15 @@ function App() {
             {/* Visual grid card */}
             <div className="challenge-grid-card card">
               <div className="card-header-bar">
-                <h3><Grid /> Track Contribution Map</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Grid /> Track Contribution Map
+                  {loadingFiles && (
+                    <span className="terminal-loader" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', opacity: 0.8 }}>
+                      <span className="loader-icon blinking-cursor" style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-cyan)', borderRadius: '50%', display: 'inline-block', animation: 'blink 1s step-end infinite' }}></span>
+                      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>[auto-detecting...]</span>
+                    </span>
+                  )}
+                </h3>
                 <div className="grid-legend">
                   <span className="legend-item"><span className="legend-cell complete"></span> Completed</span>
                   <span className="legend-item"><span className="legend-cell active"></span> Active</span>
@@ -1137,9 +1209,9 @@ function App() {
                     const dayNum = index + 1;
 
                     let cellClass = "day-cell";
-                    if (dayNum <= activeTrack.currentDay) {
+                    if (dayNum < computedCurrentDay) {
                       cellClass += " complete";
-                    } else if (dayNum === activeTrack.currentDay + 1) {
+                    } else if (dayNum === computedCurrentDay) {
                       cellClass += " active";
                     } else {
                       cellClass += " upcoming";
@@ -1171,7 +1243,7 @@ function App() {
 
               <div className="grid-summary-footer">
                 <span id="challenge-stats">
-                  <strong>{activeTrack.completedDays} / {activeTrack.totalDays} Days Completed</strong>
+                  <strong>{computedCurrentDay - 1} / {activeTrack.totalDays} Days Completed</strong>
                 </span>
                 <span>Active Track: <strong>{activeTrack.name}</strong></span>
               </div>
@@ -2526,8 +2598,8 @@ function App() {
                   <div className="viewer-day-header">
                     <div className="viewer-title-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
                       <h4 style={{ color: 'var(--text-primary)', margin: 0 }}>Day {selectedDayNum}: {selectedDayLog.title}</h4>
-                      <span className={`day-status-pill ${selectedDayNum <= activeTrack.currentDay ? 'complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'active' : 'upcoming'}`}>
-                        {selectedDayNum <= activeTrack.currentDay ? 'Verified Complete' : selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Upcoming'}
+                      <span className={`day-status-pill ${selectedDayNum < computedCurrentDay ? 'complete' : selectedDayNum === computedCurrentDay ? 'active' : 'upcoming'}`}>
+                        {selectedDayNum < computedCurrentDay ? 'Verified Complete' : selectedDayNum === computedCurrentDay ? 'Active Focus' : 'Upcoming'}
                       </span>
                     </div>
                     <div className="viewer-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '16px' }}>{selectedDayLog.subtitle}</div>
@@ -2569,13 +2641,13 @@ function App() {
                 <div style={{ padding: '10px 20px' }}>
                   <div className="viewer-day-header">
                     <div className="viewer-title-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
-                      <h4 style={{ color: 'var(--text-primary)', margin: 0 }}>Day {selectedDayNum}: {selectedDayNum === activeTrack.currentDay + 1 ? 'Awaiting Log Submission' : 'Classified Track Checkpoint'}</h4>
-                      <span className="day-status-pill upcoming">
-                        {selectedDayNum === activeTrack.currentDay + 1 ? 'Active Focus' : 'Classified'}
+                      <h4 style={{ color: 'var(--text-primary)', margin: 0 }}>Day {selectedDayNum}: {selectedDayNum === computedCurrentDay ? 'Awaiting Log Submission' : 'Classified Track Checkpoint'}</h4>
+                      <span className={`day-status-pill ${selectedDayNum === computedCurrentDay ? 'active' : 'upcoming'}`}>
+                        {selectedDayNum === computedCurrentDay ? 'Active Focus' : 'Classified'}
                       </span>
                     </div>
                     <div className="viewer-subtitle" style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '12px' }}>
-                      {selectedDayNum === activeTrack.currentDay + 1 ? 'Current roadmap day target.' : 'Future checkpoint sequence.'}
+                      {selectedDayNum === computedCurrentDay ? 'Current roadmap day target.' : 'Future checkpoint sequence.'}
                     </div>
                   </div>
                   <div className="viewer-section">
@@ -2724,7 +2796,7 @@ function App() {
             </div>
 
             {/* Login verification screen */}
-            {activeTrack.currentDay > 10 && !isAuthorized ? (
+            {(computedCurrentDay - 1) > 10 && !isAuthorized ? (
               <div className="modal-auth-console">
                 <div className="terminal-body auth-terminal" style={{ padding: '24px' }}>
                   <p className="auth-line" style={{ color: 'var(--text-muted)', marginBottom: '10px' }}>
@@ -3357,7 +3429,7 @@ function App() {
             )}
 
             {/* Modal Footer */}
-            {(isAuthorized || activeTrack.currentDay <= 10) && (
+            {(isAuthorized || (computedCurrentDay - 1) <= 10) && (
               <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span className="save-status-text" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{saveStatus}</span>
                 <div className="modal-footer-buttons" style={{ display: 'flex', gap: '8px' }}>
