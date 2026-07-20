@@ -345,6 +345,7 @@ function App() {
   // Remote HTML presence check
   const [iframeExists, setIframeExists] = useState<boolean | null>(null);
   const [checkingIframe, setCheckingIframe] = useState<boolean>(false);
+  const [checkRetryKey, setCheckRetryKey] = useState(0);
   const [activeViewerTab, setActiveViewerTab] = useState<"log" | "preview" | "revision" | "project">("log");
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
   const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
@@ -403,26 +404,29 @@ function App() {
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`;
 
         setCheckingIframe(true);
-        setIframeExists(null);
+
+        let cancelled = false;
 
         fetch(apiUrl, { method: 'GET' })
           .then(res => {
+            if (cancelled) return;
             if (res.ok) {
               setIframeExists(true);
             } else if (res.status === 403) {
-              // Rate limit reached for anonymous API access; assume file exists and let the iframe try loading it
               setIframeExists(true);
             } else {
               setIframeExists(false);
             }
           })
           .catch(() => {
-            // Network error/offline, fallback to false
+            if (cancelled) return;
             setIframeExists(false);
           })
           .finally(() => {
-            setCheckingIframe(false);
+            if (!cancelled) setCheckingIframe(false);
           });
+
+        return () => { cancelled = true; };
       } else {
         setIframeExists(false);
       }
@@ -430,7 +434,15 @@ function App() {
       console.error("Error checking file existence via API:", e);
       setIframeExists(false);
     }
-  }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval]);
+  }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval, checkRetryKey]);
+
+  // Retry existence check every 15s when it fails
+  useEffect(() => {
+    if (iframeExists === false) {
+      const timer = setTimeout(() => setCheckRetryKey(k => k + 1), 15000);
+      return () => clearTimeout(timer);
+    }
+  }, [iframeExists, checkRetryKey]);
 
   // Fetch days manifest
   useEffect(() => {
