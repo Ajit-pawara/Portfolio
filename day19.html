@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 19 — Authentication vs Authorization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:21.1%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+
+  .compare-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .compare-col{flex:1;min-width:230px;border-radius:10px;padding:18px 20px;}
+  .compare-col.authn{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .compare-col.authz{background:rgba(79,209,255,0.05);border:1px solid rgba(79,209,255,0.2);}
+  .compare-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .compare-col.authn .role{color:var(--green);}
+  .compare-col.authz .role{color:var(--cyan);}
+  .compare-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .compare-col li{margin-bottom:6px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept.red{border-left-color:var(--red);}
+  .concept.red .ctitle{color:var(--red);}
+  .concept.amber{border-left-color:var(--amber);}
+  .concept.amber .ctitle{color:var(--amber);}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .compare-grid{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day19$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 19/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 19 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Authentication vs Authorization <span class="accent">— and why confusing them is catastrophic</span></h1>
+  <p class="subtitle">Optus Australia in 2022 exposed 11 million customer records through an API that required zero authentication. No login, no token — just call the endpoint and get data. Today you learn the difference between proving who you are and controlling what you're allowed to do — two completely separate problems that developers constantly conflate.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Two completely separate questions:</strong></p>
+      <div class="compare-grid">
+        <div class="compare-col authn">
+          <div class="role">Authentication (AuthN) — WHO are you?</div>
+          <ul>
+            <li>The process of proving your identity to a system.</li>
+            <li>Factors: something you <strong>know</strong> (password), something you <strong>have</strong> (OTP token), something you <strong>are</strong> (biometric).</li>
+            <li>Fails: weak passwords, credential stuffing, session hijacking, brute force, phishing.</li>
+            <li>Result of success: a session token or access token that proves "this user is logged in."</li>
+            <li>Real-world: showing your ID at a hotel check-in — proves who you are.</li>
+          </ul>
+        </div>
+        <div class="compare-col authz">
+          <div class="role">Authorization (AuthZ) — WHAT can you do?</div>
+          <ul>
+            <li>The process of determining what an authenticated identity is permitted to access or do.</li>
+            <li>Implemented via: roles (RBAC), permissions, access control lists (ACLs), policies.</li>
+            <li>Fails: IDOR, privilege escalation, missing server-side checks, trusting client-supplied role parameters.</li>
+            <li>Happens AFTER authentication — but must be checked on every single request, not just at login.</li>
+            <li>Real-world: your hotel key card works for your room but not the penthouse — same identity, different permissions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout red" style="margin-top:14px;"><strong>The critical mistake developers make:</strong> they implement authentication (login page) and then assume "if someone is logged in, they're authorized." This is wrong. Authorization must be enforced independently on every resource, every API endpoint, every action — server-side. Every time. The Optus 2022 API had no authentication at all. The TryHackMe Broken Access Control room (from search results) shows a real lab where changing <code>isadmin=false</code> to <code>isadmin=true</code> in a URL grants admin access — because the server trusts the client.</div>
+
+      <p style="margin-top:16px;"><strong>Key concepts in authorization failures:</strong></p>
+      <div class="concept-grid">
+        <div class="concept red">
+          <div class="ctitle">IDOR (Insecure Direct Object Reference)</div>
+          <div class="cdesc">Changing an ID parameter in a URL/request to access another user's data. Example: /profile?id=1234 → /profile?id=1235 shows someone else's profile. Pure AuthZ failure — the server doesn't verify you own that ID.</div>
+        </div>
+        <div class="concept red">
+          <div class="ctitle">Vertical Privilege Escalation</div>
+          <div class="cdesc">A regular user accesses admin functionality. Example: changing roleid=1 to roleid=0 in a request to gain admin access. The TryHackMe Broken Access Control room is exactly this scenario.</div>
+        </div>
+        <div class="concept red">
+          <div class="ctitle">Horizontal Privilege Escalation</div>
+          <div class="cdesc">A user accesses another user's data at the same privilege level. IDOR is the most common form. "I can see my orders at /orders/me — what if I change 'me' to another user ID?"</div>
+        </div>
+        <div class="concept amber">
+          <div class="ctitle">Session Token</div>
+          <div class="cdesc">After authentication, the server issues a session token (cookie or JWT). This token is how authorization decisions are made on subsequent requests — it represents the authenticated identity.</div>
+        </div>
+        <div class="concept amber">
+          <div class="ctitle">JWT (JSON Web Token)</div>
+          <div class="cdesc">A signed token containing claims (user ID, role, permissions). Vulnerable if the "alg: none" attack works (server accepts unsigned tokens) or if the secret key is weak and guessable.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">RBAC (Role-Based Access Control)</div>
+          <div class="cdesc">Users are assigned roles (admin, user, moderator), roles have permissions, and permissions gate actions. Correct implementation requires server-side role checks — never trust client-supplied roles.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>MFA — how it strengthens authentication:</strong> Multi-factor authentication adds a second (or third) layer to the AuthN process. Even if a password is stolen (phishing, credential stuffing), MFA requires a second factor the attacker doesn't have — typically a TOTP (time-based one-time password) from an authenticator app. SMS-based MFA is weaker — SIM swapping attacks can intercept it — but still significantly better than password-only.</p>
+
+      <div class="callout" style="margin-top:12px;"><strong>Principle of least privilege:</strong> every user, service, and system should have only the minimum permissions needed to perform their function — nothing more. If an API key only needs to read data, it should not have write permissions. If a user only manages invoices, they should not have access to HR records. This is the foundation of correct authorization design.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2022 — OPTUS AUSTRALIA BREACH — 11 MILLION RECORDS — ZERO AUTHENTICATION REQUIRED</div>
+      <div class="name">An API endpoint with no authentication exposed the personal data of nearly half of Australia's population</div>
+      <div class="detail">In September 2022, Optus — Australia's second-largest telecommunications company — suffered a breach exposing the personal data of approximately 11 million customers, including names, dates of birth, phone numbers, email addresses, home addresses, and identity document numbers (passport, driver's licence). The root cause was an exposed API endpoint that required no authentication whatsoever — no login, no API key, no session token. An attacker simply discovered the API endpoint, began making sequential requests incrementing a customer ID parameter (a classic IDOR pattern), and received full customer records in response. The attacker downloaded 11 million records before being noticed. The breach cost Optus an estimated AUD $140 million in remediation, led to new mandatory data breach notification laws in Australia, and forced Optus to offer free credit monitoring to millions of customers. Subsequent investigation also raised questions about whether the API even needed to be internet-facing at all — least privilege applied to API exposure would have placed it behind a VPN or IP whitelist. A complete failure of both Authentication (none implemented) and Authorization (no check on which records a caller could access even if auth had existed).</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>"Does this API require authentication? Can I call it without a token?" — unauthenticated API endpoints are the fastest, highest-yield bug bounty findings.</li>
+          <li>"If I'm authenticated, can I access resources belonging to other users?" — IDOR testing: change numeric IDs, UUIDs, usernames in every URL and request body.</li>
+          <li>"Does the server actually enforce my role server-side, or does it trust what I send?" — modify roleid, isadmin, usertype parameters in requests and see what happens.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Enforce AuthN and AuthZ on every single API endpoint — no exceptions. The Optus API was presumably "internal" but was internet-exposed.</li>
+          <li>Never trust client-supplied authorization claims — always verify server-side. If the client sends <code>isadmin=true</code>, the server must check the database, not the parameter.</li>
+          <li>Apply principle of least privilege everywhere — if an API doesn't need to be internet-facing, it shouldn't be. If a role doesn't need write access, it shouldn't have it.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/brokenauthentication</strong> — free room. Work through username enumeration, brute force, session token analysis, and authentication bypass tasks.</li>
+        <li>Complete Task 3 (logic flaws in authentication) and Task 4 (session fixation) — these are the most practically applicable AuthN bypass techniques.</li>
+        <li>After completing the room, visit your DVWA on Metasploitable (from your home lab). Navigate to Insecure CAPTCHA or IDOR — test accessing user 1's data while logged in as user 2 by changing the ID parameter.</li>
+        <li>Run the curl commands below to simulate calling an API with and without authentication — see the difference in what the server returns.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of completed TryHackMe Broken Authentication room + one screenshot from DVWA showing an IDOR test (different user data returned by changing an ID).</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Simulating the Optus-style API call (no auth required)</span>
+<span class="c"># Against DVWA on your home lab (legal, authorized target)</span>
+
+<span class="c"># 1. Call an endpoint WITHOUT authentication</span>
+<span class="cmd">curl -s http://192.168.56.102/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit</span>
+<span class="out">(returns data — if no auth check, this is the Optus pattern)</span>
+
+<span class="c"># 2. IDOR test pattern — same endpoint, different user ID</span>
+<span class="cmd">curl -s "http://target/api/user/profile?id=1"</span>
+<span class="out">{"name":"Alice","email":"alice@example.com","phone":"9876..."}</span>
+<span class="cmd">curl -s "http://target/api/user/profile?id=2"</span>
+<span class="out">{"name":"Bob","email":"bob@example.com","phone":"9123..."}</span>
+<span class="danger"># if id=2 returns Bob's data while you're logged in as Alice = IDOR vulnerability</span>
+
+<span class="c"># 3. JWT "alg: none" attack pattern (conceptual — decode a JWT)</span>
+<span class="cmd">echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWxpY2UiLCJyb2xlIjoidXNlciJ9" | base64 -d</span>
+<span class="out">{"alg":"HS256","typ":"JWT"}{"user":"alice","role":"user"}</span>
+<span class="hi"># attackers modify role to "admin" and try alg:none to bypass signature check</span>
+
+<span class="c"># 4. Check if a web app leaks valid usernames (username enumeration)</span>
+<span class="cmd">curl -s -X POST http://192.168.56.102/dvwa/login.php -d "username=admin&password=wrong"</span>
+<span class="out">Username or password incorrect.</span>
+<span class="cmd">curl -s -X POST http://192.168.56.102/dvwa/login.php -d "username=nonexistent&password=wrong"</span>
+<span class="out">Username or password incorrect.</span>
+<span class="hi"># if responses DIFFER between wrong-user vs wrong-password = username enumeration = AuthN weakness</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between authentication and authorization, and can you give a real-world example of each failing?"</div>
+        <div class="a">A: "Authentication is proving who you are; authorization is controlling what you're allowed to do — and they must both be enforced independently. The Optus 2022 breach is a clean authentication failure: their API required no login, no token — sequential GET requests with incrementing customer IDs returned full personal records for 11 million Australians. A pure IDOR case is the classic authorization failure: the user is authenticated (logged in) but the server doesn't verify on each request whether they own the resource they're accessing. Change /profile?id=1234 to /profile?id=1235 and you're reading someone else's data — because authentication passed at login but authorization wasn't checked per-resource. The fix for both: enforce authentication on every endpoint, then enforce authorization server-side on every resource access — never trust client-supplied role or ID parameters."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Burp Suite (Active)</div>
+        <div class="adesc">Burp's active scanner finds IDOR and broken auth issues automatically. The Intruder module is the standard tool for testing ID-based parameter fuzzing (IDOR testing at scale).</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">jwt.io</div>
+        <div class="adesc">Free online JWT decoder — paste any JWT and instantly see its header, payload, and signature. Essential for testing JWT-based authorization claims during web app pentests.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT + Auth Review</div>
+        <div class="adesc">Paste a code snippet and ask "does this code properly enforce authorization on every request?" — AI code review for AuthN/AuthZ gaps is a real, practical use case today.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">OWASP ASVS</div>
+        <div class="adesc">Application Security Verification Standard — a free checklist covering AuthN and AuthZ requirements at three security levels. Use it as the framework for any web app security review.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Tested web applications for authentication and authorization vulnerabilities including IDOR, broken access control, JWT misconfigurations, and username enumeration; replicated Optus-class API exposure patterns in authorized lab environments."</li>
+        <li><strong>Campus interview:</strong> "What's broken authentication?" is one of the most common OWASP-related interview questions. Answering with "the Optus 2022 API required zero authentication — 11 million records exposed by sequential GET requests — and IDOR is the complementary authorization failure where authentication passes but resource-level checks don't exist" is a complete, real-world answer that most students cannot give.</li>
+        <li><strong>Bug bounty relevance:</strong> IDOR is consistently one of the highest-paid bug bounty vulnerability classes. Every major program (HackerOne, Bugcrowd) pays $500–$10,000+ for solid IDOR findings. Day 19's concepts are directly monetizable as a skill.</li>
+        <li><strong>AppSec career path:</strong> Authorization flaws (IDOR, BAC) are #1 in OWASP Top 10 2021 (A01: Broken Access Control). If you're targeting AppSec or secure code review roles, this day is one of the highest-ROI concepts in the entire 90-day roadmap.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>IDOR testing is one of the most impactful, fastest-to-demonstrate findings in a web application security assessment. You can often find an IDOR in a client's app within 30 minutes just by systematically changing ID parameters in every URL and request. Present it with a screenshot showing you accessed another user's private data — the client immediately understands the risk without technical explanation. This single finding can turn a ₹10,000 assessment into a ₹30,000–₹50,000 remediation and re-testing engagement. The Optus breach (AUD $140M in damages from one unauthenticated API) is your pitch: "I check for this class of vulnerability — the one that cost Optus $140 million."</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Authentication is showing your ID at the hotel desk to prove who you are. Authorization is your room key only opening your room, not every room. Optus forgot to ask for ID at the front desk entirely in 2022 — their API had no login requirement, so anyone who walked up to the counter and asked for a room number got full details about any customer they asked about. IDOR is the flip side: you showed your ID (authentication worked), but your key card opens every room — the hotel never checked whether the room you're trying to enter is actually yours."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Tbd76csApwo" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">TryHackMe Authentication Bypass — Full Walkthrough 2025</div><div class="res-desc">youtube.com/watch?v=Tbd76csApwo — verified Oct 2025. Directly covers the THM lab used today.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=mCZhDNCJwCM" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Authentication and Authorisation — Authentication vs Authorisation in HINDI</div><div class="res-desc">youtube.com/watch?v=mCZhDNCJwCM — verified April 2022, clear Hindi explanation of both concepts.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/brokenauthentication" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Broken Authentication</div><div class="res-desc">Free room — username enumeration, brute force, logic flaws, session fixation. Today's main lab.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Optus 2022 — recent, named, AUD $140M impact. Pure AuthN failure at massive scale.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — IDOR test in DVWA, JWT decode, username enumeration curl commands.</div>
+      <div class="mistake-item"><span class="check">✓</span> IDOR = bug bounty money. Framed as a monetizable skill, not just theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> OWASP A01 (Broken Access Control) aligned — direct Security+ and AppSec exam coverage.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–18 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain AuthN vs AuthZ in one sentence each — with the hotel analogy.</li>
+        <li><span class="box"></span> I can describe IDOR and vertical/horizontal privilege escalation with examples.</li>
+        <li><span class="box"></span> I completed TryHackMe Broken Authentication room (username enumeration + session task).</li>
+        <li><span class="box"></span> I tested IDOR in DVWA — accessed a different user's record by changing an ID parameter.</li>
+        <li><span class="box"></span> I can decode a JWT and explain what the alg:none attack does.</li>
+        <li><span class="box"></span> I can explain the Optus 2022 breach technically — what was missing and how it was exploited.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">19 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 20</div>
+      <div class="title">Password security & hashing attacks — rainbow tables, salting, Hashcat</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 20" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>
