@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cybersecurity 90-Day Challenge — Days 11–20 Revision</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #e0e0e0; line-height: 1.7; padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { color: #00e5ff; font-size: 1.6rem; margin-bottom: 6px; text-align: center; }
+.subtitle { color: #8892b0; text-align: center; font-size: 0.9rem; margin-bottom: 30px; border-bottom: 1px solid #1e2a3a; padding-bottom: 16px; }
+h2 { color: #64ffda; font-size: 1.2rem; margin: 28px 0 12px; border-left: 3px solid #00e5ff; padding-left: 12px; }
+h3 { color: #ffd700; font-size: 1rem; margin: 20px 0 8px; }
+.card { background: #111927; border: 1px solid #1e2a3a; border-radius: 8px; padding: 18px; margin: 12px 0; }
+.card h4 { color: #00e5ff; margin-bottom: 6px; }
+.tag { display: inline-block; background: #1e2a3a; color: #64ffda; padding: 2px 10px; border-radius: 4px; font-size: 0.75rem; margin: 2px; }
+pre { background: #0d1117; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; border: 1px solid #1e2a3a; margin: 8px 0; }
+code { font-family: 'JetBrains Mono', 'Fira Code', monospace; color: #ffb86c; }
+.incident { border-left: 3px solid #ff6b6b; background: #1a0e0e; padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+.incident strong { color: #ff6b6b; }
+.quiz { background: #0d1720; border: 1px dashed #2a4a6a; padding: 14px; border-radius: 6px; margin: 10px 0; }
+.quiz p { margin: 4px 0; color: #b0c4de; }
+.resume { background: #0f1a0f; border: 1px solid #2a4a2a; padding: 14px; border-radius: 6px; margin: 10px 0; }
+.resume strong { color: #4ade80; }
+ul, ol { padding-left: 22px; margin: 6px 0; }
+li { margin: 3px 0; color: #c0c8d8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Phase 2 Revision: Days 11–20</h1>
+<p class="subtitle">Windows Internals · Home Lab · Kali Toolchain · Cryptography · AuthNZ · Web Recon</p>
+
+<!-- ==================== DAY 11 ==================== -->
+<h2>Day 11 — Windows Internals for Security</h2>
+<div class="card">
+  <h4>Core Concepts</h4>
+  <ul>
+    <li><strong>NT Architecture:</strong> HAL → NTOSKRNL → subsystems (Win32, POSIX)</li>
+    <li><strong>Security Account Manager (SAM):</strong> Stores local password hashes at <code>C:\Windows\System32\config\SAM</code></li>
+    <li><strong>LM & NTLM Hashes:</strong> LM is weak (split into 2×7-char halves), NTLM is MD4-based</li>
+    <li><strong>LSASS:</strong> Local Security Authority Subsystem Service — manages authentication, stores credentials in memory</li>
+    <li><strong>Event Logs:</strong> Security log (4624=logon, 4625=failed, 4688=process creation)</li>
+    <li><strong>Registry:</strong> <code>HKLM\SAM</code> (hashes), <code>HKLM\SYSTEM</code> (boot key), <code>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code> (persistence)</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — NotPetya (2017):</strong> The world's costliest cyberattack leveraged Windows SMB vulnerabilities (EternalBlue). It propagated across networks by dumping LSASS credentials using Mimikatz, then using WMI and PsExec to move laterally. Total damage: &gt;$10B.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> What registry hive contains the SYSTEM account's boot key, needed to decrypt SAM hashes?</p>
+  <p><strong>Answer:</strong> <code>HKLM\SYSTEM</code> — Without the SYSTEM hive, SAM hashes are encrypted with the SysKey and cannot be extracted.</p>
+</div>
+
+<!-- ==================== DAY 12 ==================== -->
+<h2>Day 12 — Home Lab Setup</h2>
+<div class="card">
+  <h4>Lab Architecture</h4>
+  <ul>
+    <li><strong>Hypervisor:</strong> VirtualBox 7.x with Host-Only + NAT networking</li>
+    <li><strong>Attack VM:</strong> Kali Linux — pre-loaded with 600+ security tools</li>
+    <li><strong>Target VMs:</strong> Metasploitable 2 (intentionally vulnerable Linux), Windows 10/Server (patchable targets)</li>
+    <li><strong>Isolation:</strong> Host-Only network keeps lab traffic off your physical LAN</li>
+  </ul>
+  <h4 style="margin-top:12px;">Key Configuration Steps</h4>
+  <ul>
+    <li>Enable VT-x/AMD-V in BIOS for nested virtualization</li>
+    <li>Create Host-Only adapter → assign static IPs (e.g., Kali: 192.168.56.105, Metasploitable: 192.168.56.101)</li>
+    <li>Take snapshots before major changes</li>
+    <li>Verify connectivity: <code>ping 192.168.56.101</code> from Kali</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — Stuxnet (2010):</strong> The US/Israeli operation against Iran's nuclear program used a VirtualBox-based development environment to test the worm before deployment. Air-gapped networks were breached via infected USB drives. This is why physical isolation isn't enough — defense in depth matters.
+</div>
+
+<!-- ==================== DAY 13 ==================== -->
+<h2>Day 13 — Kali Linux Tools</h2>
+<div class="card">
+  <h4>Toolchain Overview</h4>
+  <ul>
+    <li><strong>Nmap:</strong> Port scanning — <code>nmap -sV -sC -O 192.168.56.101</code></li>
+    <li><strong>Wireshark:</strong> Packet capture — filters like <code>http.request</code>, <code>tcp.port==80</code>, <code>ftp</code></li>
+    <li><strong>Metasploit:</strong> <code>msfconsole</code> → <code>use exploit/unix/ftp/vsftpd_234_backdoor</code></li>
+    <li><strong>Burp Suite:</strong> Intercepting proxy — configure browser → 127.0.0.1:8080, install CA cert</li>
+  </ul>
+  <h4 style="margin-top:12px;">vsftpd 2.3.4 Exploitation Walkthrough</h4>
+  <pre><code>msfconsole -q
+use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.56.101
+check
+exploit</code></pre>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — Bangladesh Bank SWIFT Heist / Lazarus Group (2016):</strong> Lazarus Group installed Wireshark inside Bangladesh Bank and captured unencrypted SWIFT traffic for weeks, learning the exact protocol format and authentication flow. They then crafted fraudulent transfer requests that stole $81 million.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> What Wireshark display filter shows only HTTP POST requests?</p>
+  <p><strong>Answer:</strong> <code>http.request.method == "POST"</code></p>
+</div>
+
+<!-- ==================== DAY 14 ==================== -->
+<h2>Day 14 — Kali Tool Practice (Nmap, Wireshark, Metasploit, Burp Suite)</h2>
+<div class="card">
+  <h4>Hands-On Tasks</h4>
+  <ul>
+    <li>Run <code>nmap -sV -p- 192.168.56.101</code> against Metasploitable to enumerate all 65K ports</li>
+    <li>Capture a live FTP login in Wireshark — see the plaintext password in the packet bytes</li>
+    <li>Exploit vsftpd 2.3.4 backdoor via Metasploit, run <code>id</code> on the target shell</li>
+    <li>Intercept a login form in Burp Suite, modify parameters in Repeater, observe server response</li>
+    <li>Use <code>searchsploit vsftpd 2.3.4</code> to find the public exploit and understand its mechanism</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — Target POS Breach (2013):</strong> Attackers used malware on Target's POS systems to steal 40M credit cards. They initially gained access through a third-party HVAC vendor's network credentials. The stolen data was exfiltrated via FTP — plaintext, captured easily by network monitoring that Target didn't have enabled.
+</div>
+
+<!-- ==================== DAY 15 ==================== -->
+<h2>Day 15 — Phase 1 Review: Quiz & Phase 2 Preview</h2>
+<div class="card">
+  <h4>Phase 1 (Days 1–14) Recap</h4>
+  <ul>
+    <li>CIA Triad, hacker types (white/grey/black hat), risk management</li>
+    <li>Linux fundamentals: bash, file permissions, pipes, cron, process management</li>
+    <li>Networking: OSI model, TCP/IP, DNS, HTTP, subnetting (CIDR)</li>
+    <li>Python for security: sockets, scraping, brute-force scripts</li>
+    <li>Windows internals: SAM, LSASS, event logs, registry, SMB</li>
+    <li>Home lab setup: VirtualBox, Kali, Metasploitable, Windows VM</li>
+    <li>Kali toolchain: Nmap, Wireshark, Metasploit, Burp Suite</li>
+  </ul>
+
+  <h4>Phase 2 Preview (Days 16–30)</h4>
+  <ul>
+    <li>Cryptography: hashing, symmetric/asymmetric encryption, PKI, TLS</li>
+    <li>Authentication vs Authorization & IDOR vulnerabilities</li>
+    <li>Web recon: gobuster, ffuf, WhatWeb, Wappalyzer</li>
+    <li>SQL injection, XSS, LFI/RFI, SSRF</li>
+    <li>OWASP Top 10 & bug bounty methodology</li>
+    <li>Privilege escalation: Linux & Windows</li>
+    <li>Active Directory enumeration & attacks</li>
+  </ul>
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> What layer of the OSI model does a router operate at? What about a switch?</p>
+  <p><strong>Answer:</strong> Router → Layer 3 (Network). Switch → Layer 2 (Data Link). A layer-3 switch does both.</p>
+</div>
+
+<!-- ==================== DAY 16 ==================== -->
+<h2>Day 16 — Cryptography I: Hashing vs Encryption</h2>
+<div class="card">
+  <h4>Core Concepts</h4>
+  <ul>
+    <li><strong>Hashing:</strong> One-way, deterministic, fixed-size output. <code>sha256sum file.txt</code></li>
+    <li><strong>Encryption:</strong> Two-way — reversible with a key. <code>openssl enc -aes-256-cbc -in plain.txt -out cipher.enc</code></li>
+    <li><strong>Common Hash Algorithms:</strong> MD5 (128-bit, broken), SHA-1 (160-bit, deprecated), SHA-256 (256-bit, current standard)</li>
+    <li><strong>Salting:</strong> Adding random data before hashing prevents rainbow table attacks</li>
+    <li><strong>Integrity vs Confidentiality:</strong> Hashing verifies integrity (tamper detection), encryption provides confidentiality (secrecy)</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — LinkedIn Password Breach (2012):</strong> LinkedIn stored passwords as unsalted SHA-1 hashes. When 167M password hashes were leaked, most were cracked within days using rainbow tables and GPU clusters because SHA-1 was fast and there was no salt.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> Why is SHA-1 considered deprecated for password storage?</p>
+  <p><strong>Answer:</strong> SHA-1 is too fast (GPU can compute billions per second) and has known collision attacks (SHAttered, 2017). Modern systems use bcrypt, scrypt, or Argon2 — deliberately slow, memory-hard algorithms.</p>
+</div>
+
+<!-- ==================== DAY 17 ==================== -->
+<h2>Day 17 — Cryptography II: Symmetric vs Asymmetric</h2>
+<div class="card">
+  <h4>Comparison</h4>
+  <ul>
+    <li><strong>Symmetric (AES):</strong> One key for encrypt and decrypt. Fast. Used for bulk data. Key exchange problem.</li>
+    <li><strong>Asymmetric (RSA, ECC):</strong> Public key encrypts, private key decrypts. Slow. Used for key exchange and digital signatures.</li>
+    <li><strong>TLS Handshake:</strong> ClientHello → ServerHello + Certificate → Key Exchange (RSA/ECDHE) → symmetric session key → encrypted channel</li>
+    <li><strong>Perfect Forward Secrecy (PFS):</strong> Ephemeral Diffie-Hellman ensures past sessions can't be decrypted even if the private key is compromised</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — Heartbleed (CVE-2014-0160):</strong> A buffer over-read in OpenSSL's Heartbeat extension leaked up to 64KB of server memory per request, including private RSA keys. Attackers could decrypt previously captured TLS traffic. 500K+ servers affected.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> How does TLS use both asymmetric and symmetric cryptography in a single session?</p>
+  <p><strong>Answer:</strong> Asymmetric (RSA/ECDHE) is used during the handshake to securely exchange a symmetric session key. Symmetric (AES) then encrypts all subsequent data for performance.</p>
+</div>
+
+<!-- ==================== DAY 18 ==================== -->
+<h2>Day 18 — Cryptography III: SSL/TLS Certificates & PKI</h2>
+<div class="card">
+  <h4>Core Concepts</h4>
+  <ul>
+    <li><strong>X.509 Certificate:</strong> Public key + identity + signature + validity period</li>
+    <li><strong>Certificate Chain:</strong> Root CA → Intermediate CA → Server/Leaf certificate</li>
+    <li><strong>Certificate Revocation:</strong> CRL (Certificate Revocation List) or OCSP (Online Certificate Status Protocol)</li>
+    <li><strong>Self-Signed CA Lab:</strong> <code>openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365</code></li>
+    <li><strong>PKI Trust Model:</strong> Browsers ship with ~150 trusted root CA certificates. Any can sign for any domain.</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — DigiNotar CA Breach (2011):</strong> A Dutch Certificate Authority was compromised by attackers who issued 531 fraudulent certificates for domains including google.com, torproject.org, and CIA.gov. Iranian users were MITM'd for months using a fake Google certificate signed by the compromised CA.
+</div>
+
+<!-- ==================== DAY 19 ==================== -->
+<h2>Day 19 — Authentication vs Authorization</h2>
+<div class="card">
+  <h4>Core Concepts</h4>
+  <ul>
+    <li><strong>Authentication (AuthN):</strong> "Who are you?" — verifying identity via passwords, biometrics, MFA, certificates</li>
+    <li><strong>Authorization (AuthZ):</strong> "What are you allowed to do?" — permissions, roles, ACLs, policies</li>
+    <li><strong>IDOR:</strong> Insecure Direct Object Reference — a classic authZ failure where a user can access another user's data by changing an ID parameter</li>
+    <li><strong>Session Management:</strong> Cookies, JWT tokens, session hijacking, fixation attacks</li>
+    <li><strong>Broken Access Control:</strong> #1 on OWASP Top 10 — occurs when AuthN is checked but AuthZ is not</li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — Capital One Data Breach (2019):</strong> A former AWS employee exploited a misconfigured WAF that allowed SSRF to the AWS metadata service. The real vulnerability was authorization — the IAM role attached to the WAF had access to S3 buckets containing 100M+ credit applications. Authentication was fine, but authorization was broken.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> What is the difference between horizontal and vertical privilege escalation?</p>
+  <p><strong>Answer:</strong> Horizontal = accessing another user's data at the same privilege level (e.g., user A reads user B's inbox). Vertical = gaining higher privileges (e.g., user becomes admin).</p>
+</div>
+
+<!-- ==================== DAY 20 ==================== -->
+<h2>Day 20 — Web Recon: Directory Busting & Technology Fingerprinting</h2>
+<div class="card">
+  <h4>Core Techniques</h4>
+  <ul>
+    <li><strong>Directory Busting:</strong> Brute-forcing hidden paths — admin panels, backups, config files, dev endpoints</li>
+    <li><strong>gobuster:</strong> <code>gobuster dir -u https://target.com -w /usr/share/wordlists/dirb/common.txt -x php,txt,zip</code></li>
+    <li><strong>ffuf:</strong> <code>ffuf -u https://target.com/FUZZ -w wordlist.txt</code> — faster, more flexible than gobuster</li>
+    <li><strong>WhatWeb:</strong> <code>whatweb https://target.com</code> — passive technology fingerprinting</li>
+    <li><strong>Wappalyzer:</strong> Browser extension — identifies JS frameworks, CMS, analytics, CDN, server software</li>
+  </ul>
+
+  <h4 style="margin-top:12px;">Common Discovery Targets</h4>
+  <ul>
+    <li><code>/admin</code>, <code>/wp-admin</code>, <code>/backup</code>, <code>/config</code>, <code>/api</code>, <code>/swagger</code></li>
+    <li><code>/.git</code>, <code>/.env</code>, <code>robots.txt</code>, <code>sitemap.xml</code></li>
+    <li><code>/server-status</code>, <code>/phpinfo.php</code>, <code>/info.php</code></li>
+  </ul>
+</div>
+
+<div class="incident">
+  <strong>🔴 Real Incident — British Airways Magecart (2018):</strong> Magecart Group found an unsecured staging admin path on ba.com via directory busting. They injected a 23-line JavaScript skimmer into the payment page, capturing 380,000 payment card details over 2 weeks. BA was fined &pound;20M under GDPR.
+</div>
+
+<div class="quiz">
+  <p><strong>Quiz:</strong> What's the difference between gobuster's <code>dir</code> mode and <code>vhost</code> mode?</p>
+  <p><strong>Answer:</strong> <code>dir</code> mode finds directories/files on a single domain. <code>vhost</code> mode discovers virtual hosts (subdomains) by sending different Host headers and monitoring response size differences.</p>
+</div>
+
+<!-- ==================== COMMANDS REFERENCE ==================== -->
+<h2>Command Reference</h2>
+<div class="card">
+  <h4>Windows Security Commands</h4>
+  <pre><code>whoami                              # Current user
+net user                            # List local users
+net localgroup administrators       # List admin group
+reg save HKLM\SAM sam.save         # Dump SAM hive
+reg save HKLM\SYSTEM system.save   # Dump SYSTEM hive (boot key)
+wevtutil qe Security /count:10     # Query last 10 security events</code></pre>
+
+  <h4>Kali Tool Commands</h4>
+  <pre><code>nmap -sV -sC -O 192.168.56.101                             # Full service + OS scan
+wireshark &amp;                                                   # Launch Wireshark
+msfconsole -q                                                  # Launch Metasploit
+burpsuite &amp;                                                    # Launch Burp Suite
+gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt
+ffuf -u http://target.com/FUZZ -w /usr/share/wordlists/dirb/common.txt
+whatweb http://target.com
+nikto -h http://target.com
+searchsploit vsftpd 2.3.4</code></pre>
+
+  <h4>Cryptography Commands</h4>
+  <pre><code>echo -n "password" | sha256sum                                # SHA-256 hash
+echo -n "password" | md5sum                                   # MD5 hash (broken)
+openssl enc -aes-256-cbc -salt -in plain.txt -out cipher.enc  # AES encrypt
+openssl enc -d -aes-256-cbc -in cipher.enc -out plain.txt     # AES decrypt
+openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt # Self-signed cert
+openssl s_client -connect google.com:443 -showcerts           # View TLS cert chain</code></pre>
+</div>
+
+<!-- ==================== RESUME BULLETS ==================== -->
+<h2>Resume-Worthy Bullet Points</h2>
+<div class="resume">
+  <ul>
+    <li><strong>Built and configured a fully isolated cybersecurity home lab</strong> using VirtualBox, Kali Linux, Metasploitable 2, and Windows VMs with host-only networking for safe attack simulation.</li>
+    <li><strong>Executed live penetration testing workflows</strong> against intentionally vulnerable targets, including port scanning (Nmap), traffic analysis (Wireshark), and exploitation (Metasploit vsftpd backdoor).</li>
+    <li><strong>Applied cryptographic principles</strong> including hashing (SHA-256), symmetric encryption (AES-256-CBC), and asymmetric cryptography (RSA) using OpenSSL for data protection and PKI.</li>
+    <li><strong>Conducted web application reconnaissance</strong> using gobuster / ffuf for directory enumeration and WhatWeb / Wappalyzer for technology stack fingerprinting.</li>
+    <li><strong>Analyzed high-profile security incidents</strong> including NotPetya (SMB lateral movement), Heartbleed (TLS memory leak), DigiNotar (CA compromise), and the Capital One SSRF breach to understand real-world attack vectors.</li>
+    <li><strong>Demonstrated expertise in Windows security internals</strong>: SAM/SYSTEM registry hive extraction, LSASS credential management, and event log analysis.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>

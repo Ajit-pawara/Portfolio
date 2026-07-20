@@ -595,6 +595,74 @@ function App() {
     setSelectedDayNum(computedCurrentDay);
   }, [activeTrackId, computedCurrentDay]);
 
+  const [gitSyncStatus, setGitSyncStatus] = useState<string>("");
+
+  const pushDbToGitHub = async (newDb: any) => {
+    const pat = localStorage.getItem("github_pat") || import.meta.env.VITE_GITHUB_PAT;
+    if (!pat) {
+      setGitSyncStatus("Local storage updated. (Configure GitHub PAT to sync directly to repo)");
+      return;
+    }
+
+    const repo = localStorage.getItem("github_repo") || "Ajit-pawara/Portfolio";
+    const branch = localStorage.getItem("github_branch") || "main";
+    const path = "src/data.json";
+
+    try {
+      setGitSyncStatus("Syncing with GitHub...");
+      
+      // 1. Get file SHA
+      const getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
+      const getRes = await fetch(getUrl, {
+        headers: {
+          "Authorization": `token ${pat}`,
+          "Accept": "application/vnd.github.v3+json"
+        }
+      });
+
+      let sha = "";
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        sha = fileData.sha;
+      } else if (getRes.status !== 404) {
+        throw new Error(`Failed to fetch file info from GitHub (HTTP ${getRes.status})`);
+      }
+
+      // 2. Commit updated JSON
+      const putUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(newDb, null, 2))));
+      
+      const putBody: any = {
+        message: "update: portfolio database via settings panel [auto-sync]",
+        content: contentBase64,
+        branch: branch
+      };
+      if (sha) {
+        putBody.sha = sha;
+      }
+
+      const putRes = await fetch(putUrl, {
+        method: "PUT",
+        headers: {
+          "Authorization": `token ${pat}`,
+          "Content-Type": "application/json",
+          "Accept": "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify(putBody)
+      });
+
+      if (!putRes.ok) {
+        const errText = await putRes.text();
+        throw new Error(`GitHub upload failed: ${errText}`);
+      }
+
+      setGitSyncStatus("Successfully synchronized database with GitHub repository!");
+    } catch (err: any) {
+      console.error("Error during GitHub sync:", err);
+      setGitSyncStatus(`GitHub Sync Error: ${err.message}`);
+    }
+  };
+
   // Save changes locally
   const saveChanges = (newDb: any) => {
     setDb(newDb);
@@ -604,6 +672,9 @@ function App() {
     setTimeout(() => {
       setSaveStatus("State: changes cached locally.");
     }, 3000);
+
+    // Auto-sync to GitHub
+    pushDbToGitHub(newDb);
   };
 
   // Helper to hash password using SHA-256
@@ -622,7 +693,8 @@ function App() {
     const hashed = await hashPassword(contentPassword);
     
     // Offline / Hardcoded fallback check
-    if (hashed === "5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c") {
+    const expectedHash = import.meta.env.VITE_CONTENT_PASSWORD_HASH || "5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c";
+    if (hashed === expectedHash) {
       sessionStorage.setItem("content_unlocked", "true");
       setIsContentLocked(false);
       setContentPassword("");
@@ -657,7 +729,8 @@ function App() {
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const hashed = await hashPassword(password);
-    if (hashed === "d4f7f87af4a1d68fc8d586d455136d1958fa4844f0abeb7ee72f7edb16d4b686") {
+    const expectedHash = import.meta.env.VITE_ADMIN_PASSWORD_HASH || "d4f7f87af4a1d68fc8d586d455136d1958fa4844f0abeb7ee72f7edb16d4b686";
+    if (hashed === expectedHash) {
       sessionStorage.setItem("root_authorized", "true");
       setIsAuthorized(true);
       setAuthError("");
@@ -674,7 +747,8 @@ function App() {
     const hashed = await hashPassword(certsPassword);
     
     // Offline / Hardcoded fallback check
-    if (hashed === "c568d0c96043c60f9924afb1c1271325cee7f2fd886d59e30eb829fbdd07516d") {
+    const expectedHash = import.meta.env.VITE_CERTS_PASSWORD_HASH || "c568d0c96043c60f9924afb1c1271325cee7f2fd886d59e30eb829fbdd07516d";
+    if (hashed === expectedHash) {
       sessionStorage.setItem("certs_unlocked", "true");
       setIsCertsUnlocked(true);
       setCertsPassword("");
@@ -3371,11 +3445,11 @@ function App() {
                         <ShieldAlert style={{ color: 'var(--color-cyan)', marginTop: '2px', flexShrink: 0 }} />
                         <div style={{ fontSize: '0.8rem', lineHeight: 1.4 }}>
                           <p style={{ margin: '0 0 6px 0' }}><strong>How static state persistence works:</strong></p>
-                          <p style={{ margin: 0 }}>Modifications saved in this editor persist in your browser's local storage draft. To synchronize these changes with your public GitHub Pages deployment, export the database schema, overwrite <code>data.json</code> inside your local repository, and push changes.</p>
+                          <p style={{ margin: 0 }}>Modifications saved in this editor persist in your browser's local storage draft. You can also configure GitHub Auto-Sync below to commit updates directly to your GitHub repository automatically.</p>
                         </div>
                       </div>
 
-                      <div className="export-actions" style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+                      <div className="export-actions" style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
                         <button
                           onClick={() => {
                             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
@@ -3384,9 +3458,10 @@ function App() {
                             dlAnchorElem.setAttribute("download", "data.json");
                             dlAnchorElem.click();
                           }}
-                          className="btn btn-primary btn-lg"
+                          className="btn btn-primary"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 16px', fontSize: '0.8rem' }}
                         >
-                          <Download /> Download data.json
+                          <Download style={{ width: '14px', height: '14px' }} /> Download data.json
                         </button>
 
                         <button
@@ -3397,17 +3472,104 @@ function App() {
                               setIsAdminOpen(false);
                             }
                           }}
-                          className="btn btn-secondary btn-lg"
+                          className="btn btn-secondary"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 16px', fontSize: '0.8rem' }}
                         >
-                          <RefreshCw /> Reset Database
+                          <RefreshCw style={{ width: '14px', height: '14px' }} /> Reset Database
                         </button>
                       </div>
 
+                      <div className="git-sync-settings" style={{
+                        marginTop: '20px',
+                        padding: '16px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        backgroundColor: 'var(--bg-darker)',
+                        marginBottom: '20px'
+                      }}>
+                        <h5 style={{ color: 'var(--text-primary)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Sliders style={{ width: '16px', height: '16px' }} /> GitHub Auto-Sync Configurations
+                        </h5>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.74rem', margin: '0 0 16px 0', lineHeight: 1.4 }}>
+                          Provide your GitHub Personal Access Token (PAT) to enable direct repository synchronization when committing modifications. This token is saved exclusively in your browser's local storage and is never committed to Git.
+                        </p>
+                        
+                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                          <label style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>GitHub Personal Access Token (PAT)</label>
+                          <input
+                            type="password"
+                            value={localStorage.getItem("github_pat") || ""}
+                            onChange={(e) => {
+                              localStorage.setItem("github_pat", e.target.value);
+                              setDb({ ...db });
+                            }}
+                            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                            className="form-control"
+                            style={{ fontFamily: 'var(--font-mono)' }}
+                          />
+                        </div>
+
+                        <div className="form-row" style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                          <div className="form-group" style={{ flex: 1 }}>
+                            <label style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>GitHub Repository (owner/repo)</label>
+                            <input
+                              type="text"
+                              value={localStorage.getItem("github_repo") || "Ajit-pawara/Portfolio"}
+                              onChange={(e) => {
+                                localStorage.setItem("github_repo", e.target.value);
+                                setDb({ ...db });
+                              }}
+                              placeholder="Ajit-pawara/Portfolio"
+                              className="form-control"
+                            />
+                          </div>
+                          <div className="form-group" style={{ flex: 1 }}>
+                            <label style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Target Branch</label>
+                            <input
+                              type="text"
+                              value={localStorage.getItem("github_branch") || "main"}
+                              onChange={(e) => {
+                                localStorage.setItem("github_branch", e.target.value);
+                                setDb({ ...db });
+                              }}
+                              placeholder="main"
+                              className="form-control"
+                            />
+                          </div>
+                        </div>
+
+                        {gitSyncStatus && (
+                          <div style={{
+                            marginTop: '12px',
+                            padding: '8px 12px',
+                            borderRadius: '4px',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.74rem',
+                            backgroundColor: gitSyncStatus.includes("Error") ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)',
+                            border: `1px solid ${gitSyncStatus.includes("Error") ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                            color: gitSyncStatus.includes("Error") ? 'var(--color-red)' : 'var(--color-green)'
+                          }}>
+                            {gitSyncStatus}
+                          </div>
+                        )}
+                        
+                        <div style={{ marginTop: '14px' }}>
+                          <button
+                            onClick={() => pushDbToGitHub(db)}
+                            className="btn btn-primary"
+                            disabled={!(localStorage.getItem("github_pat") || import.meta.env.VITE_GITHUB_PAT)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', fontSize: '0.74rem' }}
+                          >
+                            <RefreshCw className={gitSyncStatus.includes("Syncing") ? "spin-animation" : ""} style={{ width: '12px', height: '12px' }} /> Force Sync to GitHub
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="git-instructions" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>
-                        <h5 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>Deploy Guidelines:</h5>
+                        <h5 style={{ color: 'var(--text-primary)', marginBottom: '8px' }}>Manual Deploy Guidelines:</h5>
                         <ol style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <li>Download the database by clicking <strong>"Download data.json"</strong>.</li>
-                          <li>Overwrite <code>data.json</code> inside your local repository folder.</li>
+                          <li>Overwrite <code>src/data.json</code> inside your local repository folder.</li>
                           <li>Perform standard Git synchronization:
                             <pre style={{
                               backgroundColor: 'var(--bg-darker)',
@@ -3416,9 +3578,9 @@ function App() {
                               borderRadius: '4px',
                               marginTop: '6px',
                               color: 'var(--color-green)'
-                            }}><code>git add data.json
-                              git commit -m "update: portfolio database"
-                              git push origin main</code></pre>
+                            }}><code>git add src/data.json
+git commit -m "update: portfolio database"
+git push origin main</code></pre>
                           </li>
                         </ol>
                       </div>

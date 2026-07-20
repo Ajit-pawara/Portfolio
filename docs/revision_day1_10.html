@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 1 to Day 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day01_to_day10.md</span>
+    <span style="color:var(--green);">Phase 1 — Foundations</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 01 TO DAY 10</div>
+    <h1>10 Days Done. <span>Don't just move forward — solidify.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 1–10 into one reference. Read it before Day 11. If any section feels fuzzy, revisit that day's HTML before continuing.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">1</div><div class="lbl">Script Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">01</div>
+      <div class="day-meta">
+        <div class="day-title">What is Cybersecurity + The CIA Triad</div>
+        <span class="day-incident">Equifax 2017 · Stuxnet 2010 · Dyn/Mirai 2016</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concept</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Confidentiality</div><div class="cdesc">Only authorized people can see the data. Breaking it = data leak. Equifax 2017 — 147M records exposed.</div></div>
+      <div class="concept"><div class="ctitle">Integrity</div><div class="cdesc">Data isn't altered without authorization. Breaking it = silent tampering. Stuxnet 2010 — centrifuge readings falsified.</div></div>
+      <div class="concept"><div class="ctitle">Availability</div><div class="cdesc">Systems are usable when needed. Breaking it = downtime/denial. Dyn DNS/Mirai 2016 — Twitter, Netflix offline for hours.</div></div>
+    </div>
+
+    <div class="section-label">// key rule</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Every attack you will ever study breaks one (or more) of these three. When you read a breach headline, your first question should always be: which of the CIA triad did this break?</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through the CIA Triad with a real example.</div>
+      <div class="a">Equifax 2017 = Confidentiality (147M records exposed, nothing changed). Stuxnet 2010 = Integrity (false sensor data fed to operators). Dyn/Mirai 2016 = Availability (DDoS took major sites offline, nothing stolen). Every security decision traces back to protecting one of these three.</div>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">02</div>
+      <div class="day-meta">
+        <div class="day-title">Types of Hackers & Attack Categories</div>
+        <span class="day-incident">Target 2013 · Twitter 2020 · WannaCry 2017</span>
+      </div>
+    </div>
+
+    <div class="section-label">// three hats</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">White Hat ✓ Legal</div><div class="cdesc">Authorized. Signed scope before touching anything. This is what you're training to be.</div></div>
+      <div class="concept"><div class="ctitle">Grey Hat ⚠ Risky</div><div class="cdesc">No permission, but reports rather than exploits. Still legally risky regardless of intent.</div></div>
+      <div class="concept"><div class="ctitle">Black Hat ✗ Illegal</div><div class="cdesc">Unauthorized, malicious. The only line between you and a black hat is written authorization.</div></div>
+    </div>
+
+    <div class="section-label">// 6 attack categories</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Social Engineering</div><div class="cdesc">Twitter 2020 — phone-phished employees to access 130 accounts</div></div>
+      <div class="concept"><div class="ctitle">Network-based</div><div class="cdesc">Dyn/Mirai DDoS — flooded DNS with traffic, took major sites offline</div></div>
+      <div class="concept"><div class="ctitle">Web Application</div><div class="cdesc">Equifax — unpatched Apache Struts, 147M records exposed</div></div>
+      <div class="concept"><div class="ctitle">Malware</div><div class="cdesc">WannaCry — ransomware hit NHS, 200k+ machines in 150+ countries</div></div>
+      <div class="concept"><div class="ctitle">Credential</div><div class="cdesc">LinkedIn 2012 — 117M hashes leaked, weakly hashed unsalted SHA-1</div></div>
+      <div class="concept"><div class="ctitle">Physical</div><div class="cdesc">Tailgating, USB drops — bypassing technical security by walking in</div></div>
+    </div>
+
+    <div class="section-label">// cyber kill chain (how real attacks unfold)</div>
+    <p style="font-size:13px;color:#cdd6da;">Recon → Weaponization → Delivery → Exploitation → Installation → Command & Control → Actions on Objective. Real attackers spend 70% of effort on recon — not exploitation. Target 2013: HVAC vendor phished, then sat in the network for weeks before exfiltrating 40M+ card numbers.</p>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">03</div>
+      <div class="day-meta">
+        <div class="day-title">Linux Fundamentals I — Filesystem & Permissions</div>
+        <span class="day-incident">PwnKit CVE-2021-4034</span>
+      </div>
+    </div>
+
+    <div class="section-label">// critical directories</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">/etc/passwd & /etc/shadow</div><div class="cdesc">User accounts + password hashes. shadow is root-only — getting here = target for attackers.</div></div>
+      <div class="concept"><div class="ctitle">/var/log/</div><div class="cdesc">System logs — where defenders spend most of their investigation time.</div></div>
+      <div class="concept"><div class="ctitle">/tmp/</div><div class="cdesc">World-writable. Attackers drop payloads here because every user can write to it.</div></div>
+      <div class="concept"><div class="ctitle">/root/</div><div class="cdesc">Superuser's home. Reaching here = full system compromise.</div></div>
+    </div>
+
+    <div class="section-label">// permission numbers — memorize these</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">r = 4, w = 2, x = 1</div><div class="cdesc">rwxr-xr-- = 754. Owner=7(rwx), Group=5(r-x), Others=4(r--)</div></div>
+      <div class="concept"><div class="ctitle">chmod 600 file</div><div class="cdesc">Only owner can read/write. Correct for sensitive files like SSH keys.</div></div>
+      <div class="concept"><div class="ctitle">chmod 777 file</div><div class="cdesc">Everyone can read/write/execute. NEVER do this in production — shows up in breach reports constantly.</div></div>
+      <div class="concept"><div class="ctitle">SUID bit (4000)</div><div class="cdesc">File runs as its owner (often root). PwnKit CVE-2021-4034 exploited a SUID binary for 12+ years.</div></div>
+    </div>
+
+    <div class="section-label">// key command</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>find / -perm -4000 -type f 2>/dev/null</code><div class="cdesc">Find all SUID binaries on the system — first thing attackers run post-compromise for privilege escalation.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 4 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">04</div>
+      <div class="day-meta">
+        <div class="day-title">Linux Fundamentals II — Users, Processes & Shell</div>
+        <span class="day-incident">TeamTNT cryptojacking 2020–21</span>
+      </div>
+    </div>
+
+    <div class="section-label">// key concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">su vs sudo</div><div class="cdesc">su switches user entirely. sudo runs one command as root AND logs it. Sudo is safer — logs are evidence.</div></div>
+      <div class="concept"><div class="ctitle">PID / PPID</div><div class="cdesc">Every process has an ID (PID) and parent ID (PPID). A "kernel thread" with a normal user as its PPID is suspicious.</div></div>
+      <div class="concept"><div class="ctitle">ps aux</div><div class="cdesc">Snapshot of all running processes. TeamTNT renamed malware to "kworker" to hide in plain sight here.</div></div>
+      <div class="concept"><div class="ctitle">kill [PID]</div><div class="cdesc">Sends SIGTERM. kill -9 [PID] sends SIGKILL — can't be ignored, forceful termination.</div></div>
+    </div>
+
+    <div class="section-label">// the real lesson</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Process names are lies. TeamTNT's cryptomining malware renamed itself to look like a legitimate kernel thread (<code>kworker</code>). Always verify with <code>ls -l /proc/[PID]/exe</code> — the actual binary path doesn't lie, the name field does.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ps aux | grep -v "\[" | grep kworker</code><div class="cdesc">Find fake kernel threads — real ones are in brackets, malware isn't.</div></div>
+      <div class="cmd-row"><code>ls -l /proc/[PID]/exe</code><div class="cdesc">Reveal the actual binary a process is running — bypasses name spoofing.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 5 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">05</div>
+      <div class="day-meta">
+        <div class="day-title">Bash Scripting Basics</div>
+        <span class="day-incident">Shellshock CVE-2014-6271</span>
+      </div>
+    </div>
+
+    <div class="section-label">// must-know syntax</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">#!/bin/bash</div><div class="cdesc">Shebang — must be line 1 of every script. Tells OS which interpreter to use.</div></div>
+      <div class="concept"><div class="ctitle">$1 $2 $#</div><div class="cdesc">First arg, second arg, total argument count passed to the script.</div></div>
+      <div class="concept"><div class="ctitle">if [ "$x" -eq 10 ]</div><div class="cdesc">Spaces inside brackets are required. Get it wrong and script errors silently.</div></div>
+      <div class="concept"><div class="ctitle">chmod +x script.sh</div><div class="cdesc">Makes script executable. Without this, ./script.sh gives "Permission denied."</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Shellshock (CVE-2014-6271, 2014):</strong> a flaw in how Bash parsed environment variables let attackers append malicious code that executed automatically — no login needed. 500M+ devices affected. Botnets scanning for it within 24 hours of disclosure. Lesson: Bash is everywhere, and flaws in it are catastrophic in scope.</p>
+
+    <div class="section-label">// your first real security script</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>#!/bin/bash<br>echo "User: $(whoami)"<br>echo "Host: $(hostname)"<br>ss -tuln</code><div class="cdesc">sysinfo.sh — your first recon script. Shows user, hostname, and all listening ports. Extends to 100+ hosts with a loop.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 6 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">06</div>
+      <div class="day-meta">
+        <div class="day-title">Networking I — The OSI Model</div>
+        <span class="day-incident">WannaCry/EternalBlue 2017</span>
+      </div>
+    </div>
+
+    <div class="section-label">// 7 layers — memorize top to bottom</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">L7 — Application</div><div class="cdesc">HTTP, DNS, SMB — what users touch. WannaCry exploited SMBv1 here.</div></div>
+      <div class="concept"><div class="ctitle">L6 — Presentation</div><div class="cdesc">Encryption (TLS), formatting, compression.</div></div>
+      <div class="concept"><div class="ctitle">L5 — Session</div><div class="cdesc">Opens, maintains, closes connection sessions.</div></div>
+      <div class="concept"><div class="ctitle">L4 — Transport</div><div class="cdesc">TCP vs UDP. Ports live here. WannaCry spread via TCP port 445.</div></div>
+      <div class="concept"><div class="ctitle">L3 — Network</div><div class="cdesc">IP addresses, routing between networks. WannaCry routed via IP to 150+ countries.</div></div>
+      <div class="concept"><div class="ctitle">L2 — Data Link</div><div class="cdesc">MAC addresses, switches, ethernet frames.</div></div>
+      <div class="concept"><div class="ctitle">L1 — Physical</div><div class="cdesc">Cables, signals, raw bits — actual hardware.</div></div>
+    </div>
+
+    <div class="section-label">// the real lesson</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Knowing which OSI layer a vulnerability lives on tells you what defense actually stops it. WannaCry required action at L7 (patch SMBv1) AND L4 (firewall block TCP port 445). Fixing only one layer is not enough.</p>
+  </div>
+
+  <!-- DAY 7 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">07</div>
+      <div class="day-meta">
+        <div class="day-title">Networking II — TCP/IP & Ports</div>
+        <span class="day-incident">MafiaBoy SYN Flood 2000</span>
+      </div>
+    </div>
+
+    <div class="section-label">// TCP three-way handshake</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">1. SYN →</div><div class="cdesc">"I want to connect." Your machine sends a connection request.</div></div>
+      <div class="concept"><div class="ctitle">2. SYN-ACK ←</div><div class="cdesc">"OK, I'm ready." Server acknowledges and prepares resources.</div></div>
+      <div class="concept"><div class="ctitle">3. ACK →</div><div class="cdesc">"Confirmed, let's go." Connection established, data flows.</div></div>
+    </div>
+
+    <div class="section-label">// ports to memorize</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>21 — FTP</code><div class="cdesc">File transfer. Often unencrypted — common pentest target.</div></div>
+      <div class="cmd-row"><code>22 — SSH</code><div class="cdesc">Secure remote shell. Encrypted. Brute-forced constantly if exposed.</div></div>
+      <div class="cmd-row"><code>80 — HTTP</code><div class="cdesc">Plain web traffic — readable by anyone on same network.</div></div>
+      <div class="cmd-row"><code>443 — HTTPS</code><div class="cdesc">Encrypted web traffic. The padlock icon in your browser.</div></div>
+      <div class="cmd-row"><code>3389 — RDP</code><div class="cdesc">Windows Remote Desktop. Very commonly attacked if internet-exposed.</div></div>
+    </div>
+
+    <div class="section-label">// SYN flood + real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>MafiaBoy (Feb 2000):</strong> a 15-year-old flooded Yahoo, eBay, CNN, Amazon with SYN requests (step 1) and never sent step 3 (ACK). Servers held resources open for incomplete connections until exhausted and crashed. ~$1.2B in damages. Still a valid attack today without SYN cookie protection.</p>
+  </div>
+
+  <!-- DAY 8 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">08</div>
+      <div class="day-meta">
+        <div class="day-title">Networking III — DNS, HTTP/HTTPS & DHCP</div>
+        <span class="day-incident">Baidu DNS Hijack 2010</span>
+      </div>
+    </div>
+
+    <div class="section-label">// DNS lookup chain (6 steps)</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">1. Local Cache</div><div class="cdesc">Already looked this up? Use cached result — skip everything.</div></div>
+      <div class="concept"><div class="ctitle">2. Recursive Resolver</div><div class="cdesc">Your ISP's lookup helper — asks on your behalf.</div></div>
+      <div class="concept"><div class="ctitle">3. Root Server</div><div class="cdesc">Doesn't know the IP — points to TLD server.</div></div>
+      <div class="concept"><div class="ctitle">4. TLD Server</div><div class="cdesc">Manages .com/.in/.org — points to authoritative server.</div></div>
+      <div class="concept"><div class="ctitle">5. Authoritative Server</div><div class="cdesc">The domain's own server — returns the actual IP.</div></div>
+      <div class="concept"><div class="ctitle">6. Cache + Connect</div><div class="cdesc">IP cached locally for next time, browser connects.</div></div>
+    </div>
+
+    <div class="section-label">// HTTP vs HTTPS</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">HTTP (port 80)</div><div class="cdesc">Plain text. Anyone on the same network can read everything — passwords, cookies, all of it.</div></div>
+      <div class="concept"><div class="ctitle">HTTPS (port 443)</div><div class="cdesc">TLS-encrypted. Intercepted traffic is unreadable garbage. Certificate verifies the server is real.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Baidu DNS Hijack (2010):</strong> attackers poisoned the DNS registrar records for China's largest search engine. 100M+ users redirected for hours to a page controlled by "Iranian Cyber Army" — without touching Baidu's servers at all. Just changed the phone book entry.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nslookup google.com</code><div class="cdesc">See which DNS server resolves it and what IP it returns.</div></div>
+      <div class="cmd-row"><code>dig tryhackme.com</code><div class="cdesc">Full lookup chain with TTL — how long the result is cached.</div></div>
+      <div class="cmd-row"><code>cat /etc/resolv.conf</code><div class="cdesc">Which DNS server your machine uses. 1.1.1.1 or 8.8.8.8 is safer than ISP default.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 9 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">09</div>
+      <div class="day-meta">
+        <div class="day-title">Subnetting & Routing Basics</div>
+        <span class="day-incident">Target Corporation 2013</span>
+      </div>
+    </div>
+
+    <div class="section-label">// CIDR — memorize these</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>/24 = 255.255.255.0</code><div class="cdesc">254 usable hosts. Most common in home/small office networks.</div></div>
+      <div class="cmd-row"><code>/16 = 255.255.0.0</code><div class="cdesc">65,534 usable hosts. Large enterprise internal networks.</div></div>
+      <div class="cmd-row"><code>/30 = 255.255.255.252</code><div class="cdesc">2 hosts only. Point-to-point router links.</div></div>
+      <div class="cmd-row"><code>/32</code><div class="cdesc">Single host. Used in firewall rules to specify one exact IP.</div></div>
+    </div>
+
+    <div class="section-label">// subnet anatomy for 192.168.1.0/24</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Network: 192.168.1.0</div><div class="cdesc">Identifies the subnet — never assigned to a device.</div></div>
+      <div class="concept"><div class="ctitle">Broadcast: 192.168.1.255</div><div class="cdesc">Reaches all devices on subnet — never assigned either.</div></div>
+      <div class="concept"><div class="ctitle">Usable: .1 → .254</div><div class="cdesc">254 devices can be assigned here.</div></div>
+      <div class="concept"><div class="ctitle">Gateway: 192.168.1.1</div><div class="cdesc">The router — traffic outside the subnet goes here first.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Target 2013:</strong> attackers entered via an HVAC vendor's credentials, moved laterally directly to POS systems because the network was flat (no segmentation). Proper subnetting with firewall rules between vendor zone and payment systems would have contained the breach. 40M card numbers stolen, $18.5M settlement.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ip addr show</code><div class="cdesc">Your IP and subnet mask — what network you're on.</div></div>
+      <div class="cmd-row"><code>ip route show</code><div class="cdesc">Your routing table — where traffic goes for each destination.</div></div>
+      <div class="cmd-row"><code>traceroute google.com</code><div class="cdesc">Every router hop from you to the destination — visualizes routing in action.</div></div>
+      <div class="cmd-row"><code>nmap -sn 192.168.1.0/24</code><div class="cdesc">Discover all live hosts on your subnet. First thing attackers do post-compromise.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 10 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">10</div>
+      <div class="day-meta">
+        <div class="day-title">Python for Security I — Syntax & First Scripts</div>
+        <span class="day-incident">PyPI Supply Chain 2022–23</span>
+      </div>
+    </div>
+
+    <div class="section-label">// syntax you must know cold</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Variables</div><div class="cdesc"><code>ip = "192.168.1.1"</code> — no type declaration. String, int, bool — just assign.</div></div>
+      <div class="concept"><div class="ctitle">If/else</div><div class="cdesc">Indentation IS the syntax — no braces. Wrong indent = broken code silently.</div></div>
+      <div class="concept"><div class="ctitle">For loop</div><div class="cdesc"><code>for p in [80,443]: print(p)</code> — heart of any scanner or automation script.</div></div>
+      <div class="concept"><div class="ctitle">Functions</div><div class="cdesc"><code>def scan(ip,port):</code> — define once, reuse anywhere, keeps scripts clean.</div></div>
+      <div class="concept"><div class="ctitle">File I/O</div><div class="cdesc"><code>with open("ips.txt","r") as f:</code> — reads wordlists, IP lists, log files.</div></div>
+      <div class="concept"><div class="ctitle">Socket library</div><div class="cdesc"><code>import socket</code> — raw network connections. Built your first port scanner with this.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>PyPI Supply Chain (2022–23):</strong> attackers uploaded packages named one letter different from real ones (<code>request</code> vs <code>requests</code>). Developers with a typo in pip install downloaded and ran credential-stealing Python automatically. Reading Python code is now a defensive skill — not just a developer one.</p>
+
+    <div class="section-label">// your first security script (port_checker.py)</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>import socket</code><div class="cdesc">Raw network library — socket.connect() attempts TCP handshake to check if port is open.</div></div>
+      <div class="cmd-row"><code>s.settimeout(1)</code><div class="cdesc">Don't wait forever for a closed port — 1 second timeout keeps the script fast.</div></div>
+      <div class="cmd-row"><code>scanme.nmap.org</code><div class="cdesc">Legal test target — Nmap's official scan-me host. Safe to test your scanner against.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL REAL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2000</div><div class="incident">MafiaBoy SYN Flood</div><div class="detail">15-year-old took Yahoo, eBay, CNN, Amazon offline. SYN flood, $1.2B damages.</div></div>
+      <div class="bt-row"><div class="year">2010</div><div class="incident">Stuxnet</div><div class="detail">Integrity attack. Falsified centrifuge sensor data. Nation-state malware.</div></div>
+      <div class="bt-row"><div class="year">2010</div><div class="incident">Baidu DNS Hijack</div><div class="detail">DNS registrar poisoned. 100M+ users redirected. Servers never touched.</div></div>
+      <div class="bt-row"><div class="year">2012</div><div class="incident">LinkedIn Breach</div><div class="detail">117M hashes leaked, unsalted SHA-1. Credential attack category.</div></div>
+      <div class="bt-row"><div class="year">2013</div><div class="incident">Target POS Breach</div><div class="detail">Flat network + HVAC vendor creds = 40M cards stolen, $18.5M settlement.</div></div>
+      <div class="bt-row"><div class="year">2016</div><div class="incident">Dyn DNS / Mirai</div><div class="detail">IoT botnet DDoS. Twitter, Netflix, Reddit offline. Availability attack.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Equifax</div><div class="detail">Unpatched Apache Struts. 147M records. Confidentiality attack.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">WannaCry / EternalBlue</div><div class="detail">SMBv1 exploit. 200k+ machines, 150+ countries. Hit UK NHS hard.</div></div>
+      <div class="bt-row"><div class="year">2020–21</div><div class="incident">TeamTNT</div><div class="detail">Cryptomining malware renamed to "kworker" to hide in ps/top output.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">PwnKit CVE-2021-4034</div><div class="detail">SUID pkexec bug. 12+ years undetected. Any user → root.</div></div>
+      <div class="bt-row"><div class="year">2022–23</div><div class="incident">PyPI Supply Chain</div><div class="detail">Typosquatted packages stole creds on install. Python is attack surface too.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REF -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 1–10</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ls -l /etc/shadow</code><div class="cdesc">Check permissions on shadow file — Confidentiality in action.</div></div>
+      <div class="cmd-row"><code>chmod 600 file</code><div class="cdesc">Owner read/write only — correct for sensitive files.</div></div>
+      <div class="cmd-row"><code>find / -perm -4000 2>/dev/null</code><div class="cdesc">Find SUID binaries — PwnKit recon command.</div></div>
+      <div class="cmd-row"><code>ps aux | head</code><div class="cdesc">Snapshot of all processes — verify suspicious ones with /proc/[PID]/exe.</div></div>
+      <div class="cmd-row"><code>ss -tuln</code><div class="cdesc">All listening ports on your system — see what's exposed.</div></div>
+      <div class="cmd-row"><code>ip addr show</code><div class="cdesc">Your IP + subnet mask.</div></div>
+      <div class="cmd-row"><code>ip route show</code><div class="cdesc">Routing table — where traffic goes.</div></div>
+      <div class="cmd-row"><code>traceroute google.com</code><div class="cdesc">Every router hop to destination.</div></div>
+      <div class="cmd-row"><code>nmap -sT [target]</code><div class="cdesc">TCP connect scan — full 3-way handshake per port.</div></div>
+      <div class="cmd-row"><code>nmap -sn 192.168.1.0/24</code><div class="cdesc">Discover all live hosts on subnet — network discovery.</div></div>
+      <div class="cmd-row"><code>nslookup google.com</code><div class="cdesc">DNS lookup — which server resolved it and what IP returned.</div></div>
+      <div class="cmd-row"><code>dig domain.com</code><div class="cdesc">Full DNS chain with TTL, record type, nameserver.</div></div>
+      <div class="cmd-row"><code>python3 port_checker.py</code><div class="cdesc">Your first security tool — socket-based port scanner.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS ACROSS DAYS 1-10 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 1–10</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT / Claude</div><div class="adesc">Explain concepts, generate practice problems, debug scripts, analyze suspicious code.</div></div>
+      <div class="ai-pill"><div class="aname">GitHub Copilot</div><div class="adesc">Autocomplete Python security scripts. Turns ideas into working code fast.</div></div>
+      <div class="ai-pill"><div class="aname">Darktrace / Vectra AI</div><div class="adesc">Enterprise lateral movement detection — the Target fix, AI-powered.</div></div>
+      <div class="ai-pill"><div class="aname">Nmap + GPT</div><div class="adesc">Paste scan output into ChatGPT — "what does this tell an attacker?" Trains threat modeling.</div></div>
+      <div class="ai-pill"><div class="aname">Bandit / Snyk</div><div class="adesc">AI Python security linters — catches hardcoded credentials and insecure functions.</div></div>
+      <div class="ai-pill"><div class="aname">Pwntools + AI</div><div class="adesc">CTF exploit library + AI guidance when stuck. Cuts hours off CTF solves.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 1–10</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 3–4</div><div class="bullet">"Analyzed Linux filesystem permissions and SUID binaries; identified privilege escalation paths using chmod audits and find commands."</div></div>
+      <div class="job-box"><div class="day-ref">Day 5</div><div class="bullet">"Wrote automated bash recon scripts for system enumeration; documented Shellshock (CVE-2014-6271) exploitation vector and defense."</div></div>
+      <div class="job-box"><div class="day-ref">Day 6–7</div><div class="bullet">"Mapped WannaCry/EternalBlue attack across OSI layers 3, 4, and 7; performed TCP port scanning using Nmap across target lab environments."</div></div>
+      <div class="job-box"><div class="day-ref">Day 8</div><div class="bullet">"Investigated DNS resolution chains using nslookup and dig; identified DNS cache poisoning vectors and misconfigured resolvers."</div></div>
+      <div class="job-box"><div class="day-ref">Day 9</div><div class="bullet">"Performed subnet discovery and network mapping using Nmap; analyzed routing configurations and CIDR addressing for security gap identification."</div></div>
+      <div class="job-box"><div class="day-ref">Day 10</div><div class="bullet">"Built Python-based port scanner using socket library; automated TCP connection checks for network reconnaissance across target IP ranges."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">A hospital database is leaked online. Nothing was altered. Which CIA element was broken?</div>
+      <div class="ans">Confidentiality — unauthorized people now have access to data they shouldn't see.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">What is the only real difference between a white hat and a black hat hacker?</div>
+      <div class="ans">Written authorization. Same skillset — the signed scope of work is the legal line.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">What does -rwxr-xr-- translate to in numeric permission notation?</div>
+      <div class="ans">754. Owner = 7 (rwx), Group = 5 (r-x), Others = 4 (r--).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">TeamTNT renamed its malware to "kworker." How do you verify if a process is real?</div>
+      <div class="ans">ls -l /proc/[PID]/exe — reveals the actual binary path, which can't be spoofed like the name field.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What does a SYN flood attack actually do, step by step?</div>
+      <div class="ans">Sends thousands of SYN (step 1) requests without ever completing step 3 (ACK). Server holds resources open for each half-finished connection until exhausted and crashes — exactly what MafiaBoy did in 2000.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">WannaCry exploited which protocol at which OSI layer? What two defenses were needed?</div>
+      <div class="ans">SMBv1 at Layer 7 (Application). Two defenses: block TCP port 445 at firewall (Layer 4) AND patch/disable SMBv1 (Layer 7). One alone wasn't sufficient.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">How many usable host addresses does a /24 subnet provide? What's the broadcast address for 192.168.5.0/24?</div>
+      <div class="ans">254 usable hosts. Broadcast = 192.168.5.255.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">The Baidu DNS hijack redirected 100M+ users without touching Baidu's servers. How?</div>
+      <div class="ans">DNS registrar records were poisoned — the "phone book entry" for baidu.com was changed to an attacker-controlled IP. Every DNS lookup returned the wrong address.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">Why did the Target 2013 breach spread so far once attackers got inside?</div>
+      <div class="ans">Flat, unsegmented network — POS systems and vendor access zone were on the same network with no subnet boundary or firewall rules between them. One vendor credential = access to everything.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">How did the PyPI supply chain attacks execute malicious code without the victim doing anything?</div>
+      <div class="ans">Malicious packages executed Python code on pip install — before the developer even imported the library. The attack was in the install command itself, not the code the developer wrote.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 11</div>
+      <div class="title">Python for Security II — sockets & automation scripts</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — say "Day 11" when you're ready to continue.</footer>
+
+</div>
+</body>
+</html>
