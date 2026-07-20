@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 11 to Day 20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day11_to_day20.md</span>
+    <span style="color:var(--green);">Phase 2 — Tools, Crypto &amp; Password Security</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 11 TO DAY 20</div>
+    <h1>10 More Days. <span>Python, Windows, labs, Kali tools, crypto, auth &amp; cracking.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 11–20 into one reference. Read it before Day 21. If any section feels fuzzy, revisit that day's HTML before continuing.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">Tools Covered</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Labs Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 11 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">11</div>
+      <div class="day-meta">
+        <div class="day-title">Python for Security II — Sockets & Automation</div>
+        <span class="day-incident">Mirai Botnet 2016 · Dyn DNS Attack</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Socket</div><div class="cdesc">Programming interface for network connections. s = socket.socket() → s.connect((ip,port)) → s.send() → s.recv(). Like a phone handset in code.</div></div>
+      <div class="concept"><div class="ctitle">SOCK_STREAM (TCP)</div><div class="cdesc">Reliable, ordered, connection-based. Use for web, SSH, anything needing guaranteed delivery.</div></div>
+      <div class="concept"><div class="ctitle">SOCK_DGRAM (UDP)</div><div class="cdesc">Fast, connectionless, fire-and-forget. Use for DNS queries, speed-critical recon.</div></div>
+      <div class="concept"><div class="ctitle">Threading</div><div class="cdesc">threading.Thread makes concurrent connections. A for loop + threads scans 65K ports in seconds — this is how Mirai scanned the entire internet.</div></div>
+    </div>
+
+    <div class="section-label">// automation pattern</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Once you open one socket in Python, a for loop scans 65K ports. Threading makes it concurrent. This is exactly how network scanners, brute-forcers, and botnets work — the same 10 lines of socket code, looped intelligently. Always use <code>s.settimeout()</code> to avoid hanging on closed ports.</p>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Mirai Botnet (2016):</strong> scanned the entire IPv4 internet for open Telnet (port 23) using concurrent socket connections, then tried 61 default username/password combos. Absorbed routers, cameras, DVRs into the botnet. Result: Oct 2016 Dyn DDoS attack took Twitter, Netflix, Reddit offline. Lesson: socket automation at scale is the foundation of both legitimate security tools and the most damaging internet attacks.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How would you use Python sockets in a real security context?</div>
+      <div class="a">"I've built a banner grabber that connects to open ports and reads service version strings — feeding directly into CVE lookups — and a threaded port scanner using threading for speed. This is the same technique the Mirai botnet used in 2016 to scan the internet for open Telnet ports. Understanding the mechanism makes it straightforward to detect: one source IP rapidly connecting to many destinations on the same port is the scanner signature you'd watch for in a SIEM."</div>
+    </div>
+  </div>
+
+  <!-- DAY 12 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">12</div>
+      <div class="day-meta">
+        <div class="day-title">Windows Internals — Registry, Processes & Event Logs</div>
+        <span class="day-incident">SolarWinds SUNBURST 2020</span>
+      </div>
+    </div>
+
+    <div class="section-label">// registry hives</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">HKLM</div><div class="cdesc">Settings for the entire computer — most important hive for security.</div></div>
+      <div class="concept"><div class="ctitle">HKCU</div><div class="cdesc">Settings for the logged-in user. Malware running as standard user hides here.</div></div>
+      <div class="concept"><div class="ctitle">Run Key</div><div class="cdesc">HKLM\...\CurrentVersion\Run — THE persistence key. Malware writes here to survive reboot.</div></div>
+      <div class="concept"><div class="ctitle">Services</div><div class="cdesc">HKLM\SYSTEM\CurrentControlSet\Services — malware installs as a service for deep persistence.</div></div>
+    </div>
+
+    <div class="section-label">// core processes — spot the fakes</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">lsass.exe</div><div class="cdesc">Handles authentication. Stores password hashes in memory. Parent = wininit.exe. Primary target for Mimikatz.</div></div>
+      <div class="concept"><div class="ctitle">svchost.exe</div><div class="cdesc">Service Host. Multiple instances normal. Suspicious if not from System32.</div></div>
+      <div class="concept"><div class="ctitle">explorer.exe</div><div class="cdesc">File manager. One per logged-in user. Malware injects here for evasion.</div></div>
+      <div class="concept"><div class="ctitle">csrss.exe</div><div class="cdesc">Critical system process. If killed, Windows crashes. Must run from System32.</div></div>
+    </div>
+
+    <div class="section-label">// event log IDs to memorize</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">4624</div><div class="cdesc">Successful logon. Baseline all activity. Watch unusual logon types.</div></div>
+      <div class="concept"><div class="ctitle">4625</div><div class="cdesc">Failed logon. Spikes = brute force. First alert to set up.</div></div>
+      <div class="concept"><div class="ctitle">4688</div><div class="cdesc">Process creation. Disabled by default. Catches living-off-the-land attacks.</div></div>
+      <div class="concept"><div class="ctitle">1102</div><div class="cdesc">Audit log cleared. Attacker cleanup. This event fires when they try to clear.</div></div>
+      <div class="concept"><div class="ctitle">4104</div><div class="cdesc">PowerShell script block logging. See exact commands run. Essential for detection.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>SolarWinds SUNBURST (2020):</strong> attackers compromised the SolarWinds build pipeline, inserted a backdoor in a trusted update. 18,000 organizations installed it — US Treasury, DOJ, DHS, Fortune 500s. SUNBURST stored C2 config in the Windows Registry to avoid suspicious file writes. Stayed dormant up to 2 weeks, mimicked legitimate API calls. Undetected for 9 months. Lesson: Event IDs 4688 and 4104 properly collected would have significantly raised detection chances.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What Windows Event IDs do you consider most important for security monitoring?</div>
+      <div class="a">"4625 failed logons — spike = brute force. 4688 process creation — disabled by default but catches most living-off-the-land attacks. 4104 PowerShell logging — you get the actual commands. 1102 audit log cleared — self-referential: even if attackers clear logs, the clearing itself fires this ID. SolarWinds went 9 months undetected partly because these logs weren't being collected across affected organizations."</div>
+    </div>
+  </div>
+
+  <!-- DAY 13 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">13</div>
+      <div class="day-meta">
+        <div class="day-title">Virtualization — Building Your Home Security Lab</div>
+        <span class="day-incident">Tesla Kubernetes Cryptojacking 2018</span>
+      </div>
+    </div>
+
+    <div class="section-label">// hypervisor types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Type 1 Hypervisor</div><div class="cdesc">Runs directly on hardware. VMware ESXi, Hyper-V, Proxmox. Enterprise data centres.</div></div>
+      <div class="concept"><div class="ctitle">Type 2 Hypervisor</div><div class="cdesc">Runs on top of your OS. VirtualBox, VMware Workstation. Your home lab choice.</div></div>
+      <div class="concept"><div class="ctitle">Snapshot</div><div class="cdesc">Saved VM state. Break it? Restore in 10 seconds. Essential for malware analysis and exploit testing.</div></div>
+      <div class="concept"><div class="ctitle">Host-Only vs NAT</div><div class="cdesc">Host-Only = isolated network between VMs only. NAT = shares host's internet. Use Host-Only for safe attack practice.</div></div>
+    </div>
+
+    <div class="section-label">// lab architecture</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Kali Linux VM</div><div class="cdesc">Attacker machine. 600+ pre-installed tools. IP 192.168.56.105 typical.</div></div>
+      <div class="concept"><div class="ctitle">Metasploitable 2</div><div class="cdesc">Intentionally vulnerable target. IP 192.168.56.102. Legal target for practice.</div></div>
+      <div class="concept"><div class="ctitle">Host-Only Network</div><div class="cdesc">Isolated virtual network between both VMs. No internet = legal to attack freely.</div></div>
+      <div class="concept"><div class="ctitle">Snapshots</div><div class="cdesc">Take "Clean Install" snapshot before any exploit. Restore in seconds after breaking.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Tesla Kubernetes Cryptojacking (2018):</strong> attackers found Tesla's Kubernetes admin console exposed to the internet with no password. They deployed their own container — a virtualized workload — running cryptominer alongside Tesla's legitimate workloads. Lesson: misconfigured virtualization/container isolation is a fast-growing cloud attack vector. The attacker didn't break in — they added their own VM alongside yours.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Do you have any hands-on lab experience outside of online platforms?</div>
+      <div class="a">"Yes — I set up a home lab with VirtualBox, Kali Linux, and Metasploitable 2 on an isolated Host-Only network. I use snapshots before exercises — same technique malware analysts use. The Tesla Kubernetes breach in 2018 is a perfect example of why isolation matters: attackers deployed their own containerized workload alongside Tesla's because the admin interface had no authentication."</div>
+    </div>
+  </div>
+
+  <!-- DAY 14 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">14</div>
+      <div class="day-meta">
+        <div class="day-title">Kali Linux Tools — Nmap, Wireshark, Metasploit, Burp Suite</div>
+        <span class="day-incident">Bangladesh Bank SWIFT Heist 2016</span>
+      </div>
+    </div>
+
+    <div class="section-label">// four core tools</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Nmap</div><div class="cdesc">Port scanning, service/OS detection, NSE scripts. <code>nmap -sV -sC -O 192.168.56.102</code> — all-in-one recon. <code>--script vuln</code> flags known CVEs.</div></div>
+      <div class="concept"><div class="ctitle">Wireshark</div><div class="cdesc">Packet capture & analysis. Filters: <code>http.request</code>, <code>tcp.port==21</code>, <code>ftp.request.command</code>, <code>tcp.flags.syn==1</code>.</div></div>
+      <div class="concept"><div class="ctitle">Metasploit</div><div class="cdesc">Exploitation framework. <code>msfconsole → search/use/exploit</code>. vsftpd 2.3.4 backdoor gives root shell in 5 commands.</div></div>
+      <div class="concept"><div class="ctitle">Burp Suite</div><div class="cdesc">Intercepting proxy. Browser → 127.0.0.1:8080. Intercept, modify, replay HTTP/S requests.</div></div>
+    </div>
+
+    <div class="section-label">// nmap switches to know cold</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sV [ip]</code><div class="cdesc">Service version detection.</div></div>
+      <div class="cmd-row"><code>nmap -sS [ip]</code><div class="cdesc">SYN stealth scan — fastest, least logged, needs root.</div></div>
+      <div class="cmd-row"><code>nmap -A [ip]</code><div class="cdesc">Aggressive — service, OS, traceroute, scripts combined.</div></div>
+      <div class="cmd-row"><code>nmap --script vuln [ip]</code><div class="cdesc">Vulnerability detection scripts — quick CVE check.</div></div>
+      <div class="cmd-row"><code>nmap -p- [ip]</code><div class="cdesc">Scan all 65,535 ports — slow but thorough.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Bangladesh Bank SWIFT Heist (2016):</strong> Lazarus Group installed Wireshark inside the bank's network, captured unencrypted SWIFT traffic for weeks, learned the exact protocol format and auth flow, then crafted fraudulent transfers stealing $81M. Wireshark didn't hack anything — it just listened. Lesson: unencrypted internal traffic + network access = full protocol knowledge without ever touching a server.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through how you'd approach a penetration test at a high level.</div>
+      <div class="a">"Start with Nmap — service version scan to identify what's running, vulnerability scripts to flag CVEs. Anything interesting gets Burp Suite if web-facing, or Metasploit if a network service with known exploit. Wireshark runs throughout to capture traffic — the Bangladesh Bank heist is the clearest example of why: Lazarus Group used passive Wireshark for weeks and learned an entire banking protocol just by listening to unencrypted traffic."</div>
+    </div>
+  </div>
+
+  <!-- DAY 15 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">15</div>
+      <div class="day-meta">
+        <div class="day-title">Phase 1 Complete — Review & Phase 2 Preview</div>
+        <span class="day-incident">Full Phase 1 Coverage</span>
+      </div>
+    </div>
+
+    <div class="section-label">// phase 1 recap (days 1–14)</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">CIA Triad + Incidents</div><div class="cdesc">Dyn DDoS (Avail.), Equifax (Conf.), Ransomware (Integrity) — each attack breaks at least one.</div></div>
+      <div class="concept"><div class="ctitle">Linux + Bash</div><div class="cdesc">Permissions, processes, cron, SUID, scripting, pipes, filesystem hierarchy.</div></div>
+      <div class="concept"><div class="ctitle">Networking</div><div class="cdesc">OSI 7 layers, TCP/IP, DNS, HTTP, CIDR, subnetting, 3-way handshake.</div></div>
+      <div class="concept"><div class="ctitle">Python + Tools</div><div class="cdesc">Socket programming, banner grabbing, threaded scanners, port checkers, automation.</div></div>
+      <div class="concept"><div class="ctitle">Windows + Registry</div><div class="cdesc">SAM/LSASS, Event Logs (4624/4625/4688/1102), process spoofing, persistence.</div></div>
+      <div class="concept"><div class="ctitle">Home Lab + Kali</div><div class="cdesc">VirtualBox, Kali, Metasploitable, Nmap, Wireshark, Metasploit, Burp Suite.</div></div>
+    </div>
+
+    <div class="section-label">// phase 2 preview (days 16–30)</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Cryptography (hashing, symmetric/asymmetric, PKI, TLS) → AuthN vs AuthZ → Password Cracking (Hashcat, John) → Web Recon (gobuster, ffuf) → SQL Injection → XSS → LFI/RFI → SSRF → OWASP Top 10 → Privilege Escalation → Active Directory.</p>
+  </div>
+
+  <!-- DAY 16 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">16</div>
+      <div class="day-meta">
+        <div class="day-title">Cryptography I — Hashing vs Encryption</div>
+        <span class="day-incident">LinkedIn 2012 · SHA-1 Collision 2017</span>
+      </div>
+    </div>
+
+    <div class="section-label">// hashing vs encryption</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Hashing (One-Way)</div><div class="cdesc">Irreversible, deterministic, fixed-size. <code>echo -n "hello" | sha256sum</code>. For: integrity, password storage.</div></div>
+      <div class="concept"><div class="ctitle">Encryption (Two-Way)</div><div class="cdesc">Reversible with a key. <code>openssl enc -aes-256-cbc -in plain.txt -out enc.txt</code>. For: confidentiality.</div></div>
+    </div>
+
+    <div class="section-label">// hash algorithms</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>MD5 — 128-bit</code><div class="cdesc">Broken. Collisions since 2004. Never use for security.</div></div>
+      <div class="cmd-row"><code>SHA-1 — 160-bit</code><div class="cdesc">Deprecated. SHAttered (2017) collision attack. Git migrating away.</div></div>
+      <div class="cmd-row"><code>SHA-256 — 256-bit</code><div class="cdesc">Current standard. TLS certs, blockchain, password hashing (with salt).</div></div>
+      <div class="cmd-row"><code>bcrypt/scrypt/Argon2</code><div class="cdesc">Password hashing. Deliberately slow + memory-hard. Argon2 won 2015 PHC.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>LinkedIn (2012):</strong> 167M unsalted SHA-1 hashes leaked. 90% cracked within days using rainbow tables. Salting alone makes cracking 1000x slower per user. Lesson: never hash passwords with a fast algorithm, and never without salt.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Why is bcrypt preferred over SHA-256 for password storage?</div>
+      <div class="a">SHA-256 is nanoseconds-fast — GPUs compute billions/sec. bcrypt has a configurable cost factor making each hash take ~250ms. Defense-in-depth = slow + salted + memory-hard (Argon2).</div>
+    </div>
+  </div>
+
+  <!-- DAY 17 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">17</div>
+      <div class="day-meta">
+        <div class="day-title">Cryptography II — Symmetric vs Asymmetric</div>
+        <span class="day-incident">Heartbleed CVE-2014-0160</span>
+      </div>
+    </div>
+
+    <div class="section-label">// comparison</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Symmetric (AES)</div><div class="cdesc">One key encrypts AND decrypts. Fast, hardware-accelerated. Problem: key sharing. Bulk data encryption.</div></div>
+      <div class="concept"><div class="ctitle">Asymmetric (RSA/ECC)</div><div class="cdesc">Public encrypts, private decrypts. Slow (100-1000x slower). Solves key exchange. Handshakes & signatures.</div></div>
+      <div class="concept"><div class="ctitle">TLS Handshake</div><div class="cdesc">ClientHello → ServerHello + Cert → Key Exchange (ECDHE) → Session key → AES encrypted channel.</div></div>
+      <div class="concept"><div class="ctitle">Perfect Forward Secrecy</div><div class="cdesc">ECDHE = unique session key per connection. Past sessions safe even if private key compromised later. RSA key exchange lacks PFS.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Heartbleed (CVE-2014-0160):</strong> buffer over-read in OpenSSL Heartbeat leaked up to 64KB server memory per request. Attackers repeatedly read memory until they extracted private RSA keys. 500K+ servers affected. Lesson: private keys are only as safe as the software managing them.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Why does TLS use both asymmetric and symmetric cryptography?</div>
+      <div class="a">Asymmetric (RSA/ECDHE) solves key exchange — securely negotiates a shared secret. Symmetric (AES) provides fast bulk encryption. Hybrid = security + performance.</div>
+    </div>
+  </div>
+
+  <!-- DAY 18 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">18</div>
+      <div class="day-meta">
+        <div class="day-title">Cryptography III — SSL/TLS, Certificates & PKI</div>
+        <span class="day-incident">DigiNotar CA Breach 2011</span>
+      </div>
+    </div>
+
+    <div class="section-label">// x.509 certificate anatomy</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Subject</div><div class="cdesc">Who the cert belongs to (CN/SAN). Browser checks this matches the URL.</div></div>
+      <div class="concept"><div class="ctitle">Public Key</div><div class="cdesc">The asymmetric key — anyone can encrypt data only the private key holder can decrypt.</div></div>
+      <div class="concept"><div class="ctitle">Issuer</div><div class="cdesc">The CA that signed this cert. Browser checks if the CA is in its trusted root store.</div></div>
+      <div class="concept"><div class="ctitle">Validity</div><div class="cdesc">Not Before / Not After. Expired certs rejected by modern browsers.</div></div>
+      <div class="concept"><div class="ctitle">Signature</div><div class="cdesc">CA's cryptographic signature proving the certificate hasn't been tampered with.</div></div>
+    </div>
+
+    <div class="section-label">// certificate chain hierarchy</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Root CA</div><div class="cdesc">Self-signed, pre-installed in browsers (~150 globally). Compromised root = all certs untrusted.</div></div>
+      <div class="concept"><div class="ctitle">Intermediate CA</div><div class="cdesc">Signed by root CA. Issues actual leaf certs. Limits blast radius if breached.</div></div>
+      <div class="concept"><div class="ctitle">Server / Leaf Cert</div><div class="cdesc">Your browser sees this. Contains domain name, public key, and signature chain to trusted root.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>DigiNotar CA Breach (2011):</strong> attackers compromised a Dutch CA and issued 531 fraudulent certs — including *.google.com. Iranian users MITM'd for months. DigiNotar bankrupted, delisted from all major browsers. Lesson: PKI trust model is only as strong as the weakest CA — any one of ~150 trusted roots can sign a cert for any domain.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What happens when you visit an HTTPS site with an expired certificate?</div>
+      <div class="a">Browser checks the validity period (Not Before / Not After). If expired, cert is rejected and a "Not Secure" warning appears — even though encryption may be sound. User must manually bypass the warning. Certificate expiration is a common cause of production outages.</div>
+    </div>
+  </div>
+
+  <!-- DAY 19 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">19</div>
+      <div class="day-meta">
+        <div class="day-title">Authentication vs Authorization</div>
+        <span class="day-incident">Capital One 2019 · IDOR</span>
+      </div>
+    </div>
+
+    <div class="section-label">// the fundamental difference</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Authentication (AuthN)</div><div class="cdesc">"Who are you?" Passwords, MFA, biometrics, certificates, SSO.</div></div>
+      <div class="concept"><div class="ctitle">Authorization (AuthZ)</div><div class="cdesc">"What can you do?" Permissions, roles, ACLs, policies. Checked AFTER auth.</div></div>
+    </div>
+
+    <div class="section-label">// common auth failures</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">IDOR</div><div class="cdesc">Change /profile?id=123 to ?id=124 and see another user's data. AuthN fine — AuthZ never checked.</div></div>
+      <div class="concept"><div class="ctitle">Session Hijacking</div><div class="cdesc">Attacker steals session cookie (XSS/sniffing). AuthN already done — cookie is the proof.</div></div>
+      <div class="concept"><div class="ctitle">Broken Access Control</div><div class="cdesc">OWASP #1. Checks "logged in?" but not "allowed to do this?"</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Capital One (2019):</strong> former AWS employee exploited a WAF misconfigured to allow SSRF to EC2 metadata service. The WAF's IAM role had S3 read access to 100M+ records. AuthN was fine (WAF properly authenticated). AuthZ was broken (role had far more permissions than needed). Lesson: least privilege — a WAF should only forward traffic, not read customer data.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What's the difference between horizontal and vertical privilege escalation?</div>
+      <div class="a">Horizontal: accessing another user's data at same privilege level (IDOR — user A reads user B's email by changing an ID). Vertical: gaining higher privileges than intended (standard user becomes admin via JWT role manipulation). Both authorization failures; vertical is usually more dangerous.</div>
+    </div>
+  </div>
+
+  <!-- DAY 20 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">20</div>
+      <div class="day-meta">
+        <div class="day-title">Password Security & Hashing Attacks</div>
+        <span class="day-incident">RockYou 2009 — 32M Plaintext Passwords</span>
+      </div>
+    </div>
+
+    <div class="section-label">// attack types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Dictionary Attack</div><div class="cdesc">Hash every word in a wordlist (rockyou.txt = 14M). Most common method — 90% of real hashes fall to this first pass.</div></div>
+      <div class="concept"><div class="ctitle">Rule-Based Attack</div><div class="cdesc">Transform words — capitalize, append numbers, Leet substitution. "password" → "P@ssw0rd1!" Covers real-world patterns.</div></div>
+      <div class="concept"><div class="ctitle">Rainbow Table Attack</div><div class="cdesc">Pre-computed hash→plaintext lookup. Instant for unsalted hashes. Defeated entirely by salting.</div></div>
+      <div class="concept"><div class="ctitle">Mask / Brute Force</div><div class="cdesc">Define character pattern or try all combos. Guaranteed but exponentially slow for long passwords.</div></div>
+    </div>
+
+    <div class="section-label">// cracking speeds — algorithm matters</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>MD5 — ~60B/sec</code><div class="cdesc">rockyou.txt cracks in milliseconds. Instant on modern GPU.</div></div>
+      <div class="cmd-row"><code>SHA-256 — ~10B/sec</code><div class="cdesc">Still very fast. Unsalted common passwords fall in seconds.</div></div>
+      <div class="cmd-row"><code>bcrypt (cost 12) — ~25K/sec</code><div class="cdesc">2.4M× slower than MD5. rockyou.txt takes ~9 min. The slowness IS the security.</div></div>
+      <div class="cmd-row"><code>Argon2id — memory-hard</code><div class="cdesc">Requires large memory per attempt. GPUs can't parallelize. Current best practice.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>RockYou (2009):</strong> SQL injection dumped 32 million accounts with passwords in plaintext — no hashing at all. The cleaned, sorted list became <code>rockyou.txt</code> — the wordlist shipped with every Kali Linux install. Top 10 passwords: 123456, 12345, 123456789, password, iloveyou, princess. Lesson: every Hashcat tutorial, every CTF challenge, every cracking lab uses this dataset — produced by the privacy failure of 32 million real people.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through how you'd crack a password hash recovered from a compromised database.</div>
+      <div class="a">"First identify the algorithm by hash format (MD5=32 hex, SHA-1=40, bcrypt=$2y$). Use hash-identifier if unsure. Then dictionary attack with rockyou.txt — 90% of MD5/SHA-1 real-world hashes crack on the first pass. If that fails, apply best64.rule for transformations, then mask attack. bcrypt cracks at ~25K/sec vs MD5's 60B/sec — that's exactly why bcrypt is correct for password storage."</div>
+    </div>
+  </div>
+
+  <!-- ALL REAL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">!</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2009</div><div class="incident">RockYou Breach</div><div class="detail">32M plaintext passwords via SQLi. Produced the rockyou.txt wordlist still used today.</div></div>
+      <div class="bt-row"><div class="year">2011</div><div class="incident">DigiNotar CA</div><div class="detail">Compromised CA issued 531 fraudulent certs. Iranian MITM. CA bankrupted.</div></div>
+      <div class="bt-row"><div class="year">2012</div><div class="incident">LinkedIn Breach</div><div class="detail">167M unsalted SHA-1 hashes. 90% cracked within days using rainbow tables.</div></div>
+      <div class="bt-row"><div class="year">2014</div><div class="incident">Heartbleed</div><div class="detail">OpenSSL memory leak. 500K+ servers leaked private RSA keys.</div></div>
+      <div class="bt-row"><div class="year">2016</div><div class="incident">Bangladesh Bank SWIFT</div><div class="detail">Lazarus used Wireshark to capture SWIFT traffic. $81M stolen via fake transfers.</div></div>
+      <div class="bt-row"><div class="year">2016</div><div class="incident">Mirai Botnet / Dyn</div><div class="detail">Socket automation scanned internet for open Telnet. DDoS took down Twitter, Netflix.</div></div>
+      <div class="bt-row"><div class="year">2018</div><div class="incident">Tesla Kubernetes</div><div class="detail">Unsecured K8s console allowed attacker to deploy cryptominer alongside Tesla's workloads.</div></div>
+      <div class="bt-row"><div class="year">2019</div><div class="incident">Capital One</div><div class="detail">WAF SSRF → metadata service → 100M+ records. Authorization failure.</div></div>
+      <div class="bt-row"><div class="year">2020</div><div class="incident">SolarWinds SUNBURST</div><div class="detail">Trojanized update, 18K orgs infected, 9 months undetected. Registry used for stealth.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">SHA-1 Collision</div><div class="detail">First practical SHA-1 collision (SHAttered). Proved deprecation was necessary.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REF -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 11–20</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>python3 banner_grabber.py</code><div class="cdesc">Socket connects to open port, reads service banner.</div></div>
+      <div class="cmd-row"><code>python3 threaded_scanner.py</code><div class="cdesc">Threaded port scanner — concurrent socket connections.</div></div>
+      <div class="cmd-row"><code>Get-ItemProperty HKLM:\...\Run</code><div class="cdesc">Check Windows Registry Run key for persistence.</div></div>
+      <div class="cmd-row"><code>Get-WinEvent -LogName Security | Where {$_.Id -eq 4625}</code><div class="cdesc">Query failed logon events from Windows Event Log.</div></div>
+      <div class="cmd-row"><code>nmap -sV -sC -O 192.168.56.102</code><div class="cdesc">Full service/OS detection scan against target.</div></div>
+      <div class="cmd-row"><code>nmap --script vuln 192.168.56.102</code><div class="cdesc">Run Nmap vulnerability scripts — quick CVE check.</div></div>
+      <div class="cmd-row"><code>msfconsole → use vsftpd_234_backdoor</code><div class="cdesc">Exploit vsftpd 2.3.4 — root shell on Metasploitable.</div></div>
+      <div class="cmd-row"><code>hashcat -m 0 -a 0 hash.txt rockyou.txt</code><div class="cdesc">Dictionary attack MD5 hash with rockyou.txt.</div></div>
+      <div class="cmd-row"><code>hashcat -m 3200 -a 0 bcrypt.txt rockyou.txt</code><div class="cdesc">Crack bcrypt hash — notice 25K/sec vs 60B/sec for MD5.</div></div>
+      <div class="cmd-row"><code>john --wordlist=rockyou.txt combined.txt</code><div class="cdesc">Crack /etc/shadow from Metasploitable using John.</div></div>
+      <div class="cmd-row"><code>echo -n "pass" | sha256sum</code><div class="cdesc">Generate SHA-256 hash of a string.</div></div>
+      <div class="cmd-row"><code>openssl enc -aes-256-cbc -in plain.txt -out enc.txt</code><div class="cdesc">Encrypt a file with AES-256-CBC symmetric encryption.</div></div>
+      <div class="cmd-row"><code>openssl s_client -connect google.com:443 -showcerts</code><div class="cdesc">View full TLS certificate chain of remote server.</div></div>
+      <div class="cmd-row"><code>openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt</code><div class="cdesc">Create a self-signed root CA certificate.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 11–20</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT / Claude + Sockets</div><div class="adesc">Paste suspicious socket scripts — ask "explain this code line by line" for malware analysis triage.</div></div>
+      <div class="ai-pill"><div class="aname">Nmap + GPT</div><div class="adesc">Paste scan output → "What vulnerabilities would you check next based on these open ports?"</div></div>
+      <div class="ai-pill"><div class="aname">Wireshark + AI</div><div class="adesc">Describe suspicious traffic and get a Wireshark display filter written in plain English.</div></div>
+      <div class="ai-pill"><div class="aname">ChatGPT + Hashcat</div><div class="adesc">Ask "what -m mode for NTLM?" or "write me the command for bcrypt with rules" — faster than man pages.</div></div>
+      <div class="ai-pill"><div class="aname">Microsoft Sentinel</div><div class="cdesc">AI-powered SIEM correlating Windows Event IDs across thousands of machines.</div></div>
+      <div class="ai-pill"><div class="aname">Copilot + Python</div><div class="adesc">Generate security scripts — "thread pool port scanner with timeout" from a comment.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">W</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 11–20</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 11</div><div class="bullet">"Developed multithreaded Python network scanner and banner-grabbing tool using socket and threading libraries; used for authorized service enumeration and version identification."</div></div>
+      <div class="job-box"><div class="day-ref">Day 12</div><div class="bullet">"Analyzed Windows Event Logs using PowerShell (Get-WinEvent) to identify suspicious logon patterns, process anomalies, and registry persistence mechanisms."</div></div>
+      <div class="job-box"><div class="day-ref">Day 13</div><div class="bullet">"Designed and deployed isolated home security lab with VirtualBox, Kali Linux, and Metasploitable 2 on Host-Only network for authorized vulnerability assessment practice."</div></div>
+      <div class="job-box"><div class="day-ref">Day 14</div><div class="bullet">"Performed authorized vulnerability assessments using Nmap, Metasploit (vsftpd CVE exploitation), Wireshark, and Burp Suite in an isolated home lab environment."</div></div>
+      <div class="job-box"><div class="day-ref">Day 16-18</div><div class="bullet">"Applied cryptographic hashing (SHA-256), encryption (AES-256-CBC), and built self-signed CA infrastructure using OpenSSL; analyzed PKI trust model vulnerabilities."</div></div>
+      <div class="job-box"><div class="day-ref">Day 20</div><div class="bullet">"Performed offline hash cracking using Hashcat (dictionary, rule-based, mask) against MD5/SHA-1/bcrypt hashes; documented speed differences and best practices."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What two socket types does Python support, and when would you use each in security work?</div>
+      <div class="ans">SOCK_STREAM (TCP) — reliable, ordered, connection-based. Used for web, SSH, port scanning. SOCK_DGRAM (UDP) — fast, connectionless. Used for DNS queries, speed-critical scanning.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">What Event IDs cover successful logon, failed logon, process creation, and log clearing?</div>
+      <div class="ans">4624 (success), 4625 (failure), 4688 (process creation), 1102 (log cleared). 4104 = PowerShell script block logging.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">What's the difference between a Type 1 and Type 2 hypervisor? Which one does your home lab use?</div>
+      <div class="ans">Type 1 (bare metal) runs directly on hardware — ESXi, Hyper-V, Proxmox. Type 2 runs on top of your OS — VirtualBox, VMware Workstation. Home lab uses Type 2.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">What Nmap switches would you use for service version detection, OS detection, and an aggressive full scan?</div>
+      <div class="ans">-sV (service version), -O (OS detection), -A (aggressive — combines -sV, -O, traceroute, scripts). --script vuln for vulnerability scan.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What was the real vulnerability in Capital One — authentication or authorization? Why?</div>
+      <div class="ans">Authorization. The WAF was properly authenticated to AWS (AuthN fine). But its IAM role had S3 read access to 100M+ records — far more permission than needed (AuthZ broken).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">Why is bcrypt better than SHA-256 for password storage? Use specific numbers.</div>
+      <div class="ans">SHA-256 = ~10B hashes/sec on a modern GPU. bcrypt (cost 12) = ~25K/sec — 2.4 million times slower. The speed difference is the security: what takes milliseconds for SHA-256 takes minutes for bcrypt.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What was the origin of the rockyou.txt wordlist shipped with Kali Linux?</div>
+      <div class="ans">The 2009 RockYou breach. Attackers used SQL injection to dump 32M accounts with passwords stored in plaintext — no hashing at all. The cleaned list became the standard dictionary for password cracking.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">How did Mirai's socket automation technique work, and what was the real-world impact?</div>
+      <div class="ans">Mirai used threaded socket connections to scan the entire IPv4 internet for open Telnet (port 23). Default creds let it absorb IoT devices into a botnet. Result: Oct 2016 Dyn DDoS took Twitter/Netflix offline.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">How did SolarWinds SUNBURST use the Windows Registry for stealth?</div>
+      <div class="ans">SUNBURST stored its configuration data and C2 server addresses in the Windows Registry instead of writing suspicious files to disk. It also mimicked legitimate SolarWinds API calls and stayed dormant up to 2 weeks.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What did Heartbleed leak from server memory, and what was the worst-case impact?</div>
+      <div class="ans">Up to 64KB of arbitrary server memory per request including private RSA keys. Worst case: attacker decrypts past TLS traffic (without PFS) and can impersonate the server going forward.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 21</div>
+      <div class="title">Web fundamentals — how an HTTP request actually works end to end</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — say "Day 21" when you're ready to continue.</footer>
+
+</div>
+</body>
+</html>
