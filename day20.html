@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day 20 — Web Recon: Directory Busting & Technology Fingerprinting</title>
+<title>Day 20 — Password Security & Hashing Attacks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -35,26 +35,23 @@
   .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
   .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
   .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
   .callout strong{color:var(--cyan);}
   .callout.amber strong{color:var(--amber);}
   .callout.red strong{color:var(--red);}
+  .callout.green strong{color:var(--green);}
 
-  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px;}
-  .tool-card{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:16px;}
-  .tool-card .tname{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px;}
-  .tool-card .trole{font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
-  .tool-card .tdesc{font-size:12.5px;color:#cdd6da;}
-  .tool-card.dirb .tname{color:var(--amber);}
-  .tool-card.ffuf .tname{color:var(--red);}
-  .tool-card.gobuster .tname{color:var(--green);}
-  .tool-card.wappalyzer .tname{color:var(--cyan);}
-  .tool-card.whatweb .tname{color:var(--purple);}
+  .attack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px;}
+  .attack-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--red);}
+  .attack-card .atitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--red);margin-bottom:6px;font-weight:600;}
+  .attack-card .adesc{font-size:12.5px;color:var(--muted);}
+  .attack-card.def{border-left-color:var(--green);}
+  .attack-card.def .atitle{color:var(--green);}
 
-  .tool-card.ferox .tname{color:var(--pink);}
-
-  .tech-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-  .tech-badge{background:var(--bg);border:1px solid var(--edge);border-radius:6px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
-  .tech-badge strong{color:var(--cyan);font-weight:600;}
+  .hashcat-table{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .hrow{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;flex-wrap:wrap;}
+  .hrow code{flex-shrink:0;min-width:0;}
+  .hrow .hdesc{font-size:12px;color:var(--muted);}
 
   .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
   .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
@@ -134,7 +131,7 @@
   .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
 
   footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
-  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .nmap-row{flex-wrap:wrap;}}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
 </style>
 </head>
 <body>
@@ -142,54 +139,70 @@
 
   <div class="topbar">
     <span>robin@gcek-it:~/roadmap/day20$ cat lesson.md</span>
-    <div style="display:flex;align-items:center;gap:6px;">Day 20/90 <div class="pbar"><i></i></div></div>
+    <div style="display:flex;align-items:center;gap:6px;">Day 20/90 — Phase 2 <div class="pbar"><i></i></div></div>
   </div>
 
-  <div class="day-tag">DAY 20 OF 90 — PHASE 2</div>
-  <h1>Web Recon: Directory Busting <span class="accent">& Technology Fingerprinting</span></h1>
-  <p class="subtitle">You know a website's front door exists (Day 8 HTTP). Today you find every side-door, maintenance hatch, backup stairwell, and forgotten window — the hidden paths attackers use to bypass logins and inject malware. Real attackers discovered the British Airways Magecart injection vector this exact way.</p>
+  <div class="day-tag">DAY 20 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Password Security <span class="accent">& Hashing Attacks</span></h1>
+  <p class="subtitle">The rockyou.txt wordlist sitting in /usr/share/wordlists on your Kali machine right now came from a 2009 breach of a company called RockYou. They stored 32 million passwords in plaintext. Today you use that wordlist to crack hashes — and understand the full attack chain from breach to cracked credential.</p>
 
   <!-- THEORY -->
   <section>
     <span class="tag-pill theory">THEORY</span>
     <div class="card">
-      <p><strong>Web recon</strong> is the process of mapping a web application's full attack surface — not just the pages users click, but every file, directory, parameter, and technology behind it. Directory busting (brute-forcing URLs with a wordlist) is the primary technique. Technology fingerprinting identifies what stack the site runs — Apache vs Nginx, PHP vs React, Cloudflare vs no WAF — so you know which vulnerabilities to test.</p>
-
-      <div class="tool-grid">
-        <div class="tool-card gobuster">
-          <div class="tname">Gobuster</div>
-          <div class="trole">Directory & DNS brute-forcer</div>
-          <div class="tdesc">Fastest directory scanner written in Go. Brute-forces URL paths, virtual hosts, and DNS subdomains using a wordlist. Main command: <code>gobuster dir -u target -w wordlist.txt</code>. Returns HTTP status codes — 200 (found), 403 (forbidden but exists), 301 (redirect).</div>
+      <p><strong>Attack types — how passwords are actually cracked:</strong></p>
+      <div class="attack-grid">
+        <div class="attack-card">
+          <div class="atitle">Dictionary Attack</div>
+          <div class="adesc">Hash every word in a wordlist (rockyou.txt = 14M passwords) and compare against the target hash. Fast, covers the most common passwords. Most breaches fall to this first.</div>
         </div>
-        <div class="tool-card ffuf">
-          <div class="tname">FFuF</div>
-          <div class="trole">Fast web fuzzer</div>
-          <div class="tdesc">Multipurpose fuzzer — not just directories but parameters, headers, and POST bodies. Replaces FUZZ in any part of the request with wordlist entries. Uses Go routines for extreme speed. <code>ffuf -u http://target/FUZZ -w wordlist.txt</code></div>
+        <div class="attack-card">
+          <div class="atitle">Brute Force</div>
+          <div class="adesc">Try every possible character combination up to a given length. Guaranteed to find the password eventually — but exponentially slow for long/complex passwords.</div>
         </div>
-        <div class="tool-card wappalyzer">
-          <div class="tname">Wappalyzer</div>
-          <div class="trole">Browser extension / API</div>
-          <div class="tdesc">Identifies ~1500 web technologies from JavaScript frameworks to CDN providers. Runs as a browser extension or CLI via <code>wappalyzer-cli</code>. Passive — just reads response headers and page source. No aggressive requests.</div>
+        <div class="attack-card">
+          <div class="atitle">Rainbow Table Attack</div>
+          <div class="adesc">Pre-computed hash → plaintext lookup tables. Instant cracking for unsalted hashes — no computation needed at attack time, just a lookup. Defeated entirely by salting.</div>
         </div>
-        <div class="tool-card whatweb">
-          <div class="tname">WhatWeb</div>
-          <div class="trole">CLI technology detector</div>
-          <div class="tdesc">Broadest tech fingerprinting CLI tool. Identifies CMS, JS libraries, server headers, analytics, even country of hosting. <code>whatweb example.com</code> returns 10–30 tech tags instantly. Scriptable for bulk scanning.</div>
+        <div class="attack-card">
+          <div class="atitle">Rule-Based Attack</div>
+          <div class="adesc">Apply transformation rules to wordlist entries — capitalize first letter, append numbers, substitute letters with symbols. "password" → "P@ssw0rd1!" — covers how real people choose passwords.</div>
+        </div>
+        <div class="attack-card">
+          <div class="atitle">Mask Attack</div>
+          <div class="adesc">Define a pattern (e.g., 8 chars, starts uppercase, ends 2 digits) and only try combinations matching that pattern. Faster than pure brute force when you know the policy.</div>
+        </div>
+        <div class="attack-card">
+          <div class="atitle">Credential Stuffing</div>
+          <div class="adesc">Use username:password pairs from one breach to try other services. Works because 65%+ of users reuse passwords. Not hash cracking — uses already-cracked credentials.</div>
         </div>
       </div>
 
-      <div class="tech-stack" style="margin-top:16px;">
-        <span class="tech-badge"><strong>Common find:</strong> /wp-admin (WordPress admin)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /admin (generic panel)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /.git (exposed repo)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /backup (old backups)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /api (REST endpoints)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /server-status (Apache status)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /.env (credentials file)</span>
-        <span class="tech-badge"><strong>Common find:</strong> /sitemap.xml (crawl map)</span>
+      <p style="margin-top:16px;"><strong>Why algorithm choice determines cracking speed:</strong></p>
+      <div class="attack-grid">
+        <div class="attack-card">
+          <div class="atitle">MD5 — ~60 billion/sec</div>
+          <div class="adesc">On a modern GPU, Hashcat tries 60B MD5 hashes per second. rockyou.txt (14M entries) finishes in milliseconds. MD5 is effectively instant to crack.</div>
+        </div>
+        <div class="attack-card">
+          <div class="atitle">SHA-256 — ~10 billion/sec</div>
+          <div class="adesc">Still very fast. Without a salt, common passwords fall in seconds. LinkedIn used unsalted SHA-1 in 2012 — cracked within days of the breach.</div>
+        </div>
+        <div class="attack-card">
+          <div class="atitle">bcrypt (cost 12) — ~25k/sec</div>
+          <div class="adesc">~2.4 million times slower than MD5 per attempt. rockyou.txt would take ~9 minutes instead of milliseconds. Significantly harder to crack at scale.</div>
+        </div>
+        <div class="attack-card def">
+          <div class="atitle">Argon2id — memory-hard</div>
+          <div class="adesc">Not just slow but requires large memory per attempt — GPUs can't parallelize effectively. The current best practice for password storage. Defeats GPU-based cracking at scale.</div>
+        </div>
       </div>
 
-      <div class="callout" style="margin-top:14px;"><strong>Wordlists matter:</strong> Kali includes wordlists at <code>/usr/share/wordlists/</code>. The most versatile is <code>dirb/common.txt</code> (4,600 entries) for small targets or <code>directory-list-2.3-medium.txt</code> (220,000 entries) from SecLists for comprehensive scans. Install SecLists with <code>sudo apt install seclists</code> — it's the standard wordlist for pentesting.</div>
+      <div class="callout" style="margin-top:14px;"><strong>Hashcat modes you must know:</strong>
+        <br>-m 0 = MD5 | -m 100 = SHA-1 | -m 1400 = SHA-256 | -m 3200 = bcrypt | -m 1800 = sha512crypt (Linux /etc/shadow)
+        <br>-a 0 = dictionary | -a 1 = combination | -a 3 = brute force (mask) | -a 6 = wordlist+mask hybrid</div>
+
+      <div class="callout amber" style="margin-top:8px;"><strong>John the Ripper vs Hashcat:</strong> John auto-detects hash types and is great for quick attempts and formats Hashcat handles poorly. Hashcat is GPU-accelerated and vastly faster for large-scale dictionary/rule attacks. In practice: use John to identify an unknown hash type, use Hashcat to crack at speed.</div>
     </div>
   </section>
 
@@ -197,9 +210,9 @@
   <section>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
     <div class="breach-card">
-      <div class="year">2018 — BRITISH AIRWAYS / MAGE CART GROUP — 380,000 PAYMENT CARDS STOLEN</div>
-      <div class="name">Attackers used directory busting to find an unsecured admin panel on ba.com</div>
-      <div class="detail">In 2018, the Magecart Group (a cluster of threat actors specializing in web-based credit card theft) targeted British Airways' main website, ba.com. Through directory enumeration they discovered a hidden admin panel path — a forgotten staging endpoint that was still accessible in production. From there, they injected a 23-line JavaScript skimmer into the payment processing page that captured every field users typed: name, card number, expiry, CVV. 380,000 payment cards were stolen over 2 weeks before the breach was detected. The script was designed to exfiltrate data to a third-party domain that appeared legitimate (baways.com — a typosquatted domain). BA was fined £20M under GDPR. The attack vector was not a zero-day — it was a path an attacker found by guessing URLs with a wordlist. Directory busting of exactly the kind you'll practice today was the entry point for one of the largest web-based data thefts in European history.</div>
+      <div class="year">2009 — ROCKYOU BREACH — 32 MILLION PASSWORDS IN PLAINTEXT</div>
+      <div class="name">The breach that created the wordlist you're using today — stored in plaintext, no hashing at all</div>
+      <div class="detail">RockYou was a social app platform popular in 2009 for Facebook and MySpace widgets. Attackers discovered an SQL injection vulnerability in their site and dumped the entire user database — 32,603,388 accounts with passwords stored in complete, unencrypted plaintext. Not weak hashing. Not unsalted hashing. No hashing at all. The dumped password list was cleaned, sorted, and released publicly — becoming the "rockyou.txt" wordlist that ships with every Kali Linux installation at /usr/share/wordlists/rockyou.txt. Every Hashcat tutorial, every TryHackMe hash-cracking room, every CTF password challenge uses this list as the primary dictionary. When you run <code>hashcat -a 0 hash.txt rockyou.txt</code> today, you are using a dataset produced by the privacy failure of 32 million real people in 2009. The top 10 passwords in the list: 123456, 12345, 123456789, password, iloveyou, princess, 1234567, rockyou, 12345678, abc123 — in that order. This is why password policies exist.</div>
     </div>
   </section>
 
@@ -210,19 +223,17 @@
       <div class="mindset-col attacker">
         <div class="role">⚔ Attacker</div>
         <ul>
-          <li>Run gobuster with medium wordlist first — fast pass to find admin panels, API endpoints, and hidden dev paths.</li>
-          <li>Then run ffuf with extension filters — look for .php, .asp, .env, .bak, .sql files specifically (Magecart's exact method).</li>
-          <li>Use Wappalyzer to detect the CMS version — if it's Wordpress 4.x (old), there are known plugin vulns to chain.</li>
-          <li>Check /.well-known/ paths — might reveal security.txt, apple-app-site-association, or assetlinks.json.</li>
+          <li>Dictionary attack first — 90% of real-world hashes from leaked databases fall to rockyou.txt in under a minute for MD5/SHA-1.</li>
+          <li>Rule attacks next — most people append numbers or substitute letters. Rules like <code>best64.rule</code> catch this pattern without brute-forcing the full space.</li>
+          <li>Hash identification is step zero — use <code>hash-identifier</code> or <code>hashid</code> to determine the algorithm before picking the Hashcat mode (-m).</li>
         </ul>
       </div>
       <div class="mindset-col defender">
         <div class="role">🛡 Defender</div>
         <ul>
-          <li>Run these same tools against your own website to find what attackers would find — if you find /admin, so will they.</li>
-          <li>Remove or require authentication for any staging, dev, or admin path that doesn't need to be public.</li>
-          <li>Block automated scanning via WAF rate-limiting and return 404 for non-existent paths instead of 403 (which confirms existence).</li>
-          <li>Monitor 404 spikes in access logs — a burst of 4XX from one IP is a directory bruteforce in progress.</li>
+          <li>Use bcrypt or Argon2 — the speed difference against an attacker is the point. 25,000/sec vs 60B/sec is the margin between "practical to crack at scale" and "not worth the resources."</li>
+          <li>Enforce password length over complexity — "correcthorsebatterystaple" (4 random words) is stronger than "P@ssw0rd!" and easier to remember. Length matters more than symbols.</li>
+          <li>Check new passwords against known breach databases (HaveIBeenPwned API) — if a user tries to set "password123", you know it's in rockyou.txt and should reject it.</li>
         </ul>
       </div>
     </div>
@@ -230,58 +241,47 @@
 
   <!-- LAB -->
   <section>
-    <span class="tag-pill lab">HANDS-ON LAB — DIRECTORY BUST METASPLOITABLE + A REAL DOMAIN</span>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
     <div class="card">
-      <p>Two targets today — Metasploitable's web server (safe, local) and a real website you have permission to scan (your own or a bug bounty program).</p>
       <ol class="lab-steps">
-        <li>Install SecLists on Kali: <code>sudo apt update && sudo apt install seclists -y</code>. This gives you 30+ specialized wordlists.</li>
-        <li>Run gobuster against Metasploitable's web server (port 80): <code>gobuster dir -u http://192.168.56.102 -w /usr/share/wordlists/dirb/common.txt</code>. Note every path found.</li>
-        <li>Run the same scan with a broader wordlist (SecLists medium): <code>gobuster dir -u http://192.168.56.102 -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt</code>. Compare results — the difference should surprise you.</li>
-        <li>Run ffuf against Metasploitable looking for specific extensions: <code>ffuf -u http://192.168.56.102/FUZZ -w /usr/share/wordlists/dirb/common.txt -e .php,.txt,.bak,.zip,.sql</code></li>
-        <li>Install Wappalyzer (browser extension) or use WhatWeb: <code>whatweb 192.168.56.102</code>. Compare the tech stack it identifies against what you know about Metasploitable.</li>
-        <li>Pick a real site you own (or use tryhackme.com) and run WhatWeb against it — see what information you're leaking about your tech stack to anyone who scans.</li>
+        <li>Go to <strong>tryhackme.com/room/crackthehash</strong> — free room. You're given a series of hashes to identify and crack. Use Hashcat on your Kali home lab.</li>
+        <li>Work through Level 1 hashes (MD5, SHA-1, SHA-256, bcrypt) using the commands below — the bcrypt one will take noticeably longer, which is the point.</li>
+        <li>Use <code>hash-identifier</code> or <code>hashid</code> to identify unknown hashes before choosing the Hashcat -m mode.</li>
+        <li>After the room, crack the /etc/shadow hash from Metasploitable using John — this is a real privilege escalation technique.</li>
       </ol>
-      <div class="deliverable"><strong>Deliverable:</strong> screenshot of gobuster output showing 10+ discovered paths on Metasploitable + WhatWeb tech fingerprint of any real website. This is Phase 2's recon skill in action.</div>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of at least 3 cracked hashes from the TryHackMe room showing Hashcat output with the plaintext recovered. Push a write-up to GitHub — hash cracking write-ups are portfolio gold for CTFs.</div>
     </div>
 
     <div class="terminal">
       <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
-      <div class="term-body"><span class="c"># ─── GOBUSTER DIRECTORY SCAN (common wordlist) ───</span>
-<span class="cmd">gobuster dir -u http://192.168.56.102 -w /usr/share/wordlists/dirb/common.txt</span>
-<span class="out">=====================================================
-Gobuster v3.6 by OJ Reeves (@TheColonial)
-=====================================================
-/index.html           (Status: 200) [Size: 171]
-/phpinfo.php          (Status: 200) [Size: 49469]
-/test                 (Status: 200) [Size: 6880]
-/dvwa                 (Status: 200) [Size: 7246]
-/phpMyAdmin           (Status: 200) [Size: 8685]
-/mutillidae           (Status: 200) [Size: 14397]
-/doc                  (Status: 200) [Size: 2583]
-/icons                (Status: 200) [Size: 1785]</span>
-<span class="hi"># /phpMyAdmin = database management — potential SQL injection entry point</span>
-<span class="hi"># /dvwa = Damn Vulnerable Web App — intentionally broken for you to practice</span>
-<span class="hi"># /mutillidae = another vulnerable web app — more attack surface</span>
+      <div class="term-body"><span class="c"># Step 0: identify an unknown hash type</span>
+<span class="cmd">echo "48bb6e862e54f2a795ffc4e541caed4d" | hash-identifier</span>
+<span class="out">Possible Hashs: [+] MD5</span>
+<span class="hi"># MD5 = 32 hex chars, SHA-1 = 40, SHA-256 = 64, bcrypt starts with $2y$</span>
 
-<span class="c"># ─── EXTENSION FILTERING WITH FFUF ──────────────</span>
-<span class="cmd">ffuf -u http://192.168.56.102/FUZZ -w /usr/share/wordlists/dirb/common.txt -e .php,.txt,.bak,.old,.sql</span>
-<span class="out">[Status: 200, Size: 2583] /doc.php
-[Status: 200, Size: 171]  /index.php
-[Status: 200, Size: 394]  /robots.txt</span>
-<span class="hi"># /robots.txt tells search engines what not to crawl — useful for attackers too</span>
+<span class="c"># Dictionary attack against MD5 hash (-m 0)</span>
+<span class="cmd">echo "48bb6e862e54f2a795ffc4e541caed4d" > hash.txt</span>
+<span class="cmd">hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt</span>
+<span class="out">48bb6e862e54f2a795ffc4e541caed4d:easy</span>
+<span class="hi"># cracked in milliseconds — MD5 + rockyou.txt is essentially instant</span>
 
-<span class="c"># ─── TECHNOLOGY FINGERPRINTING ──────────────────</span>
-<span class="cmd">whatweb 192.168.56.102</span>
-<span class="out">http://192.168.56.102 [200 OK] Apache[2.2.8], Country[RESERVED][ZZ], HTML5, HTTPServer[Ubuntu Linux][Apache/2.2.8 (Ubuntu) DAV/2], IP[192.168.56.102], PHP[5.2.4-2ubuntu5.10], X-Powered-By[PHP/5.2.4-2ubuntu5.10]</span>
-<span class="hi"># 5 pieces of intel in 1 command: Apache 2.2.8, PHP 5.2.4, Ubuntu, WebDAV enabled</span>
-<span class="hi"># Apache 2.2.8 = 2008 release — dozens of known CVEs. PHP 5.2.4 even older.</span>
-<span class="hi"># This is your FREE recon intel — technology fingerprinting tells you what to exploit.</span>
+<span class="c"># Rule-based attack — handles "Password1!" style transformations</span>
+<span class="cmd">hashcat -m 0 -a 0 hash.txt rockyou.txt -r /usr/share/hashcat/rules/best64.rule</span>
 
-<span class="c"># ─── WHATWEB AGAINST A REAL TARGET ──────────────</span>
-<span class="cmd">whatweb tryhackme.com</span>
-<span class="out">https://tryhackme.com [200 OK] Cookies[PHPSESSID], Country[UNITED KINGDOM][GB], Bootstrap[5.x], HTML5, HTTPServer[cloudflare], IP[104.18.26.222], JQuery, PHP[8.2], Script, Title[TryHackMe | Cyber Security Training], X-Frame-Options[SAMEORIGIN], X-Powered-By[PHP/8.2]</span>
-<span class="hi"># PHP 8.2, Cloudflare WAF, Bootstrap 5.x — all visible to anyone who scans</span>
-<span class="hi"># Defenders: these headers are your fingerprint — remove unnecessary ones</span></div>
+<span class="c"># Brute force mask — 6 chars, lowercase only (?l)</span>
+<span class="cmd">hashcat -m 0 -a 3 hash.txt ?l?l?l?l?l?l</span>
+
+<span class="c"># bcrypt hash — notice how much slower this is (cost factor = intentional)</span>
+<span class="cmd">echo '$2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom' > bcrypt.txt</span>
+<span class="cmd">hashcat -m 3200 -a 0 bcrypt.txt rockyou.txt</span>
+<span class="out">Progress: 1024/14344391 (0.01%)  Speed: 24.7 kH/s  ETA: 9 mins</span>
+<span class="hi"># 24,700/sec vs 60B/sec for MD5 — same GPU, same wordlist, 2.4M× slower</span>
+
+<span class="c"># Real target: crack /etc/shadow from Metasploitable using John</span>
+<span class="cmd">unshadow /etc/passwd /etc/shadow > combined.txt</span>
+<span class="cmd">john --wordlist=/usr/share/wordlists/rockyou.txt combined.txt</span>
+<span class="out">msfadmin  (msfadmin)</span>
+<span class="hi"># Linux /etc/shadow uses sha512crypt — john handles it automatically</span></div>
     </div>
   </section>
 
@@ -290,8 +290,8 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
     <span class="tag-pill interview">INTERVIEW READY</span>
     <div class="card">
       <div class="interview-box">
-        <div class="q">Q: "How would you map a web application's attack surface before testing it?"</div>
-        <div class="a">A: "I start with passive reconnaissance — WhatWeb and Wappalyzer to identify the technology stack: server type, CMS, framework versions, and any WAF present. If the site is behind Cloudflare, that changes my approach. Then I move to active recon with gobuster using a medium wordlist from SecLists to discover hidden directories and files — admin panels, API endpoints, backup archives. I follow up with ffuf extension filtering targeting .php, .bak, .sql specifically. The British Airways Magecart breach in 2018 is a direct example of why this matters — attackers found an unsecured staging path via directory enumeration and injected a credit card skimmer that stole 380,000 payment records. After mapping the surface, I'd have a prioritized list of entry points for the exploitation phase."</div>
+        <div class="q">Q: "Walk me through how you'd crack a password hash recovered from a compromised database."</div>
+        <div class="a">A: "First I'd identify the algorithm — hash length and format narrow it down: 32 hex chars is likely MD5, 40 is SHA-1, bcrypt starts with $2y$. Then I'd choose the right Hashcat mode (-m 0 for MD5, -m 3200 for bcrypt) and start with a dictionary attack against rockyou.txt — 90% of MD5/SHA-1 hashes from real breach dumps crack on the first pass because most people's passwords are in that list, which itself came from the 2009 RockYou breach of 32 million plaintext passwords. If dictionary fails, I'd apply rule-based transformations (best64.rule handles most 'P@ssw0rd1' patterns) then move to mask attacks. Against bcrypt, all of this is viable but orders of magnitude slower — 25,000 attempts/sec vs 60 billion for MD5. That's exactly why bcrypt is the correct choice for password storage."</div>
       </div>
     </div>
   </section>
@@ -301,20 +301,20 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
     <span class="tag-pill ai">AI TOOLS</span>
     <div class="ai-grid">
       <div class="ai-card">
-        <div class="aname">ChatGPT + WhatWeb output</div>
-        <div class="adesc">Paste your WhatWeb fingerprint and ask "what are the known vulnerabilities for Apache 2.2.8 / PHP 5.2.4?" — instant prioritized CVE list for your target.</div>
+        <div class="aname">CrackStation / hashes.com</div>
+        <div class="adesc">Free online rainbow tables. Paste an MD5 or SHA-1 hash and get the plaintext instantly if it's in the database. Great for CTF hash challenges — try this before firing up Hashcat.</div>
       </div>
       <div class="ai-card">
-        <div class="aname">FFuf + AI-generated wordlists</div>
-        <div class="adesc">Ask an LLM to generate a custom wordlist based on your target's context — e.g. "generate 50 possible admin panel paths for a Laravel application."</div>
+        <div class="aname">ChatGPT + Hashcat</div>
+        <div class="adesc">Ask "what is the Hashcat -m mode for NTLM hashes?" or "write me a Hashcat command for bcrypt with rules" — faster than reading the man page during a time-pressured CTF.</div>
       </div>
       <div class="ai-card">
-        <div class="aname">Wappalyzer CLI + automation</div>
-        <div class="adesc">Feed multiple targets to Wappalyzer's API and auto-categorize sites by tech stack. Use with Claude to build a target attack playbook per technology profile.</div>
+        <div class="aname">HaveIBeenPwned API</div>
+        <div class="adesc">haveibeenpwned.com/API — check if a password hash appears in known breach databases using k-anonymity (sends only first 5 chars of the SHA-1). Use in your own tools to block common passwords.</div>
       </div>
       <div class="ai-card">
-        <div class="aname">Gobuster + Notebook</div>
-        <div class="adesc">Run multiple gobuster scans with different wordlists using a bash loop, pipe results into an AI summary: "of the 47 paths found, prioritize the 7 with login forms or upload functionality."</div>
+        <div class="aname">hashcat.net example hashes</div>
+        <div class="adesc">hashcat.net/wiki/doku.php?id=example_hashes — official reference for every hash format and its corresponding -m mode. Bookmark this — you'll use it every CTF.</div>
       </div>
     </div>
   </section>
@@ -325,9 +325,9 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
     <div class="job-card">
       <div class="label">// placement & resume angles</div>
       <ul>
-        <li><strong>Resume bullet:</strong> "Mapped web application attack surfaces using gobuster/ffuf for directory enumeration and WhatWeb/Wappalyzer for technology fingerprinting during authorized penetration testing engagements in a VirtualBox home lab."</li>
-        <li><strong>Campus interview:</strong> "I ran gobuster against Metasploitable 2 and discovered 8 paths including /phpMyAdmin, /dvwa, and /mutillidae — a full vulnerable web application attack surface. I also ran WhatWeb and identified Apache 2.2.8, PHP 5.2.4, and Ubuntu — every one of which has known CVEs I could follow up on. The British Airways Magecart breach started with exactly this technique — finding a hidden path that should not have been public." This shows you understand both the technique AND the real-world incident it maps to — rare depth for a student.</li>
-        <li><strong>Interview story arc:</strong> "Phase 1 I set up the lab (Day 13), learned tools (Day 14), OSINT (Day 18–19). Day 20 was my first dedicated web recon — I can now map any website's hidden surface in under 10 minutes with automated tools."</li>
+        <li><strong>Resume bullet:</strong> "Performed offline hash cracking using Hashcat (dictionary, rule-based, and mask attacks) against MD5, SHA-1, SHA-256, and bcrypt hashes; demonstrated algorithmic speed difference between weak (MD5: ~60B/sec) and strong (bcrypt: ~25K/sec) hashing in authorized lab environments."</li>
+        <li><strong>Campus interview:</strong> "Password cracking" questions are common in pentesting and red team interviews. Knowing the specific cracking speeds (MD5 60B/sec vs bcrypt 25K/sec) and the origin of rockyou.txt (RockYou 2009, 32M plaintext passwords) makes your answer specific and memorable — not just "I use Hashcat."</li>
+        <li><strong>CTF portfolio:</strong> Hash cracking challenges appear in virtually every CTF. A documented write-up of your Crack the Hash TryHackMe room — showing which algorithm you identified, which Hashcat mode you chose, and how long each took — is a real portfolio piece that demonstrates tooling knowledge and methodology.</li>
       </ul>
     </div>
   </section>
@@ -336,7 +336,7 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <section>
     <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
     <div class="biz-card">
-      <p>Web recon is the most sellable entry-level security service: "We'll scan your website and tell you exactly what hidden paths an attacker can find." Small businesses often have old admin panels, forgotten test directories, and exposed config files that a gobuster scan can find in minutes. A basic website attack surface audit — technology fingerprint + directory enumeration + findings report — is a ₹5,000–₹15,000 deliverable you can run in an afternoon with exactly the tools you learned today. The BA fine of £20M under GDPR for a breach that started with directory enumeration is the sales pitch: "For the cost of one vulnerability scan, you avoid the risk of a GDPR fine 1000x that amount."</p>
+      <p>Password auditing is a real, billable service for organizations — especially after a breach where hashed credentials were exposed. You crack a sample of their hashed passwords (with authorization) to demonstrate how many would fall to a dictionary attack within minutes, then present a report showing the percentage of weak passwords and the cost of switching to bcrypt/Argon2. This is concrete, visual, undeniable evidence that lands with non-technical executives. Framing: "38% of your users' passwords cracked in under 60 seconds using a wordlist from a 2009 breach — here's what we need to change." That's a paying engagement with a clear deliverable.</p>
     </div>
   </section>
 
@@ -344,7 +344,7 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <section>
     <span class="tag-pill teach">TEACH IT BACK</span>
     <div class="teach-card">
-      <p>Explain to a non-technical person: "Imagine a building. You can see the main entrance (the homepage). But there are side doors, roof hatches, basement stairs, and unmarked doors hidden in the corridors. Directory busting is systematically trying every doorknob to see which ones open. Technology fingerprinting is looking at the building materials — steel frame vs wood, brand of lock, alarm system model — to figure out the best way to get in if a door is unlocked. British Airways' attacker found a forgotten side door in their website that should have been locked, walked in, and installed a card skimmer that stole 380,000 credit cards. We're finding the side doors before the bad guys do."</p>
+      <p>Explain to a non-technical person: "A rainbow table attack is like having a pre-made answer key to a test — instead of solving every problem fresh, you just look up the answer. Salting is like giving every student a different version of the test, so one answer key can't work for all of them. The rockyou.txt wordlist that hackers use today is basically a leaked answer key from 2009 — when a company called RockYou had 32 million users' passwords stolen in plaintext. Their carelessness became every attacker's gift. bcrypt makes the test so slow to grade that even with the answer key, checking each answer takes too long to do at scale."</p>
     </div>
   </section>
 
@@ -352,17 +352,17 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <section>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
     <div class="res-grid">
-      <a class="res-card" href="https://www.youtube.com/watch?v=H1SQkz-0-Qc" target="_blank">
+      <a class="res-card" href="https://www.youtube.com/watch?v=z4_oqTZJqCo" target="_blank">
         <span class="res-icon en">EN</span>
-        <div><div class="res-title">Gobuster — Full Directory Busting Walkthrough (2025)</div><div class="res-desc">youtube.com/watch?v=H1SQkz-0-Qc — gobuster setup, wordlist selection, and output interpretation for beginners.</div></div>
+        <div><div class="res-title">NetworkChuck — "how to HACK a password // password cracking with Kali Linux and HashCat"</div><div class="res-desc">youtube.com/watch?v=z4_oqTZJqCo — verified Aug 2020, hands-on Hashcat walkthrough, very popular.</div></div>
       </a>
-      <a class="res-card" href="https://www.youtube.com/watch?v=fQJlDBhY-5E" target="_blank">
+      <a class="res-card" href="https://www.youtube.com/watch?v=gjAMD_4aV4E" target="_blank">
         <span class="res-icon hi">HI</span>
-        <div><div class="res-title">WhatWeb + Wappalyzer — Web App Fingerprinting [HINDI]</div><div class="res-desc">youtube.com/watch?v=fQJlDBhY-5E — Learn web technology detection in Hindi with practical examples.</div></div>
+        <div><div class="res-title">How to use Hashcat Password Cracking Tool — Demo using Kali Linux [Hindi CSE4003]</div><div class="res-desc">youtube.com/watch?v=gjAMD_4aV4E — verified Oct 2020, academic Hindi tutorial with Kali Linux demo.</div></div>
       </a>
-      <a class="res-card" href="https://tryhackme.com/room/webfundamentals" target="_blank">
+      <a class="res-card" href="https://tryhackme.com/room/crackthehash" target="_blank">
         <span class="res-icon lab">LAB</span>
-        <div><div class="res-title">TryHackMe — Web Fundamentals</div><div class="res-desc">Free room covering HTTP basics + directory busting. Complete this to reinforce today's concepts with guided exercises.</div></div>
+        <div><div class="res-title">TryHackMe — Crack the Hash</div><div class="res-desc">Free room — identify and crack MD5/SHA-1/SHA-256/bcrypt hashes using Hashcat and John. Today's main lab.</div></div>
       </a>
     </div>
   </section>
@@ -371,11 +371,11 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <section>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
     <div class="mistakes-grid">
-      <div class="mistake-item"><span class="check">✓</span> British Airways Magecart (2018) — directory busting was the exact attack vector for 380K card theft.</div>
-      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — gobuster + ffuf + whatweb run against actual targets, not just read about.</div>
-      <div class="mistake-item"><span class="check">✓</span> Both passive (WhatWeb/Wappalyzer) AND active (gobuster/ffuf) recon distinguished — low-noise vs high-noise.</div>
-      <div class="mistake-item"><span class="check">✓</span> Real-world application to bug bounty programs and client engagements — sellable skill.</div>
-      <div class="mistake-item"><span class="check">✓</span> Progress from Day 19 OSINT into structured web recon — Phase 2 building systematically.</div>
+      <div class="mistake-item"><span class="check">✓</span> RockYou 2009 — the wordlist you're using today has a real human cost behind it. Named, verified, meaningful.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — cracked real hashes with Hashcat and John against real targets (THM + Metasploitable).</div>
+      <div class="mistake-item"><span class="check">✓</span> Concrete cracking speed numbers (MD5 60B/sec vs bcrypt 25K/sec) — makes the algorithm choice tangible, not abstract.</div>
+      <div class="mistake-item"><span class="check">✓</span> Builds directly on Days 16 (hashing theory) and 19 (AuthN) — knowledge compounds.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–19 baseline only.</div>
     </div>
   </section>
 
@@ -383,12 +383,12 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <section>
     <div class="card">
       <ul class="checklist">
-        <li><span class="box"></span> I installed SecLists and ran gobuster against Metasploitable — at least 8 paths found.</li>
-        <li><span class="box"></span> I ran ffuf with extension (-e) filtering — found at least one .php or .txt result.</li>
-        <li><span class="box"></span> I ran WhatWeb against Metasploitable and identified the tech stack (Apache, PHP, Ubuntu).</li>
-        <li><span class="box"></span> I ran WhatWeb against a real website (my own or tryhackme.com) and noted the tech fingerprint.</li>
-        <li><span class="box"></span> I can explain how the British Airways Magecart breach started with directory enumeration.</li>
-        <li><span class="box"></span> I understand the difference between passive fingerprinting and active directory busting.</li>
+        <li><span class="box"></span> I can identify a hash type from its format (length, prefix) without tools.</li>
+        <li><span class="box"></span> I know the Hashcat -m modes for MD5, SHA-1, SHA-256, bcrypt, and sha512crypt.</li>
+        <li><span class="box"></span> I cracked at least 3 hashes from the TryHackMe Crack the Hash room.</li>
+        <li><span class="box"></span> I ran a bcrypt crack and saw the speed difference vs MD5 with my own eyes.</li>
+        <li><span class="box"></span> I can explain the RockYou breach and why rockyou.txt exists.</li>
+        <li><span class="box"></span> I cracked the Metasploitable /etc/shadow hash using John the Ripper.</li>
       </ul>
     </div>
   </section>
@@ -400,7 +400,7 @@ Gobuster v3.6 by OJ Reeves (@TheColonial)
   <div class="next-up">
     <div>
       <div class="label">tomorrow — day 21</div>
-      <div class="title">Subdomain Enumeration & DNS Recon — finding hidden attack surfaces beyond the main domain</div>
+      <div class="title">Web fundamentals — how an HTTP request actually works end to end</div>
     </div>
     <div class="arrow">→</div>
   </div>
