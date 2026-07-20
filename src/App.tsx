@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import initialData from './data.json';
 
+const MANIFEST_URL = './days-manifest.json';
+
 // Inline SVGs for Linkedin, Instagram and Volleyball to prevent compilation errors
 const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -348,6 +350,7 @@ function App() {
   const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
   const [selectedRevisionInterval, setSelectedRevisionInterval] = useState<number>(10);
   const [isDayOptionModalOpen, setIsDayOptionModalOpen] = useState(false);
+  const [daysManifest, setDaysManifest] = useState<{ days: any[]; totalDays: number } | null>(null);
 
   // Auto scroll active tab into view in horizontal containers without scrolling the window vertically
   useEffect(() => {
@@ -428,6 +431,18 @@ function App() {
       setIframeExists(false);
     }
   }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval]);
+
+  // Fetch days manifest
+  useEffect(() => {
+    fetch(MANIFEST_URL)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.days) {
+          setDaysManifest(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Content password protection
   const [isContentLocked, setIsContentLocked] = useState(() => sessionStorage.getItem("content_unlocked") !== "true");
@@ -930,7 +945,24 @@ function App() {
   };
 
   // Retrieve selected day details
-  const selectedDayLog = activeTrack.days?.find((d: any) => d.day === selectedDayNum) || null;
+  const selectedDayLog = daysManifest?.days?.find((d: any) => d.day === selectedDayNum) || activeTrack.days?.find((d: any) => d.day === selectedDayNum) || null;
+
+  // Auto-computed statistics from manifest
+  const autoStats = (() => {
+    if (!daysManifest?.days) return null;
+    const completedDays = daysManifest.days.filter(d => d.day < computedCurrentDay);
+    return {
+      daysDone: completedDays.length,
+      incidents: completedDays.filter(d => d.incidentName && d.incidentName !== "Upcoming Lab").length,
+      toolsUsed: completedDays.reduce((sum, d) => sum + (d.stats?.toolsUsed || 0), 0),
+      commands: completedDays.reduce((sum, d) => sum + (d.stats?.commands || 0), 0),
+      scriptsBuilt: completedDays.reduce((sum, d) => sum + (d.stats?.scriptsBuilt || 0), 0),
+      projects: completedDays.reduce((sum, d) => sum + (d.stats?.projects || 0), 0),
+      labs: completedDays.reduce((sum, d) => sum + (d.stats?.labs || 0), 0),
+      notes: completedDays.reduce((sum, d) => sum + (d.stats?.notes || 0), 0),
+      examples: completedDays.reduce((sum, d) => sum + (d.stats?.examples || 0), 0),
+    };
+  })();
 
   return (
     <>
@@ -1279,7 +1311,7 @@ function App() {
 
               <div className="grid-wrapper">
                 <div className="contribution-grid">
-                  {Array.from({ length: activeTrack.totalDays || 90 }, (_, index) => {
+                  {Array.from({ length: daysManifest?.totalDays || activeTrack.totalDays || 90 }, (_, index) => {
                     const dayNum = index + 1;
 
                     let cellClass = "day-cell";
@@ -1317,10 +1349,28 @@ function App() {
 
               <div className="grid-summary-footer">
                 <span id="challenge-stats">
-                  <strong>{computedCurrentDay - 1} / {activeTrack.totalDays} Days Completed</strong>
+                  <strong>{computedCurrentDay - 1} / {daysManifest?.totalDays || activeTrack.totalDays} Days Completed</strong>
                 </span>
                 <span>Active Track: <strong>{activeTrack.name}</strong></span>
               </div>
+              {autoStats && (
+                <div className="auto-stats-row" style={{
+                  display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px',
+                  paddingTop: '12px', borderTop: '1px solid var(--border-color)',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.72rem'
+                }}>
+                  <span style={{ color: 'var(--text-muted)', width: '100%', marginBottom: '4px' }}>// auto-tracked statistics</span>
+                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Days Done: <strong>{autoStats.daysDone}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Incidents: <strong>{autoStats.incidents}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Tools: <strong>{autoStats.toolsUsed}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Commands: <strong>{autoStats.commands}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Scripts: <strong>{autoStats.scriptsBuilt}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Labs: <strong>{autoStats.labs}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Projects: <strong>{autoStats.projects}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Notes: <strong>{autoStats.notes}</strong></span>
+                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Examples: <strong>{autoStats.examples}</strong></span>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -2503,12 +2553,20 @@ function App() {
               ) : activeViewerTab === 'revision' ? (
                 <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <div className="revision-tabs-container" style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
-                    {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(val => {
+                    {(() => {
+                      const totalDays = daysManifest?.totalDays || 90;
+                      const maxInterval = Math.ceil(Math.min(computedCurrentDay, totalDays) / 10) * 10;
+                      const intervals = [];
+                      for (let v = 10; v <= Math.max(maxInterval, 10); v += 10) {
+                        intervals.push(v);
+                      }
+                      return intervals;
+                    })().map(val => {
                       const start = val - 9;
                       const label = `Days ${start}–${val}`;
-                      const isUnlocked = activeTrack.currentDay >= start;
+                      const isUnlocked = computedCurrentDay >= start;
                       const isActive = selectedRevisionInterval === val;
-                      const needsPass = val >= 20 && isContentLocked;
+                      const needsPass = start > 10 && isContentLocked;
                       return (
                         <button
                           key={val}

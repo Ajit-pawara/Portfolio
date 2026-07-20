@@ -415,5 +415,8 @@
   <footer>say "Day 20" when ready — one concept, one hour, one day at a time.</footer>
 
 </div>
+  <script id="day-meta" type="application/json">
+{"title": "Authentication vs Authorization", "subtitle": "Who are you? and What are you allowed to do? — these are two separate questions that get confused constantly. Today you learn why confusing them is one of the most common root causes of critical CVEs.", "takeaway": "Differentiated authentication (verifying identity) from authorization (granting permissions); analyzed real-world authN/authZ bypass cases including IDOR and broken session management.", "incidentName": "Capital One Data Breach (2019)", "incidentDetail": "A former AWS employee exploited a misconfigured WAF that allowed SSRF to the AWS metadata service. The real vulnerability was authorization — the IAM role attached to the WAF had access to S3 buckets containing 100M+ credit applications. Authentication was fine, but authorization was broken.", "stats": {"commands": 1, "toolsUsed": 1, "scriptsBuilt": 0, "projects": 0, "labs": 0, "notes": 5, "examples": 4}}
+</script>
 </body>
 </html>
