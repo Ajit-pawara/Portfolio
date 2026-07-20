@@ -223,9 +223,9 @@
       "cybersecurity": {
         "name": "Cybersecurity & Ethical Hacking",
         "repoUrl": "https://github.com/Ajit-pawara/Cyber_Security_90days",
-        "currentDay": 12,
+        "currentDay": 20,
         "totalDays": 90,
-        "completedDays": 12,
+        "completedDays": 20,
         "days": [
           {
             "day": 1,
@@ -346,66 +346,66 @@
           },
           {
             "day": 14,
-            "title": "Security Topic Day 14",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 14",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Kali Linux Tools: Nmap, Wireshark, Metasploit, Burp Suite",
+            "subtitle": "Day 13 built the lab. Today you actually use it — four tools that appear in every professional penetration test, every SOC investigation, and almost every technical interview for a security role.",
+            "takeaway": "Executed Nmap scans (service/OS/vuln), captured traffic in Wireshark, exploited vsftpd 2.3.4 with Metasploit, and intercepted HTTP requests with Burp Suite on Metasploitable.",
+            "incidentName": "Bangladesh Bank SWIFT Heist / Lazarus Group (2016)",
+            "incidentDetail": "Lazarus Group installed Wireshark inside Bangladesh Bank and captured unencrypted SWIFT traffic for weeks, learning the exact protocol format and authentication flow. They then crafted fraudulent transfer requests that stole $81 million.",
+            "status": "completed"
           },
           {
             "day": 15,
-            "title": "Security Topic Day 15",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 15",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Phase 1 Complete: Review, Quiz & Phase 2 Preview",
+            "subtitle": "Ten days of foundations — from CIA triad to your first exploit. Today you consolidate everything, test yourself, and look ahead at what Phase 2 brings.",
+            "takeaway": "Completed a comprehensive review of Days 1-14, tested knowledge with quiz questions, and previewed Phase 2 (reconnaissance, exploitation, and active directory).",
+            "incidentName": "Full Phase 1 Coverage",
+            "incidentDetail": "Reviewed CIA triad, hacker types, Linux fundamentals, bash scripting, networking (OSI/TCP/IP/DNS/HTTP/subnetting), Python security, Windows internals, home lab setup, and Kali toolchain.",
+            "status": "completed"
           },
           {
             "day": 16,
-            "title": "Security Topic Day 16",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 16",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Cryptography I: Hashing vs Encryption",
+            "subtitle": "Cryptography is the backbone of everything secure on the internet. Before you can break it, you must understand the three core operations: hashing, symmetric encryption, and asymmetric encryption.",
+            "takeaway": "Understood the difference between hashing (one-way, integrity) and encryption (two-way, confidentiality); identified common hash algorithms and their vulnerabilities.",
+            "incidentName": "LinkedIn Password Breach (2012)",
+            "incidentDetail": "LinkedIn stored passwords as unsalted SHA-1 hashes. When 167M password hashes were leaked, most were cracked within days using rainbow tables and GPU clusters because SHA-1 was fast and there was no salt.",
+            "status": "completed"
           },
           {
             "day": 17,
-            "title": "Security Topic Day 17",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 17",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Cryptography II: Symmetric vs Asymmetric Encryption",
+            "subtitle": "Symmetric = one key to lock and unlock. Asymmetric = a public key to lock, a private key to unlock. Today you understand when each is used and why the internet needs both.",
+            "takeaway": "Compared AES (symmetric, fast, bulk data) vs RSA (asymmetric, slow, key exchange); learned how TLS handshakes use both to establish secure connections.",
+            "incidentName": "Heartbleed (CVE-2014-0160)",
+            "incidentDetail": "A buffer over-read in OpenSSL's Heartbeat extension leaked up to 64KB of server memory per request, including private RSA keys. Attackers could decrypt previously captured TLS traffic. 500K+ servers affected.",
+            "status": "completed"
           },
           {
             "day": 18,
-            "title": "Security Topic Day 18",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 18",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Cryptography III: SSL/TLS Certificates & PKI",
+            "subtitle": "The padlock icon in your browser is backed by one of the most sophisticated trust infrastructures ever created. Today you understand exactly what that certificate means, how a Certificate Authority works, and how the entire system can be subverted.",
+            "takeaway": "Analyzed X.509 certificate chains, understood PKI trust hierarchy, verified certificate revocation, and simulated a self-signed CA in the home lab.",
+            "incidentName": "DigiNotar CA Breach (2011)",
+            "incidentDetail": "A Dutch Certificate Authority was compromised by attackers who issued 531 fraudulent certificates for domains including google.com, torproject.org, and CIA.gov. Iranian users were MITM'd for months using a fake Google certificate signed by the compromised CA.",
+            "status": "completed"
           },
           {
             "day": 19,
-            "title": "Security Topic Day 19",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 19",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Authentication vs Authorization",
+            "subtitle": "Who are you? and What are you allowed to do? — these are two separate questions that get confused constantly. Today you learn why confusing them is one of the most common root causes of critical CVEs.",
+            "takeaway": "Differentiated authentication (verifying identity) from authorization (granting permissions); analyzed real-world authN/authZ bypass cases including IDOR and broken session management.",
+            "incidentName": "Capital One Data Breach (2019)",
+            "incidentDetail": "A former AWS employee exploited a misconfigured WAF that allowed SSRF to the AWS metadata service. The real vulnerability was authorization — the IAM role attached to the WAF had access to S3 buckets containing 100M+ credit applications. Authentication was fine, but authorization was broken.",
+            "status": "completed"
           },
           {
             "day": 20,
-            "title": "Security Topic Day 20",
-            "subtitle": "Cybersecurity 90-Day Challenge progress log - Day 20",
-            "takeaway": "Pending learning task",
-            "incidentName": "Upcoming Lab",
-            "incidentDetail": "To be done.",
-            "status": "upcoming"
+            "title": "Web Recon: Directory Busting & Technology Fingerprinting",
+            "subtitle": "You know a website's front door exists. Today you find every side-door, maintenance hatch, backup stairwell, and forgotten window — the hidden paths attackers use to bypass logins and inject malware.",
+            "takeaway": "Used gobuster and ffuf for directory enumeration; leveraged WhatWeb and Wappalyzer for passive technology fingerprinting; discovered hidden admin panels and tech stack CVEs.",
+            "incidentName": "British Airways Magecart (2018)",
+            "incidentDetail": "Magecart Group found an unsecured staging admin path on ba.com via directory busting. They injected a 23-line JavaScript skimmer into the payment page, capturing 380,000 payment card details over 2 weeks. BA was fined £20M under GDPR.",
+            "status": "completed"
           },
           {
             "day": 21,
