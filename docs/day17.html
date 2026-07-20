@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 17 — Cryptography II: Symmetric vs Asymmetric Encryption</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:18.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+  .callout.green strong{color:var(--green);}
+
+  .compare-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .compare-col{flex:1;min-width:230px;border-radius:10px;padding:18px 20px;}
+  .compare-col.sym{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .compare-col.asym{background:rgba(79,209,255,0.05);border:1px solid rgba(79,209,255,0.2);}
+  .compare-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .compare-col.sym .role{color:var(--green);}
+  .compare-col.asym .role{color:var(--cyan);}
+  .compare-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .compare-col li{margin-bottom:6px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .flow-steps{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .flow-step{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 14px;}
+  .flow-step .fnum{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--amber);flex-shrink:0;min-width:24px;}
+  .flow-step .fdesc{font-size:13px;color:#cdd6da;}
+  .flow-step .fdesc strong{color:var(--text);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .compare-grid{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day17$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 17/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 17 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Cryptography II <span class="accent">— symmetric vs asymmetric encryption</span></h1>
+  <p class="subtitle">Every HTTPS connection, every SSH login, every encrypted email uses both types of encryption working together. Today you understand exactly how and why — and how the RSA SecurID breach showed what happens when the key material itself gets stolen.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The core problem encryption solves:</strong> two parties want to communicate privately over a public channel (the internet) where anyone could be listening. The challenge is: how do you agree on a secret key if the channel is already compromised?</p>
+
+      <div class="compare-grid">
+        <div class="compare-col sym">
+          <div class="role">Symmetric Encryption — one key</div>
+          <ul>
+            <li>Same key encrypts AND decrypts.</li>
+            <li>Very fast — ideal for bulk data encryption.</li>
+            <li>Key sizes: 128–256 bits (AES-256 is current gold standard).</li>
+            <li>Problem: how do you securely share that one key with the other party if the channel is insecure?</li>
+            <li>Examples: <strong>AES</strong> (current standard), DES (broken, 56-bit), 3DES (deprecated).</li>
+            <li>Used for: encrypting files, disk encryption, VPN tunnels after setup.</li>
+          </ul>
+        </div>
+        <div class="compare-col asym">
+          <div class="role">Asymmetric Encryption — key pair</div>
+          <ul>
+            <li>Two mathematically linked keys: <strong>public key</strong> (share freely) + <strong>private key</strong> (never share).</li>
+            <li>What one key encrypts, only the other can decrypt.</li>
+            <li>Slow — NOT used for bulk data.</li>
+            <li>Key sizes: 2048–4096 bits (RSA). Much larger than symmetric because it's doing harder math.</li>
+            <li>Examples: <strong>RSA</strong>, ECC (Elliptic Curve Cryptography).</li>
+            <li>Solves the key exchange problem — you can share your public key openly with no risk.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:16px;"><strong>How they work together in real life (TLS/HTTPS):</strong> asymmetric is too slow for bulk data, but it perfectly solves the key exchange problem. So in practice, every secure connection does both — asymmetric to securely agree on a symmetric key, then symmetric to actually encrypt the data.</div>
+
+      <p style="margin-top:16px;"><strong>How HTTPS actually establishes a secure connection — the TLS handshake:</strong></p>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fnum">1</div><div class="fdesc"><strong>Server sends its public key</strong> (inside a TLS certificate) — anyone can receive this, including attackers. That's fine.</div></div>
+        <div class="flow-step"><div class="fnum">2</div><div class="fdesc"><strong>Your browser generates a random session key</strong> (symmetric) and <strong>encrypts it using the server's public key</strong>. Only the server's private key can decrypt this — so even if an attacker intercepts it, they see encrypted garbage.</div></div>
+        <div class="flow-step"><div class="fnum">3</div><div class="fdesc"><strong>Server decrypts it with its private key</strong> — now both sides have the same symmetric session key, established securely over an insecure channel.</div></div>
+        <div class="flow-step"><div class="fnum">4</div><div class="fdesc"><strong>All further communication is encrypted with that symmetric session key</strong> (AES-256 typically) — fast, efficient, secure.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>RSA — why it works:</strong> RSA's security is based on the mathematical difficulty of factoring large prime numbers. Multiplying two large primes together is easy (computers do it in milliseconds). Factoring the result back into its two prime factors is computationally infeasible for large enough numbers. Your public key contains the product (N = p × q). Without p and q separately, you can't derive the private key.</p>
+
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">AES-256</div>
+          <div class="cdesc">Current symmetric standard. Used in TLS, disk encryption (BitLocker, VeraCrypt), VPNs. Quantum-resistant at 256-bit. NSA-approved for TOP SECRET data.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">RSA-2048/4096</div>
+          <div class="cdesc">Dominant asymmetric algorithm. Used in TLS certificates, SSH, digital signatures. Will be broken by sufficiently powerful quantum computers — replacement algorithms being standardized now.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">ECC (Elliptic Curve)</div>
+          <div class="cdesc">Modern alternative to RSA. Smaller key size for equivalent security (256-bit ECC ≈ 3072-bit RSA). Faster, used in modern TLS and mobile apps.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Diffie-Hellman</div>
+          <div class="cdesc">A key exchange protocol — lets two parties agree on a shared secret over a public channel without ever transmitting the secret itself. Underlies modern TLS key exchange.</div>
+        </div>
+      </div>
+
+      <div class="callout amber" style="margin-top:14px;"><strong>Quantum threat:</strong> sufficiently powerful quantum computers will break RSA and ECC by solving the prime factoring/discrete log problems efficiently. AES-256 is considered quantum-resistant. Post-quantum cryptography algorithms (CRYSTALS-Kyber, CRYSTALS-Dilithium) are being standardized by NIST now — worth knowing as a forward-looking security topic.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2011 — RSA SECURID BREACH — US DEFENSE CONTRACTORS COMPROMISED</div>
+      <div class="name">Attackers stole the "seeds" behind RSA's asymmetric authentication tokens — then used them to breach Lockheed Martin</div>
+      <div class="detail">In March 2011, RSA Security (the company, not just the algorithm) disclosed that attackers had breached their internal systems and stolen information related to their SecurID two-factor authentication product. SecurID tokens generate time-based one-time passwords using secret "seed" values stored at RSA. When those seed values were stolen, the mathematical relationship between the token and the server was compromised — effectively nullifying the second factor for millions of hardware tokens deployed worldwide across US defense contractors, financial institutions, and government agencies. Two months later in May 2011, Lockheed Martin — one of the world's largest defense contractors — detected an intrusion attempt using the stolen RSA SecurID data. The attack was stopped but highlighted the systemic risk of a cryptographic "root of trust" being compromised: when the underlying key material is stolen, every system that trusts that material is simultaneously at risk. RSA later replaced 40 million tokens at a cost estimated at over $66 million. The lesson: in asymmetric systems, the private key or seed is the entire security — lose that, and all encryption built on top of it collapses.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Breaking the math (cracking RSA) is infeasible at modern key sizes — attackers target the <em>keys themselves</em>, not the algorithm. RSA SecurID shows this clearly.</li>
+          <li>Man-in-the-middle attacks on TLS target the certificate validation step — if you can present a fraudulent certificate that the client accepts, you become the "server."</li>
+          <li>Weak Diffie-Hellman parameters (small groups) were exploited in the 2015 Logjam attack, downgrading connections to 512-bit DH which could be factored in hours.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Protect private keys like the most sensitive credential in your environment — they ARE the security. HSMs (Hardware Security Modules) store keys in tamper-resistant hardware.</li>
+          <li>Certificate pinning and HSTS prevent MitM attacks by making clients reject unexpected certificates even if they're technically valid.</li>
+          <li>Enforce strong cipher suites — disable legacy TLS 1.0/1.1, disable weak DH groups, mandate AES-256-GCM and ECDHE key exchange in TLS configurations.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/encryptioncrypto101</strong> — complete the symmetric encryption tasks (AES decryption with gpg) and asymmetric tasks (RSA key pair generation and GPG message decryption).</li>
+        <li>Generate a real RSA key pair using OpenSSL on your Kali machine and encrypt/decrypt a message manually — see the commands below.</li>
+        <li>Observe a live TLS handshake using Wireshark — capture traffic while visiting https://example.com and identify the ClientHello, ServerHello, and Certificate packets.</li>
+        <li>Use OpenSSL to inspect a real TLS certificate and identify the algorithm, key size, and validity period.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your RSA key pair generated with OpenSSL + the TryHackMe room completion + one Wireshark frame showing "TLS Handshake: Certificate".</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># ── SYMMETRIC (AES) ─────────────────────────────</span>
+<span class="c"># Encrypt a file with AES-256-CBC</span>
+<span class="cmd">openssl enc -aes-256-cbc -salt -in secret.txt -out secret.enc -k "mySecretKey"</span>
+<span class="c"># Decrypt it back</span>
+<span class="cmd">openssl enc -d -aes-256-cbc -in secret.enc -out decrypted.txt -k "mySecretKey"</span>
+<span class="hi"># same key encrypts and decrypts — symmetric</span>
+
+<span class="c"># ── ASYMMETRIC (RSA) ─────────────────────────────</span>
+<span class="c"># 1. Generate a 2048-bit RSA private key</span>
+<span class="cmd">openssl genrsa -out private.pem 2048</span>
+<span class="out">Generating RSA private key, 2048 bit long modulus</span>
+
+<span class="c"># 2. Extract the public key from the private key</span>
+<span class="cmd">openssl rsa -in private.pem -pubout -out public.pem</span>
+<span class="out">writing RSA key</span>
+
+<span class="c"># 3. Encrypt with PUBLIC key (anyone can do this)</span>
+<span class="cmd">echo "secret message" | openssl rsautl -encrypt -pubin -inkey public.pem -out msg.enc</span>
+
+<span class="c"># 4. Decrypt with PRIVATE key (only you can do this)</span>
+<span class="cmd">openssl rsautl -decrypt -inkey private.pem -in msg.enc</span>
+<span class="out">secret message</span>
+<span class="hi"># encrypted with public key, decrypted with private key — asymmetric</span>
+<span class="hi"># anyone can send you a secret. Only you can read it.</span>
+
+<span class="c"># ── INSPECT A REAL TLS CERTIFICATE ──────────────</span>
+<span class="cmd">echo | openssl s_client -connect google.com:443 2>/dev/null | openssl x509 -noout -text | grep -A2 "Public Key"</span>
+<span class="out">Public Key Algorithm: id-ecPublicKey  <- ECC not RSA (more efficient)
+Public-Key: (256 bit)</span>
+<span class="hi"># Google uses ECC 256-bit — equivalent to RSA 3072-bit but much faster</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain how HTTPS keeps your data secure, step by step."</div>
+        <div class="a">A: "HTTPS uses both encryption types together. First, the server sends its public key inside a TLS certificate. Your browser generates a random symmetric session key, encrypts it with the server's public key, and sends it. Only the server can decrypt this with its private key — so even if an attacker intercepts it on the wire, they see garbage. Now both sides have the same symmetric key, established securely. All actual data is then encrypted with AES-256 using that key — fast and secure. This hybrid approach is necessary because RSA is mathematically too slow for bulk data, but it perfectly solves the key exchange problem. The RSA SecurID breach in 2011 showed what happens when the private key material itself gets stolen — 40 million tokens were immediately compromised, costing RSA over $66 million to replace."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">SSL Labs (Qualys)</div>
+        <div class="adesc">ssllabs.com/ssltest — free tool that scans any website's TLS configuration and grades it A-F. Shows cipher suites, key sizes, protocol versions. Use it on any client site to spot weak configs.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Ask "analyze this openssl s_client output and identify any weak cipher suites" — paste real certificate output for instant analysis. Cuts hours off manual TLS auditing.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Cryptohack.org</div>
+        <div class="adesc">AI-friendly cryptography challenge platform — gamified, teaches RSA attacks, AES weaknesses, real crypto vulnerabilities through CTF-style challenges. Perfect for Phase 2.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Post-Quantum Crypto (NIST)</div>
+        <div class="adesc">NIST standardized CRYSTALS-Kyber and Dilithium in 2024 — the next-gen replacements for RSA. Mentioning this in interviews signals you think forward, not just about current tools.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Generated RSA-2048 key pairs using OpenSSL; performed AES-256-CBC file encryption/decryption; analyzed live TLS handshakes in Wireshark and audited cipher suite configurations using SSL Labs."</li>
+        <li><strong>Campus interview:</strong> When asked "how does HTTPS work?", most students say "it's encrypted." You can now say "it uses a hybrid of RSA for key exchange and AES-256 for the actual data transfer — and I've done this manually with OpenSSL to see exactly what happens at each step." That answer is interview-winning at the campus level.</li>
+        <li><strong>Security+ alignment:</strong> Cryptography is a major domain in Security+ (SY0-701 Domain 1). Days 16-18 together cover most of the cryptography questions you'll face on that exam — building toward certification while still doing hands-on work.</li>
+        <li><strong>AppSec/pentesting relevance:</strong> Weak TLS configurations are a real finding in web app pentests. Knowing how to use SSL Labs and interpret OpenSSL output makes this a billable skill from Day 17.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>SSL/TLS configuration audits are a fast, high-value service — run SSL Labs against a client's domain, produce a graded report, and recommend fixes (enable TLS 1.3, disable weak cipher suites, implement HSTS). This takes under 30 minutes and produces a clear, visual deliverable clients immediately understand. Many Indian SMB websites score C or D on SSL Labs — weak key sizes, outdated protocols, missing security headers. That's a direct pitch: "Your website scored C on its encryption audit — here's what it means for your customers' data and how we fix it." Easy entry point into a broader security engagement.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Symmetric encryption is like a lockbox where both people have a copy of the same key — fast, but how do you safely hand over that key copy to someone new? Asymmetric encryption solves this with a padlock and key: you give everyone a padlock they can snap shut (the public key), but only you have the key to open it (private key). So when you visit a website securely, it first hands you an open padlock. You put a secret inside, snap the padlock, and send it back — only the website can open it. Inside is the key you'll both use for the rest of the conversation. The 2011 RSA breach is like someone stealing the factory that made all the padlocks — suddenly every padlock they ever made is potentially compromised."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=3eGyyQr7arI" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Symmetric vs Asymmetric Encryption: AES, RSA, Digital Signatures & More (Feb 2025)</div><div class="res-desc">youtube.com/watch?v=3eGyyQr7arI — verified February 2025, covers both types + digital signatures clearly.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=bmtdRNGwJG0" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Symmetric & Asymmetric Cryptography — Full Hindi/Urdu Explained</div><div class="res-desc">youtube.com/watch?v=bmtdRNGwJG0 — clear Hindi/Urdu walkthrough of both encryption types with examples.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/encryptioncrypto101" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Encryption: Crypto 101</div><div class="res-desc">Free room — AES decryption with gpg, RSA key pair generation, GPG message decryption. Today's main lab.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> RSA SecurID 2011 — real, named, $66M impact. Shows key theft > algorithm weakness.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — generated real RSA keypair, AES encrypted a file, inspected live TLS cert.</div>
+      <div class="mistake-item"><span class="check">✓</span> Built directly on Day 16 (hashing) — complete cryptography picture in two days.</div>
+      <div class="mistake-item"><span class="check">✓</span> Quantum threat mentioned — forward-thinking, separates you from candidates stuck in 2015.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–16 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain the key exchange problem and why asymmetric encryption solves it.</li>
+        <li><span class="box"></span> I can walk through all 4 steps of the TLS handshake in plain language.</li>
+        <li><span class="box"></span> I generated an RSA-2048 key pair with OpenSSL and encrypted/decrypted a message.</li>
+        <li><span class="box"></span> I inspected a live TLS certificate using <code>openssl s_client</code>.</li>
+        <li><span class="box"></span> I completed TryHackMe Encryption: Crypto 101 room.</li>
+        <li><span class="box"></span> I can explain the RSA SecurID breach and why stealing key material is worse than attacking the algorithm.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">17 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 18</div>
+      <div class="title">Cryptography III — SSL/TLS certificates & PKI in depth</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 18" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

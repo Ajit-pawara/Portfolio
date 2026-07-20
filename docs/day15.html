@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 15 — Phase 1 Complete: Review, Quiz & Phase 2 Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.07),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:16.6%;height:100%;background:var(--green);}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:32px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;margin-bottom:18px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.review{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.quiz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.soft{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.phase2{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.green strong{color:var(--green);}
+
+  /* Day summary cards */
+  .day-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:14px;}
+  .day-sum{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;}
+  .day-sum .dnum{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .day-sum .dtitle{font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--text);}
+  .day-sum .dkey{font-size:12px;color:var(--muted);}
+  .day-sum .dincident{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--red);margin-top:5px;}
+
+  /* quiz */
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;cursor:pointer;user-select:none;}
+  .q-item .ans-label{font-size:10px;color:var(--muted);margin-bottom:4px;}
+
+  /* soft skills */
+  .soft-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px;}
+  .soft-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--purple);}
+  .soft-card .stitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple);font-weight:700;margin-bottom:6px;}
+  .soft-card .sdesc{font-size:12.5px;color:var(--muted);}
+
+  /* phase 2 preview */
+  .phase2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .p2-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--pink);}
+  .p2-card .day{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;}
+  .p2-card .topic{font-weight:600;font-size:13.5px;margin-bottom:5px;color:var(--text);}
+  .p2-card .why{font-size:12px;color:var(--muted);}
+
+  /* command master list */
+  .cmd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;margin-top:12px;}
+  .cmd-item{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;}
+  .cmd-item code{flex-shrink:0;min-width:0;}
+  .cmd-item .cdesc{font-size:11.5px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--amber);border-radius:50%;width:170px;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--amber);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 30px rgba(255,180,84,0.15);}
+  .stamp .l1{font-size:10px;letter-spacing:0.12em;}
+  .stamp .l2{font-size:18px;font-weight:700;margin:4px 0;text-align:center;line-height:1.2;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;color:var(--green);}
+
+  .next-up{background:linear-gradient(135deg,rgba(255,107,214,0.06),rgba(79,209,255,0.04));border:1px solid rgba(255,107,214,0.2);border-radius:12px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--pink);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day15$ cat phase1_review.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 15/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">PHASE 1 COMPLETE — DAY 15 OF 90</div>
+    <h1>Foundations <span>Done.</span> Time to test yourself.</h1>
+    <p>15 days. 15 real incidents. 13+ tools used. Your first working exploit. A home lab running. Two scripting languages started. This is your checkpoint — before Phase 2 begins, verify you actually own these fundamentals, not just recognize them.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">15</div><div class="lbl">Days</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">Kali Tools Used</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Scripts Built</div></div>
+      <div class="stat"><div class="num">1</div><div class="lbl">Root Shell Got</div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 1 QUICK REVIEW -->
+  <section>
+    <span class="tag-pill review">// Phase 1 Quick Review — All 14 Days</span>
+    <div class="day-grid">
+      <div class="day-sum"><div class="dnum">DAY 01</div><div class="dtitle">CIA Triad</div><div class="dkey">Confidentiality / Integrity / Availability. Every attack breaks one of these.</div><div class="dincident">Equifax '17 · Stuxnet '10 · Dyn/Mirai '16</div></div>
+      <div class="day-sum"><div class="dnum">DAY 02</div><div class="dtitle">Hackers & Attack Categories</div><div class="dkey">3 hats (auth = only difference). 6 categories. Cyber Kill Chain — recon is 70% of effort.</div><div class="dincident">Target '13 · Twitter '20 · WannaCry '17</div></div>
+      <div class="day-sum"><div class="dnum">DAY 03</div><div class="dtitle">Linux Filesystem & Permissions</div><div class="dkey">chmod numbers (r=4,w=2,x=1). /etc/shadow /tmp /var/log. SUID = privilege escalation path.</div><div class="dincident">PwnKit CVE-2021-4034</div></div>
+      <div class="day-sum"><div class="dnum">DAY 04</div><div class="dtitle">Linux Users, Processes & Shell</div><div class="dkey">su vs sudo. ps aux — names lie. Verify via /proc/[PID]/exe. kill / kill -9.</div><div class="dincident">TeamTNT '20–21</div></div>
+      <div class="day-sum"><div class="dnum">DAY 05</div><div class="dtitle">Bash Scripting</div><div class="dkey">#!/bin/bash. $1/$2/$#. if/for loops. chmod +x. Wrote sysinfo.sh recon script.</div><div class="dincident">Shellshock CVE-2014-6271</div></div>
+      <div class="day-sum"><div class="dnum">DAY 06</div><div class="dtitle">OSI Model</div><div class="dkey">L7→L1. Encapsulation. Defense needs controls at every layer — one is never enough.</div><div class="dincident">WannaCry/EternalBlue '17</div></div>
+      <div class="day-sum"><div class="dnum">DAY 07</div><div class="dtitle">TCP/IP & Ports</div><div class="dkey">SYN→SYN-ACK→ACK. Ports 21/22/80/443/3389. SYN flood = flood step 1, never ACK.</div><div class="dincident">MafiaBoy SYN Flood '00</div></div>
+      <div class="day-sum"><div class="dnum">DAY 08</div><div class="dtitle">DNS, HTTP/HTTPS & DHCP</div><div class="dkey">6-step DNS chain. HTTP=plain text. HTTPS=TLS encrypted. nslookup/dig commands.</div><div class="dincident">Baidu DNS Hijack '10</div></div>
+      <div class="day-sum"><div class="dnum">DAY 09</div><div class="dtitle">Subnetting & Routing</div><div class="dkey">/24=254 hosts. Network/broadcast/usable/gateway. traceroute = router hops visible.</div><div class="dincident">Target flat network '13</div></div>
+      <div class="day-sum"><div class="dnum">DAY 10</div><div class="dtitle">Python for Security I</div><div class="dkey">Variables, if/else, loops, functions, file I/O, socket. port_checker.py built + pushed to GitHub.</div><div class="dincident">PyPI Supply Chain '22–23</div></div>
+      <div class="day-sum"><div class="dnum">DAY 11</div><div class="dtitle">Python for Security II</div><div class="dkey">Sockets (TCP vs UDP). banner_grabber.py + threaded_scanner.py. Threading = 100x faster scan.</div><div class="dincident">Mirai Botnet '16</div></div>
+      <div class="day-sum"><div class="dnum">DAY 12</div><div class="dtitle">Windows Internals</div><div class="dkey">Registry Run keys. lsass.exe/svchost.exe parents. Event IDs: 4624/4625/4688/1102/4104.</div><div class="dincident">SolarWinds SUNBURST '20</div></div>
+      <div class="day-sum"><div class="dnum">DAY 13</div><div class="dtitle">Home Lab Setup</div><div class="dkey">VirtualBox + Kali + Metasploitable. Host-Only network. Snapshot = malware analyst workflow.</div><div class="dincident">Tesla Kubernetes '18</div></div>
+      <div class="day-sum"><div class="dnum">DAY 14</div><div class="dtitle">Kali Tools</div><div class="dkey">Nmap (-sV -A --script vuln). Wireshark filters. Metasploit (vsftpd 2.3.4 root shell). Burp Suite intercept.</div><div class="dincident">Bangladesh Bank Wireshark '16</div></div>
+    </div>
+  </section>
+
+  <!-- INCIDENTS FLASH CARD -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// all 15 real incidents — your unfair advantage in interviews</div>
+    <div class="callout"><strong>Interviewer tip:</strong> when you cite a specific named incident (company, year, impact figure) instead of a generic statement, you immediately signal that you've done real research — not just watched a course. Most candidates cannot name even 3 real incidents. You now know 15. Use them.</div>
+    <div class="card" style="margin-top:12px;">
+      <p style="font-size:13px;color:#cdd6da;line-height:2;">
+        MafiaBoy SYN Flood (2000) · Stuxnet (2010) · Baidu DNS Hijack (2010) · LinkedIn Breach (2012) · Target POS (2013) · Dyn/Mirai DDoS (2016) · Mirai Botnet (2016) · Bangladesh Bank SWIFT $81M (2016) · Shellshock CVE-2014-6271 · Equifax (2017) · WannaCry/EternalBlue (2017) · PwnKit CVE-2021-4034 · Tesla Kubernetes (2018) · TeamTNT Cryptojacking (2020–21) · SolarWinds SUNBURST (2020) · PyPI Supply Chain (2022–23)
+      </p>
+    </div>
+  </section>
+
+  <!-- MINI QUIZ -->
+  <section>
+    <span class="tag-pill quiz">// Mini Quiz — 15 Questions, Say Answers Out Loud</span>
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px;">Cover the answer. Say it out loud. If you can't answer fluently, mark it and revisit that day before Day 16.</p>
+
+    <div class="q-item"><div class="qnum">Q01</div><div class="qtext">A ransomware attack encrypts a hospital's files and demands payment. The hospital can still read old unencrypted backups. Which CIA element(s) were broken?</div><div class="ans-label">Answer:</div><div class="ans">Availability (files inaccessible) + potentially Confidentiality if data was exfiltrated before encryption. Integrity is intact — data wasn't altered, just encrypted/locked.</div></div>
+
+    <div class="q-item"><div class="qnum">Q02</div><div class="qtext">You find a binary at /tmp/kworker running as root. Why is this suspicious, and what command confirms whether it's real?</div><div class="ans-label">Answer:</div><div class="ans">Real kernel threads are in brackets [kworker] in ps and live in kernel space — not in /tmp. Confirm with: ls -l /proc/[PID]/exe — a real kernel thread has no file path, malware will show the actual binary.</div></div>
+
+    <div class="q-item"><div class="qnum">Q03</div><div class="qtext">Convert rwxr-x--- to octal notation.</div><div class="ans-label">Answer:</div><div class="ans">750. Owner=7(rwx), Group=5(r-x), Others=0(---). </div></div>
+
+    <div class="q-item"><div class="qnum">Q04</div><div class="qtext">WannaCry exploited EternalBlue. Name the OSI layer of the vulnerability, the transport layer port it spread through, and two required defenses.</div><div class="ans-label">Answer:</div><div class="ans">Vulnerability at L7 (SMBv1 application protocol). Spread via TCP port 445 (L4). Two defenses: (1) patch/disable SMBv1 at L7, (2) block TCP port 445 at firewall (L4). One alone was insufficient.</div></div>
+
+    <div class="q-item"><div class="qnum">Q05</div><div class="qtext">What is the broadcast address and how many usable hosts exist for the subnet 10.0.5.0/24?</div><div class="ans-label">Answer:</div><div class="ans">Broadcast: 10.0.5.255. Usable hosts: 254 (10.0.5.1 through 10.0.5.254). Network address (10.0.5.0) and broadcast (10.0.5.255) are not assignable.</div></div>
+
+    <div class="q-item"><div class="qnum">Q06</div><div class="qtext">A developer runs `pip install requets` and their system is immediately compromised. Explain the attack mechanism.</div><div class="ans-label">Answer:</div><div class="ans">PyPI typosquatting (2022–23 attacks). "requets" is a malicious package with a name one letter different from the real "requests". The malicious setup.py executes on pip install — before any code is imported or run. The attack is in the install command itself.</div></div>
+
+    <div class="q-item"><div class="qnum">Q07</div><div class="qtext">Name 4 Windows Event IDs a SOC analyst monitors and what each detects.</div><div class="ans-label">Answer:</div><div class="ans">4624 = successful logon. 4625 = failed logon (brute force). 4688 = process creation (disabled by default — catch living-off-the-land). 1102 = audit log cleared (attacker covering tracks — this fires even when they try to hide it).</div></div>
+
+    <div class="q-item"><div class="qnum">Q08</div><div class="qtext">Lazarus Group stole $81M from Bangladesh Bank using a standard Kali Linux tool. Which tool, and why was it effective?</div><div class="ans-label">Answer:</div><div class="ans">Wireshark — a packet capture tool. They installed it on a compromised host inside the bank and passively captured SWIFT transaction traffic for weeks. It was effective because internal bank traffic was unencrypted, and Wireshark generates no network traffic itself — it just listens silently.</div></div>
+
+    <div class="q-item"><div class="qnum">Q09</div><div class="qtext">What Nmap flag runs vulnerability detection scripts, and which specific output told you vsftpd 2.3.4 was exploitable?</div><div class="ans-label">Answer:</div><div class="ans">Flag: nmap --script vuln [ip]. Output: "ftp-vsftpd-backdoor: VULNERABLE" — Nmap's NSE script specifically checks for the vsftpd 2.3.4 backdoor (CVE-2011-2523) and confirms it before Metasploit even opens.</div></div>
+
+    <div class="q-item"><div class="qnum">Q10</div><div class="qtext">Write a one-line Python socket code snippet that attempts a TCP connection to port 80 on 192.168.1.1 with a 1 second timeout.</div><div class="ans-label">Answer:</div><div class="ans">s = socket.socket(); s.settimeout(1); s.connect(("192.168.1.1", 80)) — wrapped in try/except to handle closed/filtered ports cleanly.</div></div>
+
+    <div class="q-item"><div class="qnum">Q11</div><div class="qtext">What is the Cyber Kill Chain stage where attackers spent most of their effort in the 2013 Target breach, and what did they do there?</div><div class="ans-label">Answer:</div><div class="ans">Reconnaissance — they identified and targeted a third-party HVAC vendor with access to Target's network, then phished that vendor's credentials. The actual lateral movement to POS systems came much later, after weeks of quiet internal observation.</div></div>
+
+    <div class="q-item"><div class="qnum">Q12</div><div class="qtext">Why is the VirtualBox Host-Only network setting critical for your home lab, vs NAT or Bridged?</div><div class="ans-label">Answer:</div><div class="ans">Host-Only creates an isolated network between VMs only — no internet access from either VM. NAT shares the host's internet (VMs could reach real targets accidentally or malware could call home). Bridged exposes VMs to your real local network (other devices, routers, etc.). Host-Only = safe, contained, legal to attack freely.</div></div>
+
+    <div class="q-item"><div class="qnum">Q13</div><div class="qtext">SolarWinds SUNBURST went undetected for 9 months. Name two Windows logging configurations that, if active, would have significantly increased the chance of earlier detection.</div><div class="ans-label">Answer:</div><div class="ans">Event ID 4688 (process creation logging — disabled by default) and Event ID 4104 (PowerShell script block logging — also disabled by default). These are enabled via Group Policy and cost nothing — their absence let SUNBURST's process activity go unlogged across thousands of organizations.</div></div>
+
+    <div class="q-item"><div class="qnum">Q14</div><div class="qtext">What is the difference between TCP (SOCK_STREAM) and UDP (SOCK_DGRAM) sockets, and which does Nmap use for a SYN scan?</div><div class="ans-label">Answer:</div><div class="ans">TCP (SOCK_STREAM) = reliable, ordered, connection-based — requires the 3-way handshake. UDP (SOCK_DGRAM) = connectionless, fire-and-forget, no handshake. An Nmap SYN scan (-sS) uses raw TCP — sends SYN but never completes the handshake (no ACK), which is why it's "stealth" — most firewalls and application logs only record fully established connections.</div></div>
+
+    <div class="q-item"><div class="qnum">Q15</div><div class="qtext">Name three specific files or directories on a Linux system that an attacker checks immediately after getting a shell, and why each one matters.</div><div class="ans-label">Answer:</div><div class="ans">/etc/shadow — contains password hashes for all users (needs root to read, so getting it means you have privilege or found a path to escalate). /home/[user]/.bash_history — shows commands the user ran previously, may contain credentials, IPs, or clues about the system. /tmp — world-writable, check if other attackers already dropped payloads here, and use it to stage your own tools temporarily without needing write access elsewhere.</div></div>
+  </section>
+
+  <!-- SOFT SKILLS -->
+  <section>
+    <span class="tag-pill soft">// Soft Skills & Networking — Mistake #7 You Agreed Not to Make</span>
+    <div class="card">
+      <p>You're 15 days in. This is the exact point where most self-taught learners put their heads down and disappear into labs for months, then wonder why they're not getting callbacks. Soft skills and professional networking aren't a Phase 3 topic — they're parallel work that starts now.</p>
+      <div class="soft-grid">
+        <div class="soft-card">
+          <div class="stitle">LinkedIn Presence</div>
+          <div class="sdesc">15 daily posts = 15 data points that prove consistency. Recruiters search for "cybersecurity" + "building" + "student." Your posts are the trail they follow. If you've skipped days, catch up this week — even a short "Days 1–15 complete, home lab running" post is better than nothing.</div>
+        </div>
+        <div class="soft-card">
+          <div class="stitle">GitHub Portfolio</div>
+          <div class="sdesc">You should have port_checker.py, banner_grabber.py, and threaded_scanner.py committed. Plus a Day 14 exploit writeup. Three repos and a writeup at Day 15 already beats 80% of engineering graduates applying for the same roles. Keep committing.</div>
+        </div>
+        <div class="soft-card">
+          <div class="stitle">TryHackMe Profile</div>
+          <div class="sdesc">Your public TryHackMe profile shows your completed rooms and rank. Share it in your LinkedIn bio right now: "tryhackme.com/p/[yourname]." Recruiters at security firms actively check these for entry candidates.</div>
+        </div>
+        <div class="soft-card">
+          <div class="stitle">One Real Connection/Week</div>
+          <div class="sdesc">Send ONE LinkedIn connection request per week to a security professional (analyst, pentester, CISO) with a personal note mentioning one thing you learned from their posts. Not a job ask. Just a real observation. This compounds — 15 weeks from now you have 15 real contacts.</div>
+        </div>
+        <div class="soft-card">
+          <div class="stitle">Compare to Yourself Only</div>
+          <div class="sdesc">You're at Day 15. Someone on Reddit claims they got OSCP in 3 months with no prior experience. Maybe true, maybe not — either way, irrelevant to your journey. Day 15 Robin is ahead of Day 1 Robin by exactly 15 days of compounding knowledge. That's the only comparison that matters.</div>
+        </div>
+        <div class="soft-card">
+          <div class="stitle">Community</div>
+          <div class="sdesc">r/Cybersecurity_To_hack (your community), TryHackMe Discord, and LinkedIn group "Cybersecurity Build-in-Public." Post your Phase 1 completion today. Communities notice consistency — every post is a reputation deposit.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTF CHALLENGE -->
+  <section>
+    <span class="tag-pill lab">// Phase 1 Validation CTF</span>
+    <div class="card">
+      <p>The best way to know if you actually absorbed Phase 1 is to apply it blind — no walkthrough, no hints — on a real target. Simple CTF on TryHackMe uses Nmap, basic web enumeration, and Linux privilege escalation — everything from Days 3, 7, and 14.</p>
+      <p>Go to <strong>tryhackme.com/room/simplectf</strong> — it's free and designed for beginners who have exactly the Phase 1 knowledge you just built.</p>
+      <p style="font-size:13px;color:var(--muted);">Process: scan with Nmap → find web service → enumerate → exploit → escalate to root → capture flags. If you get stuck, that pinpoints which day to revisit. If you solve it cleanly, you're ready for Phase 2.</p>
+      <div class="deliverable" style="margin-top:12px;"><strong>Deliverable:</strong> screenshot of both CTF flags captured. Post it on LinkedIn with "Phase 1 of my 90-day roadmap validated — first unsupported CTF solved." This is your Phase 1 completion proof.</div>
+    </div>
+  </section>
+
+  <!-- HOW THIS GETS YOU PLACED -->
+  <section>
+    <span class="tag-pill job">// Phase 1 Placement Summary</span>
+    <div class="job-card">
+      <div class="label">// what you can now say in an interview</div>
+      <ul>
+        <li>"I have a working home lab — Kali Linux and Metasploitable 2 in an isolated VirtualBox environment. I've run authorized vulnerability scans, exploited vsftpd 2.3.4 with Metasploit, and captured traffic in Wireshark simultaneously."</li>
+        <li>"I understand Linux at the filesystem, permissions, and process level — I can audit SUID binaries, audit /etc/shadow permissions, and detect TeamTNT-style process spoofing."</li>
+        <li>"I can read Windows Event Logs with PowerShell, know the critical Event IDs (4624/4625/4688/1102/4104), and can explain why enabling 4688 and 4104 is a zero-cost high-impact security improvement."</li>
+        <li>"I've written Python security tools from scratch — a socket-based port scanner, a banner grabber, and a threaded scanner — and pushed them to GitHub."</li>
+        <li>"I can cite 15 real, named cybersecurity incidents with company, year, attack type, and impact — I don't just know definitions, I know what happened."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PHASE 2 PREVIEW -->
+  <section>
+    <span class="tag-pill phase2">// Phase 2 Preview — Days 16–35: Core Security Concepts</span>
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px;">Phase 1 was infrastructure and tooling. Phase 2 is the conceptual backbone — the knowledge behind every security decision you'll make and every tool you'll use.</p>
+    <div class="phase2-grid">
+      <div class="p2-card"><div class="day">Day 16–18</div><div class="topic">Cryptography I, II & III</div><div class="why">Hashing vs encryption, symmetric vs asymmetric, TLS/SSL/certificates — how HTTPS actually works.</div></div>
+      <div class="p2-card"><div class="day">Day 19–20</div><div class="topic">Authentication & Password Security</div><div class="why">AuthN vs AuthZ, password hashing attacks (rainbow tables, salting), MFA.</div></div>
+      <div class="p2-card"><div class="day">Day 21–22</div><div class="topic">Web Fundamentals & OWASP Top 10</div><div class="why">How HTTP requests work end-to-end, and the 10 most critical web vulnerabilities.</div></div>
+      <div class="p2-card"><div class="day">Day 23–24</div><div class="topic">SQL Injection & XSS</div><div class="why">The two most common web vulnerabilities — hands-on exploitation on DVWA.</div></div>
+      <div class="p2-card"><div class="day">Day 25–28</div><div class="topic">CSRF, Broken Auth, Misconfigurations</div><div class="why">Session attacks, access control failures, security misconfigurations — OWASP continued.</div></div>
+      <div class="p2-card"><div class="day">Day 29–33</div><div class="topic">Firewalls, VPNs, Malware & Phishing</div><div class="why">Network defenses, malware categories, social engineering techniques.</div></div>
+      <div class="p2-card"><div class="day">Day 34–35</div><div class="topic">Cloud Security & Phase 2 Review</div><div class="why">AWS/Azure shared responsibility model, cloud misconfigurations, Phase 2 quiz.</div></div>
+    </div>
+  </section>
+
+  <!-- WATCH -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch — celebrate the milestone, then plan the next phase</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=SS_yw7Xh95g" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Get into CyberSecurity | Step by Step Roadmap (2024)</div><div class="res-desc">youtube.com/watch?v=SS_yw7Xh95g — career-path video to review where Phase 2 fits in the bigger picture.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=lMSutEyJ97s" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Roadmap to Cyber Security 2024 | Complete Beginner Guide [HINDI]</div><div class="res-desc">youtube.com/watch?v=lMSutEyJ97s — full Hindi roadmap video, useful context for Phase 2 planning.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/simplectf" target="_blank">
+        <span class="res-icon lab">CTF</span>
+        <div><div class="res-title">TryHackMe — Simple CTF (Phase 1 validation)</div><div class="res-desc">Free beginner CTF — Nmap, web enumeration, basic exploit, Linux privesc. Uses everything from Phase 1.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp">
+      <div class="l1">Phase 1</div>
+      <div class="l2">COMPLETE</div>
+      <div class="l3">Day 15 / 90 ✓</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next — day 16</div>
+      <div class="title">Phase 2 begins — Cryptography I: hashing vs encryption</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 16" when ready — Phase 2 starts. The concepts get deeper from here.</footer>
+
+</div>
+</body>
+</html>
