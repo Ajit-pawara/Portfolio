@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 06 — Networking I: The OSI Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;}
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:6.6%; height:100%; background:var(--green);}
+  .day-tag{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px; background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
+  .day-tag::before{content:'●'; font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+  .tag-pill{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:6px 14px; border-radius:20px; margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px; padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);}
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;}
+
+  /* OSI layer stack */
+  .osi-stack{display:flex; flex-direction:column; gap:8px; margin-top:16px;}
+  .osi-layer{display:flex; align-items:center; gap:14px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:12px 16px;}
+  .osi-layer .num{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:16px; width:28px; flex-shrink:0;}
+  .osi-layer .name{font-weight:700; font-size:14px; width:130px; flex-shrink:0;}
+  .osi-layer .ex{font-size:12.5px; color:var(--muted);}
+  .osi-layer.l7 .num, .osi-layer.l7 .name{color:var(--red);}
+  .osi-layer.l6 .num, .osi-layer.l6 .name{color:var(--amber);}
+  .osi-layer.l5 .num, .osi-layer.l5 .name{color:var(--amber);}
+  .osi-layer.l4 .num, .osi-layer.l4 .name{color:var(--cyan);}
+  .osi-layer.l3 .num, .osi-layer.l3 .name{color:var(--cyan);}
+  .osi-layer.l2 .num, .osi-layer.l2 .name{color:var(--green);}
+  .osi-layer.l1 .num, .osi-layer.l1 .name{color:var(--green);}
+
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; border-left:3px solid var(--red);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green); color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{border:3px solid var(--green); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);}
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04)); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} .osi-layer{flex-wrap:wrap;} .osi-layer .ex{width:100%;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day06$ cat lesson.md</span>
+    <div class="progress">Day 6 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 06 OF 90</div>
+  <h1>Networking I <span class="accent">— the OSI model</span></h1>
+  <p class="subtitle">Every packet, every exploit, every Wireshark capture you'll ever look at maps onto 7 layers. Today you stop saying "the network" as one blob and start seeing the stack.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>The OSI (Open Systems Interconnection) model is the universal framework for how data moves across a network — 7 layers, each adding its own piece of information as data travels down, then unwrapping it on the way back up (a process called <strong>encapsulation</strong>).</p>
+      <div class="osi-stack">
+        <div class="osi-layer l7"><div class="num">L7</div><div class="name">Application</div><div class="ex">HTTP, DNS, SMB — what users/programs directly interact with</div></div>
+        <div class="osi-layer l6"><div class="num">L6</div><div class="name">Presentation</div><div class="ex">Encryption (TLS), data formatting/translation</div></div>
+        <div class="osi-layer l5"><div class="num">L5</div><div class="name">Session</div><div class="ex">Opens/maintains/closes the connection session</div></div>
+        <div class="osi-layer l4"><div class="num">L4</div><div class="name">Transport</div><div class="ex">TCP (reliable) vs UDP (fast) — ports live here</div></div>
+        <div class="osi-layer l3"><div class="num">L3</div><div class="name">Network</div><div class="ex">IP addresses, routing between networks</div></div>
+        <div class="osi-layer l2"><div class="num">L2</div><div class="name">Data Link</div><div class="ex">MAC addresses, switches, ethernet frames</div></div>
+        <div class="osi-layer l1"><div class="num">L1</div><div class="name">Physical</div><div class="ex">Cables, signals, raw bits — the actual hardware</div></div>
+      </div>
+      <p style="margin-top:14px; font-size:13px; color:var(--muted);">Mnemonic: "<strong>A</strong>way <strong>P</strong>izza <strong>S</strong>aving <strong>T</strong>hrows <strong>N</strong>ear <strong>D</strong>runk <strong>P</strong>eople" (L7→L1) — or build your own, it sticks better.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// real, named incident — across multiple layers</div>
+    <div class="breach-grid">
+      <div class="breach-card">
+        <div class="year">2017 — WANNACRY / ETERNALBLUE</div>
+        <div class="name">A multi-layer attack, textbook example</div>
+        <div class="detail">WannaCry spread using EternalBlue, an exploit in Microsoft's SMB protocol (Layer 7 — Application). It traveled over TCP port 445 (Layer 4 — Transport), routed across networks via IP (Layer 3 — Network), infecting 200,000+ computers in 150+ countries within days, including the UK's NHS. Understanding which layer a vulnerability lives at tells you exactly what kind of defense actually stops it — in this case, blocking port 445 at the firewall (Layer 4) and patching SMB (Layer 7) both mattered.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>"Which layer has the weakest control here — can I spoof a MAC address (L2), forge an IP (L3), or exploit the application protocol itself (L7)?"</li>
+          <li>Lower-layer attacks (ARP spoofing, MAC flooding) are often invisible to application-layer security tools entirely.</li>
+          <li>EternalBlue worked because the protocol itself (SMBv1) was flawed — no amount of "be careful what you click" would've stopped it.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>"Defense needs a control at every layer — firewall rules (L3/4), encryption (L6), and patched application protocols (L7) — one layer alone is never enough."</li>
+          <li>Knowing which layer an alert came from tells you which team/tool should respond.</li>
+          <li>Disabling legacy protocols (like SMBv1) proactively removes entire categories of future exploits.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/osimodelzi</strong> and start the room (free).</li>
+        <li>Work through all 7 layer tasks — each one asks a short, direct question about that layer's job.</li>
+        <li>Play the room's "OSI dungeon" mini-game — navigate the 7 layers in correct order to get the flag.</li>
+        <li>Run the terminal drill below to see Layer 3/4 information on your own machine.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> the flag from the OSI dungeon game + a screenshot of your terminal output below.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># see Layer 3 (IP) and Layer 2 (MAC) info on your own machine</span>
+<span class="cmd">ip addr show</span>
+<span class="out">eth0: inet 192.168.1.42/24 ... link/ether 08:00:27:4a:9c:01</span>
+<span class="c"># 192.168.1.42 = Layer 3 (IP)   |   08:00:27:4a:9c:01 = Layer 2 (MAC)</span>
+
+<span class="c"># see Layer 4 (TCP) in action — list active connections + ports</span>
+<span class="cmd">ss -tunp</span>
+<span class="out">State  Local Address:Port   Peer Address:Port
+ESTAB  192.168.1.42:443     142.250.x.x:54021</span>
+<span class="c"># port 443 = HTTPS, Layer 4 transport, Layer 7 application underneath</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Why does the OSI model matter in practice, not just theory?"</div>
+        <div class="a">A: "It tells you where to look and what tool to reach for. WannaCry in 2017 is a clean example — the actual flaw (EternalBlue) lived in SMB at Layer 7, but it traveled over TCP port 445 at Layer 4 and routed via IP at Layer 3. That meant defense needed action at multiple layers: blocking port 445 at the firewall, and patching the SMB protocol itself. If I only think 'the network is broken' without knowing which layer, I can't pick the right fix."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>When you eventually explain a security gap to a non-technical client, the OSI model gives you a simple way to translate: "your firewall protects layer 3 and 4, but layer 7 — your actual web application — has separate vulnerabilities that need separate testing." This kind of layered explanation makes a freelance security assessment sound thorough and credible rather than vague, and naturally upsells a client from "just a firewall check" into a fuller audit package — exactly the kind of conversation that grows a one-off gig into a retained client for your future firm.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Sending data across a network is like mailing a letter through several layers of packaging — a letter (Application), sealed in an envelope (Presentation), placed in a labeled box (Session), with a shipping label and tracking number (Transport), routed through sorting centers by address (Network), carried by a specific truck (Data Link), driving on an actual road (Physical). WannaCry in 2017 exploited a flaw in how one specific 'package label' (the SMB protocol) was handled — and because nearly everyone used the same mail system, it spread to 150+ countries in days."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used a real, named, multi-layer incident (WannaCry/EternalBlue) instead of an abstract explanation.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — ran real terminal commands to see L2/L3/L4 data directly, not just memorized layer names.</div>
+      <div class="mistake-item"><span class="check">✓</span> Stayed on OSI specifically — TCP/IP deep-dive saved for Day 7, no scattering.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured against Day 1–5, not anyone else's pace.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=hWIktHvNjeM" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">TryHackMe — "OSI Model - Networking Basics" (official room walkthrough)</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=hWIktHvNjeM</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/osimodelzi" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — OSI Model room</div>
+        <div class="res-desc">Today's main lab. Free, includes the OSI dungeon game + flag.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name all 7 OSI layers in order, both directions.</li>
+        <li><span class="box"></span> I can explain what "encapsulation" means.</li>
+        <li><span class="box"></span> I can map WannaCry/EternalBlue onto at least 3 layers.</li>
+        <li><span class="box"></span> I completed the TryHackMe OSI Model room + dungeon game flag.</li>
+        <li><span class="box"></span> I explained today's concept to a non-technical person before posting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">06 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 07</div>
+      <div class="title">Networking II — TCP/IP & ports</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 7" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 — Python for Security II: Sockets & Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:12.2%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day11$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 11/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 11 OF 90</div>
+  <h1>Python for Security II <span class="accent">— sockets & automation</span></h1>
+  <p class="subtitle">Day 10 gave you the syntax. Today you use it for real — building network tools from scratch using Python sockets, the same library that powers everything from port scanners to reverse shells to the Mirai botnet.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is a socket?</strong> A socket is a programming interface that lets your Python script open a real network connection — the same way a browser connects to a website, or Nmap connects to a port. Think of it as a phone handset in code: you dial (connect), talk (send data), listen (receive data), and hang up (close).</p>
+
+      <div class="callout"><strong>Two types you need to know:</strong>
+        <br><code>socket.SOCK_STREAM</code> = TCP socket — reliable, ordered, connection-based. Use for web, SSH, anything that needs guaranteed delivery.
+        <br><code>socket.SOCK_DGRAM</code> = UDP socket — fast, connectionless, fire-and-forget. Use for DNS queries, speed-critical recon.</div>
+
+      <p style="margin-top:14px;"><strong>The four socket actions every script uses:</strong></p>
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">s = socket.socket()</div>
+          <div class="cdesc">Creates the socket object. AF_INET = IPv4. SOCK_STREAM = TCP.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">s.connect((ip, port))</div>
+          <div class="cdesc">Opens the TCP connection — completes the 3-way handshake you learned on Day 7.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">s.send(data.encode())</div>
+          <div class="cdesc">Sends data as bytes. You must encode strings — sockets speak bytes, not strings.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">s.recv(1024)</div>
+          <div class="cdesc">Receives up to 1024 bytes of response. Decode with .decode() to read as text.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Automation pattern — why this scales:</strong> once you can open one socket connection in Python, a for loop makes it scan 65,535 ports. Two nested loops make it scan an entire subnet. This is literally how network scanners, brute-forcers, and botnets work — the same 10 lines of socket code, looped intelligently.</p>
+
+      <div class="callout amber"><strong>Important:</strong> always use <code>s.settimeout()</code> in your scripts — without it, a connection attempt to a closed/filtered port can hang forever and your script freezes. 0.5–1 second is standard for scanning scripts.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2016 — MIRAI BOTNET SOURCE CODE RELEASE</div>
+      <div class="name">Python socket automation at internet scale — used to take down half the internet</div>
+      <div class="detail">Mirai was a botnet that automated exactly what you're learning today — socket connections at massive scale. It scanned the entire IPv4 internet (every public IP address) for open Telnet ports (port 23) using concurrent socket connections, then attempted login with 61 default username/password combinations. Devices that accepted the defaults (routers, cameras, DVRs) were absorbed into the botnet. The result: the October 2016 Dyn DNS attack (from Day 1!) that took Twitter, Netflix, and Reddit offline for hours. The Mirai source code was released publicly in 2016 and immediately spawned hundreds of variants. Every one of them built on the same socket automation concept you're writing today — the difference is authorization and intent.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Automation is the real weapon — scanning 65,535 ports by hand is impossible, but a Python socket loop does it in minutes.</li>
+          <li>Mirai's genius was concurrent scanning — not waiting for one connection before trying the next, but opening thousands simultaneously.</li>
+          <li>Default credentials are still an attack surface in 2026 — most IoT devices still ship with admin/admin or similar. Scripted credential checks are trivial.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Your own Python scripts can scan your infrastructure for open ports and default credentials before an attacker does — same tool, authorized context.</li>
+          <li>Detecting Mirai-style scans: watch for one source IP attempting connections to hundreds of different IPs on the same port in a short window — that's a scanner signature.</li>
+          <li>Rate limiting and connection throttling are the network-level defenses against automated socket-based scanning.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/pythonforcybersecurity</strong> — covers network scanner, port scanner, hash cracker, SSH brute-forcer using Python.</li>
+        <li>Complete the Network Scanner task (uses Scapy + ARP) and Port Scanner task (socket-based) — these build directly on today's lesson.</li>
+        <li>Write both scripts below on your own machine and run them — the banner grabber and the multi-port threaded scanner.</li>
+        <li>Push both scripts to GitHub. Two more portfolio pieces today.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of completed TryHackMe room tasks + your own banner grabber output + threaded scanner running. Push all to GitHub with README.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Script 1: banner_grabber.py — identify what's running on an open port</span>
+<span class="out">import socket
+
+def grab_banner(ip, port):
+    try:
+        s = socket.socket()
+        s.settimeout(2)
+        s.connect((ip, port))
+        banner = s.recv(1024).decode().strip()
+        s.close()
+        return banner
+    except:
+        return None
+
+target = "scanme.nmap.org"
+ports  = [22, 80, 21]
+
+for p in ports:
+    b = grab_banner(target, p)
+    if b:
+        print(f"Port {p}: {b[:60]}")</span>
+
+<span class="cmd">python3 banner_grabber.py</span>
+<span class="out">Port 22: SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
+Port 80: (HTTP response header)</span>
+<span class="hi"># banner tells you the service AND version — exact input for CVE lookup</span>
+
+<span class="c"># Script 2: threaded_scanner.py — scan faster using threads (like Mirai did)</span>
+<span class="out">import socket
+import threading
+
+open_ports = []
+
+def scan(ip, port):
+    try:
+        s = socket.socket()
+        s.settimeout(0.5)
+        s.connect((ip, port))
+        open_ports.append(port)
+        s.close()
+    except:
+        pass
+
+target = "scanme.nmap.org"
+threads = []
+
+for port in range(1, 1025):
+    t = threading.Thread(target=scan, args=(target, port))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+
+print(f"Open ports: {sorted(open_ports)}")</span>
+
+<span class="cmd">python3 threaded_scanner.py</span>
+<span class="out">Open ports: [22, 80]</span>
+<span class="hi"># threading makes this ~100x faster than sequential scanning</span>
+<span class="hi"># this is the exact technique Mirai used at internet scale</span></div>
+    </div>
+
+    <div class="callout red" style="margin-top:14px;"><strong>Legal reminder:</strong> only scan systems you own or have explicit written permission to test. <code>scanme.nmap.org</code> is Nmap's official legal test target. Scanning anything else without authorization is illegal — same rule as Day 2.</div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How would you use Python sockets in a real security context?"</div>
+        <div class="a">A: "I've built two types of tools: a banner grabber that connects to open ports and reads the service version string — which feeds directly into CVE lookups — and a threaded port scanner that scans a range concurrently using Python's threading module for speed. This is the same socket automation technique the Mirai botnet used in 2016 to scan the entire internet for open Telnet ports and default credentials — which ultimately powered the Dyn DNS attack that took Twitter and Netflix offline. Understanding the mechanism makes it straightforward to detect: one source IP rapidly connecting to many destinations on the same port is the scanner signature you'd watch for in a SIEM."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">GitHub Copilot</div>
+        <div class="adesc">Write a comment like "# thread pool port scanner with timeout" and Copilot generates the full script. Speeds up tool building 5-10x.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Paste a suspicious script and ask "explain this socket code line by line." Essential for analyzing malware scripts or unfamiliar tools.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Scapy + AI</div>
+        <div class="adesc">Scapy is the Python packet crafting library. Ask ChatGPT to help write custom ARP, ICMP, or TCP packets for specific recon scenarios.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Shodan (AI-indexed)</div>
+        <div class="adesc">Shodan does internet-scale banner grabbing 24/7. Use it to find exposed services instead of scanning the whole internet yourself — legal, fast, free tier available.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Developed multithreaded Python network scanner and banner-grabbing tool using socket and threading libraries; used for authorized service enumeration and version identification during lab assessments."</li>
+        <li><strong>Campus interview:</strong> Say — "I've built socket-based tools in Python that replicate core functionality of industry tools like Nmap. I also understand offensive automation at scale through studying Mirai's source code — the same socket loop technique, but used to scan the entire internet for vulnerable IoT devices in 2016. Understanding how it works is how I'd detect it as a defender." Most students say "I know Python." You're explaining a real architecture.</li>
+        <li><strong>GitHub portfolio:</strong> Push <code>banner_grabber.py</code> and <code>threaded_scanner.py</code> today. Add a <code>README.md</code> that says "legal use only, built for authorized lab assessments." Two more tools. Recruiters count these.</li>
+        <li><strong>Next level:</strong> combine Day 10's port_checker + today's banner grabber into one script that outputs a CSV report — that's a real, deliverable recon tool.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Every script you write this week is moving toward a product. A banner grabber + port scanner + CSV output = a "network exposure report" tool. Package it with a clean interface, run it for a client's external IP, and hand over a one-page PDF. That's a ₹3,000–₹8,000 deliverable that took you 2 hours, once your scripting is solid. At your future firm, custom Python tooling is what separates you from consultants who resell generic automated scanner output — your tools are yours, tuned to your clients, priced accordingly.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "A socket in programming is like a phone call — you dial a number (connect to an IP and port), say something (send data), hear the response (receive data), and hang up (close the connection). A loop does this for thousands of numbers automatically. Mirai, the malware behind the 2016 internet outage, just automated that loop across every device connected to the internet — checking if the 'door' (Telnet port 23) was open and whether the house key was still the factory default. Most were."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=x4AE5yOF9pE" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Python Nmap Port Scanner — Socket + Nmap Library Tutorial</div><div class="res-desc">youtube.com/watch?v=x4AE5yOF9pE — builds both socket-based and nmap-library scanners side by side</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=YCfCZxYOTik" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Socket Programming in Python — Hindi</div><div class="res-desc">youtube.com/watch?v=YCfCZxYOTik — socket concepts in Hindi, client-server model explained clearly</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/pythonforcybersecurity" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Python for Cybersecurity</div><div class="res-desc">Free room — network scanner, port scanner, hash cracker, SSH brute-forcer. Today's lab.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Real named incident (Mirai + Dyn attack) — same concepts from Day 1 now connected to Day 11.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — wrote two real working tools, pushed to GitHub.</div>
+      <div class="mistake-item"><span class="check">✓</span> Built directly on Days 7 (TCP) + 10 (Python syntax) — cohesive phase, no scatter.</div>
+      <div class="mistake-item"><span class="check">✓</span> Two more GitHub portfolio pieces today. Visible proof, not just knowledge.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–10 baseline. No comparison to others.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain what a socket is in plain language and the difference between TCP and UDP sockets.</li>
+        <li><span class="box"></span> I wrote and ran banner_grabber.py — read a real service banner from a live host.</li>
+        <li><span class="box"></span> I wrote and ran threaded_scanner.py — understood why threading makes scanning faster.</li>
+        <li><span class="box"></span> I completed TryHackMe Python for Cybersecurity (network scanner + port scanner tasks).</li>
+        <li><span class="box"></span> Both scripts are on GitHub with READMEs.</li>
+        <li><span class="box"></span> I can explain Mirai's socket automation technique and how to detect it as a defender.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">11 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 12</div>
+      <div class="title">Windows internals basics — registry, processes & event logs</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 12" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

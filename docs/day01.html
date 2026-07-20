@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 01 — What is Cybersecurity + the CIA Triad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted);
+    border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;
+  }
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:1.1%; height:100%; background:var(--green);}
+
+  .day-tag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px;
+    background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3);
+    padding:5px 12px; border-radius:20px; margin-bottom:18px;
+  }
+  .day-tag::before{content:'●'; font-size:9px;}
+
+  h1{
+    font-family:'IBM Plex Mono',monospace; font-weight:700;
+    font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;
+  }
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+
+  section{margin-bottom:34px;}
+
+  .tag-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.06em;
+    padding:6px 14px; border-radius:20px; margin-bottom:16px;
+  }
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{
+    background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px;
+    padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);
+  }
+
+  .card{
+    background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;
+  }
+
+  /* CIA triad visual */
+  .triad{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .triad-node{
+    flex:1; min-width:160px; background:var(--bg); border:1px solid var(--panel-edge);
+    border-radius:10px; padding:18px; text-align:center;
+  }
+  .triad-node .letter{font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:700; margin-bottom:6px;}
+  .triad-node.c .letter{color:var(--cyan);} .triad-node.i .letter{color:var(--green);} .triad-node.a .letter{color:var(--amber);}
+  .triad-node .tname{font-weight:600; font-size:14px; margin-bottom:6px;}
+  .triad-node .tdesc{font-size:12.5px; color:var(--muted);}
+
+  /* real breach examples */
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{
+    background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px;
+    border-left:3px solid var(--panel-edge);
+  }
+  .breach-card.c{border-left-color:var(--cyan);} .breach-card.i{border-left-color:var(--green);} .breach-card.a{border-left-color:var(--amber);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  /* mindset two-column */
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{
+    flex:1; min-width:240px; border-radius:10px; padding:18px 20px;
+  }
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{
+    background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px;
+    padding:0; margin-top:14px; overflow:hidden;
+  }
+  .term-chrome{
+    display:flex; align-items:center; gap:8px; padding:10px 14px;
+    background:#0e1517; border-bottom:1px solid var(--panel-edge);
+  }
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{
+    counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;
+  }
+  .lab-steps li::before{
+    content:counter(step); position:absolute; left:0; top:0;
+    width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green);
+    color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .deliverable{
+    margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25);
+    border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);
+  }
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{
+    background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05));
+    border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;
+  }
+
+  .teach-card{
+    background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;
+  }
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px;
+    text-decoration:none; color:var(--text); transition:border-color .2s;
+  }
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan);
+    border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;
+  }
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  /* mistakes tracker */
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{
+    display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge);
+    border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;
+  }
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 0;
+    border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  /* day complete stamp */
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{
+    border:3px solid var(--green); border-radius:50%; width:160px; height:160px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);
+  }
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{
+    background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04));
+    border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day01$ cat lesson.md</span>
+    <div class="progress">Day 1 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 01 OF 90</div>
+  <h1>What is Cybersecurity? <span class="accent">+ the CIA Triad</span></h1>
+  <p class="subtitle">Before any tool, any language, any certificate — every security decision traces back to three words. Today you learn them as a working lens, not a flashcard definition.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>Cybersecurity is the practice of protecting three properties of information and systems: that data stays <strong>private</strong>, stays <strong>accurate</strong>, and stays <strong>available</strong> when needed. This is the <strong>CIA Triad</strong> — Confidentiality, Integrity, Availability — and it's the single model every other concept in this roadmap will map onto.</p>
+      <div class="triad">
+        <div class="triad-node c"><div class="letter">C</div><div class="tname">Confidentiality</div><div class="tdesc">Only the right people can see the data.</div></div>
+        <div class="triad-node i"><div class="letter">I</div><div class="tname">Integrity</div><div class="tdesc">Data isn't altered without authorization.</div></div>
+        <div class="triad-node a"><div class="letter">A</div><div class="tname">Availability</div><div class="tdesc">Systems are usable when legitimately needed.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;">// real, named incidents — not hypotheticals</div>
+    <div class="breach-grid">
+      <div class="breach-card c">
+        <div class="year">2017 — CONFIDENTIALITY BROKEN</div>
+        <div class="name">Equifax</div>
+        <div class="detail">An unpatched Apache Struts vulnerability let attackers access the personal data of roughly 147 million people — names, SSNs, birth dates. Nothing was altered, nothing went offline. Pure confidentiality failure, and it's still the textbook case study for "patch your stuff."</div>
+      </div>
+      <div class="breach-card i">
+        <div class="year">2010 — INTEGRITY BROKEN</div>
+        <div class="name">Stuxnet</div>
+        <div class="detail">This worm didn't steal or leak anything — it secretly altered the logic running Iranian centrifuge controllers, making them spin at damaging speeds while reporting normal readings. The data shown to operators was a lie. Classic integrity attack.</div>
+      </div>
+      <div class="breach-card a">
+        <div class="year">2016 — AVAILABILITY BROKEN</div>
+        <div class="name">Dyn DNS / Mirai Botnet</div>
+        <div class="detail">A botnet of hijacked IoT devices flooded Dyn's DNS servers with traffic, knocking Twitter, Netflix, Reddit, and Spotify offline for hours across the US. No data was stolen or changed — the services simply became unreachable.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker sees CIA</div>
+        <ul>
+          <li>"Which of these three is weakest at this target, and cheapest for me to break?"</li>
+          <li>Confidentiality is usually the highest-value target (data sells, or extorts).</li>
+          <li>Availability attacks (DDoS/ransomware) are often the loudest, fastest way to cause pain with the least skill required.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender sees CIA</div>
+        <ul>
+          <li>"Which of these three matters most for THIS specific system, and what's my budget to protect it?"</li>
+          <li>A hospital prioritizes Availability (patient care can't wait) almost as much as Confidentiality.</li>
+          <li>A bank prioritizes Integrity above almost everything — a wrong number is catastrophic even if no one "stole" anything.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <p>Today's lab is a real, free TryHackMe room built specifically for this exact concept.</p>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/theciatriad</strong> and create a free account if you haven't already.</li>
+        <li>Complete Task 1 (Introduction) and Task 2 (Understanding the CIA Triad) — these are short, direct questions mapping definitions to scenarios.</li>
+        <li>Complete Task 3 (The Security Mindset) — this task gives you a short scenario-based exercise and a flag to capture.</li>
+        <li>Screenshot your completed room (showing all green checkmarks) for your records.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a screenshot of the completed TryHackMe room + the captured flag from Task 3. Save it — this becomes your LinkedIn proof-of-learning graphic.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># bonus: see CIA in action at the OS level, right now</span>
+<span class="cmd">ls -l /etc/shadow</span>
+<span class="out">-rw-r----- 1 root shadow 1230 Jun 23 09:12 /etc/shadow</span>
+<span class="c"># only root can read this file — Confidentiality, enforced by Linux permissions itself.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through the CIA Triad with a real example."</div>
+        <div class="a">A: "Confidentiality, Integrity, and Availability. Equifax in 2017 is a clean Confidentiality failure — 147 million records exposed, nothing altered. Stuxnet is the classic Integrity attack — it fed false sensor data while secretly damaging equipment. And the 2016 Dyn DNS attack, powered by the Mirai botnet, is a textbook Availability failure — Twitter and Netflix went dark for hours with nothing stolen or changed. Every incident I study, I try to place against this triad first — it's the fastest way to understand impact."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>When you eventually pitch a small business on a basic security review, you won't say "I'll hack your stuff" — you'll say <strong>"I'll assess your exposure across Confidentiality, Integrity, and Availability and hand you a one-page risk summary."</strong> That single sentence, framed around a model business owners can actually picture (data privacy, data accuracy, uptime), is the opening line of your future firm's first service offering. Most self-taught beginners never learn to frame their value this clearly — you're building that habit from Day 1.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p><strong>Before you post anything publicly</strong>, explain the CIA Triad out loud to someone non-technical — a parent, a friend, anyone — using zero jargon. Try this framing: "Imagine your diary. Confidentiality is making sure only you can read it. Integrity is making sure no one secretly rewrites pages in it. Availability is making sure you can actually find and open it when you want to." If you can get a non-technical person to nod and say "okay, that makes sense" — you've actually learned it. If you can't, you've memorized it, not understood it.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> No cert-chasing — went straight to fundamentals + a real lab.</div>
+      <div class="mistake-item"><span class="check">✓</span> No tutorial hell — ~70% of the hour was hands-on (TryHackMe), not passive watching.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real lab completed, not just theory read.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back step done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress logged against Day 1 — your own baseline, not anyone else's.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=SBcDGb9l6yo" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">Professor Messer — "The CIA Triad" (Security+ SY0-701, 1.2)</div>
+        <div class="res-desc">~5 min, free, no fluff. Verified link: youtube.com/watch?v=SBcDGb9l6yo</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/theciatriad" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — The CIA Triad room</div>
+        <div class="res-desc">Today's lab. Free, ~20-30 min, includes a flag capture exercise.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain C/I/A in my own words, not the textbook definition.</li>
+        <li><span class="box"></span> I can name a real incident for each of the three (not necessarily the ones above).</li>
+        <li><span class="box"></span> I completed the TryHackMe "The CIA Triad" room and captured the flag.</li>
+        <li><span class="box"></span> I explained the diary analogy (or my own) to a non-technical person.</li>
+        <li><span class="box"></span> I screenshotted my lab completion for tomorrow's LinkedIn post.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">01 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 02</div>
+      <div class="title">Types of hackers & attack categories — thinking like the enemy</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 2" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

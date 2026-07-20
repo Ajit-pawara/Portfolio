@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 07 — Networking II: TCP/IP & Ports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.65;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;}
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:7.7%; height:100%; background:var(--green);}
+  .day-tag{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px; background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
+  .day-tag::before{content:'●'; font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+  .tag-pill{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:6px 14px; border-radius:20px; margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px; padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);}
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:24px 26px;}
+  .callout{
+    background:rgba(79,209,255,0.06); border-left:3px solid var(--cyan); border-radius:8px;
+    padding:14px 18px; margin:14px 0; font-size:14px; color:#cdd6da;
+  }
+  .callout strong{color:var(--cyan);}
+
+  /* handshake visual */
+  .handshake{display:flex; flex-direction:column; gap:10px; margin-top:16px;}
+  .hs-step{display:flex; align-items:center; gap:14px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:12px 16px;}
+  .hs-step .arrow{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; width:90px; flex-shrink:0;}
+  .hs-step.syn .arrow{color:var(--cyan);}
+  .hs-step.synack .arrow{color:var(--amber);}
+  .hs-step.ack .arrow{color:var(--green);}
+  .hs-step .desc{font-size:13.5px; color:#cdd6da;}
+
+  /* port table */
+  .port-table{display:flex; flex-direction:column; gap:6px; margin-top:14px;}
+  .port-row{display:flex; gap:14px; align-items:center; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 14px;}
+  .port-row .pnum{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--cyan); width:50px; flex-shrink:0;}
+  .port-row .pname{font-weight:600; font-size:13.5px; width:90px; flex-shrink:0;}
+  .port-row .pdesc{font-size:12.5px; color:var(--muted);}
+
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; border-left:3px solid var(--red);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green); color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{border:3px solid var(--green); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);}
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04)); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} .hs-step{flex-wrap:wrap;} .port-row{flex-wrap:wrap;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day07$ cat lesson.md</span>
+    <div class="progress">Day 7 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 07 OF 90</div>
+  <h1>Networking II <span class="accent">— TCP/IP & Ports</span></h1>
+  <p class="subtitle">Yesterday you learned the 7-layer map. Today we slow right down and actually understand the two things that map is built on top of — TCP/IP, and ports — explained in plain language, step by step, so it actually sticks.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Let's start with the simplest version of the idea.</strong> Every device on the internet needs two things to talk to another device: an <strong>address</strong> (so the message knows where to go) and a <strong>door number</strong> at that address (so the message knows which specific program inside the device should receive it). That's really all IP addresses and ports are.</p>
+
+      <p><strong>IP address</strong> = the address of the building. Every device connected to a network gets one, like <code>192.168.1.42</code>. It's how data finds the right computer out of millions.</p>
+      <p><strong>Port</strong> = the specific door/apartment number at that address. A single computer might be running a web server, an email server, and an SSH server all at once — ports are how incoming data knows which one of those programs to go to. Ports are simply numbers, 0 to 65535.</p>
+
+      <div class="callout">Think of it like a big apartment building. The IP address gets your letter to the right building. The port number is the apartment number that gets it to the right door inside that building. Without the apartment number, the mail carrier would just dump every letter in the lobby and nobody would know whose mail is whose — that's basically what happens on a computer without ports.</div>
+
+      <p style="margin-top:18px;"><strong>Now, how does TCP actually work?</strong> TCP (Transmission Control Protocol) is the most common way data is reliably sent across a network. Before any real data is sent, the two computers do a quick "handshake" to agree they're both ready — this is called the <strong>three-way handshake</strong>, and it happens every single time you load a webpage, with zero of it visible to you.</p>
+
+      <div class="handshake">
+        <div class="hs-step syn"><div class="arrow">1. SYN →</div><div class="desc">Your computer says: "Hi, I'd like to start a conversation. Here's a starting number to keep track of our messages."</div></div>
+        <div class="hs-step synack"><div class="arrow">2. SYN-ACK ←</div><div class="desc">The server replies: "Got it, I'm ready too. Here's MY starting number, and confirmation I received yours."</div></div>
+        <div class="hs-step ack"><div class="arrow">3. ACK →</div><div class="desc">Your computer replies: "Perfect, confirmed. Let's start actually sending data now."</div></div>
+      </div>
+
+      <p style="margin-top:16px;">Why does this matter for security? Because that handshake requires the server to <strong>set aside memory and wait</strong> for step 3 to arrive. If an attacker sends thousands of step-1 messages (SYN) and never sends step 3, the server sits there holding open all those half-finished conversations until it runs out of resources and crashes. This exact technique is called a <strong>SYN flood</strong> — and it's one of the oldest, simplest denial-of-service attacks that still works today if a server isn't protected against it.</p>
+
+      <p style="margin-top:16px;"><strong>A few ports you'll see constantly</strong> — memorize these, they come up in almost every lab and every interview:</p>
+      <div class="port-table">
+        <div class="port-row"><div class="pnum">21</div><div class="pname">FTP</div><div class="pdesc">File transfer — often unencrypted, a common target</div></div>
+        <div class="port-row"><div class="pnum">22</div><div class="pname">SSH</div><div class="pdesc">Secure remote login — encrypted terminal access</div></div>
+        <div class="port-row"><div class="pnum">80</div><div class="pname">HTTP</div><div class="pdesc">Regular, unencrypted web traffic</div></div>
+        <div class="port-row"><div class="pnum">443</div><div class="pname">HTTPS</div><div class="pdesc">Encrypted web traffic — what your browser shows as the padlock icon</div></div>
+        <div class="port-row"><div class="pnum">3389</div><div class="pname">RDP</div><div class="pdesc">Windows Remote Desktop — a very common attacker target if exposed to the internet</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// real, named incident — not hypothetical</div>
+    <div class="breach-grid">
+      <div class="breach-card">
+        <div class="year">FEBRUARY 2000 — "MAFIABOY" SYN FLOOD ATTACKS</div>
+        <div class="name">A 15-year-old took down Yahoo, eBay, CNN, and Amazon</div>
+        <div class="detail">Using exactly the SYN flood technique explained above, a Canadian teenager known online as "MafiaBoy" launched distributed denial-of-service attacks that knocked Yahoo (then the web's top search engine), CNN, eBay, Amazon, and Dell offline for hours, causing an estimated $1.2 billion in damages globally. He was caught after bragging about it in IRC chatrooms. The technical lesson hasn't changed in 25 years: the three-way handshake, if left unprotected, can be weaponized by flooding step 1 and never completing step 3.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>"Which ports are actually open and listening on this target?" — this is the very first question in almost every real attack, found using a port scanner.</li>
+          <li>An open port is an opportunity — each one represents a running service, and every running service has its own potential vulnerabilities.</li>
+          <li>Flooding the handshake itself (SYN flood) can take a target offline without ever needing a "real" vulnerability at all.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>"Does this server actually need this port open to the internet, or can I close/restrict it?" — every unnecessary open port is unnecessary risk.</li>
+          <li>Modern firewalls and servers use "SYN cookies" specifically to survive SYN flood attempts without exhausting memory.</li>
+          <li>Regularly scanning your own systems (the same way an attacker would) is the only reliable way to know what's actually exposed.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p style="margin-bottom:10px;">Today's lab uses Nmap — the most widely used port-scanning tool in the entire security industry — for the very first time, in the gentlest possible way.</p>
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/nmap02</strong> ("Nmap Basic Port Scans") and deploy the target machine.</li>
+        <li>Run a basic TCP connect scan against the target and read the output carefully — you'll see exactly the open/closed/filtered states explained above, for real.</li>
+        <li>Find which ports are open on the target, and try to guess what each open port is used for before checking the room's hints — this guessing habit is what builds real intuition.</li>
+        <li>Run the terminal drill below on your own machine to see your own open ports.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a screenshot of your Nmap scan results from the room, with the open ports you found and what service you believe each one runs.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># see which ports are open and listening on YOUR OWN machine first</span>
+<span class="cmd">ss -tuln</span>
+<span class="out">Netid State  Local Address:Port
+tcp   LISTEN 0.0.0.0:22
+tcp   LISTEN 127.0.0.1:631</span>
+<span class="c"># port 22 = SSH listening on all interfaces, port 631 = local printing service</span>
+
+<span class="c"># now scan a target machine in the THM lab (only do this on systems you're authorized for)</span>
+<span class="cmd">nmap -sT [target-ip]</span>
+<span class="out">PORT    STATE  SERVICE
+22/tcp  open   ssh
+80/tcp  open   http</span>
+<span class="c"># -sT performs a full TCP connect scan -- it completes the entire 3-way handshake</span>
+<span class="c"># for every port, which is why it's the gentlest, most "complete" scan to start with</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain the TCP three-way handshake and why it matters for security."</div>
+        <div class="a">A: "TCP establishes a reliable connection using three steps — SYN, SYN-ACK, ACK — where both sides confirm they're ready before real data flows. It matters for security because the server has to hold resources open after step one, waiting for step three. If that's exploited — sending thousands of SYN requests and never finishing the handshake — you get a SYN flood, exactly what 'MafiaBoy' used in 2000 to take down Yahoo, eBay, and CNN. Modern defenses like SYN cookies exist specifically because of attacks like that one."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>A basic "open port exposure check" is one of the simplest, fastest things you can offer a small business with their own server or website: scan their public IP, show them exactly which ports are open to the world, and flag anything unnecessary (like RDP port 3389 exposed directly to the internet, a very common real-world mistake). Explaining it in plain terms — "your front door (port 22) is locked properly, but you also have a side window (port 3389) wide open" — makes the risk land immediately for a non-technical business owner, and it's a natural opener into a bigger security engagement.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Every website you visit, your computer first 'knocks' on the door (SYN), the website says 'come on in, I'm ready' (SYN-ACK), and your computer says 'great, here I come' (ACK) — only then does the actual page load. In 2000, a teenager flooded major websites like Yahoo and eBay with thousands of fake knocks that never finished the conversation, until the websites had no doors left to answer with and crashed. That's still a real attack today, just better defended against now."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used a real, named incident (MafiaBoy) instead of an abstract "DDoS is bad" statement.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — ran a real Nmap scan against a real lab target, not just read about ports.</div>
+      <div class="mistake-item"><span class="check">✓</span> Built directly on Day 6 (OSI) rather than jumping topics — TCP/IP lives at Layers 3–4.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured against Day 1–6, not anyone else's pace.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Hbov_1k1hH4" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">"Network Ports Explained 🔌 TCP, UDP, Ranges & Scanning"</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=Hbov_1k1hH4</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/nmap02" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — Nmap Basic Port Scans</div>
+        <div class="res-desc">Today's main lab. Free, your first real port scan.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain, in my own words, the difference between an IP address and a port.</li>
+        <li><span class="box"></span> I can list all three steps of the TCP handshake and explain why it needs three steps, not one.</li>
+        <li><span class="box"></span> I can explain what a SYN flood is and why it works.</li>
+        <li><span class="box"></span> I ran a real Nmap scan in the TryHackMe lab and read the actual output.</li>
+        <li><span class="box"></span> I explained today's concept to a non-technical person before posting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">07 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 08</div>
+      <div class="title">Networking III — DNS, HTTP/HTTPS & DHCP</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 8" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 03 — Linux Fundamentals I: Filesystem & Permissions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;}
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:3.3%; height:100%; background:var(--green);}
+  .day-tag{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px; background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
+  .day-tag::before{content:'●'; font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+  .tag-pill{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:6px 14px; border-radius:20px; margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px; padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);}
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;}
+
+  .tree{font-family:'IBM Plex Mono',monospace; font-size:13px; background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:18px 20px; margin-top:14px; overflow-x:auto;}
+  .tree .dir{color:var(--cyan);}
+  .tree .note{color:var(--muted); font-style:italic;}
+  .tree .danger{color:var(--red);}
+
+  .perm-breakdown{display:flex; gap:8px; margin-top:16px; font-family:'IBM Plex Mono',monospace; flex-wrap:wrap;}
+  .perm-seg{flex:1; min-width:90px; text-align:center; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:14px 8px;}
+  .perm-seg .val{font-size:20px; font-weight:700; color:var(--green); margin-bottom:4px;}
+  .perm-seg .lbl{font-size:10.5px; color:var(--muted); text-transform:uppercase;}
+
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; border-left:3px solid var(--panel-edge);}
+  .breach-card.c{border-left-color:var(--red);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green); color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{border:3px solid var(--green); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);}
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04)); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day03$ cat lesson.md</span>
+    <div class="progress">Day 3 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 03 OF 90</div>
+  <h1>Linux Fundamentals I <span class="accent">— filesystem & permissions</span></h1>
+  <p class="subtitle">Every pentest tool, every SOC server, every CTF box runs on Linux. Today you stop "knowing some commands" and start understanding the system the way attackers and defenders both have to.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>Linux uses one unified filesystem tree starting at <code>/</code>. A handful of directories matter more than the rest, security-wise:</p>
+      <div class="tree">
+/<span class="dir"> (root)</span>
+├── /etc/        <span class="note">→ config files. /etc/passwd & /etc/shadow live here</span>
+├── /home/       <span class="note">→ user dirs — attackers look for SSH keys, .bash_history here</span>
+├── /var/log/    <span class="note">→ system logs — where defenders spend a huge amount of time</span>
+├── /tmp/        <span class="danger">→ world-writable — attackers love dropping payloads here</span>
+├── /root/       <span class="danger">→ superuser's home — getting here = full compromise</span>
+└── /bin /usr/bin <span class="note">→ where executable programs live</span>
+      </div>
+      <p style="margin-top:16px;">Permissions are the actual access-control mechanism. <code>ls -l</code> shows strings like <code>rwxr-xr--</code> — not decoration, the literal lock and key.</p>
+      <div class="perm-breakdown">
+        <div class="perm-seg"><div class="val">r</div><div class="lbl">read (4)</div></div>
+        <div class="perm-seg"><div class="val">w</div><div class="lbl">write (2)</div></div>
+        <div class="perm-seg"><div class="val">x</div><div class="lbl">execute (1)</div></div>
+        <div class="perm-seg"><div class="val">owner</div><div class="lbl">user</div></div>
+        <div class="perm-seg"><div class="val">group</div><div class="lbl">group</div></div>
+        <div class="perm-seg"><div class="val">other</div><div class="lbl">everyone else</div></div>
+      </div>
+      <p style="margin-top:14px;"><code>rwxr-xr--</code> = owner rwx, group r-x, others r-- → numerically <code>754</code>. Memorize the number system, not just the letters — <code>chmod 754 file</code> shows up constantly in labs.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// real, named incident — not hypothetical</div>
+    <div class="breach-grid">
+      <div class="breach-card c">
+        <div class="year">2021 — PERMISSION/SUID MISCONFIGURATION</div>
+        <div class="name">PwnKit (CVE-2021-4034)</div>
+        <div class="detail">Qualys researchers found a memory-corruption flaw in Polkit's <code>pkexec</code> — a SUID-root binary present on nearly every major Linux distro by default. It had been exploitable for over 12 years before discovery, letting any local user escalate straight to root with a few lines of code. It's the cleanest real-world proof that SUID + permission misconfigurations aren't theoretical — they sat unnoticed in production systems worldwide for over a decade.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>"Once I have any shell, what SUID binaries or writable configs can I abuse to become root?"</li>
+          <li>World-writable files + root-owned execution = a near-guaranteed path to full compromise.</li>
+          <li><code>find / -perm -4000</code> is one of the first commands run after landing on a box.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>"What SUID binaries exist on this system, and do they actually need that bit?"</li>
+          <li>Audit permissions regularly — PwnKit existed for 12+ years because nobody was looking.</li>
+          <li>Never use <code>chmod 777</code> as a quick fix — it's the most common self-inflicted wound in real incident reports.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/linuxfundamentalspart1</strong> and deploy the free machine.</li>
+        <li>Work through the filesystem navigation tasks (<code>ls</code>, <code>cd</code>, <code>find</code>, <code>grep</code>) and the permissions section.</li>
+        <li>In your own terminal (or the deployed machine), run the permission drill below.</li>
+        <li>Optionally, search "TryHackMe Pwnkit CVE-2021-4034" for a follow-on room once Part 1 is done — it shows this exact concept being actively exploited.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your completed Linux Fundamentals Part 1 progress + the chmod 600 vs 777 output below.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 1. Create a test file and lock it down properly</span>
+<span class="cmd">touch secret.txt && chmod 600 secret.txt && ls -l secret.txt</span>
+<span class="out">-rw------- 1 robin robin 0 Jun 23 secret.txt</span>
+
+<span class="c"># 2. Now do the dangerous version ON PURPOSE, to see why it's dangerous</span>
+<span class="cmd">chmod 777 secret.txt && ls -l secret.txt</span>
+<span class="out">-rwxrwxrwx 1 robin robin 0 Jun 23 secret.txt</span>
+<span class="c"># Anyone on this system can now read/write/execute this file — this exact</span>
+<span class="c"># mistake shows up in real breach post-mortems constantly.</span>
+
+<span class="c"># 3. Find every SUID binary on the system — real recon, same command attackers use</span>
+<span class="cmd">find / -perm -4000 -type f 2>/dev/null</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain Linux permissions and why misconfigurations matter."</div>
+        <div class="a">A: "Every file has three permission sets — owner, group, others — built from read(4)/write(2)/execute(1). Misconfigured permissions are a real, proven attack vector: PwnKit, CVE-2021-4034, was a flaw in a default SUID-root binary that sat undiscovered for over 12 years across nearly every major Linux distro, letting any local user escalate to root. Reading a permission string correctly, and auditing SUID bits, is a baseline skill — not optional."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>A "Linux permissions & SUID audit" is one of the fastest freelance services you can offer — most cheap VPS/web hosting runs Linux. Run <code>find / -perm -4000</code> and <code>find / -writable -type d</code>, document anything risky, hand over a one-page fix list. Reference PwnKit by name in your pitch — "I check for the same class of misconfiguration that caused CVE-2021-4034" instantly sounds more credible than generic "I do security audits." A 30–60 min job, priced ₹3,000–₹8,000 — and it's a direct building block for your future firm's "basic security hygiene" package.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Every file on a computer has a lock with three keys — one for you, one for your team, one for everyone else. Each key can open the file to read, to rewrite, or to run it. A famous bug called PwnKit happened because one of those locks was left open by mistake on millions of computers for over a decade — and once someone noticed, they could turn themselves into the computer's 'owner' instantly." If that lands, you've actually understood it.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used a real, named, verifiable CVE (PwnKit) instead of a vague hypothetical.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — actual terminal commands run, not just read.</div>
+      <div class="mistake-item"><span class="check">✓</span> Stayed on one topic (filesystem + permissions) instead of scattering into chmod, users, AND processes at once.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured against Day 1–2, not anyone else's pace.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=o_2aXxEqtao" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">"Linux File Permissions: chmod, umask & ACLs Explained"</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=o_2aXxEqtao</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/linuxfundamentalspart1" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — Linux Fundamentals Part 1</div>
+        <div class="res-desc">Today's main lab. Free, guided, matches exactly what's above.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can read <code>rwxr-xr--</code> and convert it to <code>754</code> without a calculator.</li>
+        <li><span class="box"></span> I ran the chmod 600 / chmod 777 exercise and saw the real difference in <code>ls -l</code> output.</li>
+        <li><span class="box"></span> I ran the SUID-find command and can explain why PwnKit mattered.</li>
+        <li><span class="box"></span> I completed (or started) TryHackMe Linux Fundamentals Part 1.</li>
+        <li><span class="box"></span> I explained today's concept to a non-technical person before posting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">03 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 04</div>
+      <div class="title">Linux fundamentals II — users, processes, and the shell</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 4" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

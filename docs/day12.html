@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 12 — Windows Internals: Registry, Processes & Event Logs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:13.3%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .eventid-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-top:14px;}
+  .eventid{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+  .eventid .eid{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:15px;color:var(--amber);flex-shrink:0;min-width:50px;}
+  .eventid .edesc{font-size:12.5px;color:#cdd6da;}
+  .eventid.critical{border-color:rgba(255,92,92,0.3);}
+  .eventid.critical .eid{color:var(--red);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day12$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 12/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 12 OF 90</div>
+  <h1>Windows Internals <span class="accent">— Registry, Processes & Event Logs</span></h1>
+  <p class="subtitle">The world runs on Windows. Most corporate targets are Windows machines. Today you learn where attackers hide, how they persist, and — most importantly — how defenders detect them using the logs Windows generates by default.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+
+      <p><strong>Part 1: The Windows Registry — the database that controls everything.</strong></p>
+      <p>The Registry is a hierarchical database that stores all configuration settings for Windows and installed applications. Think of it as the control panel behind the control panel. It has five main "hives" (root keys):</p>
+
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">HKEY_LOCAL_MACHINE (HKLM)</div>
+          <div class="cdesc">Settings for the entire computer — all users, hardware, installed software. The most important hive for security.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">HKEY_CURRENT_USER (HKCU)</div>
+          <div class="cdesc">Settings for the currently logged-in user only. Malware that runs as a standard user hides here.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</div>
+          <div class="cdesc">THE persistence key — anything listed here runs automatically every time Windows starts. Attacker's favorite location.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">HKLM\SYSTEM\CurrentControlSet\Services</div>
+          <div class="cdesc">Windows services — malware often installs itself as a service here for deeper persistence.</div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;"><strong>Why this matters:</strong> registry persistence is how malware survives a reboot. If you remove malware from disk but don't clean the registry Run key, it re-executes next boot. SolarWinds SUNBURST (today's incident) stored configuration data in the registry to avoid writing suspicious files to disk.</div>
+
+      <p style="margin-top:16px;"><strong>Part 2: Core Windows Processes — know the real ones to spot the fakes.</strong></p>
+      <p>Just like TeamTNT renamed malware to "kworker" on Linux (Day 4), Windows malware commonly impersonates core system processes by name. Know the real ones:</p>
+
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">lsass.exe</div>
+          <div class="cdesc">Local Security Authority — handles authentication, stores password hashes in memory. Primary target for Mimikatz credential dumping. Should have ONE instance, parent = wininit.exe.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">svchost.exe</div>
+          <div class="cdesc">Service Host — runs Windows services in groups. Multiple instances are normal. Suspicious if running from anywhere except System32, or with no parent services.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">explorer.exe</div>
+          <div class="cdesc">Windows Explorer (desktop/file manager). One instance per logged-in user. Malware injects into this for evasion because it's always trusted.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">csrss.exe</div>
+          <div class="cdesc">Client Server Runtime — critical system process. If killed, Windows crashes. Malware spoofs it to avoid termination. Must run from System32.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Part 3: Windows Event Logs — the defender's source of truth.</strong></p>
+      <p>Windows automatically logs thousands of events. The key is knowing which Event IDs matter for security. These are the ones every SOC analyst and interview panel expects you to know cold:</p>
+
+      <div class="eventid-grid">
+        <div class="eventid"><div class="eid">4624</div><div class="edesc"><strong>Successful logon.</strong> Baseline of all activity. Watch for unusual logon types or off-hours.</div></div>
+        <div class="eventid"><div class="eid">4625</div><div class="edesc"><strong>Failed logon.</strong> Multiple in a short window = brute force attempt. Most important alert to set up first.</div></div>
+        <div class="eventid critical"><div class="eid">4688</div><div class="edesc"><strong>Process creation.</strong> Logs what command was run and by whom. Disabled by default — enabling this is critical for detection.</div></div>
+        <div class="eventid"><div class="eid">4648</div><div class="edesc"><strong>Explicit credential use (RunAs).</strong> Lateral movement and privilege escalation trigger this constantly.</div></div>
+        <div class="eventid critical"><div class="eid">1102</div><div class="edesc"><strong>Audit log was cleared.</strong> Immediate red flag. Attackers clear logs to hide activity. This event fires when they try.</div></div>
+        <div class="eventid"><div class="eid">4720</div><div class="edesc"><strong>User account created.</strong> Watch for unexpected new accounts — a classic attacker persistence technique.</div></div>
+        <div class="eventid"><div class="eid">4697</div><div class="edesc"><strong>Service installed.</strong> Malware installs as a service for persistence. This event fires when it happens.</div></div>
+        <div class="eventid critical"><div class="eid">4104</div><div class="edesc"><strong>PowerShell script block logging.</strong> See exactly what PowerShell commands ran. Essential for detecting living-off-the-land attacks.</div></div>
+      </div>
+
+      <div class="callout amber" style="margin-top:14px;"><strong>Important:</strong> Event ID 4688 (process creation) and 4104 (PowerShell logging) are disabled by default on most Windows installs. Enabling them via Group Policy is one of the most impactful, zero-cost security improvements any organization can make.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2020 — SOLARWINDS SUNBURST ATTACK</div>
+      <div class="name">9 months undetected inside US government — Windows registry was the hiding spot</div>
+      <div class="detail">In late 2019, attackers (attributed to Russian SVR intelligence) compromised the build pipeline of SolarWinds Orion software and inserted a backdoor called SUNBURST. When the trojanized update was installed by ~18,000 organizations — including the US Treasury, Departments of Justice, State, Homeland Security, and multiple Fortune 500 companies — SUNBURST used the Windows Registry to store its configuration data and command-and-control server addresses, deliberately avoiding suspicious file writes to disk. It stayed dormant for up to 2 weeks after each installation before activating, and mimicked legitimate SolarWinds API calls to blend into normal traffic. It wasn't discovered until December 2020 — 9 months of undetected access to some of the most sensitive networks on earth. Proper process creation logging (Event ID 4688) and PowerShell logging (4104) in SIEM would have significantly raised the chance of earlier detection.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Registry Run keys are the first persistence mechanism to add — one registry value = malware re-runs every reboot forever.</li>
+          <li>Dump <code>lsass.exe</code> memory with Mimikatz to extract plaintext passwords and NTLM hashes from all currently logged-in users.</li>
+          <li>Clear Event Log 1102 after actions — but a good defender knows Event ID 1102 itself fires when logs are cleared, giving them away.</li>
+          <li>Inject into <code>explorer.exe</code> or <code>svchost.exe</code> — trusted processes that are whitelisted by most AV and EDR tools.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Enable Event ID 4688 and 4104 immediately — they're free and catch the majority of living-off-the-land attacks.</li>
+          <li>Alert on Event ID 1102 — if someone clears logs, that IS the alert. SUNBURST-style attacks avoid this by not clearing logs at all.</li>
+          <li>Baseline your process tree — know what lsass.exe's parent should be, and alert if it spawns child processes (it never should).</li>
+          <li>Monitor registry Run keys for unexpected entries — autorun analysis is a core part of every malware investigation.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/windowsfundamentals2x0x</strong> — free room, Windows VM included. Covers Registry Editor, Computer Management, Event Viewer, UAC.</li>
+        <li>Open Registry Editor (run: <code>regedit</code>) and navigate to the Run key: <code>HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</code> — list every entry. This is your persistence audit.</li>
+        <li>Open Event Viewer, go to Windows Logs → Security. Filter by Event ID 4624 (successful logons) — read 3 entries and note the logon type and account name.</li>
+        <li>Run the PowerShell commands below to query Event Logs without the GUI — this is how SOC analysts actually do it at scale.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your Registry Run key contents + one PowerShell Get-WinEvent output showing Event ID 4624. Screenshot both — this is your Windows lab proof.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Run these in PowerShell (Run as Administrator)</span>
+
+<span class="c"># 1. Check the persistence Run key — what auto-starts on this machine?</span>
+<span class="cmd">Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"</span>
+<span class="out">SecurityHealth  : C:\WINDOWS\system32\SecurityHealthSysHost.exe
+OneDrive        : "C:\Program Files\Microsoft OneDrive\OneDrive.exe"</span>
+<span class="hi"># any unknown entry here = immediate investigation priority</span>
+
+<span class="c"># 2. Query last 5 successful logon events (ID 4624)</span>
+<span class="cmd">Get-WinEvent -LogName Security | Where-Object {$_.Id -eq 4624} | Select-Object -First 5</span>
+<span class="out">TimeCreated  : 7/9/2026 10:32:14
+Id           : 4624
+Message      : An account was successfully logged on...</span>
+
+<span class="c"># 3. Check if the audit log was ever cleared (ID 1102 = attacker red flag)</span>
+<span class="cmd">Get-WinEvent -LogName Security | Where-Object {$_.Id -eq 1102}</span>
+<span class="out">(no output = logs have not been cleared = good sign)</span>
+<span class="danger"># if this returns results — investigate IMMEDIATELY</span>
+
+<span class="c"># 4. List running processes and their parent — spot process spoofing</span>
+<span class="cmd">Get-WmiObject Win32_Process | Select-Object Name, ProcessId, ParentProcessId | Sort-Object Name</span>
+<span class="out">lsass.exe  | PID: 712  | Parent: 504 (wininit.exe)  <- correct
+svchost.exe| PID: 1024 | Parent: 680 (services.exe) <- correct</span>
+<span class="hi"># if lsass.exe has ANY parent other than wininit.exe — that is malware</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What Windows Event IDs do you consider most important for security monitoring, and why?"</div>
+        <div class="a">A: "The ones I'd enable and alert on first: 4625 for failed logons — multiple in a short window flags a brute force immediately. 4688 for process creation — disabled by default but catches most living-off-the-land attacks since everything an attacker does involves creating a process. 4104 for PowerShell script block logging — gives you the actual commands, not just that PowerShell ran. And 1102 for audit log cleared — that one is self-referential: even if attackers clear the logs, the act of clearing generates this ID. The SolarWinds SUNBURST attack went undetected for 9 months in part because many of these logs weren't being collected or correlated across the compromised organizations."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Microsoft Sentinel (AI)</div>
+        <div class="adesc">Microsoft's cloud SIEM uses AI to correlate Windows Event IDs across thousands of machines — exactly what would have caught SUNBURST faster.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Paste a suspicious PowerShell script from Event ID 4104 and ask "what does this do?" Instant malware triage without a sandbox.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Elastic Security (AI)</div>
+        <div class="adesc">AI-powered anomaly detection on Windows event logs. Flags unusual process trees and registry modifications automatically.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Autoruns (Sysinternals)</div>
+        <div class="adesc">Microsoft's free tool that shows every registry Run key, startup folder, service, and scheduled task in one GUI. Essential for persistence analysis.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Analyzed Windows Event Logs using PowerShell (Get-WinEvent) to identify suspicious logon patterns, process creation anomalies, and persistence mechanisms via registry Run key audits."</li>
+        <li><strong>Campus interview:</strong> Memorize the 8 Event IDs above. When asked about Windows security, say "I monitor Event IDs 4624/4625 for logon anomalies, 4688 for process creation, 4104 for PowerShell, and 1102 for log clearing — the same events that, if properly collected and correlated, would have flagged the SolarWinds breach months earlier." This shows you connect tools to real-world impact — most students just list tool names.</li>
+        <li><strong>SOC role relevance:</strong> Tier 1 SOC analysts spend 60-70% of their time on exactly this — Windows Event Log analysis. Knowing these IDs cold makes you immediately useful on Day 1 of a SOC job, which hiring managers actively test for.</li>
+        <li><strong>Portfolio:</strong> Write a short Python script that parses a Windows .evtx log file using the <code>python-evtx</code> library and flags any Event ID 1102 entries. Push to GitHub. Combines Day 10-11 Python skills with today's Windows knowledge.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>A "Windows security baseline audit" is a natural extension of your growing audit package: check registry Run keys for unauthorized persistence, verify Event Log collection is active, confirm 4688 and 4104 are enabled, and review recent 4625 failed logon spikes. For a small business with 5-20 Windows machines, this takes 1-2 hours and produces a one-page risk report worth ₹5,000–₹15,000. Position it as "what SolarWinds's victims should have had in place" — that framing makes the risk concrete and the value of your service obvious.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Windows keeps a diary of everything that happens — every login, every program that runs, every file that changes. That diary is called Event Logs. The SolarWinds attack in 2020 hid inside US government networks for 9 months, partly because many organizations weren't reading their diary closely enough. The Windows Registry is like the 'startup settings' drawer — programs write their name there so they restart automatically whenever the computer boots. Malware does the same thing to survive restarts. A security audit checks both the diary and the startup drawer."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=kD7qdeYMAQ8" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Windows Event Logs Explained | TryHackMe SOC Level 1 Walkthrough</div><div class="res-desc">youtube.com/watch?v=kD7qdeYMAQ8 — verified August 2025, covers Event Viewer + PowerShell queries</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=VjDvY6c0gbE" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Lecture 21: Windows Security Internals | Blue Team — Hindi</div><div class="res-desc">youtube.com/watch?v=VjDvY6c0gbE — Windows internals for Blue Team, Hindi lecture series</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/windowsfundamentals2x0x" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Windows Fundamentals 2</div><div class="res-desc">Free room — Registry, Event Viewer, UAC, Computer Management. Windows VM included.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> SolarWinds SUNBURST (2020) — real named, verifiable incident. Largest known government breach in history.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — ran PowerShell Event Log queries + registry audit, not just read theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> Connected to Linux process spoofing from Day 4 — same concept, different OS. Knowledge compounds.</div>
+      <div class="mistake-item"><span class="check">✓</span> 8 Event IDs memorized with business impact, not just numbers. SOC-ready immediately.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured vs Day 1–11 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name the two most important registry persistence keys attackers use.</li>
+        <li><span class="box"></span> I know the correct parent process for lsass.exe, svchost.exe, and csrss.exe.</li>
+        <li><span class="box"></span> I can recite Event IDs 4624, 4625, 4688, 1102 and what each means without looking.</li>
+        <li><span class="box"></span> I ran Get-WinEvent and Get-ItemProperty commands and read the real output.</li>
+        <li><span class="box"></span> I completed TryHackMe Windows Fundamentals 2 room.</li>
+        <li><span class="box"></span> I can explain the SolarWinds SUNBURST attack and what Windows logging gap it exploited.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">12 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 13</div>
+      <div class="title">Virtualization — building your home security lab (VirtualBox + Kali Linux)</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 13" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

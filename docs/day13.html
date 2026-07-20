@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — Virtualization & Your Home Security Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:14.4%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .lab-arch{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .arch-box{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:16px;}
+  .arch-box .aicon{font-size:22px;margin-bottom:8px;}
+  .arch-box .atitle{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;margin-bottom:6px;}
+  .arch-box.attacker .atitle{color:var(--red);}
+  .arch-box.target .atitle{color:var(--amber);}
+  .arch-box.network .atitle{color:var(--cyan);}
+  .arch-box.siem .atitle{color:var(--green);}
+  .arch-box .adesc{font-size:12px;color:var(--muted);}
+
+  .steps-list{list-style:none;counter-reset:step;margin-top:14px;}
+  .steps-list li{counter-increment:step;position:relative;padding-left:42px;margin-bottom:14px;font-size:14px;color:#cdd6da;}
+  .steps-list li::before{content:counter(step);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .steps-list li strong{color:var(--green);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .lab-arch{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day13$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 13/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 13 OF 90</div>
+  <h1>Virtualization <span class="accent">— building your home security lab</span></h1>
+  <p class="subtitle">Every lab you've done on TryHackMe runs in someone else's environment. Today you build your own — a personal isolated network where you can break, attack, defend, and experiment freely with zero risk to anything real.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is virtualization?</strong> Virtualization lets you run a complete operating system inside a window on your existing computer — like running a full Linux machine inside Windows, or a vulnerable target inside Kali. The software that makes this possible is called a <strong>hypervisor</strong>.</p>
+
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">Type 1 Hypervisor</div>
+          <div class="cdesc">Runs directly on hardware (no host OS). VMware ESXi, Hyper-V, Proxmox. Used in enterprise data centres and cloud providers.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Type 2 Hypervisor</div>
+          <div class="cdesc">Runs on top of your existing OS. VirtualBox, VMware Workstation. What you'll use for your home lab — free and easy to set up.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Snapshot</div>
+          <div class="cdesc">A saved state of a VM at a point in time. Break the VM during an exploit? Restore to snapshot in 10 seconds. Essential for malware analysis.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">NAT vs Host-Only Network</div>
+          <div class="cdesc">NAT = VM shares host's internet connection. Host-Only = isolated network between VMs only, no internet — ideal for safe attack/defence practice.</div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;"><strong>Why a home lab matters for placement:</strong> TryHackMe gives you a browser-based environment. Your home lab gives you something TryHackMe can't — real customization, real tool installation, and real evidence that you built something yourself. "I set up and ran my own attack/defend lab" in an interview carries significant weight.</div>
+
+      <p style="margin-top:16px;"><strong>Your target lab architecture — four components:</strong></p>
+      <div class="lab-arch">
+        <div class="arch-box attacker">
+          <div class="aicon">⚔️</div>
+          <div class="atitle">Kali Linux VM</div>
+          <div class="adesc">Your attacker machine. Pre-loaded with 600+ security tools — Nmap, Metasploit, Burp Suite, Wireshark, John, Hydra. Free download from kali.org.</div>
+        </div>
+        <div class="arch-box target">
+          <div class="aicon">🎯</div>
+          <div class="atitle">Metasploitable 2</div>
+          <div class="adesc">Intentionally vulnerable Ubuntu server. Every service on it is deliberately broken. Legal target for your scanner and exploit practice. Free from VulnHub.</div>
+        </div>
+        <div class="arch-box network">
+          <div class="aicon">🔌</div>
+          <div class="atitle">Host-Only Network</div>
+          <div class="adesc">Isolated virtual network connecting Kali and Metasploitable only. No internet access from either VM — safe, contained, legal to attack freely.</div>
+        </div>
+        <div class="arch-box siem">
+          <div class="aicon">📊</div>
+          <div class="atitle">Wazuh SIEM (optional)</div>
+          <div class="adesc">Add a free SIEM later (Day 58 onward) to see your own attacks in the defender's log view. Blue team practice on your own infrastructure.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2018 — TESLA KUBERNETES CRYPTOJACKING</div>
+      <div class="name">Attackers exploited an unsecured Kubernetes dashboard — inside a cloud VM environment</div>
+      <div class="detail">RedLock researchers discovered in 2018 that Tesla's cloud infrastructure (running on AWS) had a Kubernetes administrative console exposed to the internet with no password. Attackers accessed it, deployed their own container (a virtualized environment — essentially a lightweight VM), and ran cryptomining software inside it. Tesla's own workloads continued running normally around the malicious container, which is why it went undetected for a period. The attack demonstrates exactly why understanding virtualization and container isolation matters: the attackers didn't break into Tesla's servers — they added their own virtual workload alongside Tesla's legitimate ones. Misconfigured virtualization and container security is one of the fastest-growing categories of real-world cloud breaches.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>VMs are an attacker's best friend too — they run malware in isolated sandboxes to test it before deploying it against real targets.</li>
+          <li>VM escape vulnerabilities (breaking out of a VM to reach the host) are some of the highest-severity CVEs that exist — e.g., CVE-2018-3646 (L1TF) affecting Intel processors.</li>
+          <li>Cloud environments are essentially rented VMs — misconfigured isolation between tenants is a real attack surface on AWS, Azure, and GCP.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Snapshots are a security tool — malware analysts snapshot before detonating a sample, then restore to clean state afterward.</li>
+          <li>Network isolation is the most important lab setting — always use Host-Only for attack/target VMs, never Bridged (which exposes the VM to your real network).</li>
+          <li>In enterprise environments: VM segmentation and hypervisor hardening follow the same logic as network segmentation from Day 9 — one compromised VM should not reach others.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB — BUILD YOUR HOME LAB TODAY</span>
+    <div class="card">
+      <p>This is the most important practical day so far — you're building infrastructure you'll use for the rest of this entire 90-day roadmap. Set aside the full hour for this.</p>
+
+      <ol class="steps-list">
+        <li><strong>Install VirtualBox</strong> — download free from <code>virtualbox.org/wiki/Downloads</code>. Install on your Windows/Mac/Linux host. Enable VT-x/AMD-V in BIOS if prompted (virtualization must be enabled in firmware settings).</li>
+        <li><strong>Download Kali Linux pre-built VM</strong> — go to <code>kali.org/get-kali/#kali-virtual-machines</code> and download the VirtualBox image (.ova file). Import it into VirtualBox via File → Import Appliance. Default credentials: <code>kali / kali</code>.</li>
+        <li><strong>Download Metasploitable 2</strong> — search "Metasploitable 2 VulnHub" or go to <code>vulnhub.com</code>. Download the .vmdk and import into VirtualBox.</li>
+        <li><strong>Set both VMs to Host-Only networking</strong> — in VirtualBox Settings → Network → Adapter 1 → Host-Only Adapter. This creates an isolated network. Both VMs get IPs on the same subnet, internet is blocked from both.</li>
+        <li><strong>Boot Kali, find your IP and Metasploitable's IP</strong> — run <code>ip addr</code> on Kali, then <code>nmap -sn [your subnet]/24</code> to discover Metasploitable's IP on the same network.</li>
+        <li><strong>Run your first scan against a legal target</strong> — Nmap against Metasploitable. This is the first real pentest workflow step.</li>
+        <li><strong>Take a snapshot of both VMs</strong> — Machine → Take Snapshot. Name it "Clean install." This is your restore point for when things break.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of Kali Linux booted inside VirtualBox + Nmap scan results against Metasploitable showing open ports. This single screenshot proves you have a working home lab — massive portfolio signal.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># inside Kali — after setting Host-Only network</span>
+
+<span class="c"># 1. find your Kali IP</span>
+<span class="cmd">ip addr show eth0</span>
+<span class="out">inet 192.168.56.101/24 brd 192.168.56.255</span>
+
+<span class="c"># 2. discover Metasploitable on the same subnet</span>
+<span class="cmd">nmap -sn 192.168.56.0/24</span>
+<span class="out">Nmap scan report for 192.168.56.102
+Host is up (0.0010s latency)
+MAC Address: 08:00:27:XX:XX:XX (Oracle VirtualBox)</span>
+<span class="hi"># 192.168.56.102 = your Metasploitable target</span>
+
+<span class="c"># 3. run a full service scan against Metasploitable</span>
+<span class="cmd">nmap -sV 192.168.56.102</span>
+<span class="out">PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 2.3.4
+22/tcp   open  ssh         OpenSSH 4.7p1
+23/tcp   open  telnet      Linux telnetd
+80/tcp   open  http        Apache httpd 2.2.8
+3306/tcp open  mysql       MySQL 5.0.51a
+5900/tcp open  vnc         VNC (protocol 3.3)</span>
+<span class="hi"># vsftpd 2.3.4 = backdoored version — famous exploitable service</span>
+<span class="hi"># this is the attacker's reconnaissance output — you'll exploit these in Phase 3</span>
+
+<span class="c"># 4. verify your VMs are isolated (can't reach internet)</span>
+<span class="cmd">ping 8.8.8.8</span>
+<span class="out">ping: connect: Network is unreachable</span>
+<span class="hi"># perfect — isolated, legal, safe to practice anything here</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Do you have any hands-on lab experience outside of online platforms?"</div>
+        <div class="a">A: "Yes — I set up a home lab using VirtualBox with Kali Linux as the attacker machine and Metasploitable 2 as the target, connected via an isolated Host-Only network. The isolation is intentional — same logic as network segmentation from an enterprise perspective. I use snapshots before any exercise so I can restore to a clean state, which is also how malware analysts work when detonating samples. The lab gives me a repeatable environment where I can practice every tool and technique without any internet exposure. The Tesla Kubernetes breach in 2018 is a good example of why VM isolation matters beyond just home labs — attackers deployed their own containerized workload alongside Tesla's because the administrative interface was exposed with no authentication."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Troubleshoot VM setup issues instantly — paste your VirtualBox error message and get a fix. Faster than googling forum threads.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Proxmox VE</div>
+        <div class="adesc">Free Type 1 hypervisor — if you have a spare old PC, turn it into a dedicated lab server. Enterprise-grade, used by real security labs.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Wazuh (AI-assisted SIEM)</div>
+        <div class="adesc">Free open-source SIEM you can add to your home lab later. AI-assisted log correlation — see your own attacks from the defender's perspective.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Copilot + VMs</div>
+        <div class="adesc">Use Copilot to generate bash automation scripts for your lab — auto-snapshot, auto-backup, auto-reset scripts for Metasploitable between sessions.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Designed and deployed an isolated home security lab using VirtualBox with Kali Linux (attacker) and Metasploitable 2 (target) on a Host-Only virtual network; used for authorized vulnerability assessment and penetration testing practice."</li>
+        <li><strong>Campus interview:</strong> "I have a working home lab" is one of the highest-signal answers you can give for any security role interview. Most B.Tech students only use online platforms. Having your own lab shows initiative, practical skill, and depth — say "I set up VirtualBox, imported Kali and Metasploitable, and found vsftpd 2.3.4 running on the target — a known backdoored version. That's where my Phase 3 labs will go."</li>
+        <li><strong>Portfolio:</strong> Screenshot your Kali desktop inside VirtualBox and post it on LinkedIn. Caption: "Day 13/90 — home lab up. Kali Linux + Metasploitable in isolated Host-Only network. First Nmap scan showing vsftpd 2.3.4 running. Phase 3 starts here." Most students don't have this. You do.</li>
+        <li><strong>Long-term value:</strong> This lab runs for the rest of your 90-day journey. Every Phase 3 exploit, every Wireshark capture, every Metasploit session happens here. It's not a one-day setup — it's your personal security proving ground.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Your home lab is the prototype of a "security testing environment" — the same thing penetration testing firms charge clients to build for them at enterprise scale. Understanding hypervisor networking, snapshot management, and VM isolation means you can eventually build client lab environments for security testing engagements (common for larger pentesting contracts). A home lab also gives you the ability to test your own custom tools, scripts, and exploits in a safe environment before using them on any client system — which is both a professional requirement and a legal necessity. Every serious security consulting firm operates some form of internal lab. You're building yours on Day 13.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Virtualization lets you run a pretend computer inside your real computer — like a full phone app running inside another app. I'm using this to build a practice range where I can safely attack and defend fake machines without any risk to real ones. It's the same technology Amazon and Google use to run thousands of customers' computers on the same physical server. The Tesla hack in 2018 happened because an attacker added their own 'pretend computer' to Tesla's practice range, without Tesla noticing — because the door to that range was left unlocked."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=JDE7bI4DS3Y" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Build A FREE Cyber Security Home Lab (2025)</div><div class="res-desc">youtube.com/watch?v=JDE7bI4DS3Y — verified May 2025, VirtualBox + Kali + Metasploitable setup end-to-end</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=KtvQjQYXCBM" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Kali Linux 2024.1: Download & Install on VirtualBox [HINDI]</div><div class="res-desc">youtube.com/watch?v=KtvQjQYXCBM — step-by-step Kali installation in Hindi, verified April 2024</div></div>
+      </a>
+      <a class="res-card" href="https://www.vulnhub.com/entry/metasploitable-2,29/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Metasploitable 2 — VulnHub</div><div class="res-desc">vulnhub.com — free download of the intentionally vulnerable target VM. Your Phase 3 practice target.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Tesla Kubernetes breach (2018) — real named incident connecting VMs to real-world cloud security.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — actually built the lab, not just read about virtualization theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> Lab infrastructure built for the rest of the 90 days — not a one-off day, a permanent asset.</div>
+      <div class="mistake-item"><span class="check">✓</span> Snapshot habit established on Day 13 — malware analysts work the same way.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–12 baseline only. Your lab is unique to you.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> VirtualBox installed and Kali Linux imported and booting successfully.</li>
+        <li><span class="box"></span> Metasploitable 2 downloaded, imported, and running on Host-Only network.</li>
+        <li><span class="box"></span> Both VMs confirmed on same subnet, internet blocked (<code>ping 8.8.8.8</code> fails).</li>
+        <li><span class="box"></span> First Nmap scan against Metasploitable complete — I can see vsftpd 2.3.4 in the output.</li>
+        <li><span class="box"></span> Snapshots taken for both VMs — clean restore points saved.</li>
+        <li><span class="box"></span> I can explain the difference between NAT and Host-Only networking in plain language.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">13 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 14</div>
+      <div class="title">Setting up Kali Linux tools — Nmap, Burp Suite, Metasploit, Wireshark</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 14" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

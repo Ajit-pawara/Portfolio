@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 09 — Subnetting & Routing Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:10%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .subnet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .subnet-box{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--green);}
+  .subnet-box .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .subnet-box .val{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--green);font-weight:600;margin-bottom:3px;}
+  .subnet-box .dsc{font-size:12px;color:var(--muted);}
+
+  .ip-table{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .ip-row{display:flex;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 13px;}
+  .ip-row .ipcol{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--cyan);min-width:150px;}
+  .ip-row .ipdesc{font-size:12px;color:var(--muted);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.7;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .ip-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day09$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 9/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 09 OF 90</div>
+  <h1>Subnetting & <span class="accent">Routing Basics</span></h1>
+  <p class="subtitle">Networks aren't one giant flat blob — they're divided into controlled segments. Today you understand how that division works, why the Target breach happened because of it, and how to use it in labs and interviews.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is subnetting?</strong> Every IP address has two parts: a <strong>network part</strong> (which network you're on) and a <strong>host part</strong> (which device you are). Subnetting controls exactly where that dividing line sits — splitting one big network into smaller, isolated sub-networks.</p>
+      <div class="callout"><strong>Plain English:</strong> think of an IP like a postal address — "Building 192.168.1, Apartment 45." The subnet decides how many apartments are in the same building, and whether your mailman needs to visit a different post office (router) to reach a different building.</div>
+
+      <p style="margin-top:14px;"><strong>The subnet mask</strong> tells your device which bits are "network" and which are "host." A mask of <code>255.255.255.0</code> = first 3 octets are network, last is host. In CIDR notation: <code>/24</code> (first 24 bits locked as network).</p>
+
+      <div class="subnet-grid">
+        <div class="subnet-box"><div class="lbl">Network address</div><div class="val">192.168.1.0/24</div><div class="dsc">Identifies the subnet — never assigned to a device</div></div>
+        <div class="subnet-box"><div class="lbl">Broadcast address</div><div class="val">192.168.1.255</div><div class="dsc">Sends to ALL devices on subnet — never assigned either</div></div>
+        <div class="subnet-box"><div class="lbl">Usable host range</div><div class="val">.1 → .254</div><div class="dsc">254 devices can live here</div></div>
+        <div class="subnet-box"><div class="lbl">Default gateway</div><div class="val">192.168.1.1</div><div class="dsc">The router — traffic goes here when destination is outside this subnet</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>CIDR quick reference:</strong></p>
+      <div class="ip-table">
+        <div class="ip-row"><div class="ipcol">/24 = 255.255.255.0</div><div class="ipdesc">254 hosts — most common in home/small networks</div></div>
+        <div class="ip-row"><div class="ipcol">/16 = 255.255.0.0</div><div class="ipdesc">65,534 hosts — large enterprise networks</div></div>
+        <div class="ip-row"><div class="ipcol">/30 = 255.255.255.252</div><div class="ipdesc">2 hosts only — point-to-point router links</div></div>
+        <div class="ip-row"><div class="ipcol">/32</div><div class="ipdesc">Single host — used in firewall rules for one exact IP</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Routing:</strong> when your device sends data outside its subnet, it forwards the packet to the <strong>default gateway</strong> (router). The router checks its routing table and forwards toward the right network. Each hop repeats this until the packet arrives. That's it — routing is just a chain of forwarding decisions.</p>
+
+      <div class="callout amber"><strong>Security angle:</strong> subnet boundaries are firewall enforcement points. A compromised device in one subnet can't directly reach another subnet — traffic must cross a router where rules can block it. No segmentation = one breach can reach everything.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2013 — TARGET CORPORATION BREACH</div>
+      <div class="name">Flat network + zero segmentation = 40M cards stolen</div>
+      <div class="detail">Attackers entered via a compromised HVAC vendor's credentials (Day 2's kill chain). Because Target's internal network had no subnet segmentation between vendor access zones and POS systems, attackers moved laterally straight to payment terminals and stole 40 million card numbers over weeks. Had POS systems been in a restricted subnet with inter-subnet firewall rules, the vendor credentials would have been worthless beyond the vendor zone. This is now the textbook case study for why subnet segmentation is non-negotiable in enterprise security — and the $18.5M settlement is the price of a flat network.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>"What other subnets can I reach from here?" — scanning different IP ranges after initial access is called <strong>network discovery</strong>.</li>
+          <li>A flat unsegmented network is a gift — one foothold reaches everything.</li>
+          <li>Routing tables and ARP caches reveal the network layout before moving laterally.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>"Are critical systems in their own subnet with least-privilege firewall rules?"</li>
+          <li>Proper segmentation limits blast radius — one compromised subnet doesn't mean all are.</li>
+          <li>Monitor inter-subnet traffic — unexpected lateral movement is one of the clearest signs of active intrusion.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/introtolan</strong> — free room, covers subnetting + ARP + DHCP interactively.</li>
+        <li>Work the subnetting task — includes an interactive simulation, not just reading.</li>
+        <li>Complete the ARP task — shows how devices find each other within a subnet (key lateral movement concept).</li>
+        <li>Run all four commands in the terminal drill below and annotate each output line before moving on.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of completed Intro to LAN room + your own <code>ip route show</code> output with subnet ranges labeled.</div>
+    </div>
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 1. your IP and subnet</span>
+<span class="cmd">ip addr show</span>
+<span class="out">inet 192.168.1.42/24 brd 192.168.1.255 scope global eth0</span>
+<span class="hi"># /24 = 254 usable hosts in range 192.168.1.1 - 192.168.1.254</span>
+
+<span class="c"># 2. routing table — where does traffic go?</span>
+<span class="cmd">ip route show</span>
+<span class="out">default via 192.168.1.1 dev eth0    <- your gateway (router)
+192.168.1.0/24 dev eth0 proto kernel <- your subnet, handled directly</span>
+
+<span class="c"># 3. trace the actual route to google.com — see every router hop</span>
+<span class="cmd">traceroute google.com</span>
+<span class="out"> 1  192.168.1.1    1ms  <- your router
+ 2  10.x.x.x       8ms  <- ISP
+ 8  142.250.x.x   22ms  <- google</span>
+
+<span class="c"># 4. discover all live devices on your subnet (only on networks you own)</span>
+<span class="cmd">nmap -sn 192.168.1.0/24</span>
+<span class="out">Nmap scan report for 192.168.1.1 (router)
+Nmap scan report for 192.168.1.42 (your machine)</span>
+<span class="hi"># this is the FIRST command an attacker runs after initial access</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Why is network segmentation important from a security perspective?"</div>
+        <div class="a">A: "Segmentation limits blast radius. The 2013 Target breach is the clearest real example — attackers entered through a third-party HVAC vendor's credentials, but because POS systems weren't segmented into a restricted subnet, they moved laterally across a flat network and stole 40 million card numbers. Proper subnetting with inter-subnet firewall rules enforcing least-privilege routing would have contained the breach to the vendor zone. I think of each subnet boundary as a mandatory firewall enforcement point — the more boundaries between crown-jewel systems and everything else, the harder lateral movement becomes."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Generate subnetting practice problems instantly — "give me 10 /26 exercises with answers." Faster than any workbook.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">GitHub Copilot</div>
+        <div class="adesc">Write a Python subnet scanner in minutes with AI assistance — turns today's concept into a GitHub portfolio piece.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Darktrace / Vectra AI</div>
+        <div class="adesc">Enterprise AI tools that monitor inter-subnet traffic and flag anomalous lateral movement automatically — exactly what Target needed.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Nmap + GPT</div>
+        <div class="adesc">Paste your Nmap scan output into ChatGPT: "what does this subnet layout reveal to an attacker?" — builds threat-modeling intuition fast.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW THIS GETS YOU PLACED -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Performed subnet discovery and network mapping using Nmap and traceroute; analyzed IP addressing schemes and routing configurations for security gap identification."</li>
+        <li><strong>Campus interview:</strong> When asked "tell me about networking" say — "I understand subnetting practically: I can read a /24 mask, identify broadcast domain, scan live hosts, and trace routing hops. The Target 2013 breach happened specifically because POS systems weren't segmented from vendor access. That's the kind of context I bring to networking questions." This separates you from students who only recite OSI layer names.</li>
+        <li><strong>Portfolio project:</strong> Push a Python script to GitHub that takes an IP range, pings all hosts, and outputs live/dead. Mention it under Projects. SOC and network security recruiters look for exactly this.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>"Network segmentation review" is a real, billable service. Most small businesses run flat /8 internal networks with no VLAN separation — the same mistake Target made at a smaller scale. Walk in, show them the Target case study, and you've pitched a "network segmentation audit." Priced at ₹5,000–₹15,000 as a standalone engagement, it feeds naturally into firewall configuration work and long-term managed security retainers — a core offering for your future firm.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Imagine an office where every room is on the same open hallway — a thief through the side door can walk into every room unchallenged. Subnetting puts keycards on individual wings: accounting in one wing, servers in another, reception in a third. The 2013 Target breach happened exactly because the vendor access door and the payment systems room were on the same open hallway with no keycard between them."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=5WfiTHiU4x8" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">NetworkChuck — "You SUCK at Subnetting // EP 1"</div><div class="res-desc">youtube.com/watch?v=5WfiTHiU4x8 — best practical series for beginners</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=rdb2ki4iGuo" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Gate Smashers — "Subnetting in Classful Addressing — Hindi"</div><div class="res-desc">youtube.com/watch?v=rdb2ki4iGuo — clear examples, Hindi/Hinglish</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/introtolan" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Intro to LAN</div><div class="res-desc">Free room — subnetting + ARP + DHCP interactive simulation</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Real named incident (Target 2013) — not vague "segmentation is important."</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — traceroute, nmap, ip route on real systems.</div>
+      <div class="mistake-item"><span class="check">✓</span> Direct on networking phase — built on Days 6-8, no topic scatter.</div>
+      <div class="mistake-item"><span class="check">✓</span> Concrete resume bullet and portfolio project included.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1-8 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain /24, /16, /30 in plain language without looking up.</li>
+        <li><span class="box"></span> I can identify network address, broadcast, and usable range for any /24.</li>
+        <li><span class="box"></span> I ran traceroute and explained what each hop represents.</li>
+        <li><span class="box"></span> I ran <code>nmap -sn</code> subnet scan and saw live hosts.</li>
+        <li><span class="box"></span> I completed TryHackMe Intro to LAN room.</li>
+        <li><span class="box"></span> I know the resume bullet and campus interview talking point from today.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">09 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 10</div>
+      <div class="title">Python for Security I — syntax & your first security scripts</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 10" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

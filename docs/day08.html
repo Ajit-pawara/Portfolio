@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 08 — Networking III: DNS, HTTP/HTTPS & DHCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.65;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);}
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;}
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:8.8%; height:100%; background:var(--green);}
+  .day-tag{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px; background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
+  .day-tag::before{content:'●'; font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+  .tag-pill{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:6px 14px; border-radius:20px; margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px; padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);}
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:24px 26px;}
+  .callout{background:rgba(79,209,255,0.06); border-left:3px solid var(--cyan); border-radius:8px; padding:14px 18px; margin:14px 0; font-size:14px; color:#cdd6da;}
+  .callout strong{color:var(--cyan);}
+
+  /* DNS flow */
+  .dns-flow{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
+  .dns-step{display:flex; align-items:flex-start; gap:14px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:12px 16px;}
+  .dns-step .snum{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:14px; color:var(--cyan); width:24px; flex-shrink:0; margin-top:1px;}
+  .dns-step .sdesc{font-size:13.5px; color:#cdd6da;}
+  .dns-step .sdesc strong{color:var(--text);}
+
+  /* HTTP vs HTTPS */
+  .compare-grid{display:flex; gap:14px; margin-top:14px; flex-wrap:wrap;}
+  .compare-col{flex:1; min-width:220px; border-radius:10px; padding:18px 20px;}
+  .compare-col.http{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .compare-col.https{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .compare-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .compare-col.http .role{color:var(--red);}
+  .compare-col.https .role{color:var(--green);}
+  .compare-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .compare-col li{margin-bottom:6px;}
+
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; border-left:3px solid var(--red);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green); color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .job-card{background:rgba(57,255,136,0.05); border:1px solid rgba(57,255,136,0.2); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace; color:var(--green); font-size:12px; text-transform:uppercase; margin-bottom:10px;}
+  .job-card ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .job-card li{margin-bottom:6px;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{border:3px solid var(--green); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);}
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04)); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day08$ cat lesson.md</span>
+    <div class="progress">Day 8 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 08 OF 90</div>
+  <h1>Networking III <span class="accent">— DNS, HTTP/HTTPS & DHCP</span></h1>
+  <p class="subtitle">These three protocols run silently behind literally every internet action you take — every website you load, every IP address your device gets assigned. Today you understand what's actually happening, step by step, so you can spot when it's being abused.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Part 1: DNS — the internet's phone book.</strong></p>
+      <p>Every website has an IP address (like <code>104.26.10.229</code>). Nobody memorizes those. DNS (Domain Name System) is the system that takes a human-readable name like <code>google.com</code> and translates it into the IP address your computer actually needs to connect. Think of it exactly like a phone book: you look up "Google," it gives you the number.</p>
+      <p>Here's what actually happens when you type <code>tryhackme.com</code> into your browser — the steps you never see:</p>
+      <div class="dns-flow">
+        <div class="dns-step"><div class="snum">1</div><div class="sdesc">Your computer checks its own <strong>local cache</strong> first — did I already look this up recently? If yes, skip everything below and go directly to the website.</div></div>
+        <div class="dns-step"><div class="snum">2</div><div class="sdesc">If not cached, it asks your <strong>ISP's Recursive DNS Resolver</strong> — your internet provider's dedicated "lookup helper."</div></div>
+        <div class="dns-step"><div class="snum">3</div><div class="sdesc">The resolver asks a <strong>Root Name Server</strong> — "where can I find who manages .com domains?" Root servers don't know the IP, they just point to the next step.</div></div>
+        <div class="dns-step"><div class="snum">4</div><div class="sdesc">The resolver asks the <strong>TLD (Top Level Domain) Server</strong> for .com — "who manages tryhackme.com specifically?" It points to TryHackMe's own nameserver.</div></div>
+        <div class="dns-step"><div class="snum">5</div><div class="sdesc">Finally, the resolver asks the <strong>Authoritative Nameserver</strong> — TryHackMe's own server — and gets the actual IP address.</div></div>
+        <div class="dns-step"><div class="snum">6</div><div class="sdesc">That IP is returned to your browser, <strong>cached locally</strong> for next time, and the connection begins.</div></div>
+      </div>
+      <div class="callout" style="margin-top:16px;"><strong>Why this matters for security:</strong> an attacker who can intercept or forge step 2–5 above can redirect you to a fake website that looks identical to the real one — this is called <strong>DNS Spoofing / Cache Poisoning</strong>, and it happens in real attacks.</div>
+
+      <p style="margin-top:20px;"><strong>Part 2: HTTP vs HTTPS — why the padlock icon actually matters.</strong></p>
+      <p>HTTP (HyperText Transfer Protocol) is the language web browsers and servers use to talk to each other — "give me this page," "here it is." HTTPS is the same thing, but with a TLS encryption layer wrapping every message so no one in the middle can read it.</p>
+      <div class="compare-grid">
+        <div class="compare-col http">
+          <div class="role">⚠ HTTP (port 80)</div>
+          <ul>
+            <li>Every request and response travels in plain text.</li>
+            <li>Anyone on the same network (e.g. public WiFi) can read your passwords, session cookies, everything.</li>
+            <li>No verification that you're actually talking to the real website.</li>
+          </ul>
+        </div>
+        <div class="compare-col https">
+          <div class="role">✓ HTTPS (port 443)</div>
+          <ul>
+            <li>Everything is encrypted end-to-end with TLS.</li>
+            <li>Even if someone intercepts the traffic, they just see encrypted garbage.</li>
+            <li>The certificate verifies you're talking to the real server, not an impostor.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin-top:20px;"><strong>Part 3: DHCP — how your device gets an IP address automatically.</strong></p>
+      <p>Every time you connect to a network (WiFi, ethernet) your device needs an IP address. You don't type one in manually — DHCP (Dynamic Host Configuration Protocol) handles this automatically. Your device broadcasts "I just joined, can anyone give me an IP?" A DHCP server on the network responds with an IP address, a subnet mask, a default gateway, and DNS server addresses — your device uses all four to function on the network. Simple, invisible, and essential.</p>
+      <div class="callout"><strong>Security angle:</strong> an attacker on your local network can run a <strong>rogue DHCP server</strong> that responds faster than the legitimate one, handing out a "poisoned" DNS address — from that moment, every domain lookup on your machine goes through the attacker's server first. All your "DNS security" is now irrelevant.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// real, named incident — not hypothetical</div>
+    <div class="breach-grid">
+      <div class="breach-card">
+        <div class="year">2010 — DNS CACHE POISONING</div>
+        <div class="name">Baidu DNS Hijack — China's top search engine redirected</div>
+        <div class="detail">On January 12, 2010, Baidu.com — China's largest search engine with hundreds of millions of users — was hijacked via a DNS attack. Visitors to baidu.com were silently redirected to a page controlled by the "Iranian Cyber Army." The attack exploited DNS infrastructure at the registrar level, redirecting millions of legitimate DNS lookups to the wrong IP address for several hours. Nobody hacked Baidu's servers — they just poisoned the phone book entry.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>"If I control what DNS returns, I control where every user on this network goes — without touching their browser or their device."</li>
+          <li>HTTP (not HTTPS) is an open book on any shared network — a coffee shop, a college campus WiFi, anywhere.</li>
+          <li>A rogue DHCP server on a local network is one of the fastest ways to man-in-the-middle every device silently.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>"Is DNS traffic on this network going somewhere unexpected?" — DNS monitoring is one of the highest-signal detection sources in a SOC.</li>
+          <li>Force HTTPS everywhere — encrypt the traffic so even a perfect DNS redirect lands on an obvious certificate mismatch warning.</li>
+          <li>Use DNSSEC and trusted resolvers (like 1.1.1.1 or 8.8.8.8) — harder to poison than your ISP's default.</div>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/dnsindetail</strong> and deploy the room (free).</li>
+        <li>Work through all DNS record types (A, AAAA, CNAME, MX, TXT) — the room's interactive nslookup simulation makes this genuinely hands-on, not just reading.</li>
+        <li>Run the terminal drill below — do this on your real machine, not just in the browser.</li>
+        <li>Open your browser's developer tools (F12 → Network tab), load any website, and find the first HTTP request — look at the headers, status codes, and see HTTP in action for real.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your DNS room completion + your terminal nslookup/dig output + one browser Network-tab screenshot showing a real HTTP request/response.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># look up what IP google.com resolves to — DNS in action</span>
+<span class="cmd">nslookup google.com</span>
+<span class="out">Server:  1.1.1.1
+Name:    google.com
+Address: 142.250.x.x</span>
+
+<span class="c"># dig gives you more detail — shows the full DNS lookup chain</span>
+<span class="cmd">dig tryhackme.com</span>
+<span class="out">;; ANSWER SECTION:
+tryhackme.com.  300  IN  A  104.26.10.229</span>
+<span class="c"># 300 = TTL (seconds this result stays cached)</span>
+
+<span class="c"># check what DNS server your machine is currently using</span>
+<span class="cmd">cat /etc/resolv.conf</span>
+<span class="out">nameserver 1.1.1.1</span>
+<span class="c"># if this is your ISP's IP instead of 1.1.1.1 or 8.8.8.8, it's easier to poison</span>
+
+<span class="c"># see your own DHCP-assigned network info</span>
+<span class="cmd">ip route show</span>
+<span class="out">default via 192.168.1.1 dev eth0</span>
+<span class="c"># 192.168.1.1 is your gateway — assigned automatically by DHCP</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is DNS and how can it be abused?"</div>
+        <div class="a">A: "DNS translates human-readable domain names into IP addresses through a chain of servers — recursive resolver, root servers, TLD servers, and the authoritative nameserver. It can be abused in a few ways: DNS cache poisoning injects false records so lookups return attacker-controlled IPs — Baidu's entire domain was redirected this way in 2010 through a registrar-level attack. On a local network, a rogue DHCP server can hand out a malicious DNS address to every new device that connects, silently man-in-the-middling all their traffic. DNS monitoring is actually one of the first things a SOC analyst looks at when investigating unusual behavior."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Investigated DNS resolution chains and HTTP/HTTPS traffic using nslookup, dig, and browser DevTools; identified misconfigured DNS resolvers and unencrypted HTTP endpoints."</li>
+        <li><strong>Interview talking point:</strong> DNS questions come up in almost every SOC/Blue Team interview — being able to say "I've monitored DNS traffic as an anomaly detection source" immediately separates you from candidates who only know the textbook definition.</li>
+        <li><strong>LinkedIn proof:</strong> post your terminal dig/nslookup output alongside a screenshot of a real HTTP request in browser DevTools — most engineering students have never done either. That screenshot alone makes your post stand out.</li>
+        <li><strong>Portfolio piece:</strong> write a short Python script that does an nslookup for a list of domains and flags any that resolve to unexpected IP ranges — this is a real SOC automation task you can put on GitHub.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>DNS misconfiguration is one of the most common issues in small business websites — wrong records, no DNSSEC, HTTP instead of HTTPS, email spoofable because of missing SPF/DKIM TXT records. A "DNS & web traffic security check" is a 30-minute audit you can eventually offer any business with a website: check their DNS records, verify HTTPS is enforced everywhere, confirm their DHCP server is the only one on the network, and flag any plain HTTP endpoints. Priced at ₹2,000–₹5,000 as a quick-win audit, it naturally leads into larger web application security engagements.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "When you type a website name into your browser, your computer doesn't actually know where that site lives — it asks a series of 'phone book' servers to look up the address. DNS is that phone book. In 2010, someone tampered with the phone book entry for Baidu.com — China's biggest search engine — and for hours, hundreds of millions of people looking up 'Baidu' got sent to the wrong address entirely. HTTP vs HTTPS is simpler: HTTP is like sending a postcard (anyone who handles it can read it), HTTPS is like sending a sealed, locked envelope."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used a real named incident (Baidu DNS hijack 2010) with a concrete, vivid explanation.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — ran real nslookup/dig commands + browser DevTools, not just read theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> Added explicit job/placement angle — how to actually use this knowledge to get hired.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured against Day 1–7, not anyone else's pace.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Azn7KF9dB8s" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">"How DNS Works Step by Step" (2023)</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=Azn7KF9dB8s — clear diagram-based walkthrough, beginner-friendly.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/dnsindetail" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — DNS in Detail</div>
+        <div class="res-desc">Today's main lab. Free, interactive nslookup simulation, covers all DNS record types.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain all 6 steps of a DNS lookup in plain language.</li>
+        <li><span class="box"></span> I can explain why HTTP is dangerous on public WiFi and HTTPS isn't.</li>
+        <li><span class="box"></span> I ran nslookup and dig on my own machine and read the output.</li>
+        <li><span class="box"></span> I opened browser DevTools and found a real HTTP request/response.</li>
+        <li><span class="box"></span> I completed the TryHackMe DNS in Detail room.</li>
+        <li><span class="box"></span> I know at least one way today's knowledge translates to a resume bullet or interview answer.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">08 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 09</div>
+      <div class="title">Subnetting & routing basics</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 9" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

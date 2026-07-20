@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 18 — Cryptography III: SSL/TLS Certificates & PKI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:20%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .callout.red strong{color:var(--red);}
+  .callout.green strong{color:var(--green);}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .concept .cdesc{font-size:12.5px;color:var(--muted);}
+
+  .flow-steps{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .flow-step{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 14px;}
+  .flow-step .fnum{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--amber);flex-shrink:0;min-width:24px;}
+  .flow-step .fdesc{font-size:13px;color:#cdd6da;}
+  .flow-step .fdesc strong{color:var(--text);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day18$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 18/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 18 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Cryptography III <span class="accent">— SSL/TLS Certificates & PKI</span></h1>
+  <p class="subtitle">The padlock icon in your browser exists because of a complex trust chain involving Certificate Authorities, digital signatures, and PKI. In 2011, DigiNotar — a Dutch CA — was hacked, and a fraudulent Google.com certificate was used to intercept 300,000 Iranian Gmail users. Today you understand exactly how that was possible.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The problem certificates solve:</strong> when you connect to google.com, your browser verifies the server's public key (from Day 17) — but how does it know the key actually belongs to Google and not an attacker? Anyone could generate an RSA key pair and claim it belongs to Google. Certificates and PKI solve this trust problem.</p>
+
+      <p style="margin-top:12px;"><strong>What is a TLS Certificate?</strong> A certificate is a digital document that binds a public key to an identity (domain name, organization). It contains:</p>
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">Subject</div>
+          <div class="cdesc">Who this certificate belongs to — the domain name (CN=google.com) or organization. What you're trusting.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Public Key</div>
+          <div class="cdesc">The server's public key — what your browser uses to establish the encrypted session (Day 17's TLS handshake).</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Issuer (CA)</div>
+          <div class="cdesc">Which Certificate Authority signed this certificate and vouches for it. DigiCert, Let's Encrypt, Comodo are real CAs.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Digital Signature</div>
+          <div class="cdesc">The CA's cryptographic signature on the certificate — proves the CA verified and approved it. Tamper-evident.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Validity Period</div>
+          <div class="cdesc">Not Before / Not After dates. An expired certificate triggers browser warnings — attackers often exploit forgotten expired certs.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">SAN / CN</div>
+          <div class="cdesc">Subject Alternative Names — which domain names this certificate covers. Wildcard certs (*.google.com) cover all subdomains.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Public Key Infrastructure (PKI) — the trust chain explained:</strong></p>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fnum">1</div><div class="fdesc"><strong>Root CA:</strong> the top of the chain — a handful of organizations (DigiCert, Comodo, Let's Encrypt, government CAs) whose root certificates are pre-installed in your OS and browser. You trust them by default.</div></div>
+        <div class="flow-step"><div class="fnum">2</div><div class="fdesc"><strong>Intermediate CA:</strong> Root CAs rarely sign certificates directly — they issue intermediate CA certificates and keep their root key offline in HSMs. Intermediate CAs do the day-to-day signing. This limits damage if an intermediate is compromised.</div></div>
+        <div class="flow-step"><div class="fnum">3</div><div class="fdesc"><strong>Certificate Signing Request (CSR):</strong> a website owner generates a private key + CSR (containing their public key and domain info) and sends the CSR to a CA. The private key never leaves their server.</div></div>
+        <div class="flow-step"><div class="fnum">4</div><div class="fdesc"><strong>CA verifies ownership</strong> (DNS record, file upload, or email) then signs the certificate with its private key — producing the final .crt file the server presents to browsers.</div></div>
+        <div class="flow-step"><div class="fnum">5</div><div class="fdesc"><strong>Browser validates:</strong> on connection, browser checks the certificate's CA signature (using the CA's public key from your trusted store), checks validity dates, checks the domain matches, checks it's not revoked (CRL/OCSP). All pass = padlock shown.</div></div>
+      </div>
+
+      <div class="callout" style="margin-top:14px;"><strong>Why the chain matters:</strong> if ANY CA in your trusted store is compromised, attackers can issue fraudulent certificates for ANY domain — and browsers will trust them. DigiNotar in 2011 was a trusted CA. When it was breached, the attackers could make a browser believe <em>any</em> server was google.com — and it would show a valid padlock.</div>
+
+      <p style="margin-top:16px;"><strong>Certificate types — know these for client engagements:</strong></p>
+      <div class="concept-grid">
+        <div class="concept">
+          <div class="ctitle">DV (Domain Validated)</div>
+          <div class="cdesc">Only proves you control the domain — no org identity check. Let's Encrypt issues these for free. What most websites use.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">OV (Organization Validated)</div>
+          <div class="cdesc">CA verifies the organization's legal existence. Shows org name in cert details. Good for business sites.</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">EV (Extended Validation)</div>
+          <div class="cdesc">Strictest — CA verifies legal identity, physical address, operational existence. Used by banks. Green address bar (legacy browsers).</div>
+        </div>
+        <div class="concept">
+          <div class="ctitle">Self-Signed</div>
+          <div class="cdesc">No CA involved — you sign your own cert. Free, fast, but browsers show a "Not Secure" warning. Used in internal corporate networks and labs.</div>
+        </div>
+      </div>
+
+      <div class="callout amber" style="margin-top:14px;"><strong>Certificate Revocation:</strong> if a private key is stolen, the certificate must be revoked. CRL (Certificate Revocation List) and OCSP (Online Certificate Status Protocol) are the two mechanisms. OCSP stapling is the modern, more efficient approach — the server pre-fetches and caches its own revocation status to serve alongside the certificate.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2011 — DIGINOTAR BREACH — 300,000 IRANIAN GMAIL USERS INTERCEPTED</div>
+      <div class="name">A trusted Certificate Authority was hacked — attackers issued a fraudulent Google.com certificate and MitM'd hundreds of thousands of users</div>
+      <div class="detail">DigiNotar was a Dutch Certificate Authority trusted by all major browsers and operating systems. In 2011, attackers (widely attributed to Iranian state actors) breached DigiNotar's systems and issued fraudulent TLS certificates for google.com and over 500 other domains including yahoo.com, mozilla.org, microsoft.com, and CIA.gov. Because DigiNotar was in every browser's trusted CA store, these fraudulent certificates showed a valid padlock — browsers had no way to tell they were fake without additional mechanisms. The certificates were used to conduct man-in-the-middle attacks against approximately 300,000 Iranian internet users, intercepting their Gmail communications. The attack was only discovered when a single Iranian user noticed an unusual certificate and reported it to Google Chrome's team. Google pushed an emergency update to distrust DigiNotar certificates within days, and all major browsers followed. DigiNotar was bankrupt within weeks, and the Dutch government took over its operations. The breach killed the company entirely and prompted the development of Certificate Transparency (CT logs) and CAA DNS records as systemic defenses. It remains the definitive case study for why the CA trust model is the single most critical point of failure in web PKI.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>A fraudulent CA-signed certificate makes a MitM attack invisible to victims — the padlock shows, no browser warning appears. DigiNotar proved this at nation-state scale.</li>
+          <li>Self-signed certificate errors that users click through are a major attack vector — users trained to ignore warnings create the opening.</li>
+          <li>Certificate transparency logs are now searchable by defenders — attackers must issue certs that will appear there, making stealth harder.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li><strong>Certificate Transparency (CT logs):</strong> all publicly-trusted certificates are now logged publicly — you can monitor crt.sh for any cert issued for your domains you didn't request.</li>
+          <li><strong>CAA DNS records:</strong> specify which CAs are allowed to issue certs for your domain. A simple, underused defense that most organizations skip.</li>
+          <li><strong>HSTS + certificate pinning:</strong> forces browsers to only accept your specific certificate or CA — makes fraudulent cert MitM attacks much harder even if a CA is compromised.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/cryptographyintro</strong> — navigate to Task 6 (PKI and SSL/TLS). Complete the certificate inspection exercise using <code>openssl x509</code>.</li>
+        <li>Run the terminal commands below — inspect three real live certificates (Google, GitHub, and an expired/self-signed one) and read every field.</li>
+        <li>Go to <strong>crt.sh</strong> and search your college's domain (gcek.ac.in) — find every certificate ever issued for it and see the CA chain.</li>
+        <li>Check if your college domain has a CAA record: <code>dig CAA gcek.ac.in</code> — if it returns nothing, that's a finding you could report.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your openssl certificate inspection output + crt.sh search results for any domain. THM Task 6 completion screenshot.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 1. Inspect Google's live TLS certificate — full details</span>
+<span class="cmd">echo | openssl s_client -connect google.com:443 2>/dev/null | openssl x509 -noout -text</span>
+<span class="out">Subject: CN=*.google.com             <- wildcard covers all subdomains
+Issuer: C=US, O=Google Trust Services, CN=WR2
+Not Before: May 12 08:22:45 2026
+Not After : Aug  4 08:22:44 2026     <- expires in ~3 months
+Public Key Algorithm: id-ecPublicKey <- ECC not RSA
+Public-Key: (256 bit)</span>
+<span class="hi"># Note: Google issues its OWN intermediate CA (GTS) — rare for big tech</span>
+
+<span class="c"># 2. See the full certificate chain (Root → Intermediate → Leaf)</span>
+<span class="cmd">echo | openssl s_client -connect github.com:443 -showcerts 2>/dev/null | grep "subject\|issuer"</span>
+<span class="out">subject=CN = github.com
+issuer=C = US, O = DigiCert, CN = DigiCert TLS RSA SHA256 2020 CA1
+subject=CN = DigiCert TLS RSA SHA256 2020 CA1     <- intermediate CA
+issuer=CN = DigiCert Global Root CA                <- root CA</span>
+<span class="hi"># 3 layers: Root (trusted in browser) → Intermediate → Leaf (github.com)</span>
+
+<span class="c"># 3. Generate a CSR (what a website sends to a CA)</span>
+<span class="cmd">openssl req -new -newkey rsa:2048 -nodes -keyout site.key -out site.csr -subj "/CN=mysite.com/O=MyOrg"</span>
+<span class="out">Generating a RSA private key... writing CSR</span>
+<span class="hi"># site.key stays on your server FOREVER, site.csr is sent to the CA</span>
+
+<span class="c"># 4. Create a self-signed certificate (for labs/internal use)</span>
+<span class="cmd">openssl x509 -req -days 365 -in site.csr -signkey site.key -out site.crt</span>
+<span class="out">Certificate request self-signature ok</span>
+<span class="hi"># browsers will warn "NET::ERR_CERT_AUTHORITY_INVALID" — no trusted CA signed it</span>
+
+<span class="c"># 5. Check for CAA records on a domain</span>
+<span class="cmd">dig CAA google.com</span>
+<span class="out">google.com.  300  IN  CAA  0 issue "pki.goog"
+google.com.  300  IN  CAA  0 issue "symantec.com"</span>
+<span class="hi"># Google only allows its own CA (pki.goog) to issue certs — CAA record defense</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How does your browser know a TLS certificate is legitimate?"</div>
+        <div class="a">A: "It verifies a chain of digital signatures. The server presents a certificate signed by an intermediate CA, which was itself signed by a root CA that your browser already trusts. The browser checks the signature math, the validity dates, that the domain matches, and that the certificate hasn't been revoked via OCSP or CRL. The critical weakness is that any trusted CA can issue certificates for any domain — DigiNotar in 2011 showed this catastrophically: when the Dutch CA was breached, attackers issued a fraudulent Google.com certificate that showed a valid padlock to 300,000 Iranian users who had no way to know it was fake. That incident directly drove the development of Certificate Transparency logs, which force all trusted CAs to publicly log every certificate they issue — making fraudulent certificates detectable."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">crt.sh</div>
+        <div class="adesc">Free CT log search — find every certificate ever issued for any domain. Invaluable for OSINT recon and monitoring your own domains for unauthorized cert issuance.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">SSL Labs (Qualys)</div>
+        <div class="adesc">Full TLS audit — certificate chain, cipher suites, HSTS, CAA records, vulnerability checks. Run it on any client domain for an instant security grade.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT + OpenSSL</div>
+        <div class="adesc">Paste your openssl x509 output and ask "identify any security issues with this certificate configuration." Instant expert-level certificate audit assistance.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Let's Encrypt + Certbot</div>
+        <div class="adesc">Free automated TLS certificates. Knowing how to deploy Let's Encrypt + auto-renewal is a practical skill for any web-facing security engagement or client setup.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Performed TLS certificate chain analysis using OpenSSL and crt.sh; identified missing CAA DNS records and expired certificates; assessed PKI configurations against DigiNotar-class vulnerabilities."</li>
+        <li><strong>Campus interview:</strong> Most students describe HTTPS as "it's encrypted." You can now say "HTTPS relies on a PKI chain — the CA's signature on the server's certificate is what your browser trusts, not the encryption itself. DigiNotar in 2011 showed that when that trust is compromised at the CA level, the padlock becomes meaningless without supplementary controls like CT logs and CAA records." This answer wins every time.</li>
+        <li><strong>Immediate practical use:</strong> Search <code>crt.sh</code> for your college domain right now. Find every certificate ever issued. Check if CAA records exist. Document what you find — this is a real, reportable security audit that took you 5 minutes and demonstrates hands-on initiative before you even graduate.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Certificate audits are a fast, easy-to-explain win for small business clients. Run SSL Labs on their domain (usually takes 60 seconds), check crt.sh for unauthorized certificates, verify CAA records are set, and confirm auto-renewal is configured for their Let's Encrypt cert. Many SMBs have expired or misconfigured certificates causing customer warnings they don't even know about. A "TLS health check" report is a ₹2,000–₹5,000 quick engagement that demonstrates immediate, visible value — and often opens the door to a broader security audit when they see how much they didn't know.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Imagine you get a letter claiming to be from your bank, with an official-looking stamp. The stamp is what you trust — if the stamp belongs to an organization you know is legitimate, you trust the letter. TLS certificates work the same way: websites present a 'letter' (certificate) with a 'stamp' from a trusted Certificate Authority. DigiNotar was a trusted stamp-maker that got its stamp stolen in 2011. Attackers used it to send 300,000 fake letters claiming to be from Google, and every recipient thought they were real — because the stamp was genuine."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=0sl7NjmdpmA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Hashing & SSL Basics Pt2: PKI & TLS Certificates | TryHackMe Intro to Cryptography</div><div class="res-desc">youtube.com/watch?v=0sl7NjmdpmA — verified Feb 2023, covers PKI chain + certificate inspection directly.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=I43NnHTeACk" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">SSL TLS Explained: Certificates, Encryption, Public & Private Keys [HINDI]</div><div class="res-desc">youtube.com/watch?v=I43NnHTeACk — verified Aug 2024, full Hindi SSL/TLS walkthrough with certificate focus.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/cryptographyintro" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Introduction to Cryptography (Task 6: PKI & SSL/TLS)</div><div class="res-desc">Free room — certificate inspection with openssl x509. Task 6 is today's specific target.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> DigiNotar 2011 — named, verified, company-killing breach. 300,000 users. CT logs created as a direct result.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — inspected 3 real live certs, generated a CSR + self-signed cert, checked CAA records.</div>
+      <div class="mistake-item"><span class="check">✓</span> Cryptography trilogy complete (Days 16-18) — hashing, encryption, PKI. Solid foundation for OWASP next.</div>
+      <div class="mistake-item"><span class="check">✓</span> Immediate practical task — crt.sh on college domain produces a real finding on Day 18.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–17 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain what a TLS certificate contains and what each field means.</li>
+        <li><span class="box"></span> I can walk through the CA trust chain: Root → Intermediate → Leaf (server cert).</li>
+        <li><span class="box"></span> I ran <code>openssl s_client</code> and read a real certificate chain from Google and GitHub.</li>
+        <li><span class="box"></span> I generated a CSR and self-signed certificate with OpenSSL.</li>
+        <li><span class="box"></span> I searched crt.sh for a domain and found real certificates in the CT logs.</li>
+        <li><span class="box"></span> I can explain the DigiNotar breach and what CT logs + CAA records prevent.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">18 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 19</div>
+      <div class="title">Authentication vs Authorization — and why getting them confused is a critical vulnerability</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 19" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

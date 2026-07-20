@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 02 — Types of Hackers & Attack Categories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted);
+    border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;
+  }
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:2.2%; height:100%; background:var(--green);}
+
+  .day-tag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px;
+    background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3);
+    padding:5px 12px; border-radius:20px; margin-bottom:18px;
+  }
+  .day-tag::before{content:'●'; font-size:9px;}
+
+  h1{
+    font-family:'IBM Plex Mono',monospace; font-weight:700;
+    font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;
+  }
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+
+  .tag-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.06em;
+    padding:6px 14px; border-radius:20px; margin-bottom:16px;
+  }
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{
+    background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px;
+    padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);
+  }
+
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;}
+
+  /* hat grid */
+  .hat-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .hat{flex:1; min-width:200px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; position:relative;}
+  .hat .swatch{width:30px; height:30px; border-radius:50%; margin-bottom:10px;}
+  .hat.white .swatch{background:#eaeaea;}
+  .hat.grey .swatch{background:#9aa0a3;}
+  .hat.black .swatch{background:#1a1a1a; border:1px solid #444;}
+  .hat .tname{font-weight:700; font-size:14.5px; margin-bottom:6px;}
+  .hat .tdesc{font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+  .hat .realex{font-size:11.5px; color:#9fb0b5; font-style:italic; margin-bottom:8px;}
+  .hat .legal{font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:3px 8px; border-radius:5px; display:inline-block;}
+  .hat.white .legal{background:rgba(57,255,136,0.12); color:var(--green);}
+  .hat.grey .legal{background:rgba(255,180,84,0.12); color:var(--amber);}
+  .hat.black .legal{background:rgba(255,92,92,0.12); color:var(--red);}
+
+  .attack-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .attack-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px;}
+  .attack-card .num{font-family:'IBM Plex Mono',monospace; color:var(--purple); font-size:12px; margin-bottom:6px;}
+  .attack-card .tname{font-weight:700; font-size:14.5px; margin-bottom:6px;}
+  .attack-card .tdesc{font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+  .attack-card .ex{font-size:12px; color:#9fb0b5; font-style:italic;}
+
+  /* mindset two-column */
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{
+    content:counter(step); position:absolute; left:0; top:0;
+    width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green);
+    color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{
+    border:3px solid var(--green); border-radius:50%; width:160px; height:160px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);
+  }
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{
+    background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04));
+    border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day02$ cat lesson.md</span>
+    <div class="progress">Day 2 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 02 OF 90</div>
+  <h1>Types of Hackers <span class="accent">& Attack Categories</span></h1>
+  <p class="subtitle">You can't defend what you don't understand. Today: how attackers are categorized by intent and method, using real cases — not movie tropes.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>Same skillset, different intent, completely different legal outcome. One signed contract is the entire line between "security researcher" and "criminal."</p>
+      <div class="hat-grid">
+        <div class="hat white">
+          <div class="swatch"></div>
+          <div class="tname">White Hat</div>
+          <div class="tdesc">Authorized. Signed scope before touching anything.</div>
+          <div class="realex">Real example: Charlie Miller — found and disclosed major Apple vulnerabilities, worked with the company to fix them.</div>
+          <span class="legal">100% LEGAL</span>
+        </div>
+        <div class="hat grey">
+          <div class="swatch"></div>
+          <div class="tname">Grey Hat</div>
+          <div class="tdesc">No authorization, but usually discloses rather than exploits maliciously.</div>
+          <div class="realex">Real example: hacktivist collective "Anonymous" — no permission, no clear criminal profit motive, legally murky regardless.</div>
+          <span class="legal">LEGAL GREY ZONE</span>
+        </div>
+        <div class="hat black">
+          <div class="swatch"></div>
+          <div class="tname">Black Hat</div>
+          <div class="tdesc">Unauthorized, malicious intent — theft, extortion, sabotage.</div>
+          <div class="realex">Real example: Albert Gonzalez — led the TJX/Heartland Payment Systems breaches, theft of 170M+ card numbers.</div>
+          <span class="legal">ILLEGAL</span>
+        </div>
+      </div>
+      <p style="margin-top:14px; font-size:13.5px; color:var(--muted);">⚠ The only thing separating you from a black hat on paper is <strong>written authorization</strong>. No scope document, no signed contract = a crime, regardless of intent. This rule matters every day of your career.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// 6 attack categories, with real cases</div>
+    <div class="attack-grid">
+      <div class="attack-card">
+        <div class="num">01 / SOCIAL</div>
+        <div class="tname">Social Engineering</div>
+        <div class="tdesc">Exploiting human psychology instead of code.</div>
+        <div class="ex">2020 Twitter "Bit-Con" hack — attackers phone-phished employees to gain admin access to 130 high-profile accounts.</div>
+      </div>
+      <div class="attack-card">
+        <div class="num">02 / NETWORK</div>
+        <div class="tname">Network-based attacks</div>
+        <div class="tdesc">Intercepting or flooding traffic between systems.</div>
+        <div class="ex">2016 Dyn DNS attack — Mirai botnet DDoS took down Twitter, Netflix, Reddit for hours.</div>
+      </div>
+      <div class="attack-card">
+        <div class="num">03 / WEB APP</div>
+        <div class="tname">Application-layer attacks</div>
+        <div class="tdesc">Exploiting flaws in how an app handles input.</div>
+        <div class="ex">2017 Equifax breach — unpatched Apache Struts vulnerability, 147M records exposed.</div>
+      </div>
+      <div class="attack-card">
+        <div class="num">04 / MALWARE</div>
+        <div class="tname">Malicious software</div>
+        <div class="tdesc">Code designed to damage, spy on, or control systems.</div>
+        <div class="ex">2017 WannaCry ransomware — hit the UK's NHS, disrupted hospitals worldwide in days.</div>
+      </div>
+      <div class="attack-card">
+        <div class="num">05 / CREDENTIAL</div>
+        <div class="tname">Password / credential attacks</div>
+        <div class="tdesc">Guessing, cracking, or stealing login credentials.</div>
+        <div class="ex">2012 LinkedIn breach — 117M password hashes leaked, weakly hashed (unsalted SHA-1).</div>
+      </div>
+      <div class="attack-card">
+        <div class="num">06 / PHYSICAL</div>
+        <div class="tname">Physical access attacks</div>
+        <div class="tdesc">Bypassing security by simply walking in or planting hardware.</div>
+        <div class="ex">Classic red-team tactic: "tailgating" through a secure door behind a badge-holder — used in countless real penetration tests.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>Spend most of the effort on quiet recon — find the path of least resistance before touching anything.</li>
+          <li>Humans are usually the weakest link — phishing beats brute-forcing a firewall almost every time.</li>
+          <li>Patience over speed — the 2013 Target breach attackers sat inside the network for weeks before acting.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>Assume recon is already happening — minimize public attack surface (job posts, exposed services, social media).</li>
+          <li>Train people, not just systems — most categories above start with a human decision.</li>
+          <li>Detect the early, quiet stages (recon/delivery), don't wait until "exploitation" to react.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <p>Today's lab uses the real <strong>Target 2013 breach</strong> (40M+ card numbers, $18.5M settlement) as a case study.</p>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/cyberkillchainzmt</strong> and start the room (free).</li>
+        <li>Work through the 7 Cyber Kill Chain stages: Reconnaissance → Weaponization → Delivery → Exploitation → Installation → Command & Control → Actions on Objectives.</li>
+        <li>Complete the final practical task — mapping the real 2013 Target breach onto each kill chain stage using the room's interactive exercise.</li>
+        <li>Capture the room's flag and screenshot your completed task list.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your completed Kill Chain mapping for the Target breach + the flag. This becomes today's LinkedIn proof graphic.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># drill: classify any breach headline by category + kill chain stage</span>
+<span class="cmd">$ search "data breach 2026"</span>
+<span class="out">→ pick one headline
+→ which of the 6 attack categories does it fall under?
+→ which Kill Chain stage was "the moment it happened"?</span>
+<span class="c"># this 2-minute habit is exactly what SOC interviewers test for.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through how a real attack typically unfolds."</div>
+        <div class="a">A: "Using the Cyber Kill Chain as a model — take the 2013 Target breach: attackers first compromised a third-party HVAC vendor's credentials through phishing (Reconnaissance + Delivery), then moved laterally into Target's network and installed malware on point-of-sale systems (Installation), exfiltrating 40 million card numbers over several weeks before detection (Actions on Objectives). The actual 'hack' was late in a long, patient process — that's true of almost every major breach, not just Target."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>When you eventually pitch a small business, you can structure your audit pitch around these exact 6 categories: <strong>"I'll check your exposure across social engineering, network, web app, malware, credentials, and physical access — and map any gaps to how real breaches like Target and Equifax actually happened."</strong> Naming real incidents in your pitch (not just buzzwords) is what separates a credible freelance security consultant from someone just repeating jargon — and it's a habit worth building before you ever take a paying client.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain this to a non-technical person: "Imagine a house. A white hat is a locksmith you hired to test your locks. A grey hat is a stranger who tries your door, finds it unlocked, and leaves a note instead of walking in. A black hat breaks in and takes your stuff. And the 'Kill Chain' is just the fact that real burglars usually watch a house for days before ever touching the door." If that lands without jargon, you're ready to post.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used real named cases (Target, Equifax, WannaCry) instead of vague hypotheticals.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on (THM lab + drill), not passive reading.</div>
+      <div class="mistake-item"><span class="check">✓</span> Stayed on one topic (hacker types + kill chain) instead of scattering.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Compared today's depth only to Day 1 — your own baseline.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=9K8Xn0y5CU4" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">Simplilearn — "White Hat vs Black Hat vs Grey Hat: Types of Hackers Explained"</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=9K8Xn0y5CU4</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/cyberkillchainzmt" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — Cyber Kill Chain room</div>
+        <div class="res-desc">Today's lab. Includes the real 2013 Target breach scenario exercise.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain white/grey/black hat using the authorization distinction, with a real example for each.</li>
+        <li><span class="box"></span> I can name all 6 attack categories and one real incident per category.</li>
+        <li><span class="box"></span> I completed the TryHackMe Cyber Kill Chain room and mapped the Target breach.</li>
+        <li><span class="box"></span> I classified one fresh news headline by category + kill chain stage.</li>
+        <li><span class="box"></span> I explained today's concept to a non-technical person before posting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">02 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 03</div>
+      <div class="title">Linux fundamentals I — filesystem & permissions</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 3" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>

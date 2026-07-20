@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 10 — Python for Security I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:11.1%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .syntax-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .syntax-box{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .syntax-box .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+  .syntax-box pre{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);white-space:pre-wrap;}
+  .syntax-box .dsc{font-size:11.5px;color:var(--muted);margin-top:6px;}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day10$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 10/90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 10 OF 90</div>
+  <h1>Python for Security I <span class="accent">— syntax & first scripts</span></h1>
+  <p class="subtitle">Python is the #1 language in cybersecurity — used by attackers, defenders, and bug bounty hunters alike. Today you learn the syntax that matters and write your first actual security-oriented scripts.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Why Python for cybersecurity?</strong> It's fast to write, easy to read, has massive security libraries (Scapy, Requests, Paramiko, Pwntools), and runs natively on Linux. Every major security tool category — port scanners, exploit frameworks, malware, OSINT tools — has a Python implementation. You don't need to be a developer; you need to be able to read and write short, purposeful scripts.</p>
+
+      <div class="callout"><strong>The security use cases you'll hit constantly:</strong> reading/parsing files (log analysis), making HTTP requests (web app testing), socket programming (port scanners, reverse shells), automating repetitive recon tasks, and writing quick CTF solve scripts.</div>
+
+      <p style="margin-top:14px;"><strong>Core syntax you must know cold:</strong></p>
+      <div class="syntax-grid">
+        <div class="syntax-box">
+          <div class="lbl">Variables & Types</div>
+          <pre>ip = "192.168.1.1"
+port = 80
+alive = True</pre>
+          <div class="dsc">No type declaration needed. Strings, ints, booleans — just assign.</div>
+        </div>
+        <div class="syntax-box">
+          <div class="lbl">if / else</div>
+          <pre>if port == 80:
+    print("HTTP open")
+elif port == 443:
+    print("HTTPS open")
+else:
+    print("Other")</pre>
+          <div class="dsc">Indentation IS the syntax — no braces. Get it wrong and code breaks.</div>
+        </div>
+        <div class="syntax-box">
+          <div class="lbl">Loops</div>
+          <pre>ports = [21,22,80,443]
+for p in ports:
+    print(f"Port: {p}")</pre>
+          <div class="dsc">Loop over a list of ports, IPs, or URLs — the heart of any scanner script.</div>
+        </div>
+        <div class="syntax-box">
+          <div class="lbl">Functions</div>
+          <pre>def scan(ip, port):
+    # logic here
+    return result
+
+scan("10.0.0.1", 80)</pre>
+          <div class="dsc">Define once, reuse anywhere. Keeps your scripts clean and testable.</div>
+        </div>
+        <div class="syntax-box">
+          <div class="lbl">File I/O</div>
+          <pre>with open("ips.txt","r") as f:
+    for line in f:
+        print(line.strip())</pre>
+          <div class="dsc">Reading a wordlist, IP list, or log file — used in almost every security script.</div>
+        </div>
+        <div class="syntax-box">
+          <div class="lbl">Key Libraries</div>
+          <pre>import socket
+import requests
+from scapy.all import *</pre>
+          <div class="dsc">socket = raw network, requests = HTTP, scapy = packet crafting.</div>
+        </div>
+      </div>
+
+      <div class="callout amber" style="margin-top:16px;"><strong>One rule:</strong> Python indentation is not optional or stylistic — it defines code blocks. A wrong indent = a broken script. Always use 4 spaces (not tabs) in security tools.</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2022–2023 — PYPI SUPPLY CHAIN ATTACKS</div>
+      <div class="name">Malicious Python packages downloaded by thousands of developers</div>
+      <div class="detail">In 2022 and 2023, attackers repeatedly uploaded malicious packages to PyPI (Python's official package index) with names intentionally similar to legitimate libraries — a technique called "typosquatting." For example, packages like <code>request</code> (vs the real <code>requests</code>) or <code>colourama</code> (vs <code>colorama</code>) were downloaded by developers who made a one-letter typo in their pip install command. The malicious packages executed Python code on install that stole crypto wallets, Discord tokens, and browser credentials. This is directly why you always verify package names before pip installing anything — and why reading Python code before running it is a real security skill, not just a developer habit.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Python scripts automate what would take hours by hand — scanning 1,000 hosts, fuzzing 10,000 URLs, brute-forcing a login — in minutes.</li>
+          <li>Most real-world malware drops Python scripts because they run on any OS with Python installed — no compilation needed.</li>
+          <li>PyPI typosquatting shows even the install command can be the attack vector.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Reading Python code is a core malware analysis skill — most modern malware scripts are readable once you know the syntax.</li>
+          <li>Python automates log parsing, alert triage, and threat hunting — the same scripts that help attackers help defenders scale too.</li>
+          <li>Always pin package versions in requirements.txt and verify checksums — PyPI attacks exploit developers who don't.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/pythonbasics</strong> — free room, web-based Python editor, no install needed.</li>
+        <li>Complete Tasks 1–5: Hello World, variables, operators, loops, functions — get all the flags.</li>
+        <li>Complete the final Bitcoin project task — it combines functions, if/else, and return values into one mini-program.</li>
+        <li>Write the security script below on your own machine after the room — this is what turns "I know Python syntax" into "I can write security tools."</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of completed TryHackMe Python Basics room + your port checker script output below. Push the script to GitHub — this is your first portfolio piece.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># write this as port_checker.py — your first real security script</span>
+<span class="cmd">nano port_checker.py</span>
+<span class="out">import socket
+
+def check_port(ip, port):
+    try:
+        s = socket.socket()
+        s.settimeout(1)
+        s.connect((ip, port))
+        s.close()
+        return True
+    except:
+        return False
+
+target = "scanme.nmap.org"   # legal test target
+ports  = [21, 22, 80, 443, 3389]
+
+print(f"Scanning {target}...")
+for p in ports:
+    status = "OPEN" if check_port(target, p) else "closed"
+    print(f"  Port {p:5d} -> {status}")</span>
+
+<span class="cmd">python3 port_checker.py</span>
+<span class="out">Scanning scanme.nmap.org...
+  Port    21 -> closed
+  Port    22 -> OPEN
+  Port    80 -> OPEN
+  Port   443 -> closed
+  Port  3389 -> closed</span>
+<span class="hi"># you just wrote a working port scanner — same concept as Nmap, from scratch</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Can you walk me through a Python script you've written for security purposes?"</div>
+        <div class="a">A: "I built a basic port checker in Python that uses the socket library to attempt TCP connections across a list of target ports — giving me a fast, readable result for each. It's the same fundamental concept behind Nmap, just written from scratch so I understand exactly what's happening at the socket level. I also understand why Python security matters on the defensive side — the 2022–2023 PyPI supply chain attacks used malicious packages that executed Python code silently on install. Reading Python is now a real malware analysis skill, not just a developer habit."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">GitHub Copilot</div>
+        <div class="adesc">Autocompletes security scripts as you type — describe what you want in a comment and it generates the code. Massive speed boost for building tools.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ChatGPT / Claude</div>
+        <div class="adesc">Explain any piece of Python code — paste suspicious script, ask "what does this do?" Instant static analysis without reverse engineering tools.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Snyk / Bandit</div>
+        <div class="adesc">AI-assisted Python security linters that scan your code for vulnerabilities before you deploy — catches hardcoded credentials, insecure functions, etc.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Pwntools + AI</div>
+        <div class="adesc">Pwntools is the CTF exploit library — ask ChatGPT to help structure your exploit script when you get stuck. Cuts hours off CTF solves.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Built Python-based port scanner using socket library; automated TCP connection checks across target IP ranges for network reconnaissance."</li>
+        <li><strong>Campus interview:</strong> Most B.Tech students say "I know Python." You can say "I've written security tools in Python — a port checker using sockets, a log parser, and automated recon scripts — and I understand how malicious Python (like PyPI typosquatting attacks) actually executes." That specificity wins interviews.</li>
+        <li><strong>GitHub portfolio:</strong> Push <code>port_checker.py</code> today. Add a README explaining what it does and how to run it. This is visible proof recruiters can actually check — most engineering students have empty GitHub profiles.</li>
+        <li><strong>Next step:</strong> extend the script to read IPs from a file and output results to a CSV. Now it's a real tool, not a demo.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Every security tool you build in Python is a potential product or service. A simple port scanner becomes a "network exposure report" you run for clients. A log parser becomes a "daily security digest" you automate for small businesses on a monthly retainer. Python is the gap between "I know cybersecurity concepts" and "I can build something a client pays for." Every script you write from Day 10 onward is a building block for your future firm's toolbox.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "Python is like a recipe language for computers — clear, step-by-step instructions anyone can read once they know the basics. Security professionals use it to automate tasks that would take days by hand — like checking which 'doors' on a network are unlocked. The 2022–2023 PyPI attacks showed the flip side: attackers uploaded fake Python recipe books with malicious steps hidden inside, which ran automatically when developers downloaded them by accident."</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=0fC1JsN8AsM" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Python for Hackers Course — Scripting Bug Bounty & Ethical Hacking</div><div class="res-desc">youtube.com/watch?v=0fC1JsN8AsM — project-based, builds real recon tools</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=Eu4I1QIgrBA" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">[HINDI] Introducing Python for Pentesters — Hands On Scripting</div><div class="res-desc">youtube.com/watch?v=Eu4I1QIgrBA — Hindi, offensive automation focus</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/pythonbasics" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Python Basics</div><div class="res-desc">Free, browser-based Python editor — no install needed. Today's lab.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Real named incident (PyPI supply chain 2022–23) — not "Python is useful."</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — wrote a real working port scanner, not just read syntax.</div>
+      <div class="mistake-item"><span class="check">✓</span> First GitHub portfolio piece created — visible proof, not just knowledge.</div>
+      <div class="mistake-item"><span class="check">✓</span> Concrete resume bullet + interview answer ready to use now.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–9 baseline — not comparing to anyone else.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I completed TryHackMe Python Basics room and captured all flags.</li>
+        <li><span class="box"></span> I wrote and ran port_checker.py on my own machine — saw real output.</li>
+        <li><span class="box"></span> I pushed the script to GitHub with a README.</li>
+        <li><span class="box"></span> I can explain the PyPI supply chain attack in plain language.</li>
+        <li><span class="box"></span> I know the resume bullet and interview answer from today — word for word.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">10 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 11</div>
+      <div class="title">Python for Security II — sockets & automation scripts</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 11" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

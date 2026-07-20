@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 05 — Bash Scripting Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0f; --panel:#10171a; --panel-edge:#1c2528;
+    --green:#39ff88; --cyan:#4fd1ff; --amber:#ffb454; --red:#ff5c5c; --purple:#b389ff;
+    --text:#e6edf0; --muted:#7d8590;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6;
+    background-image:radial-gradient(circle at 10% 0%, rgba(57,255,136,0.07), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(79,209,255,0.06), transparent 40%);
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:40px 22px 100px;}
+  .topbar{display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); border-bottom:1px solid var(--panel-edge); padding-bottom:14px; margin-bottom:30px; flex-wrap:wrap; gap:10px;}
+  .progress{display:flex; align-items:center; gap:6px;}
+  .pbar{width:120px; height:5px; background:var(--panel-edge); border-radius:3px; overflow:hidden;}
+  .pbar i{display:block; width:5.5%; height:100%; background:var(--green);}
+  .day-tag{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px; background:rgba(255,180,84,0.08); border:1px solid rgba(255,180,84,0.3); padding:5px 12px; border-radius:20px; margin-bottom:18px;}
+  .day-tag::before{content:'●'; font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(26px,4.5vw,38px); line-height:1.2; margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted); font-size:15.5px; margin-bottom:30px; max-width:660px;}
+  section{margin-bottom:34px;}
+  .sec-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px;}
+  .tag-pill{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:6px 14px; border-radius:20px; margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1); color:var(--cyan); border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1); color:var(--green); border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1); color:var(--purple); border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1); color:var(--amber); border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1); color:var(--red); border:1px solid rgba(255,92,92,0.35);}
+  p{font-size:15px; color:#cdd6da; margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b; border:1px solid var(--panel-edge); border-radius:4px; padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green);}
+  .card{background:var(--panel); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px;}
+
+  .syntax-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .syntax-card{flex:1; min-width:200px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:16px;}
+  .syntax-card code{display:block; margin-bottom:6px;}
+  .syntax-card .desc{font-size:12px; color:var(--muted);}
+
+  .breach-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px;}
+  .breach-card{background:var(--bg); border:1px solid var(--panel-edge); border-radius:10px; padding:18px; border-left:3px solid var(--red);}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:4px;}
+  .breach-card .name{font-weight:700; font-size:15px; margin-bottom:6px;}
+  .breach-card .detail{font-size:12.5px; color:#b8c2c6;}
+
+  .mindset-grid{display:flex; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .mindset-col{flex:1; min-width:240px; border-radius:10px; padding:18px 20px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.06); border:1px solid rgba(255,92,92,0.25);}
+  .mindset-col.defender{background:rgba(57,255,136,0.06); border:1px solid rgba(57,255,136,0.25);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; margin-bottom:10px; font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:18px; font-size:13.5px; color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .terminal{background:#070a0b; border:1px solid var(--panel-edge); border-radius:10px; padding:0; margin-top:14px; overflow:hidden;}
+  .term-chrome{display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0e1517; border-bottom:1px solid var(--panel-edge);}
+  .term-dot{width:10px; height:10px; border-radius:50%;}
+  .term-body{padding:18px 20px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--green); overflow-x:auto; white-space:pre-wrap;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#9fb0b5;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none; counter-reset:step; margin-top:14px;}
+  .lab-steps li{counter-increment:step; position:relative; padding-left:38px; margin-bottom:14px; font-size:14px; color:#cdd6da;}
+  .lab-steps li::before{content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--panel); border:1px solid var(--green); color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .deliverable{margin-top:10px; background:rgba(255,180,84,0.06); border:1px solid rgba(255,180,84,0.25); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple); padding-left:16px; margin-top:14px;}
+  .interview-box .q{font-weight:600; font-size:14.5px; margin-bottom:6px; color:var(--text);}
+  .interview-box .a{font-size:13.5px; color:#b8c2c6;}
+
+  .biz-card{background:linear-gradient(135deg, rgba(255,180,84,0.07), rgba(57,255,136,0.05)); border:1px solid rgba(255,180,84,0.25); border-radius:12px; padding:20px 22px; margin-top:6px;}
+  .teach-card{background:rgba(255,92,92,0.05); border:1px solid rgba(255,92,92,0.2); border-radius:12px; padding:20px 22px;}
+
+  .res-grid{display:grid; gap:12px; margin-top:8px;}
+  .res-card{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--panel-edge); border-radius:10px; padding:16px 18px; text-decoration:none; color:var(--text); transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--bg); background:var(--cyan); border-radius:6px; padding:4px 8px; flex-shrink:0; margin-top:2px; font-weight:700;}
+  .res-icon.video{background:var(--red);}
+  .res-icon.practice{background:var(--green);}
+  .res-title{font-weight:600; font-size:14.5px;}
+  .res-desc{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  .mistakes-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:14px;}
+  .mistake-item{display:flex; align-items:flex-start; gap:10px; background:var(--bg); border:1px solid var(--panel-edge); border-radius:8px; padding:10px 12px; font-size:12.5px; color:#b8c2c6;}
+  .mistake-item .check{color:var(--green); font-weight:700; flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--panel-edge); font-size:14.5px; color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:18px; height:18px; border:1.5px solid var(--green); border-radius:4px; flex-shrink:0; margin-top:1px;}
+
+  .stamp-wrap{display:flex; justify-content:center; margin:48px 0 30px;}
+  .stamp{border:3px solid var(--green); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; transform:rotate(-8deg); color:var(--green); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; box-shadow:0 0 30px rgba(57,255,136,0.15);}
+  .stamp .l1{font-size:11px; letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px; font-weight:700; margin:4px 0;}
+  .stamp .l3{font-size:11px; letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg, rgba(57,255,136,0.06), rgba(79,209,255,0.04)); border:1px solid var(--panel-edge); border-radius:12px; padding:22px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:4px;}
+  .next-up .title{font-weight:700; font-size:17px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace; color:var(--cyan); font-size:22px;}
+
+  footer{margin-top:30px; text-align:center; color:var(--muted); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){ .wrap{padding:26px 16px 70px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day05$ cat lesson.md</span>
+    <div class="progress">Day 5 / 90 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 05 OF 90</div>
+  <h1>Bash Scripting Basics <span class="accent">— automating the boring stuff</span></h1>
+  <p class="subtitle">A one-liner you type once is a habit. A script you write once runs a thousand times. Today you write your first real scripts — and learn why a single Bash bug once broke half the internet.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p>A bash script is just a text file of commands you'd otherwise type one at a time, run together as a program. Every script starts with a <strong>shebang</strong>: <code>#!/bin/bash</code>, telling the OS which interpreter to use.</p>
+      <div class="syntax-grid">
+        <div class="syntax-card"><code>$1 $2 $#</code><div class="desc">First arg, second arg, total argument count passed to the script.</div></div>
+        <div class="syntax-card"><code>read name</code><div class="desc">Pauses the script and stores typed input into the variable "name".</div></div>
+        <div class="syntax-card"><code>if [ "$x" -eq 10 ]</code><div class="desc">Conditional logic — note the required spaces inside the brackets.</div></div>
+        <div class="syntax-card"><code>chmod +x script.sh</code><div class="desc">Makes the script executable so you can run it with ./script.sh</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// real, named incident — not hypothetical</div>
+    <div class="breach-grid">
+      <div class="breach-card">
+        <div class="year">2014 — SHELLSHOCK (CVE-2014-6271)</div>
+        <div class="name">The Bash bug that broke the internet</div>
+        <div class="detail">A flaw in how Bash parsed environment variables let attackers attach malicious code to a crafted variable and have it execute automatically — no password, no login needed, on any system using vulnerable Bash through CGI scripts, DHCP clients, or SSH. Within 24 hours of disclosure, botnets were actively scanning the internet for vulnerable servers. It affected an estimated 500 million+ devices and is still referenced as one of the most severe vulnerabilities ever found, precisely because Bash itself is everywhere.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// attacker mindset vs. defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ How an attacker thinks</div>
+        <ul>
+          <li>"Can I automate scanning thousands of targets for one known flaw at once?" — Shellshock-hunting scripts spread within hours of disclosure.</li>
+          <li>Bash scripts are how recon, exploitation, and post-exploitation get repeated at scale instead of done by hand.</li>
+          <li>A script that works on one box should work on a hundred — automation is the actual force multiplier in offensive security.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 How a defender thinks</div>
+        <ul>
+          <li>"Can I script my own patch-checking and log review instead of doing it manually every day?"</li>
+          <li>Shellshock's lesson: patch fast, and know exactly which systems run which Bash version — a script can check this across a whole fleet in seconds.</li>
+          <li>Defensive automation (backups, log rotation, alerting) is just as valuable a skill as offensive scripting.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <ol class="lab-steps">
+        <li>Go to <strong>tryhackme.com/room/bashscripting</strong> and start the room (free, no VM needed for most tasks).</li>
+        <li>Work through variables, parameters ($1/$2), and the <code>read</code> input section.</li>
+        <li>Complete the if/else task — build the small age-checker script the room walks you through.</li>
+        <li>Write one extra script of your own below — a simple recon helper.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> screenshot of your completed Bash Scripting room + your own custom script's output.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># write a tiny recon script — common first script for any security learner</span>
+<span class="cmd">nano sysinfo.sh</span>
+<span class="out">#!/bin/bash
+echo "User: $(whoami)"
+echo "Host: $(hostname)"
+echo "Date: $(date)"
+echo "Open listening ports:"
+ss -tuln</span>
+
+<span class="cmd">chmod +x sysinfo.sh
+./sysinfo.sh</span>
+<span class="out">User: robin
+Host: gcek-it
+Date: Fri Jun 26 2026
+Open listening ports:
+...</span>
+<span class="c"># you just wrote a real recon script — this exact pattern scales to hundreds of hosts</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Why does scripting matter for a security role, beyond just convenience?"</div>
+        <div class="a">A: "Automation is the real force multiplier on both sides. Shellshock in 2014 showed how fast attackers automate exploitation at scale — botnets were scanning for vulnerable Bash within 24 hours of disclosure. On defense, the same scripting skill lets me check patch status, rotate logs, or alert on anomalies across an entire fleet instead of doing it server-by-server. I think of bash scripting as the baseline 'speed' skill for everything else in this field."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Small businesses running their own Linux servers almost never have basic automated health checks — patch status, disk space, failed login attempts. A simple bash script bundle ("automated daily security check-in email") is a low-effort, high-value freelance product: you write it once, deploy it to multiple clients, and charge a small recurring fee for "monitoring." This is exactly the kind of repeatable, scriptable service that scales into your future firm without you manually doing the same check by hand for every client.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p>Explain to a non-technical person: "A bash script is like a recipe card for a computer — instead of telling it what to do one step at a time every single day, you write the steps down once, and it can repeat them instantly, forever. In 2014, a bug called Shellshock let attackers sneak extra 'recipe steps' into a system without permission — and because almost every server on Earth used the same recipe book (Bash), the damage spread incredibly fast."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Used a real, named CVE (Shellshock) instead of a vague "scripting is useful" claim.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — wrote and ran a real script, not just read syntax.</div>
+      <div class="mistake-item"><span class="check">✓</span> Built directly on Days 3–4 (filesystem, processes) instead of jumping topics.</div>
+      <div class="mistake-item"><span class="check">✓</span> Teach-it-back done before any public post.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress measured against Day 1–4, not anyone else's pace.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// watch + read</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=SPwyp2NG-bE" target="_blank">
+        <span class="res-icon video">VIDEO</span>
+        <div><div class="res-title">NetworkChuck — "you need to learn BASH Scripting RIGHT NOW!! // EP 1"</div>
+        <div class="res-desc">Verified link: youtube.com/watch?v=SPwyp2NG-bE</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/bashscripting" target="_blank">
+        <span class="res-icon practice">PRACTICE</span>
+        <div><div class="res-title">TryHackMe — Bash Scripting room</div>
+        <div class="res-desc">Today's main lab. Free, walkthrough-style, no VM required for most tasks.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain the shebang line and why it's required.</li>
+        <li><span class="box"></span> I used $1/$2/$# and read in at least one script.</li>
+        <li><span class="box"></span> I wrote an if/else conditional in bash.</li>
+        <li><span class="box"></span> I wrote and ran my own custom recon script (sysinfo.sh or similar).</li>
+        <li><span class="box"></span> I explained today's concept to a non-technical person before posting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">05 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 06</div>
+      <div class="title">Networking I — the OSI model</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 6" when you're ready — same format, one hour or less.</footer>
+
+</div>
+</body>
+</html>
