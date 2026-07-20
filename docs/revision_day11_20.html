@@ -307,10 +307,20 @@
     </div>
 
     <div class="section-label">// when to use each</div>
-    <p style="font-size:13.5px;color:#cdd6da;"><strong>Symmetric (AES-256):</strong> encrypting files, database columns, disk encryption (BitLocker, LUKS). <strong>Asymmetric (RSA-4096 / ECC-256):</strong> TLS handshakes, SSH key pairs, code signing, email encryption (PGP). <strong>Both together:</strong> TLS uses RSA/ECDHE to exchange an AES key, then AES encrypts the session. This hybrid approach gives you security (asymmetric) + performance (symmetric).</p>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Symmetric (AES-256)</div><div class="cdesc">Encrypting files, database columns, disk encryption (BitLocker, LUKS). Fast, bulk data.</div></div>
+      <div class="concept"><div class="ctitle">Asymmetric (RSA-4096 / ECC-256)</div><div class="cdesc">TLS handshakes, SSH key pairs, code signing, email encryption (PGP). Slow, key exchange.</div></div>
+      <div class="concept"><div class="ctitle">Both Together (TLS)</div><div class="cdesc">TLS uses RSA/ECDHE to exchange an AES key, then AES encrypts the session. Security (asymmetric) + performance (symmetric).</div></div>
+    </div>
 
     <div class="section-label">// real incident</div>
     <p style="font-size:13.5px;color:#cdd6da;"><strong>Heartbleed (CVE-2014-0160):</strong> a buffer over-read in OpenSSL's Heartbeat extension leaked up to 64KB of server memory per request. Attackers repeatedly read memory until they extracted private RSA keys. 500K+ servers affected. No patch for 2 years before discovery. Lesson: your private keys are only as safe as the software that manages them — and OpenSSL is used everywhere.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Why does TLS use both asymmetric and symmetric cryptography?</div>
+      <div class="a">Asymmetric (RSA/ECDHE) is slow but solves the key exchange problem — it securely negotiates a shared secret. Symmetric (AES) is fast (hardware-accelerated) for bulk encryption. TLS uses asymmetric during the handshake to exchange a symmetric session key, then AES encrypts all data. This hybrid = security + performance.</div>
+    </div>
   </div>
 
   <!-- DAY 18 -->
@@ -332,8 +342,12 @@
       <div class="concept"><div class="ctitle">Signature</div><div class="cdesc">CA's cryptographic signature proving the certificate hasn't been tampered with.</div></div>
     </div>
 
-    <div class="section-label">// certificate chain</div>
-    <p style="font-size:13.5px;color:#cdd6da;"><strong>Root CA → Intermediate CA → Server/Leaf certificate.</strong> Root CAs are self-signed and pre-installed in browsers (~150). Intermediates are signed by roots and issue actual server certs. If a root is compromised, ALL certificates signed by it are untrusted. If an intermediate is compromised, only certificates from that intermediate are affected — this is why the chain exists.</p>
+    <div class="section-label">// certificate chain hierarchy</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Root CA</div><div class="cdesc">Self-signed, pre-installed in browsers (~150 globally). If compromised, ALL certs signed by it are untrusted. DigiNotar 2011.</div></div>
+      <div class="concept"><div class="ctitle">Intermediate CA</div><div class="cdesc">Signed by root CA. Issues actual server/leaf certificates. Limits blast radius — only intermediates affected if breached.</div></div>
+      <div class="concept"><div class="ctitle">Server/Leaf Cert</div><div class="cdesc">The certificate your browser sees. Contains domain name (CN/SAN), public key, and signature chain back to a trusted root.</div></div>
+    </div>
 
     <div class="section-label">// self-signed CA in lab</div>
     <div class="command-table">
@@ -343,6 +357,12 @@
 
     <div class="section-label">// real incident</div>
     <p style="font-size:13.5px;color:#cdd6da;"><strong>DigiNotar CA Breach (2011):</strong> attackers compromised a Dutch CA and issued 531 fraudulent certificates — including *.google.com, *.torproject.org, and *.cia.gov. Iranian users were MITM'd for months: their connections to Google were intercepted and decrypted using the fake certificate. Lesson: the entire PKI trust model is only as strong as its weakest CA. DigiNotar was ultimately bankrupted and delisted from all major browsers.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What happens in your browser when you visit an HTTPS site with an expired certificate?</div>
+      <div class="a">The browser checks the certificate's validity period (Not Before / Not After). If expired, the certificate is rejected and the browser shows a warning page saying the connection is not secure — even though the encryption itself may be perfectly sound. The user must manually bypass the warning to proceed. This is why certificate expiration is one of the most common causes of production outages.</div>
+    </div>
   </div>
 
   <!-- DAY 19 -->
@@ -403,10 +423,21 @@
     </div>
 
     <div class="section-label">// common discovery targets</div>
-    <p style="font-size:13.5px;color:#cdd6da;"><code>/admin /wp-admin /backup /config /api /swagger /.git /.env /robots.txt /sitemap.xml /server-status /phpinfo.php /info.php</code> — these are the first paths an attacker checks. If any return 200, the recon phase just found an entry point.</p>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Admin Panels</div><div class="cdesc">/admin, /wp-admin, /administrator — if no auth, immediate compromise.</div></div>
+      <div class="concept"><div class="ctitle">Sensitive Files</div><div class="cdesc">/.git, /.env, /backup, /config — source code and credentials exposed.</div></div>
+      <div class="concept"><div class="ctitle">API Endpoints</div><div class="cdesc">/api, /swagger, /graphql — direct access to backend functionality.</div></div>
+      <div class="concept"><div class="ctitle">Info Leakage</div><div class="cdesc">/robots.txt, /sitemap.xml, /server-status, /phpinfo.php — unintentional reconnaissance.</div></div>
+    </div>
 
     <div class="section-label">// real incident</div>
     <p style="font-size:13.5px;color:#cdd6da;"><strong>British Airways Magecart (2018):</strong> attackers discovered an unsecured staging admin path on ba.com using directory busting tools. They injected a 23-line JavaScript skimmer into the payment page that captured 380,000 payment card details over 2 weeks. BA was fined £20M under GDPR. Lesson: hidden dev/staging paths are a common finding in directory busting — Magecart operators automate directory scanning across thousands of domains daily.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What's the first three things you check when you find a /.git directory exposed on a website?</div>
+      <div class="a">(1) Download .git/config for remote origin URLs and credentials. (2) Use git-dumper or similar to reconstruct the entire repository — source code, database passwords, API keys. (3) Check git log for commit history revealing sensitive data that was pushed then "removed" (still in history). Automated scanners check for /.git first because it's one of the highest-impact findings in directory busting.</div>
+    </div>
   </div>
 
   <!-- ALL REAL INCIDENTS TIMELINE -->
