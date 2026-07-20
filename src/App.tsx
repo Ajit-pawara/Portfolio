@@ -2567,9 +2567,8 @@ function App() {
                   <div className="revision-tabs-container" style={{ padding: '10px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
                     {(() => {
                       const totalDays = daysManifest?.totalDays || 90;
-                      const maxInterval = Math.ceil(Math.min(computedCurrentDay, totalDays) / 10) * 10;
                       const intervals = [];
-                      for (let v = 10; v <= Math.max(maxInterval, 10); v += 10) {
+                      for (let v = 10; v <= totalDays; v += 10) {
                         intervals.push(v);
                       }
                       return intervals;
