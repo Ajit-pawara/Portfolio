@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 21 — OWASP Top 10 & Web Application Security Fundamentals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:23.3%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .owasp-grid{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .owasp-row{display:flex;gap:14px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 14px;}
+  .owasp-row .onum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);font-weight:700;flex-shrink:0;width:20px;}
+  .owasp-row .ot{font-size:13.5px;}
+  .owasp-row .ot strong{color:var(--text);}
+  .owasp-row .ot span{color:var(--muted);}
+
+  .bucket-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px;}
+  .bucket-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .bucket-card .btitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:6px;font-weight:600;}
+  .bucket-card .bdesc{font-size:12.5px;color:var(--muted);}
+
+  .breach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;}
+  .breach-card .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;}
+  .breach-card .name{font-weight:700;font-size:15px;margin-bottom:7px;}
+  .breach-card .detail{font-size:13px;color:#b8c2c6;line-height:1.6;}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day21$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 21/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 21 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>OWASP Top 10 <span class="accent">& Web App Security Fundamentals</span></h1>
+  <p class="subtitle">The single most-referenced list in appsec interviews — and the foundation every bug bounty hunter, pentester, and secure developer builds on. Today you stop reciting it like a poem and start using it as a mental model.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What it is:</strong> A standard awareness document ranking the most critical web application security risks, based on real-world data from hundreds of organizations and thousands of applications. Maintained by the OWASP Foundation, updated periodically — 2025 is the current edition, following 2021 and 2017.</p>
+      <p><strong>Why it matters:</strong> It's the shared vocabulary between developers, pentesters, and security teams. When an interviewer asks "walk me through a SQL injection" or "how would you secure a login form," they're testing whether you know this list cold.</p>
+
+      <p style="margin-top:16px;"><strong>The 10 categories (2021/2025 lineage):</strong></p>
+      <div class="owasp-grid">
+        <div class="owasp-row"><span class="onum">01</span><span class="ot"><strong>Broken Access Control</strong> — <span>users acting outside intended permissions (e.g. changing a URL parameter to view someone else's account).</span></span></div>
+        <div class="owasp-row"><span class="onum">02</span><span class="ot"><strong>Cryptographic Failures</strong> — <span>weak or missing encryption exposing sensitive data (ties to Day 19's crypto lesson).</span></span></div>
+        <div class="owasp-row"><span class="onum">03</span><span class="ot"><strong>Injection</strong> — <span>untrusted input executed as code (SQL injection, command injection, XSS).</span></span></div>
+        <div class="owasp-row"><span class="onum">04</span><span class="ot"><strong>Insecure Design</strong> — <span>flaws baked into the architecture itself, not just the code (new emphasis since 2021).</span></span></div>
+        <div class="owasp-row"><span class="onum">05</span><span class="ot"><strong>Security Misconfiguration</strong> — <span>default credentials, open cloud buckets, verbose error messages leaking stack traces.</span></span></div>
+        <div class="owasp-row"><span class="onum">06</span><span class="ot"><strong>Vulnerable & Outdated Components</strong> — <span>libraries/frameworks with known CVEs — why dependency scanning exists.</span></span></div>
+        <div class="owasp-row"><span class="onum">07</span><span class="ot"><strong>Identification & Authentication Failures</strong> — <span>weak password policies, session fixation, missing MFA (builds on Day 20).</span></span></div>
+        <div class="owasp-row"><span class="onum">08</span><span class="ot"><strong>Software & Data Integrity Failures</strong> — <span>trusting unsigned updates/plugins — exactly what caused SolarWinds.</span></span></div>
+        <div class="owasp-row"><span class="onum">09</span><span class="ot"><strong>Security Logging & Monitoring Failures</strong> — <span>breaches going undetected for months because no one was watching the logs.</span></span></div>
+        <div class="owasp-row"><span class="onum">10</span><span class="ot"><strong>Server-Side Request Forgery (SSRF)</strong> — <span>tricking a server into making requests to internal systems it shouldn't reach.</span></span></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Mental model — three buckets, not ten flashcards:</strong></p>
+      <div class="bucket-grid">
+        <div class="bucket-card"><div class="btitle">Bad Input Handling</div><div class="bdesc">Injection — trusting data that came from outside the app.</div></div>
+        <div class="bucket-card"><div class="btitle">Bad Access Decisions</div><div class="bdesc">Access Control + Authentication — who you are vs. what you're allowed to touch.</div></div>
+        <div class="bucket-card"><div class="btitle">Bad Hygiene</div><div class="bdesc">Misconfig, outdated components, missing logging — the boring stuff that still breaches you.</div></div>
+      </div>
+      <div class="callout"><strong>The interview tell:</strong> Every real breach maps cleanly to one of these three buckets. Naming the bucket before the category number is what separates "memorized the list" from "understands the model."</div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card">
+      <div class="year">2017 — EQUIFAX BREACH — ~147 MILLION PEOPLE</div>
+      <div class="name">A known, unpatched Apache Struts CVE — Vulnerable and Outdated Components, textbook</div>
+      <div class="detail">Equifax was running Apache Struts with a publicly disclosed remote code execution vulnerability (CVE-2017-5638). A patch existed for months before the breach. Attackers exploited the unpatched framework to gain access and exfiltrate names, SSNs, birth dates, addresses, and driver's license numbers for roughly 147 million people. The root cause maps directly to today's "Vulnerable and Outdated Components" category — the fix wasn't a new feature, it was applying a patch that already existed. This is why dependency scanning (Snyk, Dependabot, OWASP Dependency-Check) exists as a standard practice today.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> identify and exploit a Broken Access Control flaw and a basic Injection flaw on a deliberately vulnerable app.</p>
+      <ol class="lab-steps">
+        <li>Spin up <strong>OWASP Juice Shop</strong> locally with Docker — a deliberately vulnerable app built to practice exactly this list.</li>
+        <li>Test Broken Access Control: log in as a normal user, note your basket/order ID in the URL, then try incrementing it. Viewing another user's basket confirms an IDOR.</li>
+        <li>Test basic Injection on the login form using a classic SQL injection payload in the email field.</li>
+        <li>Document your finding like a real pentest report — target, severity, proof-of-concept, one-line remediation.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a short written finding (target, severity, PoC, remediation) from today's lab — this is the artifact that stands out in campus placement interviews, because most classmates can recite the list but few can show a documented finding.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — spin up OWASP Juice Shop (vulnerable-by-design app)</span>
+<span class="cmd">docker pull bkimminich/juice-shop</span>
+<span class="cmd">docker run -d -p 3000:3000 bkimminich/juice-shop</span>
+
+<span class="c"># Step 2 — Broken Access Control test</span>
+<span class="hi"># log in, note your basket ID in the URL: /rest/basket/2</span>
+<span class="hi"># try /rest/basket/3, /rest/basket/4 ...</span>
+<span class="out"># viewing another user's basket = Broken Access Control confirmed</span>
+
+<span class="c"># Step 3 — basic Injection test on the login form</span>
+<span class="cmd">Email:    ' OR 1=1--</span>
+<span class="cmd">Password: anything</span>
+<span class="hi"># logging in without valid credentials = SQL Injection confirmed</span>
+
+<span class="c"># Step 4 — document like a real pentest report</span>
+<span class="cmd">echo "Finding: IDOR on /rest/basket/{id} — severity: High" >> findings.txt</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between authentication failures and access control failures?"</div>
+        <div class="a">A: "Authentication failures happen at the 'who are you' step — weak passwords, no MFA, session hijacking. Access control failures happen after login, at the 'what are you allowed to do' step — IDOR, privilege escalation. One is about proving identity, the other is about enforcing boundaries once identity is known."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you test for SQL Injection manually before running a tool?"</div>
+        <div class="a">A: "Insert a single quote into an input field and watch for a database error message — that's the first signal the input isn't sanitized, before I'd reach for sqlmap or Burp."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's an IDOR?"</div>
+        <div class="a">A: "Insecure Direct Object Reference — when an app exposes an internal ID, like an order number, directly in a URL or parameter, without checking whether the requesting user actually owns that object."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">LLM-generated vulnerable snippets</div>
+        <div class="adesc">Ask for a deliberately vulnerable login endpoint (e.g. with SQL injection) so you can practice spotting the flaw before it's pointed out to you.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AI report-writing</div>
+        <div class="adesc">Convert a raw finding into professional pentest-report language — turning "found a bug" into client-ready deliverable is a real, paid skill.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AI-assisted SAST</div>
+        <div class="adesc">GitHub Copilot Autofix, Semgrep — see how automated scanning maps findings back to OWASP categories in real codebases.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">OWASP Top 10 (owasp.org)</div>
+        <div class="adesc">owasp.org/Top10 — the official source. Bookmark it; every category has a linked cheat sheet with concrete remediation steps.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Identified and documented OWASP Top 10 vulnerabilities (IDOR, SQL Injection) on OWASP Juice Shop using manual testing techniques."</li>
+        <li><strong>Portfolio piece:</strong> a short written pentest-style report (finding, severity, proof-of-concept, remediation) from today's lab — often the difference-maker in campus interviews, since most classmates can recite the list but few can show a documented finding.</li>
+        <li><strong>Talking point:</strong> mapping a real incident (Equifax) to a specific OWASP category on the spot signals you understand security as applied risk, not memorized theory.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>The OWASP Top 10 is the backbone of every appsec consulting engagement. When you eventually run your own security consulting firm, this list becomes your default audit checklist for client web apps — it's vendor-neutral, free, and universally recognized, so clients trust an assessment structured around it without you having to justify the framework.</p>
+      <p style="margin-bottom:0;">It's also the basis for a productized service: an <strong>"OWASP Top 10 Quick Audit"</strong> — a fixed-scope, fixed-price engagement (3–5 days) that's easy to sell to small businesses who can't afford a full pentest but need to tell their own customers "we got assessed against OWASP standards."</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 60 seconds, without notes: "What is the OWASP Top 10, why does it exist, and pick one category — walk me through a real example of that vulnerability being exploited in the wild." If you can do this cold, you've actually learned it — that's the 10% "teaching" slice of the 70/20/10 rule.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Un5FtGXPakw" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">The Treatment — "OWASP Top 10 Explained (Still Relevant)"</div><div class="res-desc">youtube.com/watch?v=Un5FtGXPakw — verified, breaks down why the list still holds up.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=HE244moNuXE" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cyberwings Security — "OWASP Top 10 Vulnerabilities in Hindi"</div><div class="res-desc">youtube.com/watch?v=HE244moNuXE — verified, Hindi walkthrough of the full list.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/owasptop10" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — OWASP Top 10</div><div class="res-desc">Hands-on room covering Broken Access Control, Injection, Vulnerable Components, and SSRF.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Equifax 2017 — named, verified, 147M-person impact. Concrete, not abstract.</div>
+      <div class="mistake-item"><span class="check">✓</span> 70% hands-on — real IDOR + SQLi test on Juice Shop, not just reading the list.</div>
+      <div class="mistake-item"><span class="check">✓</span> Three-bucket mental model instead of memorizing 10 items like a poem.</div>
+      <div class="mistake-item"><span class="check">✓</span> Builds directly on Days 19–20 (crypto, AuthN/AuthZ) — knowledge compounds.</div>
+      <div class="mistake-item"><span class="check">✓</span> Progress vs Day 1–20 baseline only.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name all 10 OWASP categories and sort them into the three buckets.</li>
+        <li><span class="box"></span> I ran Juice Shop locally and confirmed an IDOR by changing a basket ID.</li>
+        <li><span class="box"></span> I confirmed a SQL injection using the ' OR 1=1-- payload on the login form.</li>
+        <li><span class="box"></span> I wrote one documented finding (target, severity, PoC, remediation).</li>
+        <li><span class="box"></span> I can explain the Equifax breach and which OWASP category it maps to.</li>
+        <li><span class="box"></span> I can teach the OWASP Top 10 out loud in under 60 seconds without notes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">21 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 22</div>
+      <div class="title">Say "Day 22" when ready — one concept, one hour, one day at a time.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 22" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>
