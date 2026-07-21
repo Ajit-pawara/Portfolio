@@ -196,6 +196,22 @@ function RadarChart({ skills }: { skills: any[] }) {
 
 // Helper to construct the dynamic preview URL for a track and day
 const getTrackIframeUrl = (trackId: string, track: any, dayNum: number, showRevision: boolean = false) => {
+  let fileName = "";
+  if (showRevision && dayNum % 10 === 0) {
+    const startDay = dayNum - 9;
+    fileName = `revision_day${startDay}_${dayNum}.html`;
+  } else if (trackId === 'cybersecurity') {
+    fileName = `day${String(dayNum).padStart(2, '0')}.html`;
+  } else if (trackId === 'java_dsa') {
+    fileName = `DSAday${dayNum}.html`;
+  } else {
+    fileName = `day${dayNum}.html`;
+  }
+
+  if (import.meta.env.DEV) {
+    return `/${fileName}`;
+  }
+
   if (!track || !track.repoUrl) return "";
   try {
     const url = new URL(track.repoUrl);
@@ -203,19 +219,6 @@ const getTrackIframeUrl = (trackId: string, track: any, dayNum: number, showRevi
     if (pathParts.length >= 2) {
       const owner = pathParts[0];
       const repo = pathParts[1];
-
-      let fileName = "";
-      if (showRevision && dayNum % 10 === 0) {
-        const startDay = dayNum - 9;
-        fileName = `revision_day${startDay}_${dayNum}.html`;
-      } else if (trackId === 'cybersecurity') {
-        fileName = `day${String(dayNum).padStart(2, '0')}.html`;
-      } else if (trackId === 'java_dsa') {
-        fileName = `DSAday${dayNum}.html`;
-      } else {
-        fileName = `day${dayNum}.html`;
-      }
-
       return `https://${owner.toLowerCase()}.github.io/${repo}/${fileName}`;
     }
   } catch (e) {
@@ -382,58 +385,23 @@ function App() {
       return;
     }
 
-    // Determine the exact filename corresponding to the current state
-    let fileName = "";
-    if (isRev && checkDay % 10 === 0) {
-      const startDay = checkDay - 9;
-      fileName = `revision_day${startDay}_${checkDay}.html`;
-    } else if (activeTrackId === 'cybersecurity') {
-      fileName = `day${String(checkDay).padStart(2, '0')}.html`;
-    } else if (activeTrackId === 'java_dsa') {
-      fileName = `DSAday${checkDay}.html`;
-    } else {
-      fileName = `day${checkDay}.html`;
-    }
+    setCheckingIframe(true);
+    let cancelled = false;
 
-    try {
-      const repoUrlObj = new URL(activeTrack.repoUrl);
-      const pathParts = repoUrlObj.pathname.split('/').filter(Boolean);
-      if (pathParts.length >= 2) {
-        const owner = pathParts[0];
-        const repo = pathParts[1];
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/docs/${fileName}`;
-
-        setCheckingIframe(true);
-
-        let cancelled = false;
-
-        fetch(apiUrl, { method: 'GET' })
-          .then(res => {
-            if (cancelled) return;
-            if (res.ok) {
-              setIframeExists(true);
-            } else if (res.status === 403) {
-              setIframeExists(true);
-            } else {
-              setIframeExists(false);
-            }
-          })
-          .catch(() => {
-            if (cancelled) return;
-            setIframeExists(false);
-          })
-          .finally(() => {
-            if (!cancelled) setCheckingIframe(false);
-          });
-
-        return () => { cancelled = true; };
-      } else {
+    fetch(iframeUrl, { method: 'HEAD' })
+      .then(res => {
+        if (cancelled) return;
+        setIframeExists(res.ok);
+      })
+      .catch(() => {
+        if (cancelled) return;
         setIframeExists(false);
-      }
-    } catch (e) {
-      console.error("Error checking file existence via API:", e);
-      setIframeExists(false);
-    }
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingIframe(false);
+      });
+
+    return () => { cancelled = true; };
   }, [activeTrackId, selectedDayNum, activeTrack, activeViewerTab, selectedRevisionInterval, checkRetryKey]);
 
   // Retry existence check every 15s when it fails
