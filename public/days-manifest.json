@@ -345,19 +345,19 @@
     },
     {
       "day": 21,
-      "title": "Web Fundamentals: How a Request Actually Works",
-      "subtitle": "Every web attack — SQLi, XSS, CSRF — exploits a misunderstanding of how HTTP actually flows. Today you map the full request-response cycle end-to-end.",
-      "takeaway": "Mapped HTTP request/response lifecycle including headers, methods, status codes, and cookies; understood the attack surface at each stage.",
-      "incidentName": "Equifax Web Server Vulnerability (2017)",
-      "incidentDetail": "Attackers exploited Apache Struts CVE-2017-5638 on Equifax's web portal, gaining access to 147M records through a web framework vulnerability that went unpatched for months.",
+      "title": "OWASP Top 10 & Web App Security Fundamentals",
+      "subtitle": "The single most-referenced list in appsec interviews — and the foundation every bug bounty hunter, pentester, and secure developer builds on. Today you stop reciting it like a poem and start using it as a mental model.",
+      "takeaway": "Named all 10 OWASP Top 10 categories grouped by three mental-model buckets (Bad Input Handling, Bad Access Decisions, Bad Hygiene). Exploited IDOR and SQL injection on OWASP Juice Shop and documented findings in pentest-report format.",
+      "incidentName": "Equifax Breach via Apache Struts (2017)",
+      "incidentDetail": "Equifax was running Apache Struts with CVE-2017-5638, a publicly disclosed RCE vulnerability. Attackers exploited the unpatched framework to exfiltrate 147M records. Root cause: OWASP #06 — Vulnerable and Outdated Components.",
       "stats": {
-        "commands": 2,
-        "toolsUsed": 1,
-        "scriptsBuilt": 2,
+        "commands": 3,
+        "toolsUsed": 3,
+        "scriptsBuilt": 0,
         "projects": 0,
         "labs": 1,
-        "notes": 3,
-        "examples": 1
+        "notes": 4,
+        "examples": 3
       }
     },
     {
