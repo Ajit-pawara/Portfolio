@@ -292,7 +292,7 @@ function App() {
       if (pathParts.length >= 2) {
         const owner = pathParts[0];
         const repo = pathParts[1];
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/docs`;
         setLoadingFiles(true);
         fetch(apiUrl)
           .then(res => {
@@ -401,7 +401,7 @@ function App() {
       if (pathParts.length >= 2) {
         const owner = pathParts[0];
         const repo = pathParts[1];
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`;
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/docs/${fileName}`;
 
         setCheckingIframe(true);
 
