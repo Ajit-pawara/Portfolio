@@ -340,7 +340,8 @@ function App() {
         }
       }
     });
-    return maxDay > 0 ? maxDay : (activeTrack.currentDay + 1);
+    const defaultCurrentDay = (initialData.challenge?.tracks as any)?.[activeTrackId]?.currentDay
+    return maxDay > 0 ? maxDay : (defaultCurrentDay ?? activeTrack.currentDay ?? 1) + 1;
   })();
 
   const [selectedDayNum, setSelectedDayNum] = useState<number>(computedCurrentDay);
