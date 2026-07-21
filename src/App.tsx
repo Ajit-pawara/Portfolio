@@ -381,7 +381,18 @@ function App() {
     const isRev = activeViewerTab === "revision";
     const checkDay = isRev ? selectedRevisionInterval : selectedDayNum;
     const iframeUrl = getTrackIframeUrl(activeTrackId, activeTrack, checkDay, isRev);
-    if (!iframeUrl || !activeTrack.repoUrl) {
+    if (!iframeUrl) {
+      setIframeExists(false);
+      return;
+    }
+
+    if (import.meta.env.DEV) {
+      setIframeExists(true);
+      setCheckingIframe(false);
+      return
+    }
+
+    if (!activeTrack.repoUrl) {
       setIframeExists(false);
       return;
     }
