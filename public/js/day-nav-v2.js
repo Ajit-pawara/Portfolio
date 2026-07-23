@@ -275,11 +275,26 @@
   inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') jumpTo(); });
 
   /* ═══════ keyboard shortcuts ═══════ */
+  /* 1) Make body focusable so keydown fires without manual click */
+  document.body.setAttribute('tabindex', '-1');
+
+  /* 2) Listen for arrows (null-safe activeElement check) */
   document.addEventListener('keydown', function(e){
-    if (/^(input|textarea|select)$/i.test(document.activeElement.tagName)) return;
+    var ae = document.activeElement;
+    if (!ae || /^(input|textarea|select)$/i.test(ae.tagName)) return;
     if (e.key === 'ArrowLeft' && prevHref) navigateTo(prevHref);
     if (e.key === 'ArrowRight' && nextHref) navigateTo(nextHref);
   });
+
+  /* 3) Clicking outside inputs → re-focus body (keeps arrows alive) */
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('input,textarea,select,#hex-gate')) {
+      document.body.focus({preventScroll: true});
+    }
+  });
+
+  /* 4) Initial focus so arrows work immediately */
+  document.body.focus({preventScroll: true});
 
   /* ═══════ SCROLL NAVIGATION ═══════ */
   var scrollCooldown = false;
