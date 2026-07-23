@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 31 to Day 40</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day31_to_day40.md</span>
+    <span style="color:var(--green);">Phase 3 — Offensive Security</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 31 TO DAY 40</div>
+    <h1>10 Days Done. <span>Malware, recon &amp; the pentest lifecycle.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 31–40 into one reference. Malware types, phishing, wireless attacks, cloud security, the full pentest methodology, OSINT, Nmap mastery, and vulnerability scanning.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">28</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">14</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 31 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">31</div>
+      <div class="day-meta">
+        <div class="day-title">Malware Types: Virus, Worm, Trojan, Ransomware</div>
+        <span class="day-incident">NotPetya (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// four core types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Virus</div><div class="cdesc">Attaches to a file. Needs user action (open infected .exe) to spread. Self-replicates within a host.</div></div>
+      <div class="concept"><div class="ctitle">Worm</div><div class="cdesc">Self-propagates across networks without user action. NotPetya used EternalBlue to spread worm-style — no clicks needed.</div></div>
+      <div class="concept"><div class="ctitle">Trojan</div><div class="cdesc">Disguised as legitimate software. Doesn't self-replicate — relies on user downloading and running it.</div></div>
+      <div class="concept"><div class="ctitle">Ransomware</div><div class="cdesc">Encrypts files and demands payment. NotPetya was a wiper disguised as ransomware — irreversible destruction, not decryptable.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>NotPetya (2017):</strong> A Russian military cyberweapon disguised as ransomware. It spread via EternalBlue (worm component) across Maersk, Merck, and FedEx. Master Boot Record overwritten — $10B+ in damages. It wasn't actually ransomware: even if you paid, there was no key to decrypt. The destruction was the objective.</p>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What is the difference between a virus and a worm? Give a real example of each.</div>
+      <div class="a">A virus needs user action to spread (opening a file). A worm propagates automatically over the network. ILOVEYOU (2000) was a virus — users had to open the attachment. NotPetya (2017) had worm capabilities via EternalBlue — scanned and infected adjacent systems without user interaction.</div>
+    </div>
+  </div>
+
+  <!-- DAY 32 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">32</div>
+      <div class="day-meta">
+        <div class="day-title">Social Engineering &amp; Phishing</div>
+        <span class="day-incident">Google/Facebook Wire Fraud (2013–2015)</span>
+      </div>
+    </div>
+    <div class="section-label">// human attack vectors</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Phishing</div><div class="cdesc">Fraudulent email disguised as legitimate. Creates urgency ("your account is locked") to bypass rational thinking.</div></div>
+      <div class="concept"><div class="ctitle">Spear Phishing</div><div class="cdesc">Targeted. Attacker researches the victim and crafts a personally relevant message. Far higher success rate.</div></div>
+      <div class="concept"><div class="ctitle">Pretexting</div><div class="cdesc">Creating a fabricated scenario (fake support call) to extract information. No email needed.</div></div>
+      <div class="concept"><div class="ctitle">Tailgating / Baiting</div><div class="cdesc">Follow someone through a secured door (tailgating) or leave infected USB drives labeled "confidential" in parking lot (baiting).</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Google/Facebook Wire Fraud (2013–2015):</strong> Lithuanian hacker Evaldas Rimasauskas sent fake phishing invoices impersonating Quanta Computer, a legitimate Asian manufacturer. Google and Facebook employees — paid millions of dollars in salaries — wired over $100M to fraudulent bank accounts. No malware, no exploit — just a convincing email and invoice.</p>
+    <div class="section-label">// email header analysis</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>grep -i "received-spf\|dkim\|dmarc" email.txt</div><div class="cdesc">Check email authentication headers. Missing SPF/DKIM = likely spoofed.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 33 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">33</div>
+      <div class="day-meta">
+        <div class="day-title">Wireless Security Basics</div>
+        <span class="day-incident">KRACK WPA2 Attack (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// wireless encryption standards</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">WPA2 (802.11i)</div><div class="cdesc">4-way handshake for auth. CCMP/AES encryption. KRACK broke the handshake itself — protocol-level, not brute-force.</div></div>
+      <div class="concept"><div class="ctitle">WPA3 (2018)</div><div class="cdesc">Simultaneous Authentication of Equals (SAE). Protects against offline dictionary attacks even if password is weak.</div></div>
+      <div class="concept"><div class="ctitle">WPA2-Enterprise</div><div class="cdesc">Uses RADIUS server. Each user gets unique credentials. Still vulnerable to rogue AP attacks if users don't validate certificates.</div></div>
+    </div>
+    <div class="section-label">// capturing handshakes</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>airodump-ng wlan0</code><div class="cdesc">List all nearby Wi-Fi networks — BSSID, channel, encryption, signal strength.</div></div>
+      <div class="cmd-row"><code>airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0</code><div class="cdesc">Capture packets on specific channel/BSSID to file. Use aireplay-ng to force deauth and capture handshake.</div></div>
+      <div class="cmd-row"><code>aireplay-ng -0 2 -a AA:BB:CC:DD:EE:FF wlan0</code><div class="cdesc">Deauthentication attack — kicks client off AP, forces reconnection and re-transmission of 4-way handshake.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>KRACK (CVE-2017-13077, 2017):</strong> Vulnerable in the WPA2 protocol itself — not a specific implementation. The 4-way handshake could be manipulated to reuse nonces, allowing decryption of traffic without knowing the Wi-Fi password. Every WPA2 device was affected. The fix required OS/device firmware updates — not something users could easily do.</p>
+  </div>
+
+  <!-- DAY 34 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">34</div>
+      <div class="day-meta">
+        <div class="day-title">Cloud Security Basics: AWS/Azure Shared Model</div>
+        <span class="day-incident">Capital One Cloud Breach (2019)</span>
+      </div>
+    </div>
+    <div class="section-label">// shared responsibility model</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">AWS: Security OF the cloud</div><div class="cdesc">AWS handles physical data centers, hardware, network infrastructure. You never touch their switches.</div></div>
+      <div class="concept"><div class="ctitle">AWS: Security IN the cloud</div><div class="cdesc">YOUR responsibility. IAM policies, S3 bucket permissions, security groups, encryption at rest, OS patching on EC2.</div></div>
+      <div class="concept"><div class="ctitle">Most breaches happen here</div><div class="cdesc">Capital One, Verizon, Accenture — all misconfigured the "IN the cloud" part. Overly permissive IAM + public-facing resources.</div></div>
+    </div>
+    <div class="section-label">// IAM least privilege</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>aws iam list-attached-role-policies --role-name MyRole</code><div class="cdesc">List all policies attached to an IAM role — review for overly permissive actions like s3:*.</div></div>
+      <div class="cmd-row"><code>aws s3api get-bucket-acl --bucket target-bucket</code><div class="cdesc">Check S3 bucket ACLs. Look for URI=http://acs.amazonaws.com/groups/global/AllUsers — means public.</div></div>
+      <div class="cmd-row"><code>aws sts assume-role --role-arn arn:aws:iam::123456:role/CrossAccountRole --role-session-name test</code><div class="cdesc">Assume a role — see what permissions you inherit. Abuse over-privileged cross-account roles.</div></div>
+    </div>
+    <div class="section-label">// real incident tie-in</div>
+    <p style="font-size:13.5px;color:#cdd6da;">The Capital One breach (covered Day 28) is the textbook cloud security failure: SSRF to metadata service → IAM credentials with S3 read access → 100M+ records. Both violations are STRICTLY "IN the cloud" — AWS infrastructure functioned exactly as designed. The customer's configuration was the vulnerability.</p>
+  </div>
+
+  <!-- DAY 35 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">35</div>
+      <div class="day-meta">
+        <div class="day-title">Phase 2 Complete: Review &amp; Mini Quiz</div>
+        <span class="day-incident">Full Phase 2 Coverage</span>
+      </div>
+    </div>
+    <div class="section-label">// what phase 2 covered</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Cryptography</div><div class="cdesc">Hashing (SHA-256), encryption (AES), PKI, SSL/TLS handshake — the crypto underpinning everything.</div></div>
+      <div class="concept"><div class="ctitle">OWASP Top 10</div><div class="cdesc">SQLi, XSS, CSRF, broken auth, misconfiguration, SSRF — all the web app attack surface.</div></div>
+      <div class="concept"><div class="ctitle">Network Defense</div><div class="cdesc">Firewalls (iptables), IDS/IPS (Snort), VPNs (OpenVPN), proxies — how defenders segment and protect.</div></div>
+      <div class="concept"><div class="ctitle">Cloud Security</div><div class="cdesc">Shared responsibility model, IAM least privilege, S3 misconfigurations — cloud-specific attack surface.</div></div>
+    </div>
+    <div class="section-label">// key takeaway</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Phase 2 bridged foundational networking (Phase 1) to offensive techniques (Phase 3). Everything from here builds on knowing what SQLi looks like, how XSS bypasses CSP, and why firewalls alone don't stop SSRF. If any of these feel fuzzy, revisit Days 21–34 before starting Phase 3.</p>
+  </div>
+
+  <!-- DAY 36 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">36</div>
+      <div class="day-meta">
+        <div class="day-title">Pentesting Methodology: Recon → Exploit → Report</div>
+        <span class="day-incident">HackerOne Uber Bug Bounty (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// the five phases</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">1. Reconnaissance</div><div class="cdesc">Gather intel without touching systems. WHOIS, DNS, Shodan, Google dorking, job postings. 70% of effort.</div></div>
+      <div class="concept"><div class="ctitle">2. Scanning</div><div class="cdesc">Active probing — Nmap, directory brute-force, vulnerability scanners. Turn intel into a target list.</div></div>
+      <div class="concept"><div class="ctitle">3. Exploitation</div><div class="cdesc">Gain access using discovered vulnerabilities. SQLi, XSS, weak credentials, known CVEs.</div></div>
+      <div class="concept"><div class="ctitle">4. Post-Exploitation</div><div class="cdesc">Lateral movement, privilege escalation, persistence, data exfiltration. Pivot to next target.</div></div>
+      <div class="concept"><div class="ctitle">5. Reporting</div><div class="cdesc">Document findings, severity, reproduction steps, remediation. Without this, you're not a professional pentester.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Uber Bug Bounty 2017:</strong> A researcher followed structured recon → found an SSRF on an internal API → extracted AWS IAM keys → owned the production environment. The report won a $10k bounty. The methodology mattered more than the tool: phase-by-phase reconnaissance identified the SSRF that a broad scan would have missed.</p>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through your pentesting methodology from start to finish.</div>
+      <div class="a">Five phases: Recon (passive OSINT, Shodan, DNS enumeration), Scanning (Nmap port scans, directory brute-force, vulnerability scans), Exploitation (targeted CVE hunting, credential testing), Post-Exploitation (lateral movement, privilege escalation), Reporting (severity ratings, reproduction steps, remediation). Every phase must be documented — if it's not in the report, it didn't happen.</div>
+    </div>
+  </div>
+
+  <!-- DAY 37 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">37</div>
+      <div class="day-meta">
+        <div class="day-title">Passive Reconnaissance &amp; OSINT</div>
+        <span class="day-incident">Shodan — Exposed ICS Devices</span>
+      </div>
+    </div>
+    <div class="section-label">// passive recon sources</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">WHOIS</div><div class="cdesc">Domain registration data — registrant name, email, address, phone. Often reveals real names and org structure.</div></div>
+      <div class="concept"><div class="ctitle">DNS Enumeration</div><div class="cdesc">dig ANY, subdomain brute-force (subfinder), zone transfers if misconfigured. Maps the entire digital footprint.</div></div>
+      <div class="concept"><div class="ctitle">Shodan</div><div class="cdesc">Search engine for internet-connected devices. Find exposed RDP, SSH, webcams, ICS/SCADA — without scanning.</div></div>
+      <div class="concept"><div class="ctitle">Google Dorking</div><div class="cdesc">Advanced search operators. site:target.com filetype:pdf, intitle:"index of" /backup — finds exposed files.</div></div>
+    </div>
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>whois target.com</code><div class="cdesc">Query domain registration — registrar, dates, nameservers, registrant contact.</div></div>
+      <div class="cmd-row"><code>dig ANY target.com</code><div class="cdesc">Return all DNS record types — A, AAAA, MX, NS, TXT, SOA in one shot.</div></div>
+      <div class="cmd-row"><code>subfinder -d target.com</code><div class="cdesc">Passive subdomain enumeration using multiple sources (Crtsh, VirusTotal, etc.)</div></div>
+      <div class="cmd-row"><code>shodan search "port:22 country:IN"</code><div class="cdesc">Search Shodan — find SSH servers in India. Replace filters to find any exposed service.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Shodan ICS Discovery:</strong> Researchers used Shodan to find thousands of industrial control systems accessible from the internet — water treatment plants running HTTP interfaces without auth, power grid controllers on default credentials, building management systems with public dashboards. These weren't discovered by scanning each target — Shodan had already indexed them. Passive recon is often more revealing than active probing.</p>
+  </div>
+
+  <!-- DAY 38 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">38</div>
+      <div class="day-meta">
+        <div class="day-title">Active Recon — Nmap Basics</div>
+        <span class="day-incident">Mirai Botnet Nmap-Style Scanning (2016)</span>
+      </div>
+    </div>
+    <div class="section-label">// scan types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">TCP SYN (-sS)</div><div class="cdesc">Half-open scan. Sends SYN, reads SYN-ACK (open) or RST (closed). Never completes handshake. Stealthy — not logged by some apps.</div></div>
+      <div class="concept"><div class="ctitle">TCP Connect (-sT)</div><div class="cdesc">Completes full 3-way handshake. More reliable, less stealthy — every connection is logged by the target.</div></div>
+      <div class="concept"><div class="ctitle">UDP Scan (-sU)</div><div class="cdesc">Slow — UDP doesn't respond with port closed. Timeout-based detection. Essential for DNS (53), SNMP (161).</div></div>
+    </div>
+    <div class="section-label">// port states</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Open</div><div class="cdesc">Application is listening. SYN-ACK received. The target surface.</div></div>
+      <div class="concept"><div class="ctitle">Closed</div><div class="cdesc">Port accessible but no app listening. RST received. Not exploitable but host is reachable.</div></div>
+      <div class="concept"><div class="ctitle">Filtered</div><div class="cdesc">Firewall blocks probe. No response or ICMP unreachable. May need stealth timing to bypass.</div></div>
+    </div>
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sS -p 22,80,443,3389 target.com</code><div class="cdesc">Stealth SYN scan on common ports. Fast and effective for initial assessment.</div></div>
+      <div class="cmd-row"><code>nmap -sT -p- target.com</code><div class="cdesc">Full TCP connect scan on all 65535 ports. Slow but comprehensive — every open port found.</div></div>
+      <div class="cmd-row"><code>nmap -sU -p 53,161 target.com</code><div class="cdesc">UDP scan — checks DNS (53) and SNMP (161). Often forgotten, often exposed.</div></div>
+    </div>
+    <div class="section-label">// real incident tie-in</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Mirai 2016:</strong> The Mirai botnet scanned the entire IPv4 internet on port 23 (Telnet) using simple SYN probes — exactly what nmap -sS does. When it found a telnet-enabled IoT device with default credentials, it logged in and installed DDoS malware. No advanced exploit — just a SYN scan and admin:admin. Nmap-style scanning at scale.</p>
+  </div>
+
+  <!-- DAY 39 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">39</div>
+      <div class="day-meta">
+        <div class="day-title">Nmap Advanced — Scripts &amp; Evasion</div>
+        <span class="day-incident">NSE EternalBlue Detection (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// NSE script categories</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">vuln</div><div class="cdesc">Check for specific CVEs. nmap --script vuln — scans every known vuln script against open ports.</div></div>
+      <div class="concept"><div class="ctitle">exploit</div><div class="cdesc">Run actual exploits against service. Dangerous — only use with explicit permission.</div></div>
+      <div class="concept"><div class="ctitle">auth</div><div class="cdesc">Test authentication — default credentials, anonymous FTP, LDAP null binds. Finds weak auth.</div></div>
+      <div class="concept"><div class="ctitle">discovery</div><div class="cdesc">Enumerate services — SMB shares, NFS exports, database schemas. Post-exploration mapping.</div></div>
+    </div>
+    <div class="section-label">// evasion techniques</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Decoy Scan (-D)</div><div class="cdesc">Spoof random source IPs alongside your real one. Target sees 20 scans from 20 IPs — harder to block.</div></div>
+      <div class="concept"><div class="ctitle">Fragment Scan (-f)</div><div class="cdesc">Split TCP header across multiple packets. Some simple firewalls can't reassemble and pass the fragments.</div></div>
+      <div class="concept"><div class="ctitle">Timing (-T0 to -T5)</div><div class="cdesc">T0 = paranoid (5 min between probes). T5 = insane (fast). Lower timing evades rate-based IDS.</div></div>
+    </div>
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap --script vuln -sV target.com</div><div class="cdesc">Run all vulnerability detection NSE scripts with version detection. One command vulnerability assessment.</div></div>
+      <div class="cmd-row"><code>nmap --script smb-vuln-ms17-010 -p 445 target.com</div><div class="cdesc">Check if target is vulnerable to EternalBlue — the WannaCry/NotPetya entry point.</div></div>
+      <div class="cmd-row"><code>nmap -sS -D RND:10 -f -T2 target.com</div><div class="cdesc">Stealth scan: 10 decoy IPs + fragment packets + slow timing. Evades most default IDS rules.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>NSE EternalBlue Detection:</strong> After WannaCry exploded in May 2017, defenders worldwide used nmap --script smb-vuln-ms17-010 to rapidly scan their networks. What would have taken days of manual checking became a single Nmap command. This script turned Nmap from a port scanner into a vulnerability assessment tool — the same scan Mirai used to find targets could also find vulnerabilities.</p>
+  </div>
+
+  <!-- DAY 40 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">40</div>
+      <div class="day-meta">
+        <div class="day-title">Vulnerability Scanning with Nessus/OpenVAS</div>
+        <span class="day-incident">Nessus in Target Breach Forensics (2013)</span>
+      </div>
+    </div>
+    <div class="section-label">// automated vs manual</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Automated (OpenVAS)</div><div class="cdesc">Scans 50k+ CVEs. Fast, broad coverage. High false positives. Misses business logic flaws.</div></div>
+      <div class="concept"><div class="ctitle">Manual (Nmap + Burp)</div><div class="cdesc">Targeted, creative, finds logic flaws and chained attacks. Slow but thorough.</div></div>
+      <div class="concept"><div class="ctitle">Best Practice</div><div class="cdesc">Run automated scanner first for baseline → manually verify every finding → then hunt for what scanners miss.</div></div>
+    </div>
+    <div class="section-label">// openvas basics</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>gvm-cli --gmp-username admin --gmp-password pass socket --socketpath /var/run/gvmd.sock --xml "&lt;create_target&gt;&lt;name&gt;Scan_Target&lt;/name&gt;&lt;hosts&gt;10.0.0.1&lt;/hosts&gt;&lt;/create_target&gt;"</code><div class="cdesc">Create a scan target in OpenVAS (Greenbone) via GMP API.</div></div>
+      <div class="cmd-row"><code>openvas-nvt-sync</code><div class="cdesc">Update all Network Vulnerability Tests — get latest CVE coverage before scanning.</div></div>
+      <div class="cmd-row"><code>gvm-cli --gmp-username admin --gmp-password pass socket --socketpath /var/run/gvmd.sock --xml "&lt;start_task&gt;&lt;task_id&gt;TASK-ID&lt;/task_id&gt;&lt;/start_task&gt;"</code><div class="cdesc">Start a scan task. Results appear in Greenbone Security Assistant web UI.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Nessus in Target Forensics:</strong> After the Target breach (2013), forensic investigators deployed Nessus to scan Target's POS environment. They found 50+ unpatched vulnerabilities including the HVAC vendor's systems that were the initial entry point. An automated scan before the breach would have caught all of them. The scans existed — the scanning policy didn't.</p>
+  </div>
+
+  <!-- ALL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — malware through pentesting focus</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2013–15</div><div class="incident">Google/Facebook Wire Fraud</div><div class="detail">Fake invoices impersonating a supplier. $100M+ wired by employees. Pure social engineering.</div></div>
+      <div class="bt-row"><div class="year">2016</div><div class="incident">Mirai Botnet</div><div class="detail">Nmap-style SYN scans on port 23. Default creds on IoT devices. Took down Twitter/Netflix via DDoS.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">NotPetya</div><div class="detail">Wiper disguised as ransomware. EternalBlue propagation. $10B+ damages. Nation-state attack.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">KRACK WPA2</div><div class="detail">Protocol-level vulnerability. 4-way handshake nonce reuse allowed traffic decryption without password.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Uber Bounty SSRF</div><div class="detail">Structured recon → SSRF → AWS IAM keys → full prod environment owned. $10k bounty.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">NSE EternalBlue</div><div class="detail">Nmap script smb-vuln-ms17-010 turned Nmap into a rapid vulnerability assessment tool post-WannaCry.</div></div>
+      <div class="bt-row"><div class="year">2019</div><div class="incident">Capital One Cloud</div><div class="detail">SSRF + IAM over-privilege. Shared responsibility failure. 100M+ records from S3.</div></div>
+      <div class="bt-row"><div class="year">2013</div><div class="incident">Target Breach Forensics</div><div class="detail">Nessus post-breach found 50+ unpatched vulns. Automated scanning would have caught the entry vector.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Shodan ICS Exposure</div><div class="detail">Passive discovery of 1000s of exposed water treatment, power grid, and building management systems.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Phishing Campaigns</div><div class="detail">90%+ of breaches start with a phished credential. Email header analysis is now a core defense skill.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 31–40</div>
+        <span class="day-incident">Offensive security &amp; recon commands</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>airodump-ng wlan0</code><div class="cdesc">List all Wi-Fi networks with BSSID, channel, encryption, signal.</div></div>
+      <div class="cmd-row"><code>aireplay-ng -0 2 -a BSSID wlan0</code><div class="cdesc">Deauth attack — capture WPA2 handshake by forcing client reconnect.</div></div>
+      <div class="cmd-row"><code>whois target.com</code><div class="cdesc">Domain registration lookup — registrar, dates, contacts.</div></div>
+      <div class="cmd-row"><code>dig ANY target.com</code><div class="cdesc">All DNS records — A, MX, NS, TXT, SOA in one query.</div></div>
+      <div class="cmd-row"><code>subfinder -d target.com</code><div class="cdesc">Passive subdomain discovery from multiple OSINT sources.</div></div>
+      <div class="cmd-row"><code>shodan search "port:443"</code><div class="cdesc">Internet-wide device search. Find anything exposed without scanning.</div></div>
+      <div class="cmd-row"><code>nmap -sS -p 22,80,443,3389 target.com</code><div class="cdesc">Stealth SYN scan targeting common services.</div></div>
+      <div class="cmd-row"><code>nmap -sT -p- target.com</code><div class="cdesc">Full TCP connect scan — all 65535 ports.</div></div>
+      <div class="cmd-row"><code>nmap -sU -p 53,161 target.com</code><div class="cdesc">UDP scan — DNS and SNMP, often overlooked.</div></div>
+      <div class="cmd-row"><code>nmap --script vuln -sV target.com</code><div class="cdesc">NSE vulnerability scan — automated CVE checking on open services.</div></div>
+      <div class="cmd-row"><code>nmap --script smb-vuln-ms17-010 -p 445 target.com</code><div class="cdesc">Check for EternalBlue — the WannaCry/NotPetya entry point.</div></div>
+      <div class="cmd-row"><code>nmap -sS -D RND:10 -f -T2 target.com</code><div class="cdesc">Evasion scan — decoys + fragments + slow timing to bypass IDS.</div></div>
+      <div class="cmd-row"><code>grep -i "received-spf\|dkim\|dmarc" email.txt</code><div class="cdesc">Check email auth headers — missing = likely spoofed.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 31–40</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">Shodan + AI</div><div class="adesc">AI query builder for Shodan — find exposed ICS, RDP, or databases with natural language queries.</div></div>
+      <div class="ai-pill"><div class="aname">GoPhish</div><div class="adesc">Open-source phishing framework. AI can generate realistic campaign templates and landing pages.</div></div>
+      <div class="ai-pill"><div class="aname">OpenVAS / Greenbone</div><div class="adesc">Open-source vulnerability scanner. AI prioritization reduces 10k+ findings to actionable criticals.</div></div>
+      <div class="ai-pill"><div class="aname">Nmap + GPT</div><div class="adesc">Paste Nmap scan output into GPT — get instant analysis of exposed services and recommended exploits.</div></div>
+      <div class="ai-pill"><div class="aname">MalwareBazaar / Any.Run</div><div class="adesc">Malware sample databases and online sandboxes. AI classifies unknown samples by behavior patterns.</div></div>
+      <div class="ai-pill"><div class="aname">TheHarvester + AI</div><div class="adesc">OSINT email/subdomain gatherer. AI analyzes results to build target org charts and find weak points.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 31–40</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 31</div><div class="bullet">"Classified malware families by infection vector, propagation, and payload behavior; analyzed real-world samples of worms, trojans, and ransomware in sandbox environments."</div></div>
+      <div class="job-box"><div class="day-ref">Day 32</div><div class="bullet">"Built simulated phishing campaigns using GoPhish; performed email header analysis (SPF, DKIM, DMARC) to identify spoofing and social engineering indicators."</div></div>
+      <div class="job-box"><div class="day-ref">Day 33</div><div class="bullet">"Captured WPA2 4-way handshakes using aircrack-ng suite; analyzed wireless encryption protocols and enterprise deployment misconfigurations."</div></div>
+      <div class="job-box"><div class="day-ref">Day 34</div><div class="bullet">"Mapped AWS shared responsibility model; configured IAM roles with least privilege principles; identified common cloud misconfigurations including public S3 buckets."</div></div>
+      <div class="job-box"><div class="day-ref">Day 36–37</div><div class="bullet">"Executed full penetration testing methodology (recon, scanning, exploitation, reporting); gathered OSINT using whois, DNS enumeration, Shodan, and Google dorking."</div></div>
+      <div class="job-box"><div class="day-ref">Day 38–39</div><div class="bullet">"Performed advanced Nmap scanning including TCP SYN/UDP scans, NSE vulnerability scripts, and IDS evasion techniques (decoys, fragmentation, custom timing)."</div></div>
+      <div class="job-box"><div class="day-ref">Day 40</div><div class="bullet">"Configured and executed automated vulnerability scans using OpenVAS/GVM; analyzed severity ratings and prioritized remediation recommendations from 50k+ CVE database."</div></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What made NotPetya different from typical ransomware? Why couldn't victims get their data back even if they paid?</div>
+      <div class="ans">NotPetya was a wiper disguised as ransomware. The MBR was overwritten and files were irreversibly encrypted — no decryption key existed. Payment was pointless because recovery was never intended.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">How did a single phishing email convince Google and Facebook to wire over $100M to a Lithuanian hacker?</div>
+      <div class="ans">The emails impersonated Quanta Computer, a real supplier. The invoices looked legitimate. Employees in finance approved payments totaling $100M+ without verifying the bank account change via a separate channel — the classic BEC (Business Email Compromise) technique.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">What is the KRACK attack and why was it especially dangerous compared to other Wi-Fi vulnerabilities?</div>
+      <div class="ans">KRACK broke the WPA2 protocol itself — not a specific implementation. It manipulated the 4-way handshake to reuse nonces, allowing traffic decryption without knowing the password. Every WPA2 device was affected, and the fix required OS/firmware updates.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">In the AWS shared responsibility model, who was at fault for the Capital One breach — AWS or Capital One?</div>
+      <div class="ans">Capital One. AWS provided the tools correctly (metadata service, IAM, S3). Capital One misconfigured their WAF (allowing SSRF) and IAM role (over-privileged read access to S3). Security IN the cloud is always the customer's responsibility.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What are the five phases of a professional penetration test? Which phase takes 70% of the effort?</div>
+      <div class="ans">Reconnaissance (70% of effort), Scanning, Exploitation, Post-Exploitation, Reporting. Most beginners rush to exploitation — professionals spend the most time on recon because that's where the target reveals its weaknesses.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">How does Shodan find exposed industrial control systems without actively scanning the internet?</div>
+      <div class="ans">Shodan continuously crawls the internet and indexes banners from every service it connects to. ICS devices like water treatment controllers often run HTTP interfaces without authentication — Shodan finds and indexes them during routine internet-wide probing, making them searchable by anyone.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What is the difference between a TCP SYN scan (-sS) and a TCP Connect scan (-sT)? When would you use each?</div>
+      <div class="ans">SYN scan is half-open (sends SYN, reads SYN-ACK, sends RST) — never completes handshake, stealthier, faster. Connect scan completes full TCP handshake — logged by target, more reliable. Use SYN for speed/stealth, Connect when you need accuracy through firewalls.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What Nmap command would you run to check if a target is vulnerable to EternalBlue? What's the script category?</div>
+      <div class="ans">nmap --script smb-vuln-ms17-010 -p 445 target.com. The category is "vuln" — includes all detected CVE checks. This is the script that defenders ran worldwide after WannaCry.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">How did the Mirai botnet use Nmap-style scanning, and what were they looking for?</div>
+      <div class="ans">Mirai scanned the entire IPv4 internet on port 23 (Telnet) using TCP SYN probes. When it found a Telnet-enabled IoT device with default credentials (admin:admin), it logged in and installed DDoS malware. Simple scan + default creds = millions of bots.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What was the key lesson from the Target breach forensic scan with Nessus?</div>
+      <div class="ans">Post-breach Nessus scans found 50+ unpatched vulnerabilities on Target's systems — including the HVAC vendor entry vector. The lesson: vulnerability scanning tools like Nessus don't work unless you actually run them regularly with a policy that requires remediation before attackers exploit what scanners find.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next phase — day 41</div>
+      <div class="title">Phase 3 continues: Web exploitation, Metasploit, Active Directory attacks</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — Phase 2 &amp; Phase 3 (part 1) consolidated. Continue to Day 41.</footer>
+
+</div>
+</body>
+</html>

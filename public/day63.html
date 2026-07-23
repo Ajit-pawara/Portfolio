@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 63 — Endpoint Detection & Response (EDR) Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:70%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .sql{color:var(--purple);}
+  .code-block .sq{color:var(--pink);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sql{color:var(--purple);}
+  .term-body .sq{color:var(--pink);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .edr-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+  .edr-compare > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 14px;}
+  .edr-compare .label{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-bottom:6px;}
+  .edr-compare .label.sig{color:var(--red);}
+  .edr-compare .label.beh{color:var(--green);}
+  .edr-compare .item{font-size:12px;color:#cdd6da;margin-bottom:4px;padding-left:12px;}
+
+  .tel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:14px;}
+  .tel-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .tel-card .tname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:5px;color:var(--green);}
+  .tel-card .tdesc{font-size:12px;color:var(--muted);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.edr-compare{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day63$ edr-fundamentals.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 63/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 63 OF 90 — PHASE 7: NETWORK DEFENSE & TRAFFIC ANALYSIS</div>
+  <h1>Endpoint Detection & Response — <span class="accent">EDR Basics</span></h1>
+  <p class="subtitle">EDR is the difference between knowing something is wrong and knowing exactly what happened, how it got in, and what it's doing right now. While IDS (Day 62) watches network traffic, EDR watches the endpoint — every process, file, registry change, and network connection.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is EDR?</strong> Endpoint Detection & Response (EDR) is a security system that continuously monitors endpoint devices (servers, workstations, laptops) for malicious activity. Unlike traditional antivirus (signature-based), EDR is behavior-based — it looks for <em>what processes do</em>, not just <em>what files exist</em>.</p>
+
+      <p style="margin-top:16px;"><strong>Behavioral Detection vs Signature-Based Detection:</strong></p>
+      <div class="edr-compare">
+        <div>
+          <div class="label sig">❌ Signature-Based (Traditional AV)</div>
+          <div class="item">Matches file hashes or byte sequences against a known-bad database.</div>
+          <div class="item">Zero-day malware: invisible until signature is published.</div>
+          <div class="item">Polymorphic malware: same behavior, different hash — bypasses easily.</div>
+          <div class="item">Fileless attacks: no file to hash — invisible entirely.</div>
+        </div>
+        <div>
+          <div class="label beh">✅ Behavioral (EDR)</div>
+          <div class="item">Models normal behavior — flags deviations without needing a known-bad list.</div>
+          <div class="item">Detects zero-days by observing anomalous actions (e.g., powershell.exe making outbound connections).</div>
+          <div class="item">Builds process ancestry trees — <code>winword.exe -> cmd.exe -> powershell.exe</code> is always suspicious.</div>
+          <div class="item">Fileless execution: monitors process injection, WMI persistence, and registry run keys.</div>
+        </div>
+      </div>
+
+      <p><strong>EDR telemetry sources — what gets collected:</strong></p>
+      <div class="tel-grid">
+        <div class="tel-card"><div class="tname">Process Events</div><div class="tdesc">Process creation (PID, parent PID, command line, user token). Every process has a parent — the ancestry chain is the most powerful signal in EDR. <code>winword.exe (PID 1234) -> cmd.exe (PID 5678)</code> is a red flag.</div></div>
+        <div class="tel-card"><div class="tname">File System Events</div><div class="tdesc">File create, modify, delete, rename. EDR tracks which process wrote which file. A DLL written to <code>System32</code> by <code>explorer.exe</code> (not a legitimate installer) triggers an alert.</div></div>
+        <div class="tel-card"><div class="tname">Registry Events</div><div class="tdesc">Registry key create/modify/delete. Persistence mechanisms (Run keys, services, scheduled tasks) are registry operations — EDR flags <code>reg.exe add HKLM\...\Run /v Backdoor</code>.</div></div>
+        <div class="tel-card"><div class="tname">Network Events</div><div class="tdesc">Outbound connections, DNS queries, TLS handshakes. The EDR sensor logs <code>process.exe -> IP:port</code> — even if the traffic is encrypted, the beacon pattern is visible at the telemetry layer.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Fileless attack detection — the crown jewel of EDR:</strong> Fileless malware never writes a file to disk. It executes entirely in memory — often through PowerShell, WMI, or macro code. Signature AV sees nothing because there's no file to scan. EDR detects fileless attacks by monitoring the <em>behavior chain</em>: a Microsoft Office process spawning a script interpreter (<code>cmd.exe</code>, <code>powershell.exe</code>) that makes an outbound network connection is automatically flagged as suspicious, regardless of whether a file was ever written.</p>
+      <div class="callout"><strong>Key insight:</strong> EDR is not a replacement for antivirus — it's a fundamentally different approach. AV answers "is this file known-bad?" EDR answers "is this process behaving suspiciously?" A modern defense uses both: AV for known threats, EDR for everything else.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Use living-off-the-land binaries (LOLBins) — <code>powershell.exe</code>, <code>wmic.exe</code>, <code>mshta.exe</code>, <code>cscript.exe</code> — to execute code without dropping a custom binary.</li>
+          <li>Perform process injection: allocate memory in a trusted process (e.g., <code>svchost.exe</code>) and execute shellcode inside it — EDR sensors see the write but it blends with normal process activity.</li>
+          <li>Disable or tamper with EDR sensors if you gain administrator privileges: <code>sc stop CrowdStrike Falcon</code> or unload kernel drivers.</li>
+          <li>Use reflective DLL loading — load a DLL from memory without registering it in the PEB (Process Environment Block), bypassing user-mode API hooks.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Enable command-line auditing — the single most important EDR data source. Always capture the full command line of every process creation event. Attackers' intentions are visible in their arguments.</li>
+          <li>Build process tree baselines: <code>svchost.exe</code> should never parent <code>powershell.exe</code>. Any deviation from the baseline is immediately investigated.</li>
+          <li>Deploy EDR sensors in blocking mode (not just monitoring) for signed processes — block unsigned PowerShell execution, block remote WMI calls from non-admin workstations.</li>
+          <li>Correlate EDR alerts with network IDS alerts (Day 62) — a Suricata alert for C2 beaconing + an EDR process tree showing a suspicious PowerShell parent chain = confirmed compromise.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2021 — HAFNIUM EXCHANGE ATTACKS — 30,000+ US ORGANIZATIONS COMPROMISED</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">CrowdStrike Falcon EDR detected anomalous w3wp.exe process behavior — the first sign of Hafnium exploitation</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">In March 2021, a Chinese state-sponsored group (Hafnium) exploited four zero-day vulnerabilities in Microsoft Exchange Server (CVE-2021-26855, CVE-2021-26857, CVE-2021-26858, CVE-2021-27065). The first indicators were not signatures — they were process tree anomalies detected by CrowdStrike Falcon EDR sensors. The EDR telemetry showed w3wp.exe (the IIS worker process for Exchange) spawning cmd.exe and powershell.exe — behavior that never occurs in normal Exchange operation. The EDR process trees revealed the full attack chain: web shell upload through the SSRF vulnerability, followed by cmd.exe execution to install additional persistence, then outbound PowerShell connections for data exfiltration. CrowdStrike published their findings within 24 hours, but over 30,000 US organizations were compromised before patches could be deployed. The EDR telemetry was critical for incident response — it told responders exactly which systems were compromised, what the attackers executed, and what data was accessed.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> simulate EDR telemetry collection using Sysmon (System Monitor) — the free Microsoft EDR-like tool — and analyze process trees, network connections, and file events.</p>
+      <ol class="lab-steps">
+        <li>Download Sysmon from <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon" style="color:var(--cyan);">Microsoft Sysinternals</a>. Install with a config: <code>sysmon64 -accepteula -i sysmon-config.xml</code>. Use SwiftOnSecurity's popular sysmon-config.</li>
+        <li>Generate telemetry: open <code>notepad.exe</code>, then from within Notepad use File → Open → type <code>powershell.exe</code> in the filename box. This spawns a child process from an unexpected parent.</li>
+        <li>Check the Sysmon event log: Open <code>Event Viewer</code> → <code>Applications and Services Logs</code> → <code>Microsoft</code> → <code>Windows</code> → <code>Sysmon</code> → <code>Operational</code>. Look for Event ID 1 (Process Creation) showing the parent-child chain.</li>
+        <li>Use PowerShell to query Sysmon events: <code>Get-WinEvent -FilterHashtable @{LogName="Microsoft-Windows-Sysmon/Operational"; ID=1} | Select-Object -First 5 | Format-List</code>. Observe the ParentImage and CommandLine fields.</li>
+        <li>Simulate a fileless attack: run <code>powershell -enc SgBlAGwAbABvACwAIABXAG8AcgBsAGQAIQAgAD0AKAAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwBlAHgAYQBtAHAAbABlAC4AYwBvAG0AJwApAA==</code> (encoded "Hello World" web request). Sysmon captures Event ID 3 (Network Connect) showing the PowerShell process making an outbound connection.</li>
+        <li>Build a process tree visualization: write a PowerShell script that queries Sysmon events and outputs a parent-child tree (use the <code>ParentProcessId</code> and <code>ProcessId</code> fields).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A Sysmon event log showing an anomalous parent-child process chain (e.g., notepad.exe spawning powershell.exe), a network connection event from a PowerShell process, and a custom process tree diagram. You're now collecting EDR-grade telemetry on any Windows endpoint.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Install Sysmon with SwiftOnSecurity config</span>
+<span class="cmd">sysmon64 -accepteula -i sysmon-config.xml</span>
+<span class="out">&gt; Sysmon v14.x installed</span>
+
+<span class="c"># Query Sysmon process creation events (Event ID 1)</span>
+<span class="cmd">Get-WinEvent -FilterHashtable @{LogName="Microsoft-Windows-Sysmon/Operational"; ID=1} |</span>
+<span class="cmd">  Select-Object -First 3 | Format-List</span>
+<span class="hi"># Look for: ParentImage, Image, CommandLine, ProcessId, ParentProcessId</span>
+
+<span class="c"># Query network connection events (Event ID 3)</span>
+<span class="cmd">Get-WinEvent -FilterHashtable @{LogName="Microsoft-Windows-Sysmon/Operational"; ID=3} |</span>
+<span class="cmd">  Where-Object { $_.Properties[6].Value -like "*powershell*" } |</span>
+<span class="cmd">  Select-Object TimeCreated, @{n="Process";e={$_.Properties[6].Value}},</span>
+<span class="cmd">    @{n="DestIP";e={$_.Properties[13].Value}},</span>
+<span class="cmd">    @{n="DestPort";e={$_.Properties[15].Value}}</span>
+
+<span class="c"># Build a process tree from Sysmon events</span>
+<span class="cmd">$events = Get-WinEvent -FilterHashtable @{LogName="Microsoft-Windows-Sysmon/Operational"; ID=1}</span>
+<span class="cmd">foreach ($e in $events) {</span>
+<span class="cmd">  $pid = $e.Properties[4].Value</span>
+<span class="cmd">  $ppid = $e.Properties[5].Value</span>
+<span class="cmd">  $img = $e.Properties[6].Value.Split('\')[-1]</span>
+<span class="cmd">  Write-Host "$ppid -> $pid : $img"</span>
+<span class="cmd">}</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How does EDR differ from traditional antivirus?"</div>
+        <div class="a">A: "Traditional antivirus is signature-based — it matches file hashes or byte sequences against a database of known malware. It can't detect zero-days or fileless attacks. EDR is behavior-based — it collects telemetry from every process, file, registry, and network event, then uses analytics to detect anomalous behavior. EDR answers 'what is this process doing?' instead of 'is this file known-bad?' The key difference: AV detects known files, EDR detects suspicious actions. They complement each other."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is a process tree and why is it important in EDR?"</div>
+        <div class="a">A: "A process tree shows the ancestry chain of every running process — which process spawned which child processes. In normal operation, <code>explorer.exe</code> spawns <code>chrome.exe</code>, <code>winword.exe</code> stays alone. In an attack, <code>winword.exe</code> spawning <code>cmd.exe</code> which spawns <code>powershell.exe</code> is deeply suspicious. Process trees are the most reliable signal in EDR because they reveal the attacker's execution flow regardless of what specific malware is used. During the Hafnium exchange attacks, the w3wp.exe -> cmd.exe -> powershell.exe chain was the definitive indicator of compromise."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How does EDR detect fileless malware?"</div>
+        <div class="a">A: "Fileless malware executes entirely in memory — it never writes a file to disk, so signature-based AV can't see it. EDR detects fileless attacks by monitoring the behavior chain: a trusted process (like a macro in Word) spawning a script interpreter (PowerShell, WMI) that makes an outbound network connection. Even if the payload is never written to disk, the behavioral sequence is anomalous. EDR also monitors for process injection (VirtualAllocEx + WriteProcessMemory + CreateRemoteThread), reflective DLL loading, and WMI event subscription persistence — all fileless techniques that leave no on-disk artifact but generate detectable telemetry."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Process tree explainer</div>
+        <div class="adesc">Paste a list of process creation events (Sysmon JSON or CSV) into an LLM and ask it to reconstruct the attack story — which process was the initial compromise, what did the attacker execute, and what was exfiltrated.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Sysmon config generator</div>
+        <div class="adesc">Describe your detection priorities: "I want to detect all PowerShell execution, WMI persistence, and DLL sideloading" — get a Sysmon XML config that enables precisely the relevant event types with proper includes/excludes.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">EDR alert triage assistant</div>
+        <div class="adesc">Paste the raw alert details (process name, command line, parent process, network destination) and ask for a triage recommendation — is this suspicious, malicious, or benign? Include the rationale.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Hunting query generator</div>
+        <div class="adesc">Describe a threat scenario: "find all machines where svchost.exe spawned a child process with network activity" — get ready-to-run KQL or PowerShell query for your EDR platform.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Deployed Sysmon with custom detection config on Windows endpoints; analyzed process creation and network telemetry to identify anomalous parent-child process chains and fileless attack indicators."</li>
+        <li><strong>Portfolio piece:</strong> a Sysmon deployment and analysis report — installation steps, config file, sample process tree from Event ID 1, network connection from Event ID 3, and a written analysis of the telemetry.</li>
+        <li><strong>Interview talking point:</strong> explaining the Hafnium w3wp.exe anomaly demonstrates real-world EDR incident knowledge — you can describe exactly what the EDR telemetry revealed and why it mattered.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>SMBs can't afford CrowdStrike ($8-15/endpoint/month with minimums), but they can afford a Sysmon + Wazuh (open-source SIEM) deployment. You can offer an "EDR Lite" service: deploy Sysmon + Wazuh agent on every endpoint ($20-30/endpoint installation fee), with a centralized Wazuh server in the cloud or on-prem, for a monthly monitoring fee of $5-10/endpoint.</p>
+      <p style="margin-bottom:0;">At a 50-endpoint SMB, this generates $3,000-6,000/year in recurring revenue. The cost to you is ~$20/month for a cloud VM running Wazuh. This is pure margin once the endpoints are deployed. Bundle with Snort/Suricata (Day 62) for a complete IDS+EDR offering that no other local MSP can match.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud in 90 seconds: "What is the difference between signature-based detection and behavioral detection, and why does EDR catch fileless attacks that traditional antivirus misses?" If you can draw a process tree showing <code>w3wp.exe -> powershell.exe</code> and explain why that chain is always suspicious, you've mastered today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Sysmon — official Microsoft documentation</div><div class="res-desc">learn.microsoft.com/en-us/sysinternals/downloads/sysmon — complete reference for Sysmon event IDs and configuration.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=FN0y7lST9I0" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">EDR Explained in 5 Minutes — John Hammond</div><div class="res-desc">youtube.com/watch?v=FN0y7lST9I0 — clear, concise explanation of EDR concepts and how sensors work.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=GQnPkLmOy5I" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">EDR vs Antivirus (Hindi) — CyberPeace</div><div class="res-desc">youtube.com/watch?v=GQnPkLmOy5I — Hindi comparison of traditional AV vs modern EDR with practical examples.</div></div>
+      </a>
+      <a class="res-card" href="https://github.com/SwiftOnSecurity/sysmon-config" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">SwiftOnSecurity sysmon-config (GitHub)</div><div class="res-desc">github.com/SwiftOnSecurity/sysmon-config — the most widely-deployed Sysmon configuration with high-quality detection rules.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Behavioral vs signature-based detection clearly distinguished.</div>
+      <div class="mistake-item"><span class="check">✓</span> Fileless attack concept explained with real execution techniques.</div>
+      <div class="mistake-item"><span class="check">✓</span> Process tree analysis taught as the definitive EDR signal.</div>
+      <div class="mistake-item"><span class="check">✓</span> Sysmon event IDs mapped to real detection use cases.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Hafnium incident — w3wp.exe anomaly, 30K orgs compromised.</div>
+      <div class="mistake-item"><span class="check">✓</span> LOLBins and living-off-the-land attacker techniques covered.</div>
+      <div class="mistake-item"><span class="check">✓</span> Process tree PowerShell query code included — actionable immediately.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I understand behavioral vs signature-based detection.</li>
+        <li><span class="box"></span> I deployed Sysmon with a detection config.</li>
+        <li><span class="box"></span> I queried Sysmon Event ID 1 (process creation) and Event ID 3 (network connect).</li>
+        <li><span class="box"></span> I can explain what a process tree reveals about an attack.</li>
+        <li><span class="box"></span> I understand how EDR detects fileless malware.</li>
+        <li><span class="box"></span> I can describe the Hafnium w3wp.exe anomaly.</li>
+        <li><span class="box"></span> I can teach EDR fundamentals to someone else in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">63 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 64</div>
+      <div class="title">SIEM Fundamentals — Splunk, ELK, and Log Management.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 64" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

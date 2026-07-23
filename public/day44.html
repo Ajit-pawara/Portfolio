@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 44 — Practicing SQLi & XSS on DVWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:48.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .sq{color:var(--pink);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sq{color:var(--pink);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day44$ cat dvwa-practice.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 44/90 — Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 44 OF 90 — PHASE 3: WEB & NETWORK EXPLOITATION</div>
+  <h1>Practicing SQLi & XSS on <span class="accent">DVWA</span></h1>
+  <p class="subtitle">DVWA is the most popular intentionally vulnerable web application. Today you apply everything from Phase 2 — SQL injection, XSS, CSRF, and file upload — against real targets.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Damn Vulnerable Web Application (DVWA):</strong> DVWA is a PHP/MySQL web application that contains a graduated set of vulnerabilities at three security levels — Low, Medium, and High. Each level demonstrates a progressively harder exploitation scenario with real-world defenses simulated. Low level has no protections at all. Medium level introduces basic sanitization. High level implements more robust (but still flawed) controls. The platform lets you practice SQLi, XSS (stored, reflected, DOM), CSRF, file upload, command injection, and more in a legal sandbox.</p>
+
+      <p style="margin-top:16px;"><strong>SQLi across DVWA levels:</strong></p>
+      <div class="code-block">
+<span class="cmt">// Low — no input handling at all</span>
+<span class="req">$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$_GET['id']'";</span>
+<span class="req">$result = mysqli_query($conn, $query);</span>
+<span class="cmt">// Payload: ' UNION SELECT user,password FROM users --</span>
+
+<span class="cmt" style="margin-top:8px;">// Medium — mysqli_real_escape_string (bypassable with numeric injection)</span>
+<span class="req">$id = mysqli_real_escape_string($conn, $_GET['id']);</span>
+<span class="req">$query = "SELECT first_name, last_name FROM users WHERE user_id = $id";</span>
+<span class="cmt">// Integer field — no quotes needed: 1 UNION SELECT user,password FROM users</span>
+
+<span class="cmt" style="margin-top:8px;">// High — separate query page, limits results</span>
+<span class="req">$query = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1";</span>
+<span class="cmt">// Use # instead of -- to comment out LIMIT: 1' UNION SELECT user,password FROM users#</span></div>
+
+      <p><strong>XSS across DVWA levels:</strong> Reflected XSS at Low level simply echoes the name parameter without sanitization. Medium level uses <code>str_replace</code> to swap <code>&lt;script&gt;</code> to empty string — bypass with <code>&lt;scr&lt;script&gt;ipt&gt;</code>. High level uses <code>preg_replace</code> with a regex that's case sensitive — bypass with uppercase or img tag vectors. Each level teaches a specific filter bypass technique that maps directly to real-world WAF evasion.</p>
+
+      <div class="callout"><strong>Why DVWA matters:</strong> Over 500 academic papers reference DVWA as the standard platform for controlled vulnerability testing. It's the closest you can get to a real penetration test without needing authorization. The three-tier difficulty system teaches you to adapt your attacks as defenses increase — exactly what happens in real engagements.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Start at Low security to confirm the vulnerability exists, then escalate to Medium and High — this teaches you exactly which defense blocks which payload and how to bypass it.</li>
+          <li>Use Burp Suite's Repeater to send modified requests without relying on the browser form — this lets you bypass client-side validation and see the raw server response.</li>
+          <li>For file upload at Medium level, the server checks MIME type client-side via JavaScript. Disable JS or intercept with Burp and change the Content-Type to image/jpeg.</li>
+          <li>For CSRF at Low level, craft a self-contained HTML page with a hidden form that auto-submits to DVWA's password change endpoint — no user interaction needed.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Apply the same security level escalation in your thinking — Low security = no input validation (fix: prepared statements + CSP), Medium = string-level filters (fix: context-aware encoding), High = regex-based blocking (fix: allowlists over blocklists).</li>
+          <li>DVWA's Medium-level XSS defense uses str_replace to remove "script" — but this fails because the filter runs only once. Implement recursive filtering or better, use a proper HTML sanitizer library.</li>
+          <li>File upload vulnerabilities are prevented by validating file content (magic bytes), not by checking Content-Type or extension. Use php.ini disable_functions to limit what uploaded PHP files can do.</li>
+          <li>The fact that DVWA exists and is necessary shows that defensive coding is not intuitive — you must actively learn each vulnerability class and its prevention.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">ACADEMIC — DVWA IN RESEARCH — 500+ CITATIONS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">DVWA is referenced in over 500 academic papers on web security education</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">DVWA was created by RandomStorm in 2010 and has since become the de facto standard for web security education. Universities worldwide use it in cybersecurity curricula to teach SQL injection, XSS, CSRF, and file upload vulnerabilities in a controlled environment. Research papers cite DVWA as the benchmark platform for evaluating security testing tools — from automated scanners to static analysis tools. Understanding DVWA is not just a personal learning exercise; it's a recognized educational credential that appears in academic literature and industry training programs equally.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> set up DVWA locally and exploit SQLi, XSS, CSRF, and file upload vulnerabilities across all three security levels.</p>
+      <ol class="lab-steps">
+        <li>Deploy DVWA: <code>docker run -d -p 80:80 vulnerables/web-dvwa</code>. Navigate to <code>http://localhost</code> — default creds: admin/password.</li>
+        <li>Set security to LOW in DVWA Security tab. Go to SQL Injection page. Enter <code>' UNION SELECT user,password FROM users#</code> in the User ID field.</li>
+        <li>Switch to Reflected XSS. Enter <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code> — observe the popup. Now enter <code>&lt;img src=x onerror=alert('XSS')&gt;</code> and note it works even when script tags are blocked.</li>
+        <li>Set security to MEDIUM. Try the same SQLi payload. It fails. Change to <code>1 UNION SELECT user,password FROM users</code> — no quotes needed for integer fields.</li>
+        <li>For Medium XSS, enter <code>&lt;scr&lt;script&gt;ipt&gt;alert('XSS')&lt;/script&gt;</code> — the inner tag survives the str_replace filter. Test the file upload module by intercepting the request in Burp and changing Content-Type.</li>
+        <li>Set security to HIGH. Use Burp Repeater to send SQLi payloads with <code>#</code> (URL-encoded as <code>%23</code>) to bypass the LIMIT clause. Document which payloads work at each level.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A comparison table documenting which payloads succeeded at Low, Medium, and High security for SQLi and XSS. Include bypass techniques at each level and the defense mechanisms encountered.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Deploy DVWA with Docker</span>
+<span class="cmd">docker run -d -p 80:80 vulnerables/web-dvwa</span>
+<span class="out">&gt; Navigate to http://localhost — login: admin / password</span>
+
+<span class="c"># Step 2 — LOW security SQL injection</span>
+<span class="cmd">DVWA Security → set to LOW → SQL Injection page</span>
+<span class="sq">' UNION SELECT user,password FROM users#</span>
+<span class="hi"># Returns all usernames and password hashes</span>
+
+<span class="c"># Step 3 — LOW reflected XSS</span>
+<span class="sq">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</span>
+<span class="c"># Name field in Reflected XSS page — shows your cookie</span>
+
+<span class="c"># Step 4 — MEDIUM SQL injection (numeric bypass)</span>
+<span class="sq">1 UNION SELECT user,password FROM users</span>
+<span class="hi"># INT field — no quotes needed, mysqli_real_escape_string bypassed</span>
+
+<span class="c"># Step 5 — MEDIUM XSS (nested script bypass)</span>
+<span class="sq">&lt;scr&lt;script&gt;ipt&gt;alert('XSS')&lt;/script&gt;</span>
+<span class="c"># str_replace removes outer 'script' — inner survives</span>
+
+<span class="c"># Step 6 — HIGH security (Burp Repeater + %23)</span>
+<span class="cmd">1' UNION SELECT user,password FROM users %23</span>
+<span class="hi"># %23 = # — comments out the appended LIMIT clause</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is DVWA and how would you use it in a penetration testing context?"</div>
+        <div class="a">A: "DVWA — Damn Vulnerable Web Application — is a deliberately insecure PHP/MySQL web app that contains SQL injection, XSS, CSRF, file upload, and other vulnerabilities. It has three security levels: Low (no protection), Medium (basic filters like str_replace and mysqli_real_escape_string), and High (regex-based and token-based protections). I use it to practice exploitation techniques at each level and to study how defenses change attack syntax. It's also useful for demonstrating specific vulnerabilities in training scenarios."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you bypass MEDIUM security SQL injection in DVWA?"</div>
+        <div class="a">A: "Medium security uses mysqli_real_escape_string, which escapes quote characters and prevents string-based injection. However, the application still concatenates user input directly into the query string. For integer-based fields like the User ID input, no quotes are needed — I can inject UNION SELECT directly. For string fields, I look for second-order injection or alternative injection points that aren't filtered. The key insight is that escaping is not parameterization — the data is still being interpreted as SQL code."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "Explain the difference between how LOW, MEDIUM, and HIGH security levels handle SQL injection and what real-world equivalent each represents."</div>
+        <div class="a">A: "Low security has no protection — direct string concatenation. This represents legacy PHP applications written before security awareness. Medium uses mysqli_real_escape_string — equivalent to applications that think escaping is sufficient. HIGH uses a separate form submission with LIMIT and token-based CSRF protection — this represents modern applications with basic security controls. None use parameterized queries, which is the actual industry-standard fix. This progression is useful for learning but doesn't represent truly secure coding."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">DVWA exploit walkthrough generator</div>
+        <div class="adesc">Ask an LLM to generate step-by-step exploitation steps for a specific DVWA challenge at a specific security level — faster than scrolling through forums.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Payload diff analyzer</div>
+        <div class="adesc">Compare your working payload with your failed payload using an LLM to identify exactly why the defense blocked one variant but not the other.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Filter bypass brainstorming</div>
+        <div class="adesc">Describe a specific filter you encountered and ask an LLM for 10 bypass attempts ranked by probability of success — save time on trial and error.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">PHP code review assistant</div>
+        <div class="adesc">Paste a snippet of vulnerable PHP code from DVWA into the LLM and ask it to identify the vulnerability class and suggest the correct fix with parameterized queries.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Exploited SQL injection, XSS, CSRF, and file upload vulnerabilities across three security levels in DVWA; documented bypass techniques for str_replace and regex-based filters."</li>
+        <li><strong>Portfolio piece:</strong> a detailed writeup titled "DVWA Security Level Progression" showing the same vulnerability at Low, Medium, and High with screenshots of payloads, defenses, and bypasses.</li>
+        <li><strong>Talking point:</strong> "I've tested the same vulnerability against progressively stronger defenses and can explain exactly why each defense fails at each level." This demonstrates adaptability — a skill that separates script kiddies from real pentesters.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>DVWA is the perfect sandbox for developing a "Web Security Training" service. Many small businesses know they need security training but don't want their developers to learn on production. You can offer a half-day workshop: set up DVWA, walk through each vulnerability, and show developers how to fix the code. This is a $1,000-2,500 service you can deliver to small agencies, startups, and even college coding bootcamps.</p>
+      <p style="margin-bottom:0;">Beyond training, DVWA serves as your personal demo lab. When pitching pentest services to a potential client, you can screen-share a live DVWA exploitation to demonstrate what you'd be checking in their applications. A live SQL injection demo in real time is worth more than any slide deck.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is DVWA, what are the three security levels, and how does a SQL injection payload differ between LOW and MEDIUM?" If you can explain the str_replace bypass for XSS at Medium level, you've actually internalized how real-world filter bypasses work.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=NjTxO0dtdsY" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">DVWA Setup & SQLi Walkthrough — The Cyber Mentor</div><div class="res-desc">youtube.com/watch?v=NjTxO0dtdsY — full walkthrough of DVWA setup and SQL injection exploitation at all levels.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=VAa7wZA5hX0" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">DVWA Full Tutorial — All Vulnerabilities Explained</div><div class="res-desc">youtube.com/watch?v=VAa7wZA5hX0 — comprehensive guide covering every DVWA challenge with bypass techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=9t_ho4QFTvQ" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">DVWA Setup & Exploitation in Hindi — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=9t_ho4QFTvQ — Hindi tutorial covering DVWA installation and vulnerability exploitation.</div></div>
+      </a>
+      <a class="res-card" href="https://github.com/digininja/DVWA" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">DVWA GitHub Repository</div><div class="res-desc">github.com/digininja/DVWA — source code, Docker setup, and documentation for running DVWA locally.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> DVWA deployed locally — no reliance on external vulnerable sites.</div>
+      <div class="mistake-item"><span class="check">✓</span> Three security levels tested progressively — not just the easiest path.</div>
+      <div class="mistake-item"><span class="check">✓</span> SQLi, XSS, CSRF, and file upload all covered in one environment.</div>
+      <div class="mistake-item"><span class="check">✓</span> Burp Suite used to intercept and modify requests — not browser-only testing.</div>
+      <div class="mistake-item"><span class="check">✓</span> Filter bypass techniques (nested tags, numeric injection, %23) documented.</div>
+      <div class="mistake-item"><span class="check">✓</span> Defensive code for each level analyzed alongside the attack.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I deployed DVWA with Docker and accessed the web interface.</li>
+        <li><span class="box"></span> I exploited SQLi at LOW, MEDIUM, and HIGH security levels.</li>
+        <li><span class="box"></span> I executed reflected and stored XSS across all levels.</li>
+        <li><span class="box"></span> I bypassed MEDIUM XSS filter using nested script tags.</li>
+        <li><span class="box"></span> I used Burp Repeater to send modified requests to HIGH security.</li>
+        <li><span class="box"></span> I documented each payload and its corresponding defense mechanism.</li>
+        <li><span class="box"></span> I can teach the DVWA security progression out loud.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">44 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 45</div>
+      <div class="title">Privilege Escalation — Linux: SUID, cron, kernel exploits.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 45" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

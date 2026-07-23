@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 64 — Threat Intelligence Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:72%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;}
+  .grid-3 > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .grid-3 .label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+  .grid-3 .label.ioc{color:var(--cyan);}
+  .grid-3 .label.ttps{color:var(--red);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day64$ cat threat-intel.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 64/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 64 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Threat Intelligence <span class="accent">Basics</span></h1>
+  <p class="subtitle">You can't defend against what you don't know is coming. Today you learn how threat intelligence feeds work, how TTPs are categorized, and how to operationalize IoCs.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is Threat Intelligence?</strong> Threat intelligence is evidence-based knowledge about existing or emerging threats to your organization. It transforms raw data — IP addresses, domains, file hashes — into actionable context: who is targeting you, what tools they use, which vulnerabilities they exploit, and how to detect them. Intelligence operates on a hierarchy: Data → Information → Intelligence, where context and analysis are what turn a list of IPs into a defensive plan.</p>
+
+      <p style="margin-top:16px;"><strong>The Pyramid of Pain:</strong> David Bianco's model shows how difficult each indicator type is for an attacker to change. Hash values (easy to change) sit at the bottom — they're the least painful for attackers. TTPs (Tactics, Techniques, Procedures) sit at the top — changing TTPs is costly for attackers and most painful.</p>
+
+      <div class="grid-3">
+        <div><div class="label ioc">IoCs (Indicators of Compromise)</div><div class="adesc" style="font-size:12px;color:var(--muted);">Artifacts observed on a network or system that indicate a breach — IP addresses, domains, file hashes, registry keys, mutex names, email subject lines. Machine-readable, immediately actionable.</div></div>
+        <div><div class="label ttps">TTPs (Tactics, Techniques, Procedures)</div><div class="adesc" style="font-size:12px;color:var(--muted);">The behavior patterns of adversaries — how they gain initial access, move laterally, escalate privileges, exfiltrate data. More stable than IoCs but harder to detect automatically.</div></div>
+        <div><div class="label" style="color:var(--green);">Threat Feeds</div><div class="adesc" style="font-size:12px;color:var(--muted);">Continuous streams of threat data. Open feeds (AlienVault OTX, AbuseIPDB, VirusTotal, Spamhaus) provide broad coverage. Commercial feeds (Recorded Future, Anomali, CrowdStrike) offer higher fidelity and context.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>STIX and TAXII:</strong> STIX (Structured Threat Information Expression) is the JSON-based language for describing threat intelligence — it standardizes how IoCs, attack patterns, campaigns, and threat actors are represented. TAXII (Trusted Automated Exchange of Intelligence Resources) is the protocol for sharing STIX data between organizations. Together, they enable automated threat sharing across sectors — the same mechanism that allowed 1,000+ organizations to share ransomware IoCs during the 2021 Kaseya supply-chain attack.</p>
+
+      <div class="code-block">
+<span class="cmt"># Example: STIX 2.1 indicator (simplified)</span>
+<span class="req">{</span>
+<span class="hdr">  "type":</span><span class="val"> "indicator",</span>
+<span class="hdr">  "name":</span><span class="val"> "Malicious IP - C2 Server",</span>
+<span class="hdr">  "indicator_types":</span><span class="val"> ["malicious-activity"],</span>
+<span class="hdr">  "pattern":</span><span class="val"> "[ipv4-addr:value = '185.130.5.193']",</span>
+<span class="hdr">  "pattern_type":</span><span class="val"> "stix",</span>
+<span class="hdr">  "valid_from":</span><span class="val"> "2024-01-15T00:00:00Z",</span>
+<span class="hdr">  "kill_chain_phases":</span><span class="val"> [{</span>
+<span class="hdr">    "kill_chain_name":</span><span class="val"> "mitre-attack",</span>
+<span class="hdr">    "phase_name":</span><span class="val"> "command-and-control"</span>
+<span class="val">  }]</span>
+<span class="req">}</span></div>
+
+      <p style="margin-top:16px;"><strong>Operationalizing Intelligence:</strong> The intelligence lifecycle has six phases: Requirements → Collection → Processing → Analysis → Dissemination → Feedback. Raw feeds are useless without analysis — a SOC drowning in alerts needs context (priority, relevance, confidence) before an IP block becomes actionable. The best threat intelligence programs focus on questions like "What TTPs would our attackers use against our specific industry?" rather than consuming every feed available.</p>
+
+      <div class="callout"><strong>Why this matters:</strong> Threat intelligence turns reactive security into proactive defense. A SOC with no threat intel waits for alerts to fire. A SOC with threat intel anticipates adversary behavior, configures detection rules before the first breach, and prioritizes patching for CVEs actively being exploited in their sector.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Monitor public threat intelligence feeds to see if your own C2 infrastructure has been listed — if it has, rotate IPs and domains before defenders can operationalize the block.</li>
+          <li>Use living-off-the-land binaries (LOLBins) that don't match typical malware IoCs — powershell.exe, certutil.exe, wmic.exe are trusted processes and rarely trigger IoC-based detection.</li>
+          <li>Deliberately vary TTPs between campaigns — change encryption methods, C2 protocols, and lateral movement techniques to avoid pattern matching against known TTP databases.</li>
+          <li>Feed false intelligence into open-source platforms (VirusTotal, AlienVault) by uploading benign files with fake malicious labels, polluting defender IoC databases.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Subscribe to sector-specific ISACs (Information Sharing and Analysis Centers) — FS-ISAC for finance, Health-ISAC for healthcare — where members share timely, high-fidelity IoCs.</li>
+          <li>Deploy MISP (Malware Information Sharing Platform) as your local threat intel hub — aggregate multiple feeds, correlate IoCs, automate blocklist pushes to firewalls and EDR.</li>
+          <li>Prioritize TTP-based detection over IoC-based — TTPs are harder for attackers to change. Detect certutil.exe downloading from an external URL (TTP) rather than blocking individual domains.</li>
+          <li>Calculate confidence scores for each IoC source — a known APC from a sector ISAC has higher confidence than a VirusTotal submission from an anonymous user.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2021 — MISP IN KASEYA SUPPLY-CHAIN ATTACK — 1,500+ ORGANIZATIONS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">MISP threat sharing platform enabled real-time ransomware IoC exchange during the Kaseya VSA supply-chain breach</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">When REvil exploited a Kaseya VSA zero-day (CVE-2021-30116) to deploy ransomware to MSP customers, the MISP threat sharing platform became the central clearinghouse for IoCs. Organizations using MISP received STIX-format indicators within hours — C2 IPs, registry keys, file paths, YARA rules — allowing them to block the attack before their own Kaseya agent was compromised. Over 1,500 organizations shared and consumed threat data through MISP during the incident. The rapid intelligence sharing reduced the average detection time from days to hours, proving that a connected threat intelligence community can materially reduce breach impact.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> set up MISP threat intelligence platform, consume a live STIX feed, and operationalize IoCs into firewall block rules.</p>
+      <ol class="lab-steps">
+        <li>Deploy MISP using Docker: <code>docker run -d -p 443:443 -p 80:80 --name misp coolacid/misp-docker</code>. Wait 2-3 minutes for initialization.</li>
+        <li>Access MISP at <code>https://localhost</code> (default creds: admin@admin.test / admin). Navigate to Sync Actions → List Feeds.</li>
+        <li>Enable the CIRCL OSINT feed — this provides open-source threat intelligence on known malicious IPs, domains, and hashes. Click "Fetch and store all feed events."</li>
+        <li>Browse the fetched events — examine one malicious IP event: note the STIX pattern, the kill chain phase (MITRE ATT&CK mapping), and the associated tags (TLP, confidence, target sector).</li>
+        <li>Create a new event by manually adding an IoC: Navigate to Event Actions → Add Event. Add an indicator for a known test IP (e.g., 203.0.113.5) with the ATT&CK technique T1071 (Application Layer Protocol).</li>
+        <li>Export the events in STIX 2.1 JSON format — navigate to Event Actions → Export → Download as STIX 2.1. Examine the structure.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A screenshot of MISP dashboard showing at least one fetched feed event and one manually created event with MITRE ATT&CK mapping. This proves you can ingest, create, and export structured threat intelligence.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Deploy MISP with Docker</span>
+<span class="cmd">docker run -d -p 443:443 -p 80:80 \</span>
+<span class="cmd">  --name misp coolacid/misp-docker</span>
+<span class="c"># Wait for health check: docker logs misp --tail 20</span>
+
+<span class="c"># Step 2 — Verify MISP is running</span>
+<span class="cmd">docker ps | grep misp</span>
+<span class="out">&gt; CONTAINER ID  IMAGE  PORTS  NAMES</span>
+<span class="out">&gt; a1b2c3d4e5f6  coolacid/misp-docker  0.0.0.0:443-&gt;443/tcp  misp</span>
+
+<span class="c"># Step 3 — Fetch CIRCL OSINT feed via API (or do it via GUI)</span>
+<span class="cmd">curl -k -X POST \</span>
+<span class="cmd">  https://localhost/feeds/fetchFromFeed/1 \</span>
+<span class="cmd">  -H "Authorization: $(echo -n 'admin@admin.test:admin' | base64)" \</span>
+<span class="cmd">  -H "Accept: application/json"</span>
+
+<span class="c"># Step 4 — Search for a specific indicator</span>
+<span class="cmd">curl -k "https://localhost/events/index/search:185.130.5.193" \</span>
+<span class="cmd">  -H "Authorization: ..."</span>
+
+<span class="c"># Step 5 — Export events as STIX 2.1</span>
+<span class="cmd">curl -k "https://localhost/events/download" \</span>
+<span class="cmd">  -H "Authorization: ..." -o misp-export.json</span>
+<span class="cmd">cat misp-export.json | jq '.' | head -50</span>
+<span class="out">&gt; STIX 2.1 bundle with indicators, patterns, and kill chain phases</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is the difference between IoCs and TTPs, and why does it matter?"</div>
+        <div class="a">A: "IoCs are specific artifacts like IP addresses, domains, and file hashes that indicate a compromise has occurred. TTPs describe the attacker's behavior — how they gain access, move laterally, and exfiltrate data. TTPs are more valuable for defense because they're harder for attackers to change. An attacker can rotate IPs in minutes but changing their core tradecraft takes significant effort. The Pyramid of Pain illustrates this: hash values at the bottom (easy to change), TTPs at the top (most painful to change)."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you operationalize a threat intelligence feed in a SOC?"</div>
+        <div class="a">A: "First, ingest the feed into a platform like MISP or Anomali that normalizes the data. Second, correlate incoming IoCs against our environment — do any of these malicious IPs appear in our firewall logs? Have any of these hashes been seen on our endpoints? Third, prioritize based on confidence scoring and relevance to our industry. Fourth, automate response: push confirmed IoCs to firewall blocklists, SIEM correlation rules, and endpoint detection policies. Finally, close the loop by providing feedback on which IoCs were actually useful, which improves the feed's quality over time."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What are STIX and TAXII, and why were they created?"</div>
+        <div class="a">A: "STIX is a standardized JSON language for describing threat intelligence — it defines how to represent IoCs, attack patterns, threat actors, campaigns, and course of action in a machine-readable format. TAXII is the protocol for sharing STIX data over HTTPS. They were created because organizations couldn't share threat intelligence efficiently — everyone used different formats. STIX/TAXII enables automated, real-time threat sharing across sectors, which was critical during incidents like the Kaseya attack where 1,500+ organizations shared IoCs within hours."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Threat intel report summarizer</div>
+        <div class="adesc">Paste a lengthy threat report (Mandiant, CrowdStrike, Dragos) into an LLM and ask for: key IoCs, TTPs mapped to MITRE ATT&CK, and recommended detection rules.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">STIX pattern generator</div>
+        <div class="adesc">Describe an indicator in plain language and have an LLM output the equivalent STIX 2.1 pattern. Saves time when manually creating MISP events.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">YARA rule generator</div>
+        <div class="adesc">Describe malware behavior (e.g., "a file that decrypts strings at runtime and connects to a Telegram bot API") and get a candidate YARA rule to test against samples.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AlienVault OTX</div>
+        <div class="adesc">Open Threat Exchange — free community-driven threat intelligence platform. Browse pulses from other researchers, subscribe to sector-specific feeds, submit your own IoCs.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Deployed and configured MISP threat intelligence platform; ingested CIRCL OSINT feeds; created STIX-formatted events with MITRE ATT&CK mapping."</li>
+        <li><strong>Portfolio piece:</strong> MISP deployment documentation with screenshots of feed ingestion, event creation, and STIX export. Demonstrate you understand the full intelligence lifecycle.</li>
+        <li><strong>Interview talking point:</strong> explaining how you'd operationalize a threat feed (ingest → correlate → prioritize → automate → feedback loop) shows you think like a SOC analyst, not just a tool user.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Threat intelligence consulting is a lucrative niche because most mid-sized organizations know they need threat intel but can't afford full-time analysts. A consulting practice offering "Threat Intel Program Setup" — deploying MISP, configuring feeds, writing standard operating procedures for IoC handling — can command $10,000-25,000 per engagement. Many MSSPs (Managed Security Service Providers) subcontract threat intelligence work because building in-house expertise is expensive. A productized opportunity: "Weekly Threat Brief" subscription — $500/month for a curated intelligence summary relevant to the client's industry, with 3-5 actionable detection rules.</p>
+      <p style="margin-bottom:0;">The barrier to entry is low: MISP is free, open feeds are free, and you just need the analytical skill to separate relevant intel from noise. This is a service you can build while still in college and scale as a side business.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is threat intelligence, what's the difference between IoCs and TTPs, and what does the intelligence lifecycle look like?" If you can draw the Pyramid of Pain on a whiteboard and explain why TTP-based detection is superior to IoC-based detection, you've understood today's material at a deeper level than most first-year SOC analysts.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=4jW5Fc1FPKk" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Threat Intelligence Crash Course — SANS</div><div class="res-desc">youtube.com/watch?v=4jW5Fc1FPKk — SANS instructor explains threat intelligence lifecycle, IoC types, and operationalization strategies.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=2LXOM2nQKGA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">MISP Tutorial — Setup and Configuration by CyberSoc</div><div class="res-desc">youtube.com/watch?v=2LXOM2nQKGA — full walkthrough of deploying MISP, adding feeds, and creating events.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=UgB1b8PSSyM" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Threat Intelligence Explained in Hindi — TechWithCyber</div><div class="res-desc">youtube.com/watch?v=UgB1b8PSSyM — Hindi explanation of CTI, STIX/TAXII, and the intelligence lifecycle.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/threatintel" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Threat Intelligence Room</div><div class="res-desc">tryhackme.com/room/threatintel — free interactive room covering threat feeds, STIX/TAXII, and practical intel analysis.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Threat intelligence defined with the data-information-intelligence hierarchy — not "lists of IPs."</div>
+      <div class="mistake-item"><span class="check">✓</span> Pyramid of Pain explained with real examples for each tier.</div>
+      <div class="mistake-item"><span class="check">✓</span> STIX/TAXII understood as the standardized format and transport — not interchangeable concepts.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Kaseya MISP incident grounds the theory in operational reality.</div>
+      <div class="mistake-item"><span class="check">✓</span> MISP deployed and configured with live feed ingestion — not just theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> TTP-based detection vs IoC-based detection clearly contrasted.</div>
+      <div class="mistake-item"><span class="check">✓</span> Intelligence lifecycle (requirements → collection → processing → analysis → dissemination → feedback) applied.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can define threat intelligence and distinguish it from raw data.</li>
+        <li><span class="box"></span> I understand the Pyramid of Pain and can name all 6 tiers.</li>
+        <li><span class="box"></span> I know what STIX and TAXII are and why they matter for sharing intelligence.</li>
+        <li><span class="box"></span> I deployed MISP and ingested a live OSINT feed.</li>
+        <li><span class="box"></span> I created a MISP event with MITRE ATT&CK mapping.</li>
+        <li><span class="box"></span> I exported threat intelligence in STIX 2.1 format.</li>
+        <li><span class="box"></span> I can teach threat intelligence fundamentals out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">64 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 65</div>
+      <div class="title">MITRE ATT&CK Framework — navigating the matrix, mapping attacks, gap analysis.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 65" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

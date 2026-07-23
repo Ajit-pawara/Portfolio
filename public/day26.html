@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 26 — Broken Authentication & Access Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:28.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .jwt{color:var(--pink);}
+  .code-block .tok{color:var(--purple);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+  .term-body .jwt{color:var(--pink);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day26$ cat broken-auth-access-control.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 26/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 26 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Broken Authentication &amp; <span class="accent">Access Control</span></h1>
+  <p class="subtitle">Authentication proves who you are. Access control proves what you can do. When either breaks, attackers become administrators. Today you test both.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Broken Authentication</strong> covers any flaw in how an application verifies identity: weak password policies, credential stuffing (automated login attempts with breached credentials), session fixation, JWT manipulation, and MFA fatigue attacks. OWASP consistently ranks broken authentication in the Top 10 because a single authentication bypass grants the attacker full account access.</p>
+
+      <p style="margin-top:16px;"><strong>JWT structure and the "none" algorithm attack:</strong></p>
+      <div class="code-block">
+<span class="cmt"># A JWT has three base64url-encoded parts separated by dots:</span>
+<span class="jwt">header.payload.signature</span>
+
+<span class="cmt"># Legitimate token:</span>
+<span class="req">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.</span>
+<span class="req">eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoidXNlciJ9.</span>
+<span class="req">signature_here</span>
+
+<span class="cmt"># Algorithm confusion attack — attacker changes alg to "none":</span>
+<span class="cmt"># Server using a vulnerable JWT library will accept empty signature:</span>
+<span class="danger">eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.</span>
+<span class="danger">eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.</span></div>
+
+      <p style="margin-top:16px;"><strong>Broken Access Control (IDOR, PrivEsc, RBAC bypass):</strong> Access control enforces what an authenticated user can do. Common failures: Insecure Direct Object References (IDOR) — changing <code>/profile/123</code> to <code>/profile/456</code> to see another user's data; privilege escalation — a regular user accessing admin endpoints; missing function-level access controls — the admin panel has no authorization check, just a different URL.</p>
+
+      <div class="callout"><strong>Key insight:</strong> Authentication and access control are separate concerns. A user can be perfectly authenticated (valid session, strong MFA) but still exploit broken access control (accessing data they shouldn't). Many security assessments focus heavily on authentication while neglecting authorization — a pattern attackers actively exploit.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Test for JWT algorithm confusion: decode the token, change <code>alg</code> to <code>none</code> or swap RS256 to HS256 using the public key as the HMAC secret, and re-encode.</li>
+          <li>Use credential stuffing with breached credentials — <code>hydra -l admin -P rockyou.txt target.com/login</code>. Automated login attempts at scale.</li>
+          <li>Check for IDOR by incrementing/decrementing numeric IDs in URL paths or API requests. Test <code>/api/user/2</code> when logged in as user 1.</li>
+          <li>Try forced browsing — access <code>/admin</code>, <code>/dashboard</code>, or <code>/api/admin/users</code> directly with a low-privilege session.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Always use the latest JWT libraries with explicit algorithm whitelisting — never rely on the token's <code>alg</code> header to select the verification algorithm.</li>
+          <li>Implement rate limiting on login endpoints — 5 failed attempts = 15-minute lockout. This stops credential stuffing and brute force.</li>
+          <li>Use server-side session management with random, unpredictable session IDs — regenerate ID after login, enforce expiry, implement absolute and idle timeouts.</li>
+          <li>Enforce authorization checks on every API endpoint and page load — never rely on hiding UI elements. Check the user's role/permissions server-side.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2018 — JWT ALGORITHM CONFUSION — COUNTLESS APPLICATIONS VULNERABLE</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">JWT libraries defaulted to accepting 'none' algorithm, allowing universal token forgery</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">In 2018, security researchers disclosed a widespread flaw in JSON Web Token implementations: many server-side JWT libraries would accept a token with the algorithm header set to "none" and an empty signature — effectively trusting any payload the attacker sent. Applications using these libraries would verify the token as valid regardless of who created it. The fix required libraries to whitelist accepted algorithms rather than trusting the token's header. This vulnerability affected thousands of applications using JWT for authentication, including major SaaS platforms and enterprise systems.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> forge a JWT token, perform IDOR exploitation, and test RBAC bypass.</p>
+      <ol class="lab-steps">
+        <li>Log into Juice Shop and extract your JWT from DevTools → Storage → Local Storage. Decode it at <strong>jwt.io</strong> to see the header, payload, and signature.</li>
+        <li>Create a forged JWT with <code>alg: none</code> and <code>{ "email": "admin@juice-sh.op", "role": "admin" }</code>. Use the token to access an admin-only endpoint.</li>
+        <li>Test IDOR: create two accounts in Juice Shop. Note the numeric user ID in each profile URL. Try accessing user 2's data while logged in as user 1.</li>
+        <li>Use Burp Suite's Sequencer to test session token randomness. Capture 100 session cookies and analyze the entropy.</li>
+        <li>Attempt forced browsing: try accessing <code>http://localhost:3000/#/administration</code> with a regular user token.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A forged JWT token (alg: none) that successfully authenticates as admin, plus documentation of one IDOR or RBAC bypass finding.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Decode and analyze a JWT</span>
+<span class="cmd"># Use Python to decode (base64url decode parts):</span>
+<span class="cmd">echo "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9" | base64 -d 2&gt;/dev/null; echo</span>
+<span class="out">{"alg":"RS256","typ":"JWT"}</span>
+
+<span class="c"># Step 2 — Forge JWT with alg: none</span>
+<span class="cmd">python3 &lt;&lt; 'EOF'</span>
+<span class="out">import base64, json</span>
+<span class="out">header = base64.urlsafe_b64encode(json.dumps({"alg":"none","typ":"JWT"}).encode()).rstrip(b'=')</span>
+<span class="out">payload = base64.urlsafe_b64encode(json.dumps({"email":"admin@juice-sh.op","role":"admin"}).encode()).rstrip(b'=')</span>
+<span class="out">print(f"{header.decode()}.{payload.decode()}.")</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 3 — Use forged token</span>
+<span class="cmd">curl -H "Authorization: Bearer FORGED_TOKEN" \</span>
+<span class="cmd">  http://localhost:3000/api/Challenges</span>
+<span class="hi"># If server returns data, JWT alg confusion is confirmed.</span>
+
+<span class="c"># Step 4 — Test IDOR in Juice Shop</span>
+<span class="c"># Try accessing another user's basket:</span>
+<span class="cmd">curl -b "token=YOUR_TOKEN" \</span>
+<span class="cmd">  http://localhost:3000/api/Basket/2</span>
+<span class="hi"># If you can see basket ID 2 while logged in as user 1 → IDOR.</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is the JWT algorithm confusion attack?"</div>
+        <div class="a">A: "The attacker modifies the JWT header to change the algorithm from RS256 (asymmetric, requires private key to sign) to HS256 (symmetric, uses a shared secret) and signs the token using the server's public key as the HMAC secret. Since the public key is often known or obtainable, the attacker can forge valid tokens. Another variant sets alg to 'none' where the library accepts an empty signature. The fix is whitelisting accepted algorithms server-side."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between authentication and authorization?"</div>
+        <div class="a">A: "Authentication verifies who you are — your identity. Authorization determines what you're allowed to do — your permissions. You can be authenticated as a regular user but not authorized to access admin endpoints. Many breaches happen when authentication is strong but authorization checks are missing. Every API endpoint must independently verify both."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is IDOR and how do you test for it?"</div>
+        <div class="a">A: "Insecure Direct Object Reference is when an application exposes a direct reference to an internal object (like a database ID) in a URL or API parameter without proper authorization checks. I test by creating two accounts, noting the object IDs for each, then trying to access account B's resources while logged in as account A. If the server returns account B's data, there's an IDOR vulnerability."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">JWT.io debugger</div>
+        <div class="adesc">jwt.io — web-based JWT decoder and debugger. Paste any JWT to instantly decode header and payload. Essential for analyzing token structure and crafting forgeries.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">JWT Tool (jwt_tool)</div>
+        <div class="adesc">GitHub.com/ticarpi/jwt_tool — CLI tool for testing JWT security. Includes alg confusion, key brute force, and tampering features. Ask an LLM to generate the correct command for your test scenario.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Credential stuffing simulator</div>
+        <div class="adesc">Ask an LLM to generate a Python script that reads a list of breached credentials and tests them against a login endpoint with randomized delays, proxy rotation, and rate-limit handling.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">RBAC policy reviewer</div>
+        <div class="adesc">Paste your application's role definitions and endpoint mapping into an LLM and ask it to identify missing authorization checks, privilege escalation paths, and inconsistent permission assignments.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Forged JWT tokens using algorithm confusion attack; identified IDOR vulnerabilities and broken access controls in OWASP Juice Shop; documented RBAC bypass techniques."</li>
+        <li><strong>Portfolio piece:</strong> A forged JWT with screenshots of successful admin access, plus an IDOR walkthrough with curl commands showing horizontal privilege escalation.</li>
+        <li><strong>Interview talking point:</strong> explaining that authentication and authorization are separate security domains that must each be tested independently demonstrates real-world assessment maturity beyond textbook knowledge.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Authentication and access control testing is one of the highest-value billable services in application security. Every platform with user accounts — SaaS, e-commerce, healthcare, fintech — needs this tested regularly. JWT misconfigurations alone have led to critical CVEs in major platforms.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Auth Security Review" — a $2,000-4,000 engagement where you audit JWT implementation, session management, password policies, MFA configuration, and role-based access controls. You deliver a risk-prioritized report with proof-of-concept exploits for each finding. Most startups building on JWT don't realize their tokens are forgeable until someone shows them with a 3-line Python script. Be that person — paid.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is the difference between authentication and authorization? Give one attack on each and the corresponding fix." If you can walk through a JWT forgery attack and an IDOR example without pausing, you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=sohYKNuU7SU" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">JWT Authentication Vulnerabilities Explained — PwnFunction</div><div class="res-desc">youtube.com/watch?v=sohYKNuU7SU — JWT algorithm confusion, none attack, and HMAC key confusion explained with animations.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=b2r1mEx5FgM" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Broken Authentication in Hindi — Ethical Sharmaji</div><div class="res-desc">youtube.com/watch?v=b2r1mEx5FgM — Hindi tutorial covering credential stuffing, JWT attacks, and access control bypasses.</div></div>
+      </a>
+      <a class="res-card" href="https://portswigger.net/web-security/authentication" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PortSwigger Authentication Labs</div><div class="res-desc">portswigger.net/web-security/authentication — Free labs covering JWT attacks, password-based auth flaws, and multi-factor bypass techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://github.com/ticarpi/jwt_tool" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">jwt_tool — JWT security testing toolkit</div><div class="res-desc">github.com/ticarpi/jwt_tool — Comprehensive JWT testing tool with alg confusion, key brute force, and tampering modules.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> JWT alg confusion explained with forgeable token example.</div>
+      <div class="mistake-item"><span class="check">✓</span> Auth vs authz clearly separated — different attack surfaces.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real JWT "none" algorithm incident — widespread, critical.</div>
+      <div class="mistake-item"><span class="check">✓</span> IDOR, credential stuffing, forced browsing all covered.</div>
+      <div class="mistake-item"><span class="check">✓</span> Server-side authorization enforcement vs UI hiding.</div>
+      <div class="mistake-item"><span class="check">✓</span> Rate limiting and session regeneration as key defenses.</div>
+      <div class="mistake-item"><span class="check">✓</span> Direct prerequisite for Day 27 (Security Misconfiguration).</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain JWT structure and the alg confusion attack.</li>
+        <li><span class="box"></span> I forged a JWT with alg: none and tested it.</li>
+        <li><span class="box"></span> I can distinguish authentication from authorization.</li>
+        <li><span class="box"></span> I tested IDOR by accessing another user's resources.</li>
+        <li><span class="box"></span> I understand credential stuffing and rate limiting as defense.</li>
+        <li><span class="box"></span> I can explain the difference between 401 and 403.</li>
+        <li><span class="box"></span> I can teach broken auth/access control in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">26 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 27</div>
+      <div class="title">Security Misconfiguration — Default Creds, Open Buckets, Verbose Errors.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 27" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

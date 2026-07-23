@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 37 \u2014 Passive Reconnaissance & OSINT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>:root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+.wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+.pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+.pbar i{display:block;width:25.5%;height:100%;background:var(--green);}
+.day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+.day-tag::before{content:'\25cf';font-size:9px;}
+h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+h1 .accent{color:var(--green);}
+.subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+section{margin-bottom:34px;}
+.tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+.tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+.tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+.tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+.tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+.tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+.tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+.tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+strong{color:var(--text);}
+code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+.callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+.callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+.callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+.callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+.callout strong{color:var(--cyan);}
+.callout.amber strong{color:var(--amber);}
+.mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+.mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+.mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+.mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+.mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+.mindset-col.attacker .role{color:var(--red);}
+.mindset-col.defender .role{color:var(--green);}
+.mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+.mindset-col li{margin-bottom:6px;}
+.code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+.code-block .req{color:var(--green);}
+.code-block .hdr{color:var(--cyan);}
+.code-block .val{color:var(--amber);}
+.code-block .body{color:#8fa5ad;}
+.code-block .cmt{color:var(--muted);}
+.terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+.term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+.term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+.term-body .c{color:var(--muted);}
+.term-body .out{color:#8fa5ad;}
+.term-body .cmd{color:var(--cyan);}
+.term-body .hi{color:var(--amber);}
+.lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+.lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+.lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+.interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+.interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+.interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+.interview-box + .interview-box{margin-top:20px;}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+.ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+.ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+.ai-card .adesc{font-size:12px;color:var(--muted);}
+.job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+.job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+.job-card li{margin-bottom:8px;}
+.biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+.teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+.res-grid{display:grid;gap:10px;margin-top:10px;}
+.res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+.res-card:hover{border-color:var(--cyan);}
+.res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+.res-icon.en{background:var(--red);}
+.res-icon.hi{background:var(--amber);}
+.res-icon.lab{background:var(--green);}
+.res-title{font-weight:600;font-size:13.5px;}
+.res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+.mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+.mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+.checklist{list-style:none;}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+.checklist li:last-child{border-bottom:none;}
+.checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+.stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+.stamp .l1{font-size:10px;letter-spacing:0.1em;}
+.stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+.stamp .l3{font-size:10px;letter-spacing:0.1em;}
+.next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.next-up .title{font-weight:700;font-size:16px;}
+.next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+@media(max-width:600px){.wrap{padding:26px 14px 70px;}}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day37$ cat passive-recon.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 37/90 \u2014 Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+  <div class="day-tag">DAY 37 OF 90 -- PHASE 3: OFFENSIVE SECURITY & TOOLS</div>
+  <h1>Passive Reconnaissance & OSINT <span class="accent"></span></h1>
+  <p class="subtitle">The best attacks start before you touch a single system. Today you gather intelligence from public sources.</p>
+  <section><span class="tag-pill theory">THEORY</span><div class="card">
+<p><strong>Passive reconnaissance (OSINT):</strong> Gathering information without directly interacting with the target. Sources include DNS records, search engines, social media, job postings, leaked credentials, CT logs, Shodan, Censys. The target cannot detect passive recon because you never send a packet to their infrastructure.</p>
+<div class="code-block">
+<span class="cmt"># DNS recon</span>
+<span class="req">whois target.com                 # Registrant info, nameservers</span>
+<span class="req">dig target.com ANY @8.8.8.8      # All DNS record types</span>
+<span class="req">dig target.com AXFR              # Zone transfer (rare gold)</span>
+<span class="cmt"># Google dorking</span>
+<span class="req">site:target.com filetype:pdf     # Exposed documents</span>
+<span class="req">site:target.com intitle:"index of" # Directory listing</span>
+<span class="cmt"># Shodan</span>
+<span class="req">shodan search hostname:target.com # Internet-facing services</span></div>
+<p><strong>Certificate Transparency:</strong> Every SSL cert is logged in public CT logs. Query them to find subdomains not in DNS: <code>curl -s 'https://crt.sh/?q=%25.target.com&output=json' | jq -r '.[].name_value' | sort -u</code>. Often reveals 5-10x more subdomains than DNS brute forcing.</p>
+<div class="callout"><strong>Key insight:</strong> Passive recon is always the first step. The more you learn without touching the target, the less noise you make. The quieter you are, the longer you remain undetected during active ops.</div></div></section>
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul><li>Start every engagement with full OSINT before any Nmap. Look for admin panels, employee emails, tech stacks, leaked creds.</li><li>Google dork: site:target.com filetype:sql OR filetype:env OR filetype:bak -- finds misconfigured servers.</li><li>Search job postings -- security job descriptions list specific firewall brands and SIEM tools.</li><li>Check Pastebin, GitHub, GitLab for exposed code and credentials using truffleHog.</li></ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul><li>Monitor CT logs for your domains. If a cert appears you didn't request, someone may be phishing your domain.</li><li>Reduce OSINT footprint: remove employee details from public pages, use generic job descriptions.</li><li>Search for your own company on Shodan, Censys. Protect what you find before attackers find it.</li><li>Implement DNS zone transfer ACL -- only authorized secondaries should get zone transfers.</li></ul>
+      </div>
+    </div>
+  </section>
+  <section><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div><div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;"><div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">ONGOING -- SHODAN EXPOSED ICS DEVICES</div><div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Researchers use Shodan to discover thousands of unauthenticated industrial control systems.</div><div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Security researchers routinely use Shodan.io to find internet-connected ICS devices. Queries for port 502 (Modbus), 1911 (Niagara Fox), 44818 (Ethernet/IP) return thousands of exposed devices. In 2019, a researcher found 4,000+ Modbus devices accessible without authentication -- water treatment controllers, power grid monitors, hospital building automation. Many ran on default passwords like admin/admin. The same method for finding web servers finds water pumps and electrical substations, discoverable by any teenager with basic Shodan queries.</div></div></section>
+  <section><span class="tag-pill lab">HANDS-ON LAB</span><div class="card"><p><strong>Goal:</strong> Install tools: sudo apt install whois dnsutils jq -y && go install -v github.com...</p><ol class="lab-steps"><li>Install tools: sudo apt install whois dnsutils jq -y && go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest.</li><li>WHOIS: whois example.com. Record registrant, dates, nameservers, admin email.</li><li>DNS: dig example.com ANY @8.8.8.8 and dig example.com MX. Record A, MX, NS, TXT.</li><li>CT logs: curl -s 'https://crt.sh/?q=%25.example.com&output=json' | jq -r '.[].name_value' | sort -u</li><li>Google dork: site:example.com filetype:pdf OR filetype:docx in browser. Document findings.</li><li>Shodan: shodan search hostname:example.com (requires free API key). Record ports and services.</li></ol><div class="deliverable"><strong>Deliverable:</strong> OSINT profile with DNS records, subdomains, CT log findings, Google dork results, Shodan data.</div></div></section>
+  <div class="terminal"><div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div><div class="term-body"><span class="c"># Install OSINT tools</span>
+<span class="cmd">sudo apt install whois dnsutils jq -y</span>
+<span class="cmd">go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest</span>
+
+<span class="c"># WHOIS</span>
+<span class="cmd">whois example.com | head -30</span>
+
+<span class="c"># DNS enumeration</span>
+<span class="cmd">dig example.com ANY @8.8.8.8</span>
+<span class="cmd">dig example.com MX</span>
+
+<span class="c"># Certificate Transparency</span>
+<span class="cmd">curl -s "https://crt.sh/?q=%25.example.com&output=json" | jq -r '.[].name_value' | sort -u</span>
+
+<span class="c"># Subdomains</span>
+<span class="cmd">subfinder -d example.com -silent | tee subdomains.txt</span>
+
+<span class="c"># Shodan</span>
+<span class="cmd">shodan init YOUR_API_KEY</span>
+<span class="cmd">shodan search hostname:example.com</span></div></div>
+  <section><span class="tag-pill interview">INTERVIEW READY</span><div class="card"><div class="interview-box"><div class="q">Q: "What is OSINT and why first step?"</div><div class="a">A: "OSINT gathers info from public sources without touching the target -- undetectable. It reduces active recon time and often reveals exposed creds and internal hostnames that make exploitation trivial."</div></div><div class="interview-box"><div class="q">Q: "Certificate Transparency logs for recon?"</div><div class="a">A: "CT logs record every SSL cert issued, including all SANs (domain + subdomains). Query at crt.sh: curl + %25.target.com pattern. Reveals staging, dev, internal subdomains -- often 5-10x more than DNS brute forcing."</div></div><div class="interview-box"><div class="q">Q: "Passive vs active recon?"</div><div class="a">A: "Passive does not interact with target -- whois, DNS to public resolvers, CT logs, Shodan, Google dorking. Cannot be detected. Active sends packets -- Nmap, directory busting, service probing. Can be detected. Passive first, active only after exhausting passive sources."</div></div></div></section>
+  <section><span class="tag-pill ai">AI TOOLS</span><div class="ai-grid"><div class="ai-card"><div class="aname">Shodan AI search assistant</div><div class="adesc">Craft complex Shodan queries: 'Find exposed RDP on port 3389 in India.'</div></div><div class="ai-card"><div class="aname">SpiderFoot HX</div><div class="adesc">Open-source OSINT automation querying 200+ sources. Auto-collects whois, DNS, subdomains, creds.</div></div><div class="ai-card"><div class="aname">crt.sh / CertSpotter</div><div class="adesc">CT log monitoring. crt.sh for history; CertSpotter for real-time alerts on your domains.</div></div><div class="ai-card"><div class="aname">theHarvester</div><div class="adesc">CLI tool aggregating emails, subdomains, IPs from Google, LinkedIn, Shodan. theHarvester -d target.com -b google,linkedin</div></div></div></section>
+  <section><span class="tag-pill job">HOW THIS GETS YOU PLACED</span><div class="job-card"><div class="label">// placement & resume angles</div><ul><li><strong>Resume bullet:</strong> "Performed passive recon using whois, DNS, CT logs, Shodan, and Google dorking."</li><li><strong>Portfolio piece:</strong> OSINT profile with DNS, subdomains, exposed services, dork findings in a professional report.</li><li><strong>Talking point:</strong> starting every engagement with passive recon -- CT logs, Shodan, Google dorking -- demonstrates professionalism over script kiddies.</li></ul></div></section>
+  <section><span class="tag-pill biz">ENTREPRENEUR ANGLE</span><div class="biz-card"><p>OSINT services are a standalone business. Companies want to know their public exposure before mergers, after breaches, for compliance. An 'External OSINT Assessment' ($2k-5k) delivers a report of public domains, exposed creds, sensitive documents. Free tools (Shodan, crt.sh, theHarvester) produce a report that helps reduce external attack surface. Many companies run this quarterly.</p></div></section>
+  <section><span class="tag-pill teach">TEACH IT BACK</span><div class="teach-card"><p style="margin-bottom:0;">Explain in 90 seconds: "Difference between passive and active recon? Name 3 passive sources you check first." whois, CT logs, Shodan, Google dorking, DNS. No hesitation = professional-grade recon approach.</p></div></section>
+  <section><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div><div class="res-grid"><a class="res-card" href="https://www.youtube.com/watch?v=SKkHZQK9kYI" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">OSINT Fundamentals -- The Cyber Mentor</div><div class="res-desc">Complete intro: DNS recon, Google dorking, Shodan.</div></div></a><a class="res-card" href="https://www.youtube.com/watch?v=VTN2LkyQjF4" target="_blank"><span class="res-icon hi">HI</span><div><div class="res-title">OSINT & Passive Recon Hindi -- Ethical Sharmaji</div><div class="res-desc">whois, dig, crt.sh, Shodan in Hindi.</div></div></a><a class="res-card" href="https://www.youtube.com/watch?v=YqjP1Ff0BKM" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">Google Dorking -- Cybrary</div><div class="res-desc">Advanced search operators for exposed files and admin panels.</div></div></a><a class="res-card" href="https://tryhackme.com/room/ohsint" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">TryHackMe OhSINT room</div><div class="res-desc">Free room: OSINT investigation of a target.</div></div></a></div></section>
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid"><div class="mistake-item"><span class="check">CHECK</span> Passive vs active clearly distinguished -- never start with active.</div><div class="mistake-item"><span class="check">CHECK</span> CT logs as #1 subdomain discovery source.</div><div class="mistake-item"><span class="check">CHECK</span> Google dorking with real operational queries.</div><div class="mistake-item"><span class="check">CHECK</span> Shodan for exposed services including ICS/SCADA.</div><div class="mistake-item"><span class="check">CHECK</span> CT log discovery via curl + crt.sh API + jq.</div><div class="mistake-item"><span class="check">CHECK</span> Tools: whois, dig, subfinder, Shodan, crt.sh, theHarvester -- all real and available.</div></div>
+  </section>
+  <section>
+    <div class="card">
+      <ul class="checklist"><li><span class="box"></span> I understand passive vs active recon differences.</li><li><span class="box"></span> I performed whois lookup and interpreted output.</li><li><span class="box"></span> I used dig for A, MX, NS, TXT records.</li><li><span class="box"></span> I queried CT logs via crt.sh.</li><li><span class="box"></span> I ran subfinder and compared with CT logs.</li><li><span class="box"></span> I performed Google dorking.</li><li><span class="box"></span> I understand how Shodan exposes internet-connected devices.</li></ul>
+    </div>
+  </section>
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">37 / 90</div><div class="l3">Verified</div></div>
+  </div>
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow \u2014 day 38</div>
+      <div class="title">Active Recon -- Nmap Basics</div>
+    </div>
+    <div class="arrow">\u2192</div>
+  </div>
+  <footer>say "Day 38" when ready \u2014 one concept, one hour, one day at a time.</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 71 — Security Policies & Compliance (ISO 27001, GDPR)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:79%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .compliance-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .compliance-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day71$ cat policies-compliance.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 71/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 71 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Security Policies & <span class="accent">Compliance</span></h1>
+  <p class="subtitle">Security is as much about policy as it is about technology. Today you understand ISO 27001 ISMS, GDPR data protection principles, and how compliance drives security spending.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is an ISMS?</strong> An Information Security Management System (ISMS) is a systematic framework for managing sensitive information. ISO 27001 is the international standard for ISMS — it specifies requirements for establishing, implementing, maintaining, and continually improving an organization's security posture. Unlike a technology checklist, ISO 27001 is risk-based: you assess your specific risks and implement controls (from Annex A's 93 controls across 14 domains) that are appropriate to those risks.</p>
+
+      <p style="margin-top:16px;"><strong>Key compliance frameworks compared:</strong></p>
+      <div class="compliance-grid">
+        <div><div class="pe-label" style="color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">ISO 27001</div><div class="adesc" style="font-size:12px;color:var(--muted);">International ISMS standard. 93 controls across 14 domains. Certification required. Annual audits. Risk-based approach.</div></div>
+        <div><div class="pe-label" style="color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">GDPR</div><div class="adesc" style="font-size:12px;color:var(--muted);">EU data protection regulation. Applies to any org processing EU citizen data. Fines up to 4% of global revenue or 20M. Data subject rights: access, rectification, erasure, portability.</div></div>
+        <div><div class="pe-label" style="color:var(--amber);font-family:'IBM Plex Monaco',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">NIST CSF</div><div class="adesc" style="font-size:12px;color:var(--muted);">US framework — Identify, Protect, Detect, Respond, Recover. Voluntary but widely adopted. Less prescriptive than ISO 27001.</div></div>
+        <div><div class="pe-label" style="color:var(--purple);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">PCI DSS</div><div class="adesc" style="font-size:12px;color:var(--muted);">Payment Card Industry standard. 12 requirements for handling credit card data. Required for any business processing cards.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>GDPR Data Subject Rights and Breach Notification:</strong> GDPR grants individuals eight rights including the right to be informed, right of access, right to rectification, right to erasure (right to be forgotten), and right to data portability. Crucially for security professionals: GDPR Article 33 requires breach notification to the supervisory authority within 72 hours of becoming aware of a personal data breach. Article 34 requires notification to affected data subjects if the breach poses a high risk to their rights and freedoms. This means every incident responder must know how to determine whether a breach involves personal data and calculate the 72-hour notification window.</p>
+
+      <div class="code-block">
+<span class="cmt"># Example: ISO 27001 Annex A control mapping (simplified)</span>
+<span class="hdr">Domain:</span>        <span class="val">A.12 — Operations Security</span>
+<span class="hdr">Control:</span>       <span class="val">A.12.6.1 — Management of technical vulnerabilities</span>
+<span class="hdr">Implementation:</span> <span class="val">"A vulnerability scanning tool (e.g., OpenVAS, Nessus) must</span>
+                 <span class="val">scan all internet-facing assets weekly. Critical vulnerabilities</span>
+                 <span class="val">must be remediated within 48 hours of discovery."</span>
+
+<span class="cmt"># GDPR Article 33 Breach Notification Checklist</span>
+<span class="hdr">1.</span> <span class="val">Confirm a personal data breach has occurred</span>
+<span class="hdr">2.</span> <span class="val">Identify the categories of data affected</span>
+<span class="hdr">3.</span> <span class="val">Estimate the number of data subjects and records</span>
+<span class="hdr">4.</span> <span class="val">Assess the likely risk to data subjects' rights and freedoms</span>
+<span class="hdr">5.</span> <span class="val">Document the breach in the internal breach register</span>
+<span class="hdr">6.</span> <span class="val">Notify supervisory authority within 72 hours</span>
+<span class="hdr">7.</span> <span class="val">Notify affected data subjects if high risk</span></div>
+
+      <div class="callout"><strong>Why this matters:</strong> Compliance is often the primary driver of security budgets. A CISO justifying a SIEM purchase to the board will say "ISO 27001 control A.12.6.1 requires us to monitor and log security events" — not "we should buy a SIEM." Understanding compliance frameworks is how you translate technical security needs into business language that decision-makers understand.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Target organizations during compliance audit periods when security teams are distracted by paperwork and evidence gathering rather than threat monitoring.</li>
+          <li>Exploit the gap between compliance (checking boxes) and actual security — many orgs pass audits but have weak real-world defenses because they focus on documentation over capability.</li>
+          <li>Use GDPR as a weapon — report a company to the DPA for a minor incident, forcing a regulatory investigation that distracts their security team while you continue operations.</li>
+          <li>Focus on data subjects' personal data — GDPR creates a legal penalty for breach of personal data. The higher the fine potential, the more leverage the attacker has in ransom negotiations.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Map every security control to a compliance requirement — this justifies tooling and staffing costs to management. "We need EDR because it addresses ISO 27001 A.12.4.1 (event logging)."</li>
+          <li>Create a compliance-to-technical-control spreadsheet: for each ISO 27001 control, document the specific technical implementation (SIEM rule, firewall policy, access review schedule).</li>
+          <li>Practice the 72-hour breach notification drill — time how long it takes from detection to determining if personal data was involved. Most organizations fail this timeline.</li>
+          <li>Use GDPR as a security driver — when you need budget for data classification tools or DLP, frame it as "GDPR compliance requirement" which management understands better than "data security."</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2023 — META — €1.2B GDPR FINE</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Meta fined €1.2B by the Irish DPC for violating GDPR data transfer requirements — the largest GDPR fine in history</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">In May 2023, Meta was fined €1.2 billion by the Irish Data Protection Commission (DPC) for transferring personal data of EU users to the United States in violation of GDPR Article 45-49 (international data transfer requirements). The fine, the largest in GDPR history, represented 4% of Meta's 2022 global revenue — the maximum possible penalty. The case highlighted that compliance violations do not require a security breach — simply failing to meet data protection requirements is enough. Meta was ordered to suspend data transfers to the US within 5 months and delete unlawfully transferred data. The ruling forced Meta to re-architect its data infrastructure, a cost estimated at $500M+. This case demonstrates that compliance failures can be as financially damaging as security breaches.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> create a compliance checklist mapping ISO 27001 Annex A controls to specific technical implementations, and simulate a GDPR breach notification.</p>
+      <ol class="lab-steps">
+        <li>Download the ISO 27001:2022 Annex A control list (available free from ISO or via summary documents online). Focus on Domain A.12 (Operations Security) and A.8 (Asset Management).</li>
+        <li>Create a spreadsheet with columns: Control ID, Control Name, Technical Implementation, Responsible Team, Status (Implemented/Partial/Missing).</li>
+        <li>Map 5 controls to real technical implementations. Example: A.12.6.1 (Vulnerability Management) → "Weekly OpenVAS scans on all internet-facing systems. Critical vulns patched within 48 hours."</li>
+        <li>For the GDPR drill: write a simulated breach scenario — "An employee laptop with 5,000 customer records (names + emails) was stolen from a coffee shop." Determine: does this trigger Article 33 notification? What's the risk to data subjects? Draft the notification email to the DPA.</li>
+        <li>Calculate the 72-hour window: if the theft was discovered at 10:00 AM on Monday, what is the deadline? When does the clock start? (Answer: when you become aware, not when the incident occurred.)</li>
+        <li>Document everything in a single-page compliance reference sheet you can use during interviews.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a compliance checklist spreadsheet (5+ controls mapped) AND a simulated GDPR breach notification draft. These demonstrate you can bridge the gap between security operations and regulatory requirements.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Create ISO 27001 control mapping spreadsheet</span>
+<span class="cmd">cat &lt;&lt;EOF > iso27001_mapping.csv</span>
+<span class="cmd">Control ID,Control Name,Technical Implementation,Status</span>
+<span class="cmd">A.8.1.1,Inventory of Assets,"CMDB with all IT assets — updated monthly",Implemented</span>
+<span class="cmd">A.9.2.1,User Registration and De-registration,"HR-integrated IAM system — disabled within 24h of termination",Implemented</span>
+<span class="cmd">A.12.4.1,Event Logging,"Centralized SIEM collecting Windows Event Logs, syslog, and AWS CloudTrail",Implemented</span>
+<span class="cmd">A.12.6.1,Management of Technical Vulnerabilities,"Weekly OpenVAS scans. Critical: 48h fix. High: 7 day fix.",Partial</span>
+<span class="cmd">A.13.1.1,Network Controls,"Firewall rules reviewed quarterly. Zero-trust segmentation.",Implemented</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 2 — GDPR breach notification simulation</span>
+<span class="cmd">cat &lt;&lt;EOF > gdpr_notification_draft.md</span>
+<span class="cmd"># Breach Notification to DPA (Article 33)</span>
+<span class="cmd">## Date: [Date] — Deadline: [Date + 72h]</span>
+<span class="cmd">## Case: Stolen employee laptop containing customer data</span>
+<span class="cmd"></span>
+<span class="cmd">1. Nature of breach: Physical theft of encrypted laptop</span>
+<span class="cmd">2. Data categories: Names, email addresses (5,000 records)</span>
+<span class="cmd">3. Data subjects: Customers who purchased between Jan-Jun 2024</span>
+<span class="cmd">4. Risk assessment: LOW (data encrypted at rest with BitLocker)</span>
+<span class="cmd">5. Measures taken: Remote wipe attempted, laptop reported to police</span>
+<span class="cmd">6. Notification to data subjects: NOT REQUIRED (data encrypted, low risk)</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 3 — Calculate 72-hour notification window</span>
+<span class="cmd">python3 -c "</span>
+<span class="cmd">from datetime import datetime, timedelta</span>
+<span class="cmd">discovery = datetime(2024, 11, 4, 10, 0)  # Monday 10 AM</span>
+<span class="cmd">deadline = discovery + timedelta(hours=72)</span>
+<span class="cmd">print(f'Discovered: {discovery}')</span>
+<span class="cmd">print(f'Notification deadline: {deadline}')</span>
+<span class="cmd">print(f'Day of week: {deadline.strftime(\"%A\")}')</span>
+<span class="cmd">"</span>
+<span class="out">&gt; Discovered: 2024-11-04 10:00:00</span>
+<span class="out">&gt; Notification deadline: 2024-11-07 10:00:00 (Thursday)</span>
+<span class="c"># Always count 72 consecutive hours — weekends count!</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is ISO 27001 and what is its approach to security?"</div>
+        <div class="a">A: "ISO 27001 is an international standard for Information Security Management Systems (ISMS). It takes a risk-based approach — organizations assess their specific risks and implement appropriate controls from Annex A (93 controls across 14 domains). It's not a technology checklist; it's a management framework that requires continuous improvement, management review, and internal audits. Certification involves an external audit by an accredited body and requires recertification every three years."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What happens when a GDPR personal data breach occurs?"</div>
+        <div class="a">A: "The organization must notify the supervisory authority within 72 hours of becoming aware of the breach, per Article 33. The notification must describe the nature of the breach, categories and number of data subjects and records, likely consequences, and measures taken. If the breach poses a high risk to data subjects, Article 34 requires direct notification to affected individuals. The organization must also document the breach in an internal breach register including root cause and remedial actions taken."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you demonstrate to management that security spending is justified?"</div>
+        <div class="a">A: "By mapping security controls to compliance requirements. For example, I'd say 'ISO 27001 control A.12.6.1 requires vulnerability management — we need a scanner. Control A.12.4.1 requires event logging — we need a SIEM.' Management understands compliance mandates because non-compliance means legal liability, fines, and loss of business. I'd also present risk-based numbers: 'A data breach costs $4.45M on average. This EDR tool costs $50K/year. The ROI is clear.' The compliance framework provides the language to translate security needs into business terms."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Policy document generator</div>
+        <div class="adesc">Describe your organization type and compliance needs — get a draft security policy (acceptable use, access control, incident response) aligned to ISO 27001 or GDPR.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Control mapping assistant</div>
+        <div class="adesc">Paste a technical control description and ask which ISO 27001 Annex A control it maps to, and what evidence would satisfy an auditor.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">GDPR breach timer</div>
+        <div class="adesc">Enter the time of breach discovery and get the 72-hour deadline with a checklist of what to include in the DPA notification.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Gap analysis tool</div>
+        <div class="adesc">List your current security controls and have an LLM identify gaps against ISO 27001 Annex A, recommending specific controls to implement.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Mapped ISO 27001 Annex A controls to technical implementations across 5 security domains; created GDPR breach notification procedure and simulated 72-hour notification drill."</li>
+        <li><strong>Portfolio piece:</strong> a compliance mapping spreadsheet and a GDPR notification template. These show you understand the regulatory side of security — a skill gap many technical-only candidates have.</li>
+        <li><strong>Talking point:</strong> explaining compliance-driven security justification to management (instead of pure technical reasoning) demonstrates you can communicate with both technical and non-technical stakeholders — a requirement for senior SOC roles.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Compliance consulting is one of the highest-margin security services. Small businesses need ISO 27001 certification to win enterprise contracts but can't afford full-time compliance officers. A "Compliance Jumpstart" package — documentation templates, control mapping, internal audit — can be delivered in 2-4 weeks for $10,000-25,000. The tools are free (Google Docs, spreadsheets), and the value is your understanding of the framework.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "ISO 27001 Documentation Pack" — pre-written security policies, risk assessment templates, and control implementation guides for small businesses. $2,000 for the complete set. Add optional "Virtual CISO" monthly calls for $1,000/month to review their compliance status. This model scales: you create the documentation once, sell it repeatedly, while the advisory calls generate recurring revenue.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is ISO 27001, what is GDPR Article 33, and how would you map a security control to a compliance requirement?" If you can explain the 72-hour breach notification rule and describe how to justify a SIEM purchase using Annex A control references, you've bridged the gap between technical operations and compliance.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=H_kG8DZQJWE" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">ISO 27001 Explained — IT Governance UK</div><div class="res-desc">youtube.com/watch?v=H_kG8DZQJWE — comprehensive overview of ISO 27001 ISMS, Annex A controls, and certification process.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=s9N7ENWjB74" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">GDPR Compliance for Security Teams — SANS</div><div class="res-desc">youtube.com/watch?v=s9N7ENWjB74 — SANS instructor explains GDPR requirements from a security operations perspective.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=XZ6hE2dRPiA" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">ISO 27001 and GDPR in Hindi — Cyber Security Hindi</div><div class="res-desc">youtube.com/watch?v=XZ6hE2dRPiA — Hindi explanation of compliance frameworks and their impact on security operations.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/compliance" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Compliance and Policy Room</div><div class="res-desc">tryhackme.com/room/compliance — free room covering ISO 27001, GDPR, NIST CSF, and practical compliance exercises.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> ISO 27001 understood as risk-based ISMS — not "fill out a checklist and pass."</div>
+      <div class="mistake-item"><span class="check">✓</span> GDPR Article 33 (72-hour notification) and Article 34 (data subject notification) distinguished.</div>
+      <div class="mistake-item"><span class="check">✓</span> Compliance mapped to technical controls — A.12.4.1 = SIEM, A.12.6.1 = vulnerability scanner.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Meta €1.2B fine — compliance failure exceeds breach costs.</div>
+      <div class="mistake-item"><span class="check">✓</span> Breach notification drill completed with 72-hour deadline calculation.</div>
+      <div class="mistake-item"><span class="check">✓</span> Four frameworks compared — ISO 27001 vs GDPR vs NIST CSF vs PCI DSS.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 72 (Risk Assessment) — risk assessment is foundational to both ISO 27001 and compliance.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain what ISO 27001 is and its risk-based approach.</li>
+        <li><span class="box"></span> I know the key requirements of GDPR (rights, breach notification, fines).</li>
+        <li><span class="box"></span> I mapped 5 ISO 27001 controls to specific technical implementations.</li>
+        <li><span class="box"></span> I can calculate the 72-hour GDPR breach notification deadline.</li>
+        <li><span class="box"></span> I drafted a simulated GDPR breach notification.</li>
+        <li><span class="box"></span> I understand how to justify security spending using compliance language.</li>
+        <li><span class="box"></span> I can teach compliance frameworks out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">71 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 72</div>
+      <div class="title">Risk Assessment Basics — NIST SP 800-30, qualitative risk, inherent vs residual.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 72" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

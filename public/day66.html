@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 66 — Incident Response Lifecycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:74%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .ir-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:14px;}
+  .ir-steps > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;text-align:center;}
+  .ir-steps .step-num{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--cyan);}
+  .ir-steps .step-label{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day66$ cat ir-lifecycle.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 66/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 66 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Incident Response <span class="accent">Lifecycle</span></h1>
+  <p class="subtitle">When a breach happens, there's no time to learn. Today you drill the NIST IR lifecycle — Preparation, Detection, Containment, Eradication, Recovery, Lessons Learned.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The NIST SP 800-61 IR Lifecycle:</strong> Incident response is not a single action — it's a structured process with six phases. NIST SP 800-61 (Computer Security Incident Handling Guide) defines the gold standard. The lifecycle approach ensures that responders don't skip critical steps under pressure. Every phase has specific goals, actions, and success criteria.</p>
+
+      <div class="ir-steps">
+        <div><div class="step-num">1</div><div class="step-label">Preparation</div><div class="step-label" style="font-size:10px;color:var(--muted);">IR plan, tools, training</div></div>
+        <div><div class="step-num">2</div><div class="step-label">Detection & Analysis</div><div class="step-label" style="font-size:10px;color:var(--muted);">Identify, validate, scope</div></div>
+        <div><div class="step-num">3</div><div class="step-label">Containment</div><div class="step-label" style="font-size:10px;color:var(--muted);">Stop the bleed</div></div>
+        <div><div class="step-num">4</div><div class="step-label">Eradication</div><div class="step-label" style="font-size:10px;color:var(--muted);">Remove threat</div></div>
+        <div><div class="step-num">5</div><div class="step-label">Recovery</div><div class="step-label" style="font-size:10px;color:var(--muted);">Restore operations</div></div>
+        <div><div class="step-num">6</div><div class="step-label">Lessons Learned</div><div class="step-label" style="font-size:10px;color:var(--muted);">Improve for next time</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Preparation (the most neglected phase):</strong> Most organizations fail at IR before an incident even occurs because they skip preparation. Preparation includes: documented IR plan with defined roles and communication channels, pre-deployed forensic tools (imaging stations, write-blockers, analysis VMs), established chain-of-custody procedures, and regular tabletop exercises. The time to configure logging is not after you detect a breach — it's during preparation.</p>
+
+      <p><strong>Detection and Analysis:</strong> This is where the SOC operates. Alerts from EDR, SIEM, NIDS, and user reports are triaged. The key question is not "is this malicious?" but "what is the scope?" — which systems are affected, which accounts, what data, and how did the attacker get in. The analysis phase often reveals a larger compromise than initially suspected.</p>
+
+      <p><strong>Containment, Eradication, and Recovery:</strong> Containment is divided into short-term (e.g., isolate the host from the network) and long-term (e.g., rebuild from clean media). Eradication removes all traces of the attacker — deleted malware, revoked certificates, rotated credentials. Recovery restores business operations, often from verified clean backups. The sequence matters: containment before eradication prevents the attacker from re-establishing access faster than you can remove it.</p>
+
+      <div class="code-block">
+<span class="cmt"># Example: IR Phase Decision Tree for Ransomware</span>
+<span class="hdr">1. DETECTION:</span> <span class="val">Alert: "File encryption detected on host 10.0.1.45"</span>
+<span class="hdr">2. TRIAGE:</span> <span class="val">Is this a real ransomware event? Check file extensions (.locked),</span>
+             <span class="val">ransom note presence (README.txt), process list (encrypt.exe).</span>
+<span class="hdr">3. CONTAIN:</span> <span class="val">Isolate host: block at switch port, disable network interface.</span>
+              <span class="val">Preserve evidence: capture memory (LiME), create disk image (dd).</span>
+<span class="hdr">4. ERADICATE:</span> <span class="val">Identify initial vector (phishing? RDP brute-force?).</span>
+                <span class="val">Remove malware, patch exploited service, rotate all credentials.</span>
+<span class="hdr">5. RECOVER:</span> <span class="val">Restore from verified clean backup. Validate data integrity.</span>
+<span class="hdr">6. LEARN:</span> <span class="val">What failed? Write post-mortem. Implement missing control.</span></div>
+
+      <div class="callout"><strong>Why the lifecycle approach matters:</strong> Without a structured process, responders skip containment and go straight to eradication — then realize the attacker already re-infected through a backdoor that was never found. The NIST lifecycle forces methodical response, which is why every SOC job interview includes questions about it.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Time the attack for weekends or holidays when IR teams are at minimum staffing — slower containment means more time to encrypt and exfiltrate data.</li>
+          <li>Deploy multiple persistence mechanisms — scheduled tasks, WMI subscriptions, services, startup folders — so that even if one is found during eradication, another remains.</li>
+          <li>Destroy forensic evidence before defenders can collect it — use event log clearing (wevtutil), timestomping, and secure deletion to complicate the lessons-learned phase.</li>
+          <li>Move fast during containment — if you detect network isolation, trigger your backup C2 channel immediately before the first connection is cut.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Run tabletop exercises quarterly — simulate a ransomware scenario with all stakeholders (IT, legal, PR, executives). The discovery of gaps during a drill is infinitely cheaper than during a real incident.</li>
+          <li>Pre-deploy forensic collection tools: write-blockers, imaging workstations, and incident response jump bags with pre-configured laptops containing Volatility, FTK Imager, and chain-of-custody forms.</li>
+          <li>Document every action during containment with timestamps — who did what, when, and what was the result. This documentation is essential for post-incident analysis and potential legal proceedings.</li>
+          <li>Establish a warm site for the IR team — a separate management plane that isn't affected by the incident, with out-of-band communication (Signal, Slack, dedicated IR channel).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2021 — COLONIAL PIPELINE — $4.4M RANSOM PAID</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Colonial Pipeline's IR team followed the NIST lifecycle to respond to the Darkside ransomware attack</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">On May 6, 2021, Darkside ransomware encrypted Colonial Pipeline's billing systems. The IR team executed the NIST lifecycle: Containment — immediately isolated the OT pipeline control network from the compromised IT billing network, preventing the spread to operational technology. Eradication — identified the initial vector (a single compromised VPN password without MFA) and rebuilt systems from clean backups. Recovery — resumed pipeline operations after 6 days, restoring 5,500 miles of pipeline delivering 100 million gallons/day. The lessons learned led to mandatory MFA for all remote access, network segmentation between IT and OT, and dedicated ICS incident response procedures. Colonial paid $4.4M in ransom but recovered $2.3M via DOJ seizure.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> apply the NIST IR lifecycle to a simulated ransomware scenario — you are the incident responder.</p>
+      <ol class="lab-steps">
+        <li>Set up a scenario: create a simple IR playbook document for ransomware. Use a template from <code>github.com/OWASP/IR-Playbooks</code> or write your own with sections for each phase.</li>
+        <li>Preparation phase: list 5 tools you would have ready before an incident (e.g., FTK Imager, KAPE, Velociraptor, a pre-configured analysis VM, and an out-of-band communication channel).</li>
+        <li>Detection phase: download a free ransomware simulation tool (e.g., RanSim from KnowBe4) or use a YARA rule to search for known ransomware indicators in the <code>/tmp</code> directory: <code>yara -s /path/to/rule.yar /tmp</code>.</li>
+        <li>Containment phase: write a script that, when executed on a Linux host, isolates it from the network by disabling the network interface and adding iptables rules to block all traffic except to the SIEM: <code>iptables -A INPUT -s SIEM_IP -j ACCEPT; iptables -A INPUT -j DROP</code>.</li>
+        <li>Eradication phase: document the steps to identify and remove persistence mechanisms — check crontab (<code>crontab -l</code>), systemd services (<code>systemctl list-units --type=service</code>), and SSH authorized_keys.</li>
+        <li>Lessons learned: write a 5-point post-mortem document identifying what went wrong, what went well, and 3 action items to improve. This is the deliverable.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a complete IR post-mortem document (1 page) covering containment actions, eradication steps, and lessons learned. This is exactly what a SOC analyst would produce after a real incident.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Simulate containment: isolate this host</span>
+<span class="cmd">#!/bin/bash</span>
+<span class="cmd">SIEM_IP="192.168.1.100"</span>
+<span class="cmd">iptables -F</span>
+<span class="cmd">iptables -A INPUT -s $SIEM_IP -j ACCEPT</span>
+<span class="cmd">iptables -A INPUT -j DROP</span>
+<span class="cmd">iptables -A OUTPUT -d $SIEM_IP -j ACCEPT</span>
+<span class="cmd">iptables -A OUTPUT -j DROP</span>
+<span class="c"># This allows only SIEM communication — everything else blocked</span>
+
+<span class="c"># Step 2 — Check for persistence mechanisms (eradication)</span>
+<span class="cmd">crontab -l</span>
+<span class="cmd">systemctl list-units --type=service --state=running</span>
+<span class="cmd">cat ~/.ssh/authorized_keys 2>/dev/null</span>
+<span class="cmd">find /etc/systemd/system -name "*.service" -type f | xargs grep -l "ExecStart" 2>/dev/null</span>
+
+<span class="c"># Step 3 — Collect forensic evidence before cleanup</span>
+<span class="cmd">cp /var/log/auth.log /evidence/auth.log.incident</span>
+<span class="cmd">cp /var/log/syslog /evidence/syslog.incident</span>
+<span class="cmd">bash history > /evidence/bash_history.txt</span>
+
+<span class="c"># Step 4 — Post-mortem template</span>
+<span class="cmd">cat &lt;&lt;EOF > post-mortem.md</span>
+<span class="cmd"># Incident Post-Mortem: Ransomware Simulation</span>
+<span class="cmd">## Timeline</span>
+<span class="cmd">- Detection: [time] — alert from EDR on host XYZ</span>
+<span class="cmd">- Containment: [time] — network isolation applied</span>
+<span class="cmd">- Eradication: [time] — persistence removed, accounts rotated</span>
+<span class="cmd">- Recovery: [time] — services restored from backup</span>
+<span class="cmd">## Root Cause</span>
+<span class="cmd">- Initial access via [phishing / RDP brute-force / vulnerability]</span>
+<span class="cmd">## Recommendations</span>
+<span class="cmd">1. [Action item 1]</span>
+<span class="cmd">2. [Action item 2]</span>
+<span class="cmd">3. [Action item 3]</span>
+<span class="cmd">EOF</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through the NIST incident response lifecycle."</div>
+        <div class="a">A: "The NIST SP 800-61 lifecycle has six phases. Preparation: having the plan, tools, and training ready before an incident. Detection and Analysis: identifying the incident through alerts, logs, and user reports, then determining the scope. Containment: stopping the incident from spreading — short-term containment like host isolation, then long-term containment like network segmentation. Eradication: removing the threat — deleting malware, closing backdoors, rotating credentials. Recovery: restoring operations from clean backups and validating functionality. Lessons Learned: conducting a post-mortem to identify what went wrong and what to improve."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you prioritize containment during a ransomware incident?"</div>
+        <div class="a">A: "First, I'd isolate the affected host from the network immediately — disconnect the network cable or disable the switch port. Second, I'd preserve evidence by taking a memory dump and disk image before any cleanup. Third, I'd identify the scope — does this affect other hosts, file shares, or domain controllers? If encryption is detected on network shares, I'd block SMB traffic at the firewall. Fourth, I'd communicate to stakeholders — what systems are down, what's the estimated impact, and is law enforcement notification required. Containment is about stopping the bleed while preserving forensic integrity."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the most common mistake organizations make in incident response?"</div>
+        <div class="a">A: "Skipping the Preparation phase. Most organizations try to build their IR program during the incident. They don't have pre-deployed tools, documented procedures, or defined roles. This leads to chaotic response, lost evidence, and missed containment windows. The second most common mistake is moving straight from detection to eradication without proper containment — attackers often have multiple backdoors, and if you clean one without containing the environment, they'll still be present through another."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">IR playbook generator</div>
+        <div class="adesc">Describe the incident type (ransomware, data breach, insider threat) and receive a draft IR playbook with phase-specific actions, communication templates, and decision trees.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Timeline reconstructor</div>
+        <div class="adesc">Paste log entries (Windows Event Logs, syslog, EDR alerts) into an LLM and ask it to build a chronological incident timeline with phase mapping.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Post-mortem writer</div>
+        <div class="adesc">Describe the incident and actions taken — get a professional post-mortem document with root cause analysis, timeline, and recommendations.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">CVE-to-containment mapper</div>
+        <div class="adesc">Enter a CVE and ask which containment actions are appropriate — e.g., "CVE-2021-44228 Log4Shell: contain by blocking outbound LDAP and disabling JNDI lookup."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Applied NIST SP 800-61 incident response lifecycle to simulated ransomware scenario; produced containment script, evidence preservation procedure, and post-mortem report."</li>
+        <li><strong>Portfolio piece:</strong> a one-page IR post-mortem document from today's lab. Real interviewers will ask you to describe your response process — having a written example shows you can document under pressure.</li>
+        <li><strong>Talking point:</strong> being able to recite the six phases and explain the order with reasoning (containment before eradication) separates structured responders from panic-mode responders.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Incident response readiness consulting is a high-margin service. Most organizations don't know their IR gaps until they pay millions in ransom. A "Readiness Assessment" — reviewing their IR plan, testing tools, and running a tabletop exercise — can be packaged as a 1-week engagement for $7,500-15,000. The value proposition is compelling: "For less than the cost of a single ransomware encrypted server, we'll identify every gap in your ability to respond."</p>
+      <p style="margin-bottom:0;">A productized entry point: "IR Plan-in-a-Box" — a template IR plan customized for their industry, with playbooks for the 5 most common incident types (ransomware, BEC, insider threat, DDoS, supply chain). At $500-1,000 per delivery, this is a low-effort digital product you can sell while gaining consulting experience. Add optional tabletop facilitation for $2,000-3,000 per session.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What are the six phases of the NIST incident response lifecycle, what happens in each phase, and why does the order matter?" If you can describe a real scenario (ransomware on a domain controller) and walk through each phase with concrete actions, you're ready for IR-related interview questions at any tier-1 or tier-2 SOC position.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Jdpt2XMGIgQ" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Incident Response Lifecycle — SANS GIAC Webcast</div><div class="res-desc">youtube.com/watch?v=Jdpt2XMGIgQ — SANS instructor walks through the full NIST IR lifecycle with real incident examples.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=7JC9GrJTsKY" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Colonial Pipeline Incident Response Analysis — Cyber Security</div><div class="res-desc">youtube.com/watch?v=7JC9GrJTsKY — breakdown of how Colonial executed each IR phase after the Darkside ransomware attack.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=eC5CJMJEoVs" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Incident Response Lifecycle Hindi — CyberPlatter</div><div class="res-desc">youtube.com/watch?v=eC5CJMJEoVs — Hindi explanation of NIST 800-61 phases with Indian context for SOC teams.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/incidentresponse" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Incident Response Fundamentals</div><div class="res-desc">tryhackme.com/room/incidentresponse — free room covering the IR lifecycle with practical scenarios and decision-making exercises.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Six NIST phases learned in order with phase-specific actions — not "call IT."</div>
+      <div class="mistake-item"><span class="check">✓</span> Containment vs Eradication distinguished — most beginners skip straight to cleanup.</div>
+      <div class="mistake-item"><span class="check">✓</span> Preparation phase recognized as the most neglected but most critical.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Colonial Pipeline incident mapped to each phase of the lifecycle.</div>
+      <div class="mistake-item"><span class="check">✓</span> Hands-on containment script (iptables isolation) and evidence preservation commands.</div>
+      <div class="mistake-item"><span class="check">✓</span> Post-mortem documented with timeline, root cause, and recommendations.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 67 (Digital Forensics) — forensics supports every IR phase.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name all 6 phases of the NIST IR lifecycle in order.</li>
+        <li><span class="box"></span> I understand why containment comes before eradication.</li>
+        <li><span class="box"></span> I can describe the Colonial Pipeline response in terms of IR phases.</li>
+        <li><span class="box"></span> I wrote a containment isolation script (iptables or equivalent).</li>
+        <li><span class="box"></span> I collected forensic evidence with timestamps for later analysis.</li>
+        <li><span class="box"></span> I produced a post-mortem document with root cause and action items.</li>
+        <li><span class="box"></span> I can teach the IR lifecycle out loud in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">66 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 67</div>
+      <div class="title">Digital Forensics Basics — forensic imaging, file recovery, timeline analysis.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 67" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

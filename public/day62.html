@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 62 — Intrusion Detection — Snort / Suricata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:68.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .sql{color:var(--purple);}
+  .code-block .sq{color:var(--pink);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sql{color:var(--purple);}
+  .term-body .sq{color:var(--pink);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:14px;}
+  .rule-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .rule-card .rname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:5px;color:var(--green);}
+  .rule-card .rdesc{font-size:12px;color:var(--muted);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day62$ snort-rule-analysis.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 62/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 62 OF 90 — PHASE 7: NETWORK DEFENSE & TRAFFIC ANALYSIS</div>
+  <h1>Intrusion Detection — <span class="accent">Snort / Suricata</span></h1>
+  <p class="subtitle">Intrusion Detection Systems (IDS) and Intrusion Prevention Systems (IPS) are the burglar alarms of the network world. Snort and Suricata are the gold-standard open-source engines — together they power the majority of the world's network security monitoring deployments.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is an IDS/IPS?</strong> An Intrusion Detection System monitors network traffic for suspicious patterns and generates alerts. An Intrusion Prevention System does the same but blocks traffic inline. Snort (1998) and Suricata (2010) are rule-based engines that match packet content against signatures — also called rules — to detect attacks.</p>
+
+      <p style="margin-top:16px;"><strong>Snort rule structure — every rule has two parts:</strong></p>
+      <div class="code-block">
+<span class="req"># Rule header + rule options</span>
+<span class="hdr">alert tcp $EXTERNAL_NET any -> $HOME_NET 80</span>
+<span class="val">(msg:"SQL Injection - UNION SELECT detected";</span>
+<span class="body"> flow:to_server,established;</span>
+<span class="body"> content:"UNION"; nocase;</span>
+<span class="body"> content:"SELECT"; nocase; distance:0;</span>
+<span class="body"> sid:1000001; rev:1;)</span></div>
+
+      <p><strong>Breaking down the rule:</strong></p>
+      <div class="rule-grid">
+        <div class="rule-card"><div class="rname">Rule Header</div><div class="rdesc">Action (<code>alert</code>), Protocol (<code>tcp</code>), Source IP/port, Direction (<code>-></code>), Destination IP/port. The rule fires when traffic matches ALL header conditions.</div></div>
+        <div class="rule-card"><div class="rname">Rule Options</div><div class="rdesc"><code>msg</code> — alert text; <code>content</code> — pattern to match in payload; <code>nocase</code> — case-insensitive match; <code>sid</code> — unique rule ID; <code>rev</code> — revision number.</div></div>
+        <div class="rule-card"><div class="rname">Flow Keyword</div><div class="rdesc"><code>flow:to_server,established</code> — only inspect packets in the server-bound direction of an established TCP connection. Reduces false positives from outbound server responses.</div></div>
+        <div class="rule-card"><div class="rname">PCRE (Perl-Compatible Regex)</div><div class="rdesc"><code>pcre:"/(?:UNION\s+ALL\s+SELECT|UNION\s+SELECT)/i"</code> — regex matching for complex patterns that content keywords cannot express.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Detection Mode vs Prevention Mode:</strong></p>
+      <div class="callout.amber" style="background:rgba(255,180,84,0.05);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;"><strong>Detection (IDS):</strong> Snort/Suricata receives a copy of the traffic (via SPAN port or TAP). It can only alert — the original traffic passes through unaffected. Zero risk of blocking legitimate traffic. <strong>Prevention (IPS):</strong> The engine sits inline in the traffic path. When a rule matches, it can <code>drop</code>, <code>reject</code>, or <code>sdrop</code> the packet. Must be tuned aggressively to avoid blocking legitimate traffic.</div>
+
+      <p><strong>Suricata advantages over Snort:</strong> Multi-threaded by default (Snort is single-threaded), native GPU acceleration via CUDA, built-in HTTP/ TLS/ DNS parsers (app-layer inspectors), and support for emerging protocols like MQTT and HTTP/2. Both use nearly identical rule syntax, so rules are portable between them.</p>
+      <div class="callout"><strong>Key insight:</strong> Rule quality matters more than rule quantity. The Emerging Threats Open rule set ships ~35,000 rules; a tuned production deployment typically enables only 3,000-5,000. Every enabled rule is a source of potential false positives — tune ruthlessly.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Evade signature detection by encoding payloads: URL-encode SQLi (<code>%27%20OR%201%3D1</code>), base64-encode shellcode, use UTF-16 or gzip compression in HTTP requests.</li>
+          <li>Fragment packets across multiple TCP segments — a single rule match may span two packets that the IDS fails to reassemble properly.</li>
+          <li>Use encrypted channels (HTTPS, DNS-over-HTTPS, SSH tunnels) to bypass content inspection entirely — the IDS sees only the encrypted wrapper.</li>
+          <li>Slow down automated scans to 1-2 packets per minute to evade rate-based threshold rules that trigger on 10+ connections per second.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Enable preprocessors in Snort or app-layer parsers in Suricata — they normalize traffic (de-fragment IP, re-assemble TCP, decode HTTP) before rule matching.</li>
+          <li>Write threshold rules to suppress noisy-but-harmless alerts: <code>threshold: type both, track by_src, count 5, seconds 60</code> — only alert if a source triggers 5 times in 60 seconds.</li>
+          <li>Run rules against a pcap of known-good traffic first — identify and exclude rules that generate false positives in your environment before going live.</li>
+          <li>Use <code>fast_pattern</code> to optimize rule matching — Snort/Suricata uses the longest content match as the initial filter, rejecting non-matching packets early.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2003-PRESENT — SNORT: 5M+ DOWNLOADS, 40K+ VULNERABILITY SIGNATURES</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Snort powers the Top 10 IDS deployments globally — from NSA to Fortune 50 SOCs</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Created by Martin Roesch in 1998, Snort became the de facto standard for network intrusion detection. By 2003 it had over 5 million downloads and a community of 40,000+ rules covering everything from SQL injection to zero-day exploit signatures. Snort rules detected the SQL Slammer worm (2003), the Blaster worm, and Sasser within hours of outbreak. Today, Snort 3 (written in C++) delivers 10x performance over Snort 2. Suricata, created by the OISF in 2010, emerged as the multi-threaded successor and now powers most modern IDS deployments, including AWS Shield and many MSSP platforms. Both engines remain actively developed — Snort by Cisco, Suricata by the OISF community — and both share the same rule language, making skills 100% transferable between them.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> install Suricata, write custom detection rules, generate attack traffic, and verify alerts in the unified2 alert log.</p>
+      <ol class="lab-steps">
+        <li>Install Suricata: <code>sudo apt install suricata -y</code>. Verify with <code>suricata --build-info</code>. The default rule path is <code>/etc/suricata/rules/</code>.</li>
+        <li>Create a custom rule file: <code>sudo nano /etc/suricata/rules/local.rules</code>. Add: <code>alert http $HOME_NET any -> $EXTERNAL_NET any (msg:"C2 Beacon — Nslookup to Suspicious Domain"; content:"|0d 0a|Host|3a 20|evil"; nocase; sid:2000001; rev:1;)</code></li>
+        <li>Test the rule syntax: <code>suricata -T -c /etc/suricata/suricata.yaml -S /etc/suricata/rules/local.rules</code>. Fix any syntax errors before proceeding.</li>
+        <li>Run Suricata in IDS mode on an interface: <code>sudo suricata -c /etc/suricata/suricata.yaml -i eth0</code>. Generate attack traffic: visit a test site and trigger an HTTP request.</li>
+        <li>Check alerts in the fast log: <code>sudo tail -f /var/log/suricata/fast.log</code>. Each alert shows the rule message, source/dest IPs, and timestamp.</li>
+        <li>Write a threshold rule to suppress excessive alerts from one source: <code>event_filter: gen_id 1, sig_id 2000001, type threshold, track by_src, count 3, seconds 60</code>.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A working Suricata rule that fires on a specific HTTP request, a screenshot of the alert in <code>fast.log</code>, and a threshold filter configured to reduce alert noise. You're now writing production-grade IDS rules.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Install Suricata</span>
+<span class="cmd">sudo apt update && sudo apt install suricata -y</span>
+<span class="out">&gt; Suricata 6.x installed</span>
+
+<span class="c"># Test custom rule syntax (before deploying)</span>
+<span class="cmd">sudo suricata -T -c /etc/suricata/suricata.yaml \</span>
+<span class="cmd">  -S /etc/suricata/rules/local.rules</span>
+<span class="out">&gt; Rule syntax is valid</span>
+
+<span class="c"># Run Suricata in IDS mode (non-inline)</span>
+<span class="cmd">sudo suricata -c /etc/suricata/suricata.yaml -i eth0</span>
+<span class="out">&gt; Running in IDS mode. Waiting for signals...</span>
+
+<span class="c"># Generate test traffic</span>
+<span class="cmd">curl -H "Host: evil-c2.example.com" http://example.com</span>
+
+<span class="c"># Check alerts in real-time</span>
+<span class="cmd">sudo tail -f /var/log/suricata/fast.log</span>
+<span class="hi"># Expected output:</span>
+<span class="hi">07/23/2026-10:15:30.123456 [**] [1:2000001:1] C2 Beacon — Host evil-c2.example.com [**] [Classification: (null)] [Priority: 3] {TCP} 10.0.2.15:56342 -> 93.184.216.34:80</span>
+
+<span class="c"># Count alerts by signature ID</span>
+<span class="cmd">sudo grep -c "2000001" /var/log/suricata/fast.log</span>
+
+<span class="c"># Parse eve.json (JSON log) with jq</span>
+<span class="cmd">sudo jq 'select(.alert != null) | {timestamp, alert_sig: .alert.signature, src_ip: .src_ip}' \</span>
+<span class="cmd">  /var/log/suricata/eve.json | head -5</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain the difference between IDS and IPS with Snort/Suricata."</div>
+        <div class="a">A: "IDS mode — also called promiscuous mode — receives a copy of the traffic via a SPAN port or network TAP. The engine can only alert; it can't block. IPS mode — also called inline mode — sits directly in the traffic path, and the engine can drop, reject, or pass packets. IPS requires the <code>af-packet</code> inline mode in Suricata or <code>nfqueue</code> in Snort. The same rules work in both modes, but in IPS mode the action changes from <code>alert</code> to <code>drop</code> for malicious signatures."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you tune Snort rules to reduce false positives?"</div>
+        <div class="a">A: "First, I run the full rule set against a pcap of known-good traffic and identify which rules fire on benign traffic. Those get either disabled or wrapped in a <code>threshold</code> or <code>suppress</code> filter. Second, I use <code>flow:established</code> to avoid inspecting handshake packets. Third, I create custom pass rules for known-safe IPs. Fourth, I use Suricata's app-layer parsers — the HTTP parser decodes the request before rule matching, so URL-encoded attacks are caught without needing dozens of encoding variant rules."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do attackers evade signature-based IDS?"</div>
+        <div class="a">A: "Common techniques: payload encoding (base64, UTF-16, URL encoding), packet fragmentation (IP fragments or TCP segmentation that the IDS doesn't reassemble), encryption (HTTPS/SSH tunnels), and polymorphic shellcode that changes its byte signature every infection. Modern engines counter evasion with preprocessors (frag3, stream5 in Snort) that normalize traffic before rule matching, and with app-layer inspectors that decode the protocol (HTTP, TLS, DNS) before looking for patterns in the decoded content."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Snort rule generator</div>
+        <div class="adesc">Describe an attack in plain English: "detect directory traversal in HTTP requests to Apache servers" — get a ready-to-use Snort rule with proper content matching and sid numbering.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">False positive analyzer</div>
+        <div class="adesc">Paste a fast.log alert entry into an LLM and ask it to determine whether the alert indicates a real attack or a false positive based on the IP, port, and payload pattern.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">PCRE rule optimizer</div>
+        <div class="adesc">Ask an LLM to convert a complex PCRE-based Snort rule into an equivalent multi-content rule — PCRE is CPU-intensive and should be the last resort, not the first.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Rule set auditor</div>
+        <div class="adesc">Paste your enabled rule list and ask for a review: which rules are redundant, which have known bypasses, and which should be prioritized in your environment.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Deployed Suricata IDS with custom rule sets; wrote 15+ detection rules for SQLi, XSS, and C2 beaconing; reduced false positive rate by 60% through threshold tuning and pass-rule exclusions."</li>
+        <li><strong>Portfolio piece:</strong> a documented Suricata deployment — architecture diagram, three custom rules with explanations, a sample alert log, and a before/after false positive comparison.</li>
+        <li><strong>Interview talking point:</strong> the ability to explain rule header vs rule options syntax, app-layer parsing benefits, and the IDS vs IPS decision process demonstrates SOC analyst readiness.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Many small MSPs (<5 employees) can't justify a commercial IDS solution like Cisco Firepower or Palo Alto Threat Prevention. You can offer a "Managed Suricata Sensor" as a subscription service: deploy a Raspberry Pi 4 with Suricata + ELK Stack at each client site for $200/month per sensor, including weekly rule updates, false positive tuning, and monthly alert summaries.</p>
+      <p style="margin-bottom:0;">At 10 clients, this generates $24,000/year in recurring revenue with hardware cost of ~$100 per sensor. Add a one-time deployment fee of $500/site and your first 10 clients cover hardware + tooling costs in a single month. Bundle with Day 61's pcap analysis service for full-spectrum network defense.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud in under 90 seconds: "What is a Snort rule, what are its two main parts, and how do you test one before deploying it to production?" If you can write a sample rule on a whiteboard and explain what each field means, you've internalized today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://suricata.io/documentation/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Suricata Official Documentation</div><div class="res-desc">suricata.io/documentation/ — complete reference for installation, rule writing, and performance tuning.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=6We8h6k3s0s" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Snort IDS Tutorial — NetworkChuck</div><div class="res-desc">youtube.com/watch?v=6We8h6k3s0s — beginner-friendly walkthrough of installing Snort and writing detection rules.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=6VNZ4N8Z7aA" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Suricata IDS Full Course (Hindi) — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=6VNZ4N8Z7aA — complete Hindi tutorial covering Suricata installation, rules, and testing.</div></div>
+      </a>
+      <a class="res-card" href="https://rules.emergingthreats.net/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Emerging Threats Open Ruleset</div><div class="res-desc">rules.emergingthreats.net/ — the most widely-used open-source Snort/Suricata rule set with 35K+ signatures.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Rule syntax explained thoroughly — header vs options, not just copy-paste.</div>
+      <div class="mistake-item"><span class="check">✓</span> IDS vs IPS clarified with network topology implications.</div>
+      <div class="mistake-item"><span class="check">✓</span> Rule quality over quantity — tuned deployment = 3-5K rules, not 35K.</div>
+      <div class="mistake-item"><span class="check">✓</span> Preprocessors and app-layer parsers taught as evasion countermeasures.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Snort adoption stats — 5M+ downloads, powers global SOCs.</div>
+      <div class="mistake-item"><span class="check">✓</span> Threshold/suppress filters included — not just raw rule writing.</div>
+      <div class="mistake-item"><span class="check">✓</span> eve.json + jq parsing for structured alert analysis.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain the Snort rule header vs options structure.</li>
+        <li><span class="box"></span> I wrote and tested a custom detection rule with Suricata.</li>
+        <li><span class="box"></span> I understand IDS vs IPS deployment differences.</li>
+        <li><span class="box"></span> I configured threshold filters to reduce alert noise.</li>
+        <li><span class="box"></span> I parsed eve.json with jq for structured alert analysis.</li>
+        <li><span class="box"></span> I learned how attackers evade signature-based detection.</li>
+        <li><span class="box"></span> I can teach Snort/Suricata rule writing to someone else.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">62 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 63</div>
+      <div class="title">Endpoint Detection & Response (EDR) — behavioral detection, process trees, telemetry.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 63" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

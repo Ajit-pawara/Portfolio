@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 55 — Phase 3 Complete Review & Mini Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:60%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'\25CF';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day55$ cat phase3-review.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 55/90 — Phase 3 Review <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 55 OF 90 — PHASE 3 REVIEW</div>
+  <h1>Phase 3 Complete <span class="accent">Review & Mini Quiz</span></h1>
+  <p class="subtitle">Twenty days of offensive security — pentesting, scanning, exploitation, and CTFs. Today you consolidate everything and gear up for defensive operations.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Phase 3 covered days 35 through 55:</strong> twenty days of pure offensive security. You started with the pentesting methodology and OSINT (recon with theHarvester, Recon-ng, Shodan), moved through Nmap scanning (basic, advanced, NSE scripts), vulnerability scanning with Nuclei and Nikto, exploitation with Metasploit, Burp Suite interception and web attacks, OWASP Top 10 exploitation through DVWA, Linux and Windows privilege escalation, password cracking with Hashcat and John, wireless attacks (Wi-Fi Pineapple, Evil Twin), network pivoting, pentest reporting, TryHackMe and Hack The Box methodology, and CTF strategies for crypto and forensics.</p>
+<p style="margin-top:16px;"><strong>What Phase 4 brings:</strong> Starting tomorrow, you shift to the defensive side — SOC operations, log analysis, SIEM, detection engineering, network traffic analysis, intrusion detection, endpoint detection and response, threat intelligence, incident response, malware analysis, and finally the capstone: a full blue team simulation. Every concept you attacked in Phase 3 will now be examined from the defender's perspective.</p>
+<p style="margin-top:16px;"><strong>Mini quiz — test yourself before Phase 4:</strong></p>
+<div class="code-block">
+<span class="req">1. What Nmap flag performs version detection?</span>
+<span class="body">   Answer: -sV</span>
+<span class="req">2. What Metasploit module stages a payload on the target?</span>
+<span class="body">   Answer: exploit/multi/handler + staged payload like windows/meterpreter/reverse_tcp</span>
+<span class="req">3. What is the difference between 401 and 403?</span>
+<span class="body">   Answer: 401 = unauthenticated, 403 = authenticated but denied</span>
+<span class="req">4. Name three privilege escalation vectors on Linux.</span>
+<span class="body">   Answer: SUID binaries, kernel exploits (Dirty Pipe), sudo misconfigurations</span>
+<span class="req">5. What tool automates SQL injection detection and exploitation?</span>
+<span class="body">   Answer: sqlmap</span></div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">&#9876; Attacker</div>
+        <ul>
+          <li>Review every exploitation technique from Phase 3 and identify which detection gaps each one exploits — knowing the defender's blind spots makes you a better pentester.</li>
+          <li>Identify the weakest link in any environment: outdated software, exposed admin panels, default credentials, unvalidated file uploads.</li>
+          <li>Combine techniques from different days — use OSINT from earlier to find exposed credentials, then test them against targets found in Nmap scans.</li>
+          <li>Apply the kill chain mindset: each phase of the attack (recon, weaponize, deliver, exploit, install, C2, actions) has distinct detection opportunities you can study.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">&#9937; Defender</div>
+        <ul>
+          <li>Build a consolidated knowledge base linking each Phase 3 attack technique to its MITRE ATT&CK ID — reference these mappings in every Phase 4 detection rule.</li>
+          <li>Create personal cheat sheets for Nmap flags, Metasploit commands, Burp Suite workflows, and privesc enumeration — speed matters in real engagements.</li>
+          <li>Identify which attack types appeared in your THM/HTB labs — map real CVEs to the techniques you practiced to bridge theory and real threats.</li>
+          <li>Document one "I will never forget" lesson from each day — memory decays fast without active recall.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">FULL PHASE 3 COVERAGE</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Reviewed pentesting lifecycle, OSINT, Nmap, vulnerability scanning, Metasploit, Burp Suite, DVWA, privesc, password cracking, wireless, pivoting, pentest reporting, THM/HTB, and CTF strategies</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Over twenty days you've built the offensive security foundation that most self-taught hackers never systematize. By covering the full lifecycle — from reconnaissance through exploitation, privilege escalation, lateral movement, and reporting — you now understand how real penetration tests are scoped, executed, and delivered. Every technique you practiced maps to real-world CVE exploitation chains used in the 2023 MOVEit Transfer attacks, the 2021 Kaseya supply chain compromise, and the 2020 SolarWinds SUNBURST campaign. Phase 4 will teach you to defend against precisely these attacks.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> complete the Phase 3 review quiz with 100% accuracy and prepare a personal cheat sheet for Phase 4.</p>
+      <ol class="lab-steps">
+        <li>Open a text editor and write down, from memory, the Nmap flags for: version detection, OS detection, script scanning, SYN scan, UDP scan, and the timing templates T0-T5. Check against your notes.</li>
+        <li>Write the full Metasploit workflow for exploiting EternalBlue (MS17-010) — set RHOSTS, set PAYLOAD, set LHOST, exploit. Without notes.</li>
+        <li>List all five SQL injection types with a one-sentence description of how each works.</li>
+        <li>Write down the privilege escalation checklist for both Linux (SUID, kernel vulns, sudo, cron, capabilities) and Windows (unquoted service paths, AlwaysInstallElevated, SeImpersonatePrivilege).</li>
+        <li>Create a one-page PDF cheatsheet with: Nmap, Metasploit, Burp Suite, sqlmap, Hashcat, Wireshark, and Linux/Windows privesc commands. Format it for quick reference during labs.</li>
+        <li>After completing the quiz, identify your three weakest areas and plan to revisit those specific days before beginning Phase 4.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a completed self-assessment quiz (score out of 10), a one-page Phase 3 cheat sheet PDF, and a list of 3 topics to review before Day 56.</div>
+    </div>
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body">
+<span class="c"># Phase 3 self-assessment quiz</span>
+<span class="cmd">echo "1. Nmap -sV flag does what? -> Version detection"</span>
+<span class="cmd">echo "2. Metasploit command to set payload -> set PAYLOAD windows/meterpreter/reverse_tcp"</span>
+<span class="cmd">echo "3. Five SQLi types -> UNION, Error, Boolean-blind, Time-blind, OOB"</span>
+<span class="cmd">echo "4. Linux privesc: SUID, kernel, sudo, cron, capabilities"</span>
+<span class="cmd">echo "5. Windows privesc: unquoted paths, AlwaysInstallElevated, SeImpersonate"</span>
+
+<span class="c"># Generate Phase 3 cheat sheet (markdown for PDF conversion)</span>
+<span class="cmd">cat > phase3_cheatsheet.md << \'EOF\'</span>
+<span class="out"># Phase 3 Cheat Sheet</span>
+<span class="out">## Nmap</span>
+<span class="out">-sV (version), -O (OS), -sC (scripts), -sS (SYN), -sU (UDP)</span>
+<span class="out">-T0 to T5 (timing), -oA (all output formats)</span>
+<span class="out">## Metasploit</span>
+<span class="out">search, use, set RHOSTS, set PAYLOAD, set LHOST, exploit</span>
+<span class="out">## Burp Suite</span>
+<span class="out">Proxy (intercept), Repeater (modify), Intruder (fuzz), Decoder</span>
+<span class="out">EOF</span>
+<span class="cmd">pandoc phase3_cheatsheet.md -o phase3_cheatsheet.pdf</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through a typical penetration test from start to finish."</div>
+        <div class="a">A: "A pentest has five phases. 1) Reconnaissance: gather information using OSINT (theHarvester, Shodan), passive DNS, and social engineering. 2) Scanning: Nmap to discover live hosts and open ports, vulnerability scanning with Nuclei or Nessus. 3) Exploitation: Metasploit for known exploits, manual web attacks (SQLi, XSS) through Burp Suite. 4) Post-exploitation: privilege escalation, lateral movement, persistence, data exfiltration. 5) Reporting: document findings with severity ratings, proof-of-concept evidence, and remediation recommendations. Each phase feeds into the next."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is the most important thing you learned from the Phase 3 labs?"</div>
+        <div class="a">A: "That manual exploitation gives you understanding, but automation gives you speed. You need both. Knowing how to manually craft a SQL injection payload teaches you how the database processes queries, which helps you write better detection rules later. But in a real engagement, you'd use sqlmap after confirming the injection manually. The balance between manual depth and automated breadth is what separates script kiddies from professional pentesters."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you prepare for a certification like OSCP or PNPT based on your Phase 3 experience?"</div>
+        <div class="a">A: "The Phase 3 curriculum directly maps to OSCP objectives: Nmap scanning, web vulnerability assessment, exploitation with Metasploit and manual techniques, Linux and Windows privilege escalation, password cracking, and pivoting. For OSCP specifically, focus on manual exploitation without Metasploit's auto-pwn modules. For PNPT, practice active directory attacks, OSINT, and the full pentest report format. The THM/HTB methodology from Phase 3 directly translates to exam machine methodology."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card"><div class="aname">LLM as Pentest Mentor</div><div class="adesc">Describe the scenario you're stuck on and ask for hints — "I'm on a Linux box with port 80 open and no obvious exploit path. What should I check?"</div></div>
+      <div class="ai-card"><div class="aname">Command Generator</div><div class="adesc">Ask for the exact Nmap/Metasploit/sqlmap command for a given scenario. "Nmap scan for SMB vulnerabilities on port 445 with NSE scripts."</div></div>
+      <div class="ai-card"><div class="aname">Knowledge Gap Analyzer</div><div class="adesc">List what you remember from Phase 3 and ask the LLM to identify gaps and suggest which days to revisit.</div></div>
+      <div class="ai-card"><div class="aname">Cheat Sheet Builder</div><div class="adesc">Ask for a formatted Markdown cheat sheet on any Phase 3 topic — Nmap flags, Metasploit workflow, privesc methodology — ready to paste into your notes.</div></div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Completed 20-day intensive offensive security curriculum covering Nmap, Metasploit, Burp Suite, privilege escalation, password cracking, and CTF strategies."</li>
+        <li><strong>Portfolio piece:</strong> consolidated Phase 3 cheat sheet — a one-page reference showing all tools and techniques mastered across 20 days.</li>
+        <li><strong>Interview talking point:</strong> being able to rapidly switch between offensive tools and explain how they map to the penetration testing lifecycle shows structured, methodical thinking that hiring managers value.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>The skills consolidated today are what you'd offer as a freelance penetration tester: network and web application security testing, vulnerability assessment, and remediation guidance. A basic pentest engagement (1-2 days) for a small business can be priced at $2,000-5,000. The cheat sheet you built today becomes your reference during real engagements — your personal knowledge base that makes you faster and more thorough than competitors who still look up commands during client time.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Name all five phases of a penetration test and three tools you'd use in each phase." If you can do this without pausing, you've internalized the methodology well enough to explain it to a client — which is what senior pentesters do every day.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=WZpm6LAaUrY" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">Full Pentesting Methodology — The Cyber Mentor</div><div class="res-desc">youtube.com/watch?v=WZpm6LAaUrY — Complete walkthrough of a penetration test from recon to reporting.</div></div></a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=ZtuMvz-egFU" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">OSCP Exam Tips and Methodology — IppoSec</div><div class="res-desc">youtube.com/watch?v=ZtuMvz-egFU — Practical exam methodology and time management tips.</div></div></a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=E8-gnLEIzbo" target="_blank"><span class="res-icon hi">HI</span><div><div class="res-title">Penetration Testing Full Course Hindi — Ethical Sharmaji</div><div class="res-desc">youtube.com/watch?v=E8-gnLEIzbo — Complete Hindi course covering pentesting methodology.</div></div></a>
+      <a class="res-card" href="https://www.hackthebox.com/" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">Hack The Box — Practice Platform</div><div class="res-desc">hackthebox.com — Continue practicing Phase 3 skills on real machines with HTB's retired and active boxes.</div></div></a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">&#10003;</span> All 20 days of Phase 3 content reviewed and consolidated — no gaps.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Cheat sheet created for quick reference during future labs and engagements.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Self-assessment quiz identifies weak areas before moving to Phase 4.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> MITRE ATT&CK mappings started — linking attacks to their detection IDs.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Real CVEs linked to practiced techniques — theory meets reality.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Phase 4 preview provides context for why defensive knowledge matters.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name all five pentest phases from memory.</li>
+        <li><span class="box"></span> I know the key Nmap flags for version, OS, and script scanning.</li>
+        <li><span class="box"></span> I can explain the Metasploit workflow without looking it up.</li>
+        <li><span class="box"></span> I have a completed cheat sheet for Phase 3 tools.</li>
+        <li><span class="box"></span> I identified my three weakest topics for review.</li>
+        <li><span class="box"></span> I understand what Phase 4 will cover and why it matters.</li>
+        <li><span class="box"></span> I can teach the pentest lifecycle out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">55 / 90</div><div class="l3">Verified &#10003;</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 56</div>
+      <div class="title">SOC Structure — Tier 1/2/3 Analyst Roles</div>
+    </div>
+    <div class="arrow">&rarr;</div>
+  </div>
+
+  <footer>say "Day 56" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

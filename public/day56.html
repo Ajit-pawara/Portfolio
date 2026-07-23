@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 56 — SOC Structure Tier 1/2/3 Analyst Roles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:60%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'\25CF';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day56$ cat soc-structure.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 56/90 — Phase 4 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 56 OF 90 — PHASE 4</div>
+  <h1>SOC Structure <span class="accent">Tier 1/2/3 Analyst Roles</span></h1>
+  <p class="subtitle">Security Operations Centers run on a tiered model. Today you understand what each tier does, what certifications you need, and how to progress from alert triage to threat hunting.</p>
+
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The SOC tiered model:</strong> Security Operations Centers divide analyst responsibilities into three tiers. Tier 1 (Triage) monitors the SIEM dashboard, validates alerts, prioritizes incidents, and escalates confirmed threats. Typical requirements: CompTIA Security+, ability to read logs, basic networking knowledge. Tier 2 (Incident Responder) conducts deep-dive investigations, contains threats, performs forensic collection, and writes incident reports. Requires CySA+, GCFA, or equivalent experience. Tier 3 (Threat Hunter) proactively searches for threats that evaded existing controls, develops detection content, reverse-engineers malware, and improves SOC processes. Requires GCIH, GREM, or deep specialization.</p>
+<p style="margin-top:16px;"><strong>Key metrics measured at each tier:</strong> Tier 1 is measured by Mean Time to Acknowledge (MTTA), alert volume handled, false positive rate. Tier 2 by Mean Time to Respond (MTTR), containment time, number of incidents investigated. Tier 3 by threat hunting hypotheses tested, new detections created, and threat intelligence consumed. Progression from T1 to T3 typically takes 2-5 years and requires continuous certification and tool mastery.</p>
+<p style="margin-top:16px;"><strong>Common SOC tools per tier:</strong></p>
+<div class="code-block">
+<span class="req">Tier 1:</span> <span class="body">SIEM (Splunk, ELK), ticketing system (ServiceNow, Jira),</span>
+<span class="body">phishing reporting tools, basic EDR console (Defender, CrowdStrike)</span>
+<span class="req">Tier 2:</span> <span class="body">EDR deep investigation, Wireshark, Volatility,</span>
+<span class="body">YARA, VirusTotal, sandbox execution (Cuckoo, Any.Run)</span>
+<span class="req">Tier 3:</span> <span class="body">Python/Go scripting, Sigma rule authoring,</span>
+<span class="body">MITRE ATT&amp;CK mapping, MISP threat intel platform, Ghidra/IDA</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">&#9876; Attacker</div>
+        <ul>
+<li>Tier 1 analysts triage alerts — attackers exploit this by generating noise (false positives) to hide real activity. Volume-based attacks overwhelm triage capacity.</li>
+<li>Attack during shift handover times (early morning, late evening) when SOC coverage is thinnest and alert fatigue is highest.</li>
+<li>Abuse legitimate tools (LOLBins) that Tier 1 analysts are trained to deprioritize — use Invoke-Mimikatz.ps1 instead of the mimikatz binary.</li>
+<li>Test detection rules by running known-malicious tools in a sandboxed environment to see which alerts fire — gaps become your attack path.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">&#9937; Defender</div>
+        <ul>
+<li>Create shift handover templates so Tier 1 analysts document ongoing investigations, false positive patterns, and IOCs clearly for the next shift.</li>
+<li>Implement automated alert enrichment — pull IP reputation, geolocation, and historical context into each alert so Tier 1 spends less time researching.</li>
+<li>Train Tier 1 analysts to spot attacker psychology — unusual login times, spike in low-severity alerts, or targeted phishing of SOC staff are red flags.</li>
+<li>Build a playbook library covering the top 10 alert types — Tier 1 can follow a playbook for malware, phishing, brute force, and policy violations.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2019 — MICROSOFT SOC — 24 TRILLION SIGNALS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Microsoft's SOC processes over 24 trillion security signals daily using a tiered analyst model</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Microsoft's Security Operations processes more than 24 trillion signals daily from 200+ cloud and enterprise services including Azure AD, Microsoft 365, and Windows Defender. Their SOC operates on the Tier 1/2/3 model: Tier 1 analysts triage automated alerts from Azure Sentinel, Tier 2 analysts investigate escalated incidents, and Tier 3 threat hunters proactively search for nation-state actors like NOBELIUM (SolarWinds). Microsoft employs over 8,000 security professionals across 77 countries in this structure. The tiered model ensures junior analysts handle volume while senior analysts focus on complex threats.</div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> map the SOC tier structure to a real organization and role-play incident escalation.</p>
+      <ol class="lab-steps">
+<li>Research a company's SOC structure — look at job postings for "SOC Analyst Tier 1" on LinkedIn and note the required certifications, tools, and responsibilities listed.</li>
+<li>Create a tiered escalation flowchart in Draw.io or on paper: alert comes in (T1), analyst validates and categorizes, escalates to T2 if confirmed malicious, T2 investigates and contains, T3 hunts for related threats.</li>
+<li>Write a playbook for one alert type (phishing): what T1 does (verify URL, check attachment hash in VT, determine if user clicked), what T2 does (check mailbox rules, check for data exfiltration, isolate user), what T3 does (hunt for similar emails across the org).</li>
+<li>Simulate a tier escalation: you're a T1 analyst and see "Multiple Failed Logins — user: admin — source: 185.220.101.x". Write the escalation ticket with: how many failures, time range, asset owner contacted, and recommendation.</li>
+<li>Map out a career progression plan: which certifications to get (Security+ → CySA+ → GCFA → GCIH) and estimated timeline (6 months per tier).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a tiered escalation flowchart (PDF or image), a phishing playbook, and a completed escalation ticket example. These demonstrate SOC process knowledge in interviews.</div>
+    </div>
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body">
+<span class="c"># SOC tier structure reference</span>
+<span class="cmd">echo "=== SOC Tier Responsibilities ==="</span>
+<span class="cmd">echo "Tier 1: Alert triage, validation, prioritization, escalation"</span>
+<span class="cmd">echo "  Tools: SIEM dashboard, ticketing, basic EDR"</span>
+<span class="cmd">echo "  Certs: Security+, CySA+"</span>
+<span class="cmd">echo "Tier 2: Incident investigation, containment, forensic collection"</span>
+<span class="cmd">echo "  Tools: EDR deep analysis, Wireshark, Volatility"</span>
+<span class="cmd">echo "  Certs: GCFA, GCIH"</span>
+<span class="cmd">echo "Tier 3: Threat hunting, detection engineering, malware analysis"</span>
+<span class="cmd">echo "  Tools: MISP, YARA, Ghidra, Python"</span>
+<span class="cmd">echo "  Certs: GREM, GXPN"</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is the difference between a Tier 1 and Tier 2 SOC analyst?"</div>
+        <div class="a">A: "Tier 1 analysts are the first line of defense — they monitor the SIEM dashboard, validate incoming alerts, determine priority, and escalate confirmed threats to Tier 2. Their focus is speed: triage as many alerts as possible with minimal false negatives. Tier 2 analysts are incident responders — they conduct deep investigations, collect forensic evidence, contain active threats, and write incident reports. Tier 1 asks 'is this real?', Tier 2 asks 'what happened, what is the impact, and how do we stop it?'"</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What certifications would you recommend for someone starting as a Tier 1 analyst?"</div>
+        <div class="a">A: "CompTIA Security+ is the baseline — it covers networking, cryptography, risk management, and basic incident response. Then CompTIA CySA+ (Cybersecurity Analyst) focuses specifically on SIEM, log analysis, and threat detection. For Tier 2, the SANS GCFA (Forensic Analyst) and GCIH (Incident Handler) are gold-standard certifications. Microsoft also offers SC-200 (Security Operations Analyst) for Azure Sentinel. Start with Security+, get six months of SOC experience, then specialize."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How does a SOC measure its effectiveness?"</div>
+        <div class="a">A: "Key metrics include: Mean Time to Acknowledge (MTTA) — how fast an alert is picked up; Mean Time to Respond (MTTR) — how long to contain an incident; false positive rate — too many FPs cause alert fatigue; dwell time — how long a threat was undetected in the environment; and coverage percentage — what percentage of MITRE ATT&CK techniques have detection coverage. The best SOCs measure both speed (MTTA/MTTR) and quality (false positive rate, dwell time)."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+<div class="ai-card"><div class="aname">SOC Playbook Generator</div><div class="adesc">Describe a threat type and get a complete SOC playbook with T1/T2/T3 actions, escalation criteria, and reporting templates.</div></div>
+<div class="ai-card"><div class="aname">Certification Path Advisor</div><div class="adesc">Tell an LLM your experience level and career goals — get a personalized certification roadmap with estimated costs and study time.</div></div>
+<div class="ai-card"><div class="aname">Alert Triage Simulator</div><div class="adesc">Describe an alert scenario and ask how a T1 analyst should triage it — practice decision-making before you're in the chair.</div></div>
+<div class="ai-card"><div class="aname">Resume Optimizer</div><div class="adesc">Paste your resume and target SOC role — get suggestions for keywords, certifications to add, and experience to highlight.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+<li><strong>Resume bullet:</strong> "Mapped SOC Tier 1/2/3 responsibilities, escalation paths, and key performance metrics; developed phishing incident playbook and escalation flow documentation."</li>
+<li><strong>Portfolio piece:</strong> escalation flowchart, phishing playbook, and sample escalation ticket — show you understand SOC process, not just tools.</li>
+<li><strong>Interview talking point:</strong> explaining the tiered SOC model with real metric definitions (MTTA, MTTR, dwell time) demonstrates you've researched how SOCs actually operate, not just what tools they use.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Building a SOC-as-a-Service (SOCaaS) offering for small-to-medium businesses that can't afford 24/7 in-house monitoring is a viable business model. You bundle SIEM deployment (ELK or Azure Sentinel), detection rule configuration, and weekly threat reports for $2,000-5,000/month. Many MSPs offer SOC services at this price point with 30-40% margins. The tiered model you learned today translates directly into service tiers — cheaper automated monitoring (T1) and premium incident response (T2/T3) add-ons.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Walk through the SOC tiered model — what each tier does, three metrics for each tier, and how an alert moves from detection to resolution." If you can articulate how a SOC functions from top to bottom, you're ready to interview for a Tier 1 position.</p>
+    </div>
+  </section>
+
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+<a class="res-card" href="https://www.youtube.com/watch?v=Q9TYnZXaREI" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">SOC 101: What is a SOC — Gerald Auger</div><div class="res-desc">youtube.com/watch?v=Q9TYnZXaREI — Complete breakdown of SOC team structure and analyst responsibilities.</div></div></a>
+<a class="res-card" href="https://www.youtube.com/watch?v=TYgACi3pXSc" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">Day in the Life of a SOC Analyst — SimplyCyber</div><div class="res-desc">youtube.com/watch?v=TYgACi3pXSc — Real walkthrough of a SOC analyst's daily workflow and tools.</div></div></a>
+<a class="res-card" href="https://www.youtube.com/watch?v=RjOz_2f_B7I" target="_blank"><span class="res-icon hi">HI</span><div><div class="res-title">SOC Analyst Role in Hindi — CyberPlatter</div><div class="res-desc">youtube.com/watch?v=RjOz_2f_B7I — Hindi explanation of SOC structure, tiers, and career progression.</div></div></a>
+<a class="res-card" href="https://www.splunk.com/en_us/blog/learn/soc-security-operations-center.html" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">Splunk SOC Guide</div><div class="res-desc">splunk.com — Comprehensive guide to building and operating a SOC, with best practices and metrics.</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+<div class="mistake-item"><span class="check">&#10003;</span> SOC structure learned as actionable tier model — not abstract theory.</div>
+<div class="mistake-item"><span class="check">&#10003;</span> Real Microsoft SOC example (24 trillion signals) grounds the model in reality.</div>
+<div class="mistake-item"><span class="check">&#10003;</span> Escalation flowchart built — demonstrates process understanding for interviews.</div>
+<div class="mistake-item"><span class="check">&#10003;</span> Phishing playbook created — a common entry-level SOC task.</div>
+<div class="mistake-item"><span class="check">&#10003;</span> Metrics (MTTA, MTTR, dwell time) learned — critical for SOC interviews.</div>
+<div class="mistake-item"><span class="check">&#10003;</span> Certification roadmap established — Security+ → CySA+ → GCFA/GCIH.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <ul class="checklist">
+<li><span class="box"></span> I can explain all three SOC tiers and their responsibilities.</li>
+<li><span class="box"></span> I created an escalation flowchart for incident response.</li>
+<li><span class="box"></span> I wrote a playbook for at least one alert type.</li>
+<li><span class="box"></span> I know the key metrics: MTTA, MTTR, dwell time, FP rate.</li>
+<li><span class="box"></span> I mapped a certification path from T1 to T3.</li>
+<li><span class="box"></span> I understand how an alert escalates through the tiers.</li>
+<li><span class="box"></span> I can teach SOC structure out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">56 / 90</div><div class="l3">Verified &#10003;</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 57</div>
+      <div class="title">Log Analysis Fundamentals</div>
+    </div>
+    <div class="arrow">&rarr;</div>
+  </div>
+
+  <footer>say "Day 57" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

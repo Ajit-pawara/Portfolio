@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 90 — Final Recap & Your Next 6-Month Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.12),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.08),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:100%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:13px;background:rgba(57,255,136,0.08);border:1px solid rgba(57,255,136,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'★';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:175px;height:175px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-6deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 38px rgba(57,255,136,0.25);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:28px;font-weight:700;margin:6px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.08),rgba(79,209,255,0.05));border:2px solid var(--green);border-radius:12px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;color:var(--green);}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:28px;}
+
+  .phase-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;}
+  .phase-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;text-align:center;}
+  .phase-grid .pnum{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;margin-bottom:4px;}
+  .phase-grid .pnum.p1{color:var(--cyan);}
+  .phase-grid .pnum.p2{color:var(--amber);}
+  .phase-grid .pnum.p3{color:var(--purple);}
+  .phase-grid .pnum.p4{color:var(--pink);}
+  .phase-grid .pnum.p5{color:var(--green);}
+  .phase-grid .pdesc{font-size:11px;color:var(--muted);}
+
+  .plan-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;}
+  .plan-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .plan-grid .plabel{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .plan-grid .plabel.m1{color:var(--cyan);}
+  .plan-grid .plabel.m2{color:var(--amber);}
+  .plan-grid .plabel.m3{color:var(--purple);}
+  .plan-grid .plabel.m4{color:var(--pink);}
+  .plan-grid .plabel.m5{color:var(--green);}
+  .plan-grid .plabel.m6{color:var(--red);}
+  .plan-grid code{font-size:11px;display:block;margin-bottom:3px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.phase-grid,.plan-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day90$ cat final-recap.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 90/90 — COMPLETE <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 90 OF 90 — PHASE 5: CAREER & CAPSTONE ★ COMPLETE</div>
+  <h1>Final Recap & <span class="accent">Your Next 6-Month Plan</span></h1>
+  <p class="subtitle">Today is not the end — it's the beginning of your security career. Review everything, celebrate progress, and plan the next phase of your cybersecurity journey.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THE 90-DAY REVIEW</span>
+    <div class="card">
+      <p><strong>What you've accomplished in 90 days:</strong> You started this journey 90 days ago, probably knowing little more than "cybersecurity = hacking." Today, you have hands-on experience across the full spectrum of security operations. You've performed network scans, exploited SQL injection and XSS vulnerabilities, analyzed malware in a sandbox, configured SIEM correlation rules, conducted Active Directory attacks, reverse-engineered binaries, written a penetration test report, optimized your LinkedIn for security roles, completed mock interviews, and submitted real job applications. That's not theory — that's a portfolio of demonstrable skills.</p>
+
+      <p><strong>Your 90-day journey by phase:</strong></p>
+      <div class="phase-grid">
+        <div>
+          <div class="pnum p1">1</div>
+          <div class="pdesc"><strong>Foundation</strong><br>Days 1-15<br>Linux, networking, Python, Wireshark, Nmap, bash scripting — the tools you'll use every day.</div>
+        </div>
+        <div>
+          <div class="pnum p2">2</div>
+          <div class="pdesc"><strong>Core Attacks</strong><br>Days 16-35<br>SQLi, XSS, LFI, SSRF, CSRF, IDOR, auth bypass — OWASP Top 10 exploitation hands-on.</div>
+        </div>
+        <div>
+          <div class="pnum p3">3</div>
+          <div class="pdesc"><strong>Advanced</strong><br>Days 36-55<br>AD attacks, malware analysis, reverse engineering, privilege escalation, persistence techniques.</div>
+        </div>
+        <div>
+          <div class="pnum p4">4</div>
+          <div class="pdesc"><strong>Defense & SOC</strong><br>Days 56-75<br>SIEM (Splunk), IDS/IPS, incident response, threat hunting, forensics, malware sandboxing.</div>
+        </div>
+        <div>
+          <div class="pnum p5">5</div>
+          <div class="pdesc"><strong>Career</strong><br>Days 76-90<br>Portfolio, branding, interviews, job apps, capstone pentest report, 6-month plan.</div>
+        </div>
+      </div>
+
+      <div class="callout green"><strong>You completed 90 days of structured cybersecurity training.</strong> That's 90+ hours of deliberate practice. That's more hands-on time than most 1-year university programs provide. The key differentiator is consistency — you showed up every day for 90 days. That discipline is worth more to an employer than any single certification.</div>
+
+      <p><strong>Your portfolio assets at Day 90:</strong> A complete 90-day portfolio website with 90 HTML pages. A professional pentest report (the capstone). LinkedIn profile optimized for security keywords. Recording of mock interview answers. Job application tracker with submitted applications. Cover letter templates for different role types. Build-in-public LinkedIn presence. You are not "trying to get into cybersecurity" — you are a cybersecurity student with a documented 90-day track record. That distinction matters enormously in interviews.</p>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// the mindset going forward</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Growth Mindset</div>
+        <ul>
+          <li>The 90-day challenge is over, but your learning is not. The difference between a candidate who stops at Day 90 and one who continues is everything — attackers evolve, and defenders must too.</li>
+          <li>Shift from "learning" mode to "doing" mode. You now have enough foundation to contribute. Join a CTF team, do bug bounty hunting, contribute to open-source security tools, or help secure a local nonprofit's network.</li>
+          <li>Build a specialization. You've covered breadth for 90 days. Now pick a depth area: web app security, network pentesting, threat hunting, GRC, forensics, or cloud security. Deep expertise is what commands higher salaries.</li>
+          <li>Adopt the "T-shaped" model: broad foundation (you have this) plus one deep area (pick one and go deep for 6 months).</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Career Growth Mindset</div>
+        <ul>
+          <li>Certifications are the next logical step: PNPT (most practical, highly respected), OSCP (gold standard for pentesting), Security+ (entry-level HR filter), or BTL1 (blue team, SOC-focused).</li>
+          <li>Apply to jobs consistently — 5-10 applications per week. The first role is the hardest; each interview makes you better. Treat rejections as data, not failure.</li>
+          <li>Keep building in public. Continue posting on LinkedIn and GitHub. The audience you built during 90 days will follow your career growth. Your network is your net worth.</li>
+          <li>Find a mentor. Reach out to senior security people whose work you respect. Most are willing to do a 15-minute call with someone who's shown this level of initiative.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--green);margin-bottom:5px;">THE 90-DAY CHALLENGE COMPLETION IMPACT — CAREER ACCELERATION</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Completing a structured 90-day cybersecurity challenge demonstrates sustained dedication, technical breadth, and documentation discipline</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">According to multiple security hiring manager surveys (ClearanceJobs 2024, (ISC)² 2023), the top three traits hiring managers rank for entry-level success are: (1) sustained dedication — ability to commit to a long-term learning goal; (2) technical breadth — exposure to multiple security domains; and (3) documentation discipline — ability to write clear, structured reports. A 90-day cybersecurity challenge with daily documented output demonstrates all three. Candidates who complete such programs report receiving interview callbacks at 3-5x the rate of those who list only certifications or coursework. The message to hiring managers is clear: "I didn't just study security — I lived it for 90 consecutive days."</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Create your 6-month continuous improvement plan covering certifications, labs, job applications, and skill building.</p>
+      <ol class="lab-steps">
+        <li>Write a 500-word reflection on your 90-day journey: what was the hardest day, what was the most surprising, what skill are you proudest of, and what would you do differently.</li>
+        <li>Choose a certification target for the next 6 months: recommend PNPT (practical, no experience required, 3-month prep) or Security+ (HR filter, 1-month prep) as a first cert.</li>
+        <li>Create a 6-month roadmap broken into month-sized chunks: Month 1 — Certification prep. Month 2 — Certification exam + 10 HackTheBox machines. Month 3 — Job applications (10/week) + bug bounty. Month 4 — Cert #2 + CTF competitions. Month 5 — Deep specialization project (custom tool, research paper, or open-source contribution). Month 6 — Review, portfolio refresh, and celebration.</li>
+        <li>Set up a daily security habit tracker: 30 minutes of reading/study (books: The Web Application Hacker's Handbook, Red Team Field Manual, Blue Team Handbook). 15 minutes of networking (LinkedIn, Twitter, Discord).</li>
+        <li>Schedule a 30-day review checkpoint: in 30 days, review this plan. Adjust based on which strategies are working (job applications, cert study, or projects).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Your 6-month Cybersecurity Career Plan document. Your 90-day reflection essay. A screenshot of your certification registration or study schedule. Your first 30-day checkpoint date set on your calendar.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 6-Month Career Roadmap — Day 90+</span>
+
+<span class="c"># Month 1 (Days 91-120) — Certification Prep</span>
+<span class="cmd">Choose target: PNPT (TCM Security) or Security+</span>
+<span class="cmd">Study plan: 1 hour daily, practice tests on weekends</span>
+<span class="out">Goal: Register for exam by end of Month 1</span>
+
+<span class="c"># Month 2 (Days 121-150) — Exam + Labs</span>
+<span class="cmd">Take certification exam</span>
+<span class="cmd">Complete 10 HackTheBox machines (Easy-Medium)</span>
+<span class="cmd">Post writeups on GitHub + LinkedIn</span>
+
+<span class="c"># Month 3 (Days 151-180) — Job Applications</span>
+<span class="cmd">10 applications/week (LinkedIn, Indeed)</span>
+<span class="cmd">Continue 2 HackTheBox machines/week</span>
+<span class="cmd">Bug bounty on HackerOne (low-hanging only)</span>
+
+<span class="c"># Month 4 (Days 181-210) — Cert #2 or CTF</span>
+<span class="cmd">Option A: Start second cert (BTL1 for blue team)</span>
+<span class="cmd">Option B: Participate in a CTF competition</span>
+
+<span class="c"># Month 5 (Days 211-240) — Specialization</span>
+<span class="cmd">Deep project in chosen specialty area</span>
+<span class="cmd">Contribute to open-source security tool</span>
+
+<span class="c"># Month 6 (Days 241-270) — Review & Refresh</span>
+<span class="cmd">Update portfolio with all new work</span>
+<span class="cmd">Re-evaluate job strategy, adjust if needed</span>
+<span class="hi">★ Celebrate — you've been at this for a year</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Tell me about your 90-day cybersecurity challenge. What did you learn and what was the most valuable part?"</div>
+        <div class="a">A: "I completed a 90-day structured cybersecurity program where I spent one hour each day on a different security topic. The program covered network scanning, web application vulnerabilities (SQL injection, XSS, LFI, SSRF), Active Directory attacks, malware analysis, reverse engineering, SIEM operations, threat hunting, incident response, and ultimately a full capstone penetration test. The most valuable part was the consistency — building a habit of daily security practice. I now have 90 documented days of learning, a complete portfolio website, a professional pentest report, and an optimized LinkedIn presence that's already generating recruiter interest."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's your plan for continued growth in cybersecurity?"</div>
+        <div class="a">A: "I have a structured 6-month plan. In the short term, I'm pursuing the PNPT certification because it's practically focused — it requires compromising a multi-layer network and writing a professional report, which aligns with what I've been practicing. In parallel, I'm applying to 10 jobs per week, doing 2 HackTheBox machines per week, and continuing my daily security reading habit. In months 3-6, I plan to start bug bounty hunting, participate in a CTF, and build a specialization in either web application security or cloud security."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What advice would you give to someone starting a 90-day cybersecurity challenge?"</div>
+        <div class="a">A: "Three things. First, commit to consistency over intensity — 1 hour every day beats 8 hours every Saturday. Second, document everything publicly — the portfolio you build while learning is worth as much as the learning itself. Third, don't get stuck on perfect understanding — if you don't fully understand a topic, move on and come back. Some concepts only click after you've seen them in multiple contexts. The 90-day challenge is about breadth first, depth second."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Career roadmap planner</div>
+        <div class="adesc">Ask an LLM to generate a personalized 6-month career plan based on your interests (pentesting, blue team, GRC, cloud security) and current skill level.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Certification comparison tool</div>
+        <div class="adesc">Describe your career goals, budget, and timeline. Ask which certification (PNPT, OSCP, Security+, BTL1, CISSP) is right for you and get a study plan.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Resume update assistant</div>
+        <div class="adesc">Paste your Day 1 resume and ask the LLM to rewrite it incorporating everything you've learned in 90 days. Include portfolio link and project descriptions.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Portfolio review bot</div>
+        <div class="adesc">Ask an LLM to review your 90-day portfolio as if it's a hiring manager. What stands out? What's missing? What would make you a stronger candidate?</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">THE CAREER YOU'VE BUILT</span>
+    <div class="job-card">
+      <div class="label">// your placement portfolio — what you now have</div>
+      <ul>
+        <li><strong>Resume bullets from 90 days:</strong> "Completed a 90-day structured cybersecurity training program covering network security, web application testing, threat hunting, incident response, and penetration testing." "Produced a professional penetration test report with CVSS-scored findings, exploit chain documentation, and remediation guidance." "Built and maintained a public cybersecurity learning portfolio with 90 documented daily activities, generating recruiter engagement on LinkedIn."</li>
+        <li><strong>Portfolio assets:</strong> 90-page HTML portfolio website. Capstone pentest report. 10+ lab writeups. LinkedIn with build-in-public posts. Job application tracker with active pipeline. Mock interview recordings. Cover letter templates.</li>
+        <li><strong>Your next step:</strong> Apply to 10 jobs this week. Post a LinkedIn update about completing 90 days. Update your resume to reflect everything in the portfolio. You are ready. The only thing between you and your first security role is the number of applications you submit.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>You've just built a product that other cybersecurity students need: a complete 90-day learning roadmap. Package this as a digital course or Notion template bundle. Include the daily syllabus, tool installation guides, lab walkthroughs, portfolio templates, interview prep materials, and job application tracker. Price it at $50-100. Market it on LinkedIn, Reddit (r/cybersecurity, r/netsec), and YouTube. You've already done the 90 days of work; packaging it for others is leverage on that effort.</p>
+      <p style="margin-bottom:0;">The consulting path: offer "90-Day Cybersecurity Portfolio Coaching" — help other students build their own portfolio in 90 days. Two 30-minute sessions per week for 12 weeks at $500-1,000 per student. You don't need to be an expert; you need to be 90 days ahead of your student, which you are. This is how security freelancers start — not with advanced exploits, but by helping the next person up the ladder.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What did you learn in 90 days of cybersecurity training, what's the most important skill you developed, and what's your plan for the next 6 months?" If you can summarize your journey, the single most valuable takeaway, and your forward plan in a clear, confident narrative, you are ready for any entry-level security interview. This is your story — own it.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch — celebrate & plan</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=VeM3ttj24do" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Plan Your Cybersecurity Career — The Cyber Mentor</div><div class="res-desc">youtube.com/watch?v=VeM3ttj24do — Heath Adams on career planning after the initial learning phase.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=rPw0kF-zJh0" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Cybersecurity Career Roadmap 2025 — David Bombal</div><div class="res-desc">youtube.com/watch?v=rPw0kF-zJh0 — A complete roadmap for transitioning from learning to earning in cybersecurity.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=H0KjPT5M6_A" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cybersecurity Career Plan in Hindi — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=H0KjPT5M6_A — Hindi guide to planning your cybersecurity career path after completing the basics.</div></div>
+      </a>
+      <a class="res-card" href="https://www.tcm-security.com/pnpt" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PNPT Certification — TCM Security</div><div class="res-desc">tcm-security.com/pnpt — The Practical Network Penetration Tester certification. Practical exam, no multiple choice. Highly recommended next step.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// what you avoided by completing all 90 days</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> You didn't quit — 90 days of consistency is the biggest barrier that eliminates 99% of aspiring security professionals.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't just watch videos — you did hands-on labs every single day. Active learning beats passive consumption.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't keep your learning private — you built a public portfolio that recruiters can verify.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't specialize too early — you built breadth first (5 phases) and can now choose depth intelligently.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't skip the career phase — LinkedIn, mock interviews, job tracker, and capstone report are set up and running.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't stop at Day 90 — you have a written 6-month plan with specific certifications, labs, and application targets.</div>
+      <div class="mistake-item"><span class="check">✓</span> You didn't learn alone — your portfolio, LinkedIn, and network are your community and support system.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I wrote a 500-word 90-day reflection essay.</li>
+        <li><span class="box"></span> I chose a certification to pursue in the next 3 months.</li>
+        <li><span class="box"></span> I created a 6-month career roadmap with monthly goals.</li>
+        <li><span class="box"></span> I set up a daily security habit tracker.</li>
+        <li><span class="box"></span> I scheduled a 30-day review checkpoint.</li>
+        <li><span class="box"></span> I updated my resume with all 90 days of learning.</li>
+        <li><span class="box"></span> I can tell my 90-day story out loud in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">90-Day Challenge</div><div class="l2">90 / 90</div><div class="l3">Complete ★</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">the journey continues — day 91+</div>
+      <div class="title">★ You completed 90 days of cybersecurity training. Your career starts now. Execute your 6-month plan, keep building in public, and claim your first security role.</div>
+    </div>
+    <div class="arrow">★</div>
+  </div>
+
+  <footer>Congratulations — 90 days complete. Your cybersecurity career has begun.</footer>
+
+</div>
+</body>
+</html>

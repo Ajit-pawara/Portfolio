@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 77 — CompTIA Security+ Exam Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:85.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:14px;}
+  .domain-card{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:16px;border-left:3px solid var(--green);}
+  .domain-card .dname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;margin-bottom:4px;}
+  .domain-card .dpct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);margin-bottom:6px;}
+  .domain-card .ddesc{font-size:12px;color:var(--muted);}
+  .domain-card.d1{border-color:var(--red);}
+  .domain-card.d2{border-color:var(--cyan);}
+  .domain-card.d3{border-color:var(--amber);}
+  .domain-card.d4{border-color:var(--purple);}
+  .domain-card.d5{border-color:var(--pink);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day77$ cat security-plus-overview.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 77/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 77 OF 90 — PHASE 5: CERTIFICATION & PORTFOLIO</div>
+  <h1>CompTIA Security+ <span class="accent">Exam Overview</span></h1>
+  <p class="subtitle">Security+ is the most widely recognized entry-level certification. Today you understand the exam domains, question formats, and create a study plan.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is CompTIA Security+ (SY0-701)?</strong> Security+ is an entry-level cybersecurity certification that validates baseline security knowledge required for any cybersecurity role. It's accredited by ANSI and ISO, meets DoD 8570 requirements (the US Department of Defense baseline certification), and is the most common certification listed in SOC analyst job postings. Over 60% of cybersecurity job listings prefer or require Security+. The exam costs $404 (USD), has 90 minutes to answer up to 90 questions (multiple choice + PBQs), and requires a passing score of 750/900.</p>
+
+      <p><strong>The 5 exam domains (SY0-701):</strong></p>
+      <div class="domain-grid">
+        <div class="domain-card d1"><div class="dname" style="color:var(--red);">Domain 1: Attacks, Threats & Vulnerabilities</div><div class="dpct">24% of exam — ~22 questions</div><div class="ddesc">Malware types, social engineering, application attacks (SQLi, XSS), network attacks, wireless attacks, cryptographic attacks, threat actors, attack frameworks (MITRE ATT&CK, Cyber Kill Chain).</div></div>
+        <div class="domain-card d2"><div class="dname" style="color:var(--cyan);">Domain 2: Architecture & Design</div><div class="dpct">21% of exam — ~19 questions</div><div class="ddesc">Defense-in-depth, secure network segmentation, virtualization and cloud security, embedded/IoT systems, secure facility design, fundamental security concepts (confidentiality, integrity, availability).</div></div>
+        <div class="domain-card d3"><div class="dname" style="color:var(--amber);">Domain 3: Implementation</div><div class="dpct">25% of exam — ~22 questions</div><div class="ddesc">Secure protocols (TLS, SSH, IPsec), PKI/certificates, identity and access management (AAA, MFA, SSO), host/network security controls, mobile security, wireless security configurations.</div></div>
+        <div class="domain-card d4"><div class="dname" style="color:var(--purple);">Domain 4: Operations & Incident Response</div><div class="dpct">16% of exam — ~14 questions</div><div class="ddesc">Incident response lifecycle, digital forensics, data sources for investigation (logs, PCAPs, netflow), mitigation techniques, disaster recovery and continuity, data sovereignty.</div></div>
+        <div class="domain-card d5"><div class="dname" style="color:var(--pink);">Domain 5: Governance, Risk & Compliance</div><div class="dpct">14% of exam — ~13 questions</div><div class="ddesc">Security policies, risk assessment types (qualitative vs quantitative), business continuity, GDPR/HIPAA/FISMA compliance, vendor due diligence, security awareness training.</div></div>
+      </div>
+
+      <p><strong>Question types you'll see:</strong></p>
+      <div class="code-block">
+<span class="req">Multiple Choice (MCQ):</span>
+<span class="cmt">  "Which of the following is the BEST control to prevent SQL injection?"</span>
+<span class="cmt">  A) WAF  B) Input validation  C) Parameterized queries  D) Encryption</span>
+
+<span class="req">Performance-Based Questions (PBQ):</span>
+<span class="cmt">  - Drag-and-drop: configure a secure network with correct firewall placement</span>
+<span class="cmt">  - Ordering: put incident response steps in the correct sequence</span>
+<span class="cmt">  - Matching: associate security controls with their types (preventive/detective/deterrent)</span>
+<span class="cmt">  - Simulation: configure a wireless router with WPA3 or set up a VPN tunnel</span>
+
+<span class="req">PBQs appear FIRST — you can't go back to them once submitted.</span>
+<span class="req">Answer PBQs, then go back to MCQs you flagged for review.</span></div>
+
+      <div class="callout"><strong>Exam strategy:</strong> Answer all PBQs first (they're weighted highest). Flag MCQs you're unsure of for review. Use the "eliminate wrong answers" technique — in Security+, two answers are usually obviously wrong, leaving a 50/50 choice. Trust your lab experience over memorization.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>The Security+ exam doesn't make you a pentester — but understanding the certification's attack coverage helps you identify what entry-level defenders are trained to look for.</li>
+          <li>Domain 1 covers the same attack techniques you'd study for offensive certs — SQLi, XSS, CSRF, buffer overflows, social engineering. Master Domain 1 for both Security+ and OSCP foundations.</li>
+          <li>Knowing what Security+ covers helps you understand what entry-level SOC analysts can detect — and therefore what they might miss.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Security+ is the baseline certification for DoD 8570 — without it, you can't work in many government and defense contractor SOC roles regardless of your skills.</li>
+          <li>The PBQ simulations test real-world configuration tasks — configuring firewall rules, setting up wireless security, implementing access controls. Practice these hands-on.</li>
+          <li>Security+ Domain 4 (Operations & IR) directly maps to your Phase 4 labs — IR phases, forensic procedures, and data sources. Your lab experience makes this domain easier.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2024 — SECURITY+ IN THE SOC HIRING PIPELINE — 60%+ OF JOB POSTINGS REQUIRE IT</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Over 60% of SOC analyst job postings list CompTIA Security+ as a preferred or required qualification</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">A 2024 analysis of cybersecurity job postings on LinkedIn and Indeed found that Security+ is the most commonly listed entry-level certification, appearing in over 60% of SOC analyst job descriptions. The certification meets the US Department of Defense Directive 8570 (now 8140) requirement for Information Assurance Technician (IAT) Level II positions. Many employers use Security+ as a resume filter — if the applicant tracking system (ATS) doesn't find Security+ on your resume, your application is automatically rejected regardless of other qualifications. This makes Security+ a checkbox requirement for government and defense contractor roles, and a strong differentiator for private sector positions.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Create a 14-day Security+ study plan, take a baseline diagnostic test, and practice your first PBQ simulation.</p>
+      <ol class="lab-steps">
+        <li>Create a study plan schedule: 14 days, 1 domain every 2 days, days 13-14 for full practice tests. Use the domain weightings to allocate study time proportionally.</li>
+        <li>Take a free baseline diagnostic test at <strong>examcompass.com</strong> or <strong>professormesser.com</strong> — score yourself and note which domains you're weakest in.</li>
+        <li>Practice a PBQ: use a free browser-based firewall configuration simulator. Configure a DMZ with web server in DMZ, database in private, and allow only HTTP/HTTPS from internet.</li>
+        <li>Create flashcards for all port numbers and protocols from Domain 2: SSH=22, DNS=53, HTTPS=443, SMB=445, RDP=3389, LDAPS=636, Kerberos=88.</li>
+        <li>Download the CompTIA Security+ objectives PDF from comptia.org and check off every objective you already know from Phase 4 (IR, forensics, risk assessment).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A 14-day Security+ study schedule with domain-by-domain allocation, baseline diagnostic score, and completed cheat sheet for ports/protocols and IR phases. This is your study roadmap for Days 77-80.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Create study plan with shell script</span>
+<span class="cmd">cat > secplus_study_plan.sh << 'SCRIPT'</span>
+<span class="out">#!/bin/bash</span>
+<span class="out">echo "=== Security+ 14-Day Study Plan ==="</span>
+<span class="out">echo "Day 77: Exam overview + baseline diagnostic"</span>
+<span class="out">echo "Day 78: Domain 1 (Attacks) + Domain 2 (Architecture)"</span>
+<span class="out">echo "Day 79: Domain 3 (Implementation) + Domain 4 (Operations)"</span>
+<span class="out">echo "Day 80: Domain 5 (Governance) + Full practice test"</span>
+<span class="out">echo "Days 81-82: Bug bounty / portfolio labs"</span>
+<span class="out">echo "Days 83-90: Portfolio, resume, job applications"</span>
+<span class="cmd">SCRIPT</span>
+
+<span class="c"># Port & protocol cheat sheet</span>
+<span class="cmd">cat > ports_cheatsheet.md << 'EOF'</span>
+<span class="out">| Port | Protocol | Service       |</span>
+<span class="out">|------|----------|---------------|</span>
+<span class="out">| 22   | TCP      | SSH           |</span>
+<span class="out">| 25   | TCP      | SMTP          |</span>
+<span class="out">| 53   | UDP/TCP  | DNS           |</span>
+<span class="out">| 80   | TCP      | HTTP          |</span>
+<span class="out">| 110  | TCP      | POP3          |</span>
+<span class="out">| 143  | TCP      | IMAP          |</span>
+<span class="out">| 389  | TCP/UDP  | LDAP          |</span>
+<span class="out">| 443  | TCP      | HTTPS         |</span>
+<span class="out">| 445  | TCP      | SMB           |</span>
+<span class="out">| 636  | TCP      | LDAPS         |</span>
+<span class="out">| 3389 | TCP      | RDP           |</span>
+<span class="out">| 8443 | TCP      | Alt HTTPS     |</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Baseline diagnostic — visit Professor Messer</span>
+<span class="hi"># https://www.professormesser.com/security-plus-training/</span>
+<span class="hi"># Take the free SY0-701 practice exam and record your score</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Tell me about the CompTIA Security+ certification and why you're pursuing it."</div>
+        <div class="a">A: "Security+ is the industry-standard entry-level cybersecurity certification covering attacks, architecture, implementation, operations, and governance. I'm pursuing it because it's the most commonly listed requirement in SOC analyst job postings — over 60% of roles list it. It validates my foundational security knowledge and it's a DoD 8570 requirement for government and defense sector roles. The exam domains align well with my hands-on lab experience in incident response, forensics, and risk assessment from my 90-day training program."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a qualitative and quantitative risk assessment?"</div>
+        <div class="a">A: "Qualitative risk assessment uses descriptive scales like High/Medium/Low based on expert judgment and experience. It's faster and easier but subjective. Quantitative risk assessment uses numerical data — calculating SLE (Single Loss Expectancy), ARO (Annual Rate of Occurrence), and ALE (Annualized Loss Expectancy). For example, if a server costs $50,000 and has a 20% chance of failure per year, the ALE is $10,000. Quantitative is more precise but requires good data. Both are useful — qualitative for quick decisions, quantitative for budget justification."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a denial-of-service (DoS) and a distributed denial-of-service (DDoS) attack?"</div>
+        <div class="a">A: "A DoS attack comes from a single source — one computer sending excessive traffic. A DDoS attack comes from many sources simultaneously, typically a botnet of compromised devices. DDoS is harder to defend against because you can't just block a single IP — you need cloud-based mitigation services (like Cloudflare or AWS Shield) that can absorb traffic across multiple distributed scrubbing centers. DDoS attacks have grown to over 1 Tbps, far beyond what a single organization's internet connection can handle."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Professor Messer Security+ videos</div>
+        <div class="adesc">professormesser.com — free Security+ video course covering every exam objective. Watch at 1.5x speed for review, normal speed for new topics.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AI-generated PBQ practice</div>
+        <div class="adesc">Ask an LLM to create a Security+ PBQ simulation: "Create a drag-and-drop PBQ about configuring firewall rules for a DMZ with a web server and database."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ExamCompass free practice tests</div>
+        <div class="adesc">examcompass.com — free Security+ practice exams by domain with instant scoring and answer explanations. Take one domain at a time.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Anki for Security+ flashcards</div>
+        <div class="adesc">apps.ankiweb.net — spaced repetition flashcard app. Download a shared Security+ deck or create your own for port numbers, cryptographic algorithms, and attack types.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "CompTIA Security+ (SY0-701) certified — validated baseline cybersecurity knowledge across all 5 domains including threat management, architecture, implementation, operations, and governance."</li>
+        <li><strong>Portfolio piece:</strong> Your Security+ study plan document, baseline diagnostic score, port/protocol cheat sheet, and PBQ practice results. Shows employers you're systematically preparing for certification.</li>
+        <li><strong>Interview talking point:</strong> "Security+ is my foundation certification. The domains cover the same areas as my hands-on lab experience — I've already applied Domain 4 (incident response) in my home lab by configuring a Splunk SIEM and analyzing PCAP traffic."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Security+ certification opens doors not just for employment but for credibility as a consultant. Clients are more likely to trust a Security+ certified consultant for small security engagements than someone without any certification. You can offer "Security Readiness Assessments" — reviewing a small business's security posture against Security+ controls — for $500-1,500 per engagement.</p>
+      <p style="margin-bottom:0;">Tutoring is another path: many aspiring cybersecurity students need help passing Security+. You can offer 1-on-1 tutoring at $30-50/hour or create a study guide/cheat sheet product and sell it for $20-30 on Gumroad. The Security+ exam has over 600,000 holders — and many more are studying for it. Even capturing 0.1% of that market is valuable.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is Security+, what are the 5 domains, what percentage of the exam is each one worth, and how do PBQs work?" If you can rattle off all 5 domains with their percentages from memory, you've internalized the exam structure.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=zV4k9nYFj4Y" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Security+ Full Course in 8 Hours — Professor Messer (SY0-701)</div><div class="res-desc">youtube.com/watch?v=zV4k9nYFj4Y — complete Security+ training course organized by domain with downloadable slides.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=W5HrwqLxTao" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How I Passed Security+ in 14 Days — CyberWise</div><div class="res-desc">youtube.com/watch?v=W5HrwqLxTao — study strategy, exam tips, and resources used for a 2-week Security+ preparation.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=8L1y0qA-o2M" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Security+ Full Course in Hindi — Kaushal Bhardwaj</div><div class="res-desc">youtube.com/watch?v=8L1y0qA-o2M — complete Security+ SY0-701 training in Hindi with domain-by-domain coverage.</div></div>
+      </a>
+      <a class="res-card" href="https://www.professormesser.com/security-plus-training/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Professor Messer Security+ — free training + practice exams</div><div class="res-desc">professormesser.com — complete free video course, downloadable course notes, and pop quiz questions for every Security+ domain.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Domain weightings memorized — study time allocated proportionally.</div>
+      <div class="mistake-item"><span class="check">✓</span> PBQ strategy established — answer first, can't return, weighted highest.</div>
+      <div class="mistake-item"><span class="check">✓</span> Baseline diagnostic taken before studying — measure improvement.</div>
+      <div class="mistake-item"><span class="check">✓</span> Port/protocol cheat sheet created — essential for Domain 2 and PBQs.</div>
+      <div class="mistake-item"><span class="check">✓</span> 14-day study plan built — structured approach beats cramming.</div>
+      <div class="mistake-item"><span class="check">✓</span> Already-covered Phase 4 objectives identified before deep study.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I know all 5 Security+ domains and their exam percentages.</li>
+        <li><span class="box"></span> I understand the difference between MCQ and PBQ question types.</li>
+        <li><span class="box"></span> I created a 14-day study plan with domain time allocation.</li>
+        <li><span class="box"></span> I took a baseline diagnostic and recorded my score.</li>
+        <li><span class="box"></span> I created a port/protocol cheat sheet.</li>
+        <li><span class="box"></span> I practiced one PBQ simulation (firewall/DMZ configuration).</li>
+        <li><span class="box"></span> I can explain Security+'s importance to employers.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">77 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 78</div>
+      <div class="title">Security+ Domains 1 & 2 Deep Review — threats, attacks, architecture, and design.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 78" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 61 — Network Traffic Analysis — Wireshark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:67.7%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .sql{color:var(--purple);}
+  .code-block .sq{color:var(--pink);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sql{color:var(--purple);}
+  .term-body .sq{color:var(--pink);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:14px;}
+  .filter-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .filter-card .fname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:5px;color:var(--green);}
+  .filter-card .fdesc{font-size:12px;color:var(--muted);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day61$ wireshark-tcp-analysis.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 61/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 61 OF 90 — PHASE 7: NETWORK DEFENSE & TRAFFIC ANALYSIS</div>
+  <h1>Network Traffic Analysis — <span class="accent">Wireshark</span></h1>
+  <p class="subtitle">Network traffic analysis is the art of reading packets like a surgeon reads X-rays. Wireshark is the industry-standard protocol analyzer — used by SOC analysts, incident responders, and threat hunters to reconstruct attacks, detect C2 beaconing, and extract artifacts from raw packet captures.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is Network Traffic Analysis?</strong> Network traffic analysis captures and inspects packets traversing a network to identify malicious activity, policy violations, and performance issues. Every request, response, DNS lookup, and TLS handshake leaves a forensic record in the packet stream.</p>
+
+      <p style="margin-top:16px;"><strong>Wireshark's core capabilities:</strong></p>
+      <div class="filter-grid">
+        <div class="filter-card"><div class="fname">Packet Capture (Live)</div><div class="fdesc">Capture traffic in real-time from any network interface. Filter during capture with BPF syntax: <code>host 10.0.0.1 and port 80</code>.</div></div>
+        <div class="filter-card"><div class="fname">Display Filters</div><div class="fdesc">Post-capture filtering without modifying the capture file. Expression-based: <code>http.request.method == "POST"</code>, <code>tcp.port eq 443</code>.</div></div>
+        <div class="filter-card"><div class="fname">Protocol Hierarchy</div><div class="fdesc">Statistics → Protocol Hierarchy shows the breakdown of every protocol in the capture. A single DNS-over-HTTPS outlier can reveal C2 traffic.</div></div>
+        <div class="filter-card"><div class="fname">Follow Streams</div><div class="fdesc">Reconstruct TCP, UDP, TLS, or HTTP streams into a readable conversation. Right-click → Follow → TCP Stream shows the full client-server dialogue.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>BPF (Berkeley Packet Filter) syntax for live capture:</strong></p>
+      <div class="code-block">
+<span class="req"># Capture only HTTP traffic from a specific host</span>
+<span class="cmt">tcp port 80 and host 192.168.1.100</span>
+<span class="req"># Exclude broadcast and multicast</span>
+<span class="cmt">not broadcast and not multicast</span>
+<span class="req"># Capture DNS queries only</span>
+<span class="cmt">udp port 53</span></div>
+
+      <p><strong>Display filter basics:</strong> Wireshark display filters use a <code>field operator value</code> syntax. Examples: <code>ip.src == 10.0.0.5</code>, <code>tcp.analysis.flags</code> (show all TCP anomalies), <code>http.response.code >= 400</code> (all server errors).</p>
+      <div class="callout"><strong>Key distinction:</strong> BPF filters are applied <em>during</em> capture and are irreversible. Display filters are applied <em>after</em> capture and are non-destructive. Always capture full packets (no slicing) when doing security analysis — you can't reconstruct what you didn't capture.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// analyst vs adversary mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Adversary</div>
+        <ul>
+          <li>Encrypt C2 traffic with HTTPS or custom protocols — Wireshark sees the TLS handshake but the payload is opaque without the key.</li>
+          <li>Use DNS tunneling to exfiltrate data: encode stolen files as subdomain queries (<code>base64.stolen-data.evil.com</code>).</li>
+          <li>Beacon on irregular intervals with jitter (e.g., 47-53 seconds) to evade frequency-based detection rules.</li>
+          <li>Fragment packets or use non-standard TCP window sizes to evade signature-based NIDS rules that expect canonical packet structure.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Analyst</div>
+        <ul>
+          <li>Start with <code>http.request or tls.handshake.type == 1</code> — identify every HTTP request and TLS Client Hello to map all external communications.</li>
+          <li>Use <code>tcp.analysis.retransmission</code> and <code>tcp.analysis.ack_lost_segment</code> to find hosts experiencing packet loss — often indicates scanning or DoS.</li>
+          <li>Enable TLS key logging (SSLKEYLOGFILE) for decryption in controlled lab environments: set the environment variable before launching the app.</li>
+          <li>Build a baseline of normal traffic patterns first — anomalies only stand out against a known good baseline.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2016 — BANGLADESH BANK HEIST — $81 MILLION (DPRK LAZARUS GROUP)</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Wireshark analysis of SWIFT traffic inside Bangladesh Bank reconstructed the Lazarus Group's fraudulent transfer requests</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The Lazarus Group (DPRK) compromised Bangladesh Bank's SWIFT network and issued fraudulent transfer requests totaling $951 million. Wireshark was used to capture and reconstruct the SWIFT MT103 message traffic between Bangladesh Bank and the Federal Reserve Bank of New York. Analysts followed the TCP streams to see the exact SWIFT messages, identified the attacker's IPs, and traced the flow of funds through accounts in Sri Lanka and the Philippines. The attackers had installed a custom malware that monitored the bank's SWIFT printer and deleted the printed confirmation records — but the Wireshark pcap files preserved the full conversation. Five of the 35 fraudulent transfers succeeded ($101M), of which $81M was never recovered. This remains the largest cyber-heist in history.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> capture, analyze, and reconstruct network traffic using Wireshark. Identify HTTP credentials, extract transferred files, and detect a simulated C2 beacon.</p>
+      <ol class="lab-steps">
+        <li>Launch Wireshark and capture on the active interface. Apply BPF <code>tcp port 80 or tcp port 443</code> to reduce noise. Save the capture as <code>lab61.pcapng</code>.</li>
+        <li>Visit <code>http://testphp.vulnweb.com/login.php</code> (public Acunetix test site) and enter fake creds. Stop capture. Use display filter <code>http.request.method == "POST"</code> to find the login request.</li>
+        <li>Right-click the POST packet → Follow → HTTP Stream. The submitted username and password are visible in cleartext in the stream body.</li>
+        <li>Use Statistics → Protocol Hierarchy to see the protocol breakdown. Note the percentage of TCP, HTTP, DNS, and TLS traffic.</li>
+        <li>Export an HTTP object: File → Export Objects → HTTP → select a file and save it. This extracts files transferred over HTTP from the pcap.</li>
+        <li>Set up a simple reverse shell C2 simulation: run <code>nc -lvnp 4444</code> in a terminal, connect from another terminal, and capture the traffic. Use display filter <code>tcp.port == 4444</code> and follow the TCP stream.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A Wireshark pcap file with at least one HTTP stream showing cleartext credentials, a protocol hierarchy screenshot, and a TCP stream reconstruction of a netcat conversation. You can now read network traffic like a SOC analyst.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Launch Wireshark from CLI (or open GUI)</span>
+<span class="cmd">wireshark</span>
+
+<span class="c"># Capture with tshark (CLI equivalent of Wireshark)</span>
+<span class="cmd">tshark -i eth0 -w lab61.pcapng -f "tcp port 80 or tcp port 443"</span>
+<span class="out">&gt; Press Ctrl+C to stop capture</span>
+
+<span class="c"># Read capture and filter for HTTP POST requests</span>
+<span class="cmd">tshark -r lab61.pcapng -Y "http.request.method == POST" -T fields \</span>
+<span class="cmd">  -e http.host -e http.request.uri -e http.file_data</span>
+
+<span class="c"># Follow TCP stream (stream index 0 shown below)</span>
+<span class="cmd">tshark -r lab61.pcapng -z follow,tcp,ascii,0</span>
+<span class="hi"># Reconstructs the full TCP conversation as ASCII</span>
+
+<span class="c"># Protocol hierarchy stats</span>
+<span class="cmd">tshark -r lab61.pcapng -z io,phs</span>
+
+<span class="c"># Extract all HTTP objects</span>
+<span class="cmd">tshark -r lab61.pcapng --export-objects "http,/tmp/extracted/"</span>
+<span class="out">&gt; Files (images, scripts, documents) saved to /tmp/extracted/</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How would you use Wireshark to investigate a potential data exfiltration?"</div>
+        <div class="a">A: "I'd start by examining the Protocol Hierarchy Statistics to identify unusual protocols — DNS with high volume, ICMP with large payloads, or non-standard ports. Then I'd filter for suspicious outbound connections: <code>ip.dst != 10.0.0.0/8 and ip.dst != 192.168.0.0/16 and tcp.dstport not in {80 443 53}</code>. I'd look for DNS TXT queries with base64-encoded subdomains, follow TCP streams to see if data is being sent to unknown hosts, and check TLS SNI fields for domains that don't match the organization's normal traffic patterns."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a BPF capture filter and a Wireshark display filter?"</div>
+        <div class="a">A: "BPF filters are applied during capture at the kernel level — they drop non-matching packets before they reach Wireshark. This is useful for reducing capture file size on busy networks but means you permanently lose non-matching traffic. Display filters are applied after capture on the full pcap file — they're non-destructive and can be changed anytime. For security analysis, I always capture everything and filter during analysis, unless disk space or performance forces BPF pre-filtering."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you analyze encrypted TLS traffic in Wireshark?"</div>
+        <div class="a">A: "Without the private key or session keys, Wireshark can only show TLS handshake metadata — cipher suites, certificate details, SNI — but not the encrypted payload. In controlled environments, I set the SSLKEYLOGFILE environment variable before launching the browser or application. Wireshark decrypts the traffic when I point it to that log file via Edit → Preferences → TLS → (Pre)-Master-Secret log filename. In incident response, I'd look at TLS handshake metadata: unusual cipher suites, self-signed certs, or SNI names that don't match the IP's expected domain."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Pcap summarizer</div>
+        <div class="adesc">Upload or describe a pcap file to an LLM and ask it to summarize the conversation patterns — endpoints, protocols, suspicious anomalies — based on your tshark field output.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Display filter generator</div>
+        <div class="adesc">Describe the traffic you need to find in plain English: "show me all DNS queries that are not going to our internal resolvers" — get a ready-to-paste display filter expression.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Malicious traffic profile</div>
+        <div class="adesc">Paste extracted TLS handshake or HTTP header data and ask the LLM to classify the traffic as benign, C2 beaconing, or data exfiltration based on known IoC patterns.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Log to pcap converter</div>
+        <div class="adesc">Ask an LLM to write a Python script that converts a proxy log or firewall log into a pcap file using scapy — bridges the gap between log analysis and Wireshark visualization.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Captured and analyzed network traffic with Wireshark and tshark; reconstructed TCP streams to identify cleartext credential submission and extracted transferred files from pcap artifacts."</li>
+        <li><strong>Portfolio piece:</strong> a pcap analysis report showing the protocol hierarchy, a cleartext HTTP login stream, and a netcat TCP stream reconstruction — annotated with your findings.</li>
+        <li><strong>Interview talking point:</strong> explaining the Bangladesh Bank SWIFT heist and how Wireshark preserved the fraudulent MT103 messages demonstrates real-world incident knowledge beyond tool proficiency.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Small businesses and law firms increasingly need pcap analysis for breach investigations but can't afford a full incident response retainer. A "PCAP Forensics Review" service ($750-1,500 per capture) fills this gap: you take their pcap, extract evidence of data exfiltration, malware callbacks, or policy violations, and deliver a plain-English report with Wireshark screenshots.</p>
+      <p style="margin-bottom:0;">Recurring revenue opportunity: monthly "Network Hygiene Review" where you analyze one week of pcap per month for SMB clients, establishing a baseline and flagging anomalies. Combine with Snort rule tuning (Day 62) for a bundled network defense package.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud in 90 seconds: "What is a TCP stream, how do you follow it in Wireshark, and what can you see in the reconstructed conversation that individual packets hide?" If you can demonstrate opening a pcap, applying a display filter, and reading a TCP stream end-to-end without hesitation, you've internalized today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.wireshark.org/docs/wsug_html/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Wireshark User's Guide — official docs</div><div class="res-desc">wireshark.org/docs/wsug_html/ — the definitive reference for every filter, statistic, and feature.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=OU-A2EmVrKQ" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Wireshark Tutorial for Beginners — David Bombal</div><div class="res-desc">youtube.com/watch?v=OU-A2EmVrKQ — practical walkthrough of capturing and analyzing traffic step by step.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=flDzRczYfV4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Wireshark Complete Course (Hindi) — Tech Guru Manjit</div><div class="res-desc">youtube.com/watch?v=flDzRczYfV4 — full Hindi tutorial covering capture filters, display filters, and stream analysis.</div></div>
+      </a>
+      <a class="res-card" href="https://wiki.wireshark.org/SampleCaptures" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Wireshark Sample Captures — practice pcaps</div><div class="res-desc">wiki.wireshark.org/SampleCaptures — real-world pcaps including malware traffic, exploits, and protocol examples.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> BPF vs display filter distinction clarified — irreversible vs non-destructive.</div>
+      <div class="mistake-item"><span class="check">✓</span> Full packet capture emphasized — packet slicing destroys forensic value.</div>
+      <div class="mistake-item"><span class="check">✓</span> Protocol Hierarchy used as the starting point, not random packet scrolling.</div>
+      <div class="mistake-item"><span class="check">✓</span> Follow Stream taught as the definitive conversation reconstruction method.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Bangladesh Bank heist — $81M stolen, Wireshark preserved the evidence.</div>
+      <div class="mistake-item"><span class="check">✓</span> tshark CLI commands included — not GUI-dependent for headless analysis.</div>
+      <div class="mistake-item"><span class="check">✓</span> TLS decryption via SSLKEYLOGFILE explained correctly.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can capture traffic with both Wireshark GUI and tshark CLI.</li>
+        <li><span class="box"></span> I wrote display filters for HTTP methods, IPs, and ports.</li>
+        <li><span class="box"></span> I followed a TCP stream and read the reconstructed conversation.</li>
+        <li><span class="box"></span> I examined Protocol Hierarchy Statistics to understand traffic composition.</li>
+        <li><span class="box"></span> I exported HTTP objects from a pcap file.</li>
+        <li><span class="box"></span> I understand the difference between BPF and display filters.</li>
+        <li><span class="box"></span> I can explain how TLS decryption works with SSLKEYLOGFILE.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">61 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 62</div>
+      <div class="title">Intrusion Detection — Snort / Suricata — rules, alerts, and deployment modes.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 62" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

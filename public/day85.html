@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 85 — Mock Technical Interview — Concepts Round</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:94.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .star-framework{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+  .star-framework > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .star-framework .slabel{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .star-framework .slabel.s{color:var(--green);}
+  .star-framework .slabel.t{color:var(--amber);}
+  .star-framework .slabel.a{color:var(--purple);}
+  .star-framework .slabel.r{color:var(--red);}
+  .star-framework code{font-size:11.5px;display:block;margin-bottom:3px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.star-framework{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day85$ cat mock-interview-concepts.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 85/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 85 OF 90 — PHASE 5: CAREER & CAPSTONE</div>
+  <h1>Mock Technical Interview <span class="accent">Concepts Round</span></h1>
+  <p class="subtitle">The first interview tests concepts. Today you practice answering fundamental security questions clearly and confidently.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The structure of security interviews:</strong> Most security technical interviews follow a three-stage progression. Stage 1 (phone screen, 15-30 min): fundamental concepts — CIA triad, types of hackers, OWASP Top 10, basic networking. Stage 2 (technical round, 45-60 min): deeper discussion of tools, methodologies, and scenario-based questions. Stage 3 (practical or system design): hands-on assessment or architecture discussion. Today focuses on Stage 1 — the concepts that every interviewer expects you to know cold.</p>
+
+      <p><strong>The STAR method for security questions:</strong> Behavioral questions in security interviews use the STAR format — Situation, Task, Action, Result. When asked "Tell me about a time you found a vulnerability," structure your answer around a specific lab or CTF challenge. The framework forces specificity, which is what interviewers are testing for. They don't want to hear "I know SQL injection" — they want to hear "I found a SQL injection in the login form of Juice Shop by sending a single quote, confirmed it was injectable, extracted the user table with UNION, and documented the column count method."</p>
+
+      <div class="star-framework">
+        <div>
+          <div class="slabel s">S — Situation</div>
+          <code>"I was testing OWASP Juice Shop</code>
+          <code>as part of my 90-day portfolio.</code>
+          <code>The login form accepted JSON."</code>
+        </div>
+        <div>
+          <div class="slabel t">T — Task</div>
+          <code>"I needed to determine if the</code>
+          <code>email field was vulnerable to</code>
+          <code>SQL injection."</code>
+        </div>
+        <div>
+          <div class="slabel a">A — Action</div>
+          <code>"I injected a single quote, got</code>
+          <code>a 500 error. Then used UNION</code>
+          <code>SELECT to find 8 columns and</code>
+          <code>extracted user credentials."</code>
+        </div>
+        <div>
+          <div class="slabel r">R — Result</div>
+          <code>"Extracted 100+ user records</code>
+          <code>including admin hash. Documented</code>
+          <code>the finding in my portfolio."</code>
+        </div>
+      </div>
+
+      <p><strong>Concepts you must be able to explain in under 60 seconds:</strong> CIA triad (Confidentiality, Integrity, Availability — the three security objectives every control maps to). Defense in depth (layered security — no single control is trusted). Least privilege (users/processes get only what they need). Attack surface reduction. The OWASP Top 10 (by memory, at least the top 5: Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security Misconfiguration). STRIDE (Microsoft's threat model — Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege).</p>
+      <div class="callout"><strong>Key insight:</strong> Interviewers don't ask these questions because they need answers — they ask to see if you can communicate clearly under pressure. A candidate who stumbles on "explain the CIA triad" but can eventually get there is less impressive than a candidate who says "Confidentiality, Integrity, Availability — and here's how they apply to file permissions in Linux." Connect concepts to examples immediately.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// interview mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Candidate Mindset</div>
+        <ul>
+          <li>Treat every question as an opportunity to demonstrate structured thinking — pause, clarify the scope, then answer with a framework (STAR for behavior, first-things-first for concepts).</li>
+          <li>Never answer with a single word or sentence. Expand: "Confidentiality — ensuring data is accessible only to authorized parties, enforced through encryption, access controls, and the principle of least privilege. For example, in Linux, file permissions (chmod 600) enforce confidentiality at the OS level."</li>
+          <li>When you don't know something, say "I haven't encountered that specifically, but here's how I'd approach finding the answer" — demonstrates research discipline over pretending.</li>
+          <li>Keep a "cheat sheet" of your 90-day portfolio projects ready — each concept question maps to a lab you've done. "SQL injection? Here's exactly how I did it on Day 23."</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Interviewer Mindset</div>
+        <ul>
+          <li>Interviewers look for three signals: technical accuracy (are you correct?), communication clarity (can I follow your explanation?), and intellectual honesty (do you acknowledge limits?).</li>
+          <li>They expect entry-level candidates to know fundamentals cold but not advanced topics. Getting the CIA triad wrong is a red flag. Not knowing how Active Directory authentication works is expected and can be taught.</li>
+          <li>They note when candidates use portfolio examples vs abstract theory. "I saw a similar issue in my lab" always beats "In theory, you would..." — it proves hands-on experience.</li>
+          <li>They listen for passion signals — candidates who say "I spent 3 extra hours on this because I wanted to understand the underlying protocol" score higher on culture fit.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">GOOGLE SECURITY INTERVIEW PROCESS — 4-5 ROUND DEEP DIVE</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Google's security engineer interviews cover networking, OS internals, cryptography, threat modeling (STRIDE), and system design</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Google's security hiring process is widely regarded as one of the most rigorous in the industry. Candidates face 4-5 rounds: one covering networking fundamentals (TCP/IP, DNS, HTTP/2, BGP), one on operating system internals (process memory layout, syscalls, kernel vs user mode), one on cryptography (symmetric vs asymmetric, TLS handshake, hash functions, certificate pinning), one on threat modeling using STRIDE, and one system design round. Each round tests practical application — not memorization. Google publishes that they seek candidates who can "explain TLS to a non-technical product manager" as a communication benchmark.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> practice answering the 10 most common security interview concept questions out loud, recorded, and self-evaluated.</p>
+      <ol class="lab-steps">
+        <li>Open a voice recorder (phone, laptop, or online tool). Set a timer for 30 minutes.</li>
+        <li>Answer each of these 10 questions out loud, recording yourself. Time limit per answer: 90 seconds.</li>
+        <li>Question list: (1) Explain the CIA triad. (2) What is defense in depth? (3) What is the OWASP Top 10? Name the top 5. (4) Explain STRIDE threat modeling. (5) What is the difference between symmetric and asymmetric encryption? (6) Explain the TLS handshake. (7) What is the difference between a vulnerability, a threat, and a risk? (8) Explain the incident response process (NIST 6-step). (9) What is least privilege and how do you enforce it? (10) Explain how a SQL injection attack works and the fix.</li>
+        <li>After answering all 10, play back your recording. Grade yourself on clarity (did you stumble?), accuracy (were you correct?), and completeness (did you cover key points?).</li>
+        <li>For any question you struggled with, write a 3-sentence answer, read it aloud 3 times, then re-record just that question.</li>
+        <li>Pick your 3 best answers — these become your "signature responses" for real interviews. Memorize the structure, not the script.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A 15-minute recording of yourself answering all 10 concept questions. A written self-assessment noting which questions need more practice. A final polished answer for each of your 3 weakest areas.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Example — CIA Triad (recorded answer template)</span>
+<span class="cmd">Q: "Explain the CIA triad."</span>
+<span class="out">A: "The CIA triad is the foundational model for</span>
+<span class="out">cybersecurity policy. Confidentiality means data</span>
+<span class="out">is accessible only to authorized parties — enforced</span>
+<span class="out">through encryption (AES-256, TLS) and access controls</span>
+<span class="out">(file permissions, IAM policies). Integrity means</span>
+<span class="out">data hasn't been tampered with — verified through</span>
+<span class="out">hashing (SHA-256), checksums, and digital signatures.</span>
+<span class="out">Availability means the system is accessible when</span>
+<span class="out">needed — ensured through redundancy, backups, and</span>
+<span class="out">DDoS protection. Every security control maps to</span>
+<span class="out">one of these three objectives."</span>
+<span class="c"># Time: 35 seconds. Clear structure. ✅</span>
+
+<span class="c"># Self-evaluation rubric:</span>
+<span class="c"># Did you define each term?  □ Yes  □ Partially  □ No</span>
+<span class="c"># Did you give an example?   □ Yes  □ Partially  □ No</span>
+<span class="c"># Did you connect to tools?  □ Yes  □ Partially  □ No</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain the difference between a vulnerability, a threat, and a risk."</div>
+        <div class="a">A: "A vulnerability is a weakness — for example, an unpatched Apache server with CVE-2024-1234. A threat is what could exploit that weakness — like an automated bot scanning for Apache exploits. A risk is the likelihood and impact of that threat materializing — if that server is internal-only with no sensitive data, risk is low; if it's internet-facing with a customer database, risk is high. Risk = Threat × Vulnerability × Impact. Security is about reducing these three variables through controls."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through the incident response process."</div>
+        <div class="a">A: "The NIST 6-step incident response process: Preparation — having playbooks, tools, and team ready. Detection & Analysis — identifying the incident through alerts, logs, or user reports. Containment — stopping the spread, isolating affected systems. Eradication — removing the root cause, deleting malware, patching vulns. Recovery — restoring systems from clean backups, monitoring for re-infection. Post-Incident Activity — writing the lessons-learned report and updating defenses. In my lab, I simulated this by detecting a failed login spike in Splunk, isolating the host, rotating credentials, and writing a postmortem."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between symmetric and asymmetric encryption, and when would you use each?"</div>
+        <div class="a">A: "Symmetric encryption uses one shared key for both encryption and decryption — it's fast and good for bulk data (AES-256, ChaCha20). Asymmetric uses a public-private key pair — slower but solves key distribution (RSA, ECC). In practice, we use both: TLS uses asymmetric (ECDHE) to exchange a symmetric session key, then AES for the bulk data. Asymmetric is for key exchange and digital signatures; symmetric is for encrypting files, disks (LUKS), and database columns."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Mock interviewer bot</div>
+        <div class="adesc">Ask an LLM to act as a security interviewer. Give it your target role and experience level. Have it ask questions and evaluate your typed answers.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Answer evaluator</div>
+        <div class="adesc">Paste your recorded answer transcript. Ask the LLM to rate it on clarity, accuracy, and completeness, with specific improvement suggestions.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Concept explainer generator</div>
+        <div class="adesc">Ask for a 60-second script explaining any security concept as if to a non-technical interviewer. Practice reading it aloud.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">STAR story builder</div>
+        <div class="adesc">Describe a lab you completed. Ask the LLM to turn it into a STAR-formatted behavioral answer ready for interview use.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Completed 10-question mock technical interview (concepts) with self-evaluation, achieving fluency in CIA triad, defense-in-depth, OWASP Top 10, STRIDE, TLS handshake, incident response, and risk management."</li>
+        <li><strong>Portfolio piece:</strong> link to your recorded mock interview or a written Q&A document with your best answers. Include your self-assessment and improvement notes.</li>
+        <li><strong>Interview talking point:</strong> "I practice answering concept questions out loud using voice recording and self-evaluation. This helped me identify three weak areas — encryption types, threat modeling, and risk calculation — which I then strengthened with targeted review."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Interview preparation is a $500M+ market, and cybersecurity-specific interview coaching is severely undersupplied. Most general tech interview prep services don't cover security fundamentals — threat modeling, cryptography basics, incident response frameworks. A service offering "Cybersecurity Interview Prep" — conceptual mock interviews with feedback, cheat sheets, and STAR story development — could charge $50-100 per session.</p>
+      <p style="margin-bottom:0;">The micro-SaaS opportunity: a web app that generates randomized security concept interviews with voice recording, AI evaluation, and progress tracking. You've just done the research on what questions are asked — package that into a product. Even a Notion template sold for $20 with 50 security interview questions and STAR answer templates could generate passive income while you job hunt.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is the CIA triad, what is defense in depth, and what is the OWASP Top 10 — describe each so that a non-technical hiring manager understands." If you can answer all three in a flowing, confident explanation, you're ready for the concepts round of any SOC analyst or junior pentest interview.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=l2zgH6BwcaI" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Pass a Cybersecurity Interview — The Infosec Academy</div><div class="res-desc">youtube.com/watch?v=l2zgH6BwcaI — Real interview questions for SOC analyst and pentest roles with answer breakdowns.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=UqP1dMBunB0" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Cybersecurity Interview Questions & Answers — IT Career Questions</div><div class="res-desc">youtube.com/watch?v=UqP1dMBunB0 — 50 common security interview questions with detailed answers.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=Q7cDDw2sVJ4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cybersecurity Interview Questions in Hindi — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=Q7cDDw2sVJ4 — Hindi walkthrough of common security interview questions and how to answer them.</div></div>
+      </a>
+      <a class="res-card" href="https://www.pramp.com" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Pramp — Free Mock Interviews with Peers</div><div class="res-desc">pramp.com — Practice live mock interviews with other candidates. Includes cybersecurity question sets.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Answers practiced out loud — thinking you can answer in your head is not preparation.</div>
+      <div class="mistake-item"><span class="check">✓</span> Self-evaluation completed — identifying weak areas before real interviews, not after.</div>
+      <div class="mistake-item"><span class="check">✓</span> STAR method used for behavioral questions — structure beats improvisation.</div>
+      <div class="mistake-item"><span class="check">✓</span> Portfolio examples connected to every concept answer — concrete over abstract.</div>
+      <div class="mistake-item"><span class="check">✓</span> Stumbled answers re-recorded three times — muscle memory for real interviews.</div>
+      <div class="mistake-item"><span class="check">✓</span> Concepts grounded in the 90-day portfolio — every answer references a real lab.</div>
+      <div class="mistake-item"><span class="check">✓</span> Day 85 lays the foundation for Day 86's practical round.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I answered all 10 concept questions out loud on recording.</li>
+        <li><span class="box"></span> I self-evaluated my answers for clarity, accuracy, completeness.</li>
+        <li><span class="box"></span> I identified and practiced my 3 weakest questions.</li>
+        <li><span class="box"></span> I can explain CIA triad, defense-in-depth, and OWASP Top 10 fluently.</li>
+        <li><span class="box"></span> I know the NIST 6-step incident response process by memory.</li>
+        <li><span class="box"></span> I have a STAR story prepared from my 90-day portfolio.</li>
+        <li><span class="box"></span> I can teach each concept out loud in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">85 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 86</div>
+      <div class="title">Mock Technical Interview — Practical Round (Nmap, SQLi, Wireshark, triage)</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 86" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

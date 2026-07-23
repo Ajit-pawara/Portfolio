@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 83 — Writing a Security-Focused Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:92.2%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .resume-section{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:18px;margin-top:12px;}
+  .resume-section .rs-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;margin-bottom:8px;font-weight:700;}
+  .resume-section .rs-bullet{font-size:13px;color:#cdd6da;padding:6px 0;border-bottom:1px solid rgba(28,37,40,0.5);}
+  .resume-section .rs-bullet:last-child{border-bottom:none;}
+  .resume-section .rs-bullet .highlight{color:var(--green);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day83$ cat security-resume.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 83/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 83 OF 90 — PHASE 5: CERTIFICATION & PORTFOLIO</div>
+  <h1>Writing a <span class="accent">Security-Focused Resume</span></h1>
+  <p class="subtitle">Generic resumes don't get past security hiring managers. Today you tailor your resume with security-specific keywords, quantify achievements, and highlight hands-on lab experience.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The security resume is different:</strong> Generic resumes list responsibilities. Security resumes list capabilities with measurable outcomes. Hiring managers for SOC analyst, pentester, and AppSec roles look for specific keywords, hands-on tool experience, and evidence of practical application — not just theoretical knowledge. Your resume must pass the Applicant Tracking System (ATS) scan before a human ever sees it.</p>
+
+      <p><strong>ATS keywords for security roles (must include):</strong></p>
+      <div class="code-block">
+<span class="req">TOOLS:</span>
+<span class="val">SIEM, Splunk, Wireshark, Nmap, Metasploit, Burp Suite, Nessus/OpenVAS,</span>
+<span class="val">Snort/Suricata, EDR, MISP, VirusTotal, YARA, Autopsy, Volatility, Ghidra,</span>
+<span class="val">Python, Bash, PowerShell, Docker, Git, AWS/Azure/GCP (if cloud path)</span>
+
+<span class="req">CONCEPTS:</span>
+<span class="val">Incident Response, Threat Hunting, Malware Analysis, Digital Forensics,</span>
+<span class="val">Vulnerability Assessment, Penetration Testing, Risk Management,</span>
+<span class="val">MITRE ATT&CK, Cyber Kill Chain, OWASP Top 10, Zero Trust,</span>
+<span class="val">Defense-in-Depth, Least Privilege, IAM, PKI, SIEM Correlation</span>
+
+<span class="req">CERTIFICATIONS (if held):</span>
+<span class="val">CompTIA Security+, CySA+, CEH, OSCP, AWS Security, CCSP</span></div>
+
+      <p><strong>Bullet point transformation — weak vs strong:</strong></p>
+      <div class="resume-section">
+        <div class="rs-title">❌ Weak (generic, no metrics, no tools)</div>
+        <div class="rs-bullet">• Responsible for monitoring network security</div>
+        <div class="rs-bullet">• Helped with incident response</div>
+        <div class="rs-bullet">• Used security tools to find vulnerabilities</div>
+      </div>
+      <div class="resume-section" style="margin-top:10px;">
+        <div class="rs-title" style="color:var(--green);">✅ Strong (specific tools, quantified outcomes, active language)</div>
+        <div class="rs-bullet">• <span class="highlight">Configured Splunk SIEM</span> with custom correlation rules, reducing mean detection time for port scans and brute-force attacks by automating alert triage.</div>
+        <div class="rs-bullet">• <span class="highlight">Analyzed 500+ PCAP files</span> using Wireshark and Zeek, identifying C2 beaconing patterns and generating 15+ actionable threat intelligence IoCs.</div>
+        <div class="rs-bullet">• <span class="highlight">Conducted vulnerability assessments</span> with Nessus and OpenVAS across 50+ hosts, prioritizing remediation for 120+ findings based on CVSS scoring.</div>
+        <div class="rs-bullet">• <span class="highlight">Built a home SOC lab</span> with Splunk, Suricata, and Kali Linux, simulating real-world attack scenarios and documenting detection workflows.</div>
+      </div>
+
+      <p><strong>Resume structure for entry-level security:</strong></p>
+      <div class="code-block">
+<span class="req">1. NAME + CONTACT + GITHUB/LINKEDIN (top — no summary needed for entry-level)</span>
+<span class="req">2. TECHNICAL SKILLS (tools, programming, frameworks — grouped by category)</span>
+<span class="req">3. CERTIFICATIONS (if held, with dates)</span>
+<span class="req">4. HANDS-ON PROJECTS / LABS (2-3 bullet points each, with tools and outcomes)</span>
+<span class="req">5. WORK EXPERIENCE (if any — focus on security-adjacent duties)</span>
+<span class="req">6. EDUCATION (degree + relevant coursework)</span>
+<span class="req">7. CTF / BUG BOUNTY / COMPETITIONS (if applicable)</span></div>
+
+      <div class="callout amber"><strong>ATS tip:</strong> Use standard section headings (not creative ones). Don't use columns, tables, graphics, or unusual fonts — ATS parsers break on them. Save your resume as PDF (not Word) but verify the PDF text is selectable — if it's an image-based PDF, ATS reads nothing.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Your resume is competing against hundreds of others. The ATS is your first adversary — if your resume doesn't contain the right keywords, it's rejected without a human ever seeing it.</li>
+          <li>Hiring managers spend 6-10 seconds scanning each resume. Make every word count — lead with impact, use active verbs (Configured, Analyzed, Built, Automated, Developed).</li>
+          <li>Tailor your resume for each application — job descriptions contain the keywords you need. If the job says "Splunk" and your resume says "log analysis," you'll lose to someone who said "Splunk."</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Your resume is a security document — don't include personal information beyond what's needed (no photo, no age, no marital status — in many places it's illegal to ask).</li>
+          <li>Don't exaggerate or lie — security hiring managers often verify claims with technical questions. "Proficient in Splunk" means you can write complex SPL queries under interview pressure.</li>
+          <li>Quantify everything — "Analyzed 500 PCAPs" is verifiable if you can describe the analysis in an interview. "Configured Splunk" is verifiable if you can build a dashboard on the spot.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2024 — ATS KEYWORDS FOR SECURITY ROLES — WHAT HIRING SYSTEMS SCAN FOR</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">ATS systems for security roles scan for: SIEM, Splunk, Wireshark, Nmap, Metasploit, Burp Suite, Python, Bash, incident response, penetration testing, OWASP, MITRE ATT&CK</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Analysis of 500+ SOC analyst job descriptions in 2024 revealed the most common ATS keywords: SIEM (85% of postings), incident response (78%), Splunk (62%), Python (58%), Wireshark (55%), Nmap (52%), threat intelligence (48%), vulnerability management (45%), MITRE ATT&CK (42%), and security tools (40%). The key insight: if your resume doesn't contain these exact terms, the ATS filters you out before a recruiter ever opens it. Even if you have equivalent experience ("network traffic analysis" instead of "Wireshark"), the ATS doesn't know — it matches exact terms. This is why tailoring your resume to each job description is essential, not optional.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Create an ATS-optimized, security-focused resume with quantified accomplishments from your 90-day training.</p>
+      <ol class="lab-steps">
+        <li>Extract the top 15 keywords from 3 SOC analyst job descriptions on LinkedIn or Indeed. Use an online ATS keyword extractor or paste into an LLM and ask for keyword analysis.</li>
+        <li>Write 5 resume bullets in the strong format using your actual 90-day lab experience. Each bullet must include: a tool name, an action verb, and a quantified outcome.</li>
+        <li>Write your "Projects" section — document your home SOC lab, bug bounty report, CTF writeups, or DevSecOps pipeline. Include tools used and measurable results.</li>
+        <li>Create a "Skills" section organized by category: SIEM & Log Analysis, Vulnerability Assessment, Scripting & Automation, Frameworks & Standards.</li>
+        <li>Run your resume through an ATS simulator (jobscan.co or similar free tool) — check your match rate against a target job description.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Your final ATS-optimized resume saved as a text-selectable PDF. Minimum requirements: 5 quantified security bullets, skills section with specific tools, projects section with lab names, and 85%+ ATS match rate against a target security job description.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># ATS keyword extraction from job descriptions</span>
+<span class="cmd">curl -s "https://www.linkedin.com/jobs/search?keywords=SOC+analyst" \</span>
+<span class="cmd">  | grep -oP '"title":"[^"]*"' | sort | uniq -c | sort -rn | head -20</span>
+
+<span class="c"># Template: quantified security bullet formula</span>
+<span class="c"># [Action Verb] + [Tool/Technology] + [What you did] + [Measurable Outcome]</span>
+<span class="out">"Configured Splunk SIEM with custom correlation rules, reducing</span>
+<span class="out"> detection time for brute-force attacks from manual review to</span>
+<span class="out"> automated real-time alerting."</span>
+
+<span class="c"># Skills section template</span>
+<span class="cmd">cat > skills_section.yaml << 'EOF'</span>
+<span class="out">SIEM & Log Analysis:</span>
+<span class="out">  - Splunk (SPL, dashboards, alerts)</span>
+<span class="out">  - Wireshark (PCAP analysis, protocol filtering)</span>
+<span class="out">  - Zeek (network flow analysis)</span>
+<span class="out">Vulnerability Assessment:</span>
+<span class="out">  - Nmap (port scanning, service detection, NSE scripts)</span>
+<span class="out">  - Nessus / OpenVAS (vulnerability scanning, remediation)</span>
+<span class="out">  - Burp Suite (web app testing, proxy interception)</span>
+<span class="out">Scripting & Automation:</span>
+<span class="out">  - Python (log parsing, automation scripts)</span>
+<span class="out">  - Bash (Linux administration, scripting)</span>
+<span class="out">  - Git / GitHub Actions (CI/CD security scanning)</span>
+<span class="cmd">EOF</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through a project on your resume that demonstrates your security skills."</div>
+        <div class="a">A: "My home SOC lab project demonstrates my core security capabilities. I set up Splunk Free as the SIEM, configured Suricata as an IDS with custom rules, and used Kali Linux to simulate attacks including port scans (nmap), brute force (hydra), and malware beaconing (custom Python script). I configured log forwarding from Suricata and the Windows endpoint to Splunk, created custom dashboards showing detection metrics, and wrote SPL queries for threat hunting. The project documented over 15 hours of hands-on work and resulted in automated detection of 3/3 simulated attack types. The full documentation is on my GitHub."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "You don't have professional security experience. Why should we hire you over someone who does?"</div>
+        <div class="a">A: "While I don't have professional security experience, I've invested 90+ days in a structured hands-on training program that covers exactly what your SOC team does daily. I've configured a Splunk SIEM, analyzed PCAPs in Wireshark, written Suricata rules, practiced incident response triage, and documented everything on GitHub. I come in with a learning mindset, no bad habits from other environments, and recent hands-on practice with the tools you use. I'm also Security+ certified, which validates my baseline knowledge across all five security domains."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's your biggest weakness and how are you working on it?"</div>
+        <div class="a">A: "My biggest weakness is depth of experience — I've built a broad foundation across offensive and defensive security, but I haven't had the opportunity to specialize deeply in one area yet. I'm addressing this by choosing my specialization path (SOC/blue team) and focusing my remaining lab time on advanced SIEM correlation, threat hunting methodologies, and preparing for the CySA+ certification. I believe a broad foundation followed by deep specialization is a stronger starting point than deep knowledge of one tool with no context of how it fits into the broader security landscape."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">ATS resume scanner</div>
+        <div class="adesc">jobscan.co or skillsyncer.com — paste your resume and a job description to get a match score. Free tier available. Target 85%+ match rate.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Bullet point improver</div>
+        <div class="adesc">Paste a weak bullet: "Responsible for security monitoring." Ask: "Rewrite this as a quantified, ATS-optimized security resume bullet."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Job description keyword extractor</div>
+        <div class="adesc">Paste a job description and ask: "Extract the top 20 keywords from this JD and tell me which ones I should include in my resume."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Cover letter generator</div>
+        <div class="adesc">Describe your background and the role: "Write a 3-paragraph cover letter for a SOC analyst position highlighting my home lab, Security+ cert, and 90-day training."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet (most impactful):</strong> "Configured Splunk SIEM with custom correlation rules and real-time alerting, simulating 3 attack types (port scan, brute force, C2 beaconing) in a home SOC lab environment and achieving automated detection across all scenarios."</li>
+        <li><strong>Portfolio piece:</strong> The final ATS-optimized resume itself, plus the ATS match score report showing 85%+ against your target role. These prove you understand how the hiring process works for security roles.</li>
+        <li><strong>Interview talking point:</strong> "My resume is optimized for ATS systems — every bullet includes specific tools and quantified outcomes. I've tested it against real job descriptions and scored 90%+ match. I understand that getting an interview is the first security challenge, and my resume is designed to pass that gate."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Most cybersecurity students and professionals don't know how to write an ATS-optimized security resume. You can turn this gap into a business: "Security Resume Review Service" — review resumes for cybersecurity job seekers, optimize for ATS keywords, quantify bullet points, and structure for security hiring manager preferences. Charge $50-150 per resume.</p>
+      <p style="margin-bottom:0;">Scale it: create a "Security Resume Template Pack" — 3 ATS-optimized resume templates (SOC Analyst, Penetration Tester, Cloud Security) with pre-written quantified bullet points that users can customize. Sell it for $27-47 on Gumroad or Etsy. Add a companion guide: "The Cybersecurity Resume Playbook" — 20-page PDF covering ATS optimization, keyword strategy, and interview preparation. Bundle for $57. Every year, thousands of new cybersecurity graduates need this.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What's the difference between a weak and strong security resume bullet? Name 10 ATS keywords every SOC analyst resume should include. What's the proper resume structure for an entry-level security role?" If you can articulate the full resume strategy, you're ready to apply for security positions.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=4JANiHydlzU" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Write a Cybersecurity Resume That Gets You Hired — TCM Security</div><div class="res-desc">youtube.com/watch?v=4JANiHydlzU — Heath Adams walks through exactly how to structure a security resume, write quantified bullets, and pass ATS filters.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=BYUjkA5PH-k" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Get a SOC Analyst Job with No Experience — Gerald Auger</div><div class="res-desc">youtube.com/watch?v=BYUjkA5PH-k — practical advice from a Sr. SOC analyst on resume gaps, home labs, and breaking into SOC roles with zero professional experience.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=QmZjkL96xFY" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cyber Security Resume Kaise Banaye? — Hindi Tutorial</div><div class="res-desc">youtube.com/watch?v=QmZjkL96xFY — Hindi guide to creating a cybersecurity resume with ATS optimization, keywords, and project documentation.</div></div>
+      </a>
+      <a class="res-card" href="https://www.jobscan.co/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Jobscan — ATS resume scanner (free tier)</div><div class="res-desc">jobscan.co — paste your resume and a job description to see your ATS match rate with keyword gap analysis and formatting recommendations.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Weak bullets transformed to strong quantified format with tools.</div>
+      <div class="mistake-item"><span class="check">✓</span> ATS keywords identified from real job descriptions — not guessed.</div>
+      <div class="mistake-item"><span class="check">✓</span> Resume structure optimized for ATS parsers (no columns, images, or graphics).</div>
+      <div class="mistake-item"><span class="check">✓</span> Projects section includes home SOC lab, bug bounty report, and GitHub portfolio.</div>
+      <div class="mistake-item"><span class="check">✓</span> ATS match rate tested (85%+ target) before sending applications.</div>
+      <div class="mistake-item"><span class="check">✓</span> "No experience" objection pre-empted with a strong interview answer.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I extracted keywords from 3 SOC analyst job descriptions.</li>
+        <li><span class="box"></span> I wrote 5 quantified security resume bullets.</li>
+        <li><span class="box"></span> I created a skills section organized by category.</li>
+        <li><span class="box"></span> I wrote a projects section with home lab documentation.</li>
+        <li><span class="box"></span> I tested my resume against an ATS simulator (85%+ target).</li>
+        <li><span class="box"></span> I saved my resume as an ATS-friendly text-selectable PDF.</li>
+        <li><span class="box"></span> I can explain the weak → strong bullet transformation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">83 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 84</div>
+      <div class="title">Phase 5 Complete: Final Review & Graduation Prep — consolidate, apply, and celebrate 90 days.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 84" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

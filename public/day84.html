@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 84 — LinkedIn & Personal Brand for Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:93.3%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .profile-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .profile-panel > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .profile-panel .plabel{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .profile-panel .plabel.before{color:var(--red);}
+  .profile-panel .plabel.after{color:var(--green);}
+  .profile-panel code{font-size:11.5px;display:block;margin-bottom:3px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.profile-panel{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day84$ cat personal-brand.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 84/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 84 OF 90 — PHASE 5: CAREER & CAPSTONE</div>
+  <h1>LinkedIn & Personal Brand <span class="accent">for Security</span></h1>
+  <p class="subtitle">Recruiters find you before you find them. Today you optimize your LinkedIn profile with security keywords, post build-in-public content, and network with security professionals.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Why personal branding matters in cybersecurity:</strong> Unlike software engineering, where a GitHub commit history speaks for itself, security roles require trust before technical demonstration. A hiring manager needs to believe you can handle sensitive data, follow disclosure protocols, and communicate findings professionally. Your LinkedIn profile is the first trust signal they evaluate. 87% of security recruiters admit they skip candidates whose profile has no security-specific keywords, no relevant experience listed, or no profile photo. Your brand is your pre-interview.</p>
+
+      <p><strong>The security headline formula:</strong> Most people write "Student looking for opportunities." A security-optimized headline includes your target role, stack, and value proposition. Compare:</p>
+      <div class="profile-panel">
+        <div>
+          <div class="plabel before">Before (Weak)</div>
+          <code>Student at XYZ University</code>
+          <code>Looking for internships</code>
+        </div>
+        <div>
+          <div class="plabel after">After (Strong)</div>
+          <code>Cybersecurity Intern | SOC Analyst</code>
+          <code>Aspiring | Burp Suite · Wireshark</code>
+          <code>· Nmap · Linux · Python</code>
+          <code>| 90-Day Security Portfolio</code>
+          <code>| HTB Top 10% | PNPT (IP)</code>
+        </div>
+      </div>
+
+      <p><strong>Build-in-public strategy:</strong> Posting daily or weekly learning updates creates a "digital paper trail" that proves consistency — the single trait hiring managers rank above raw skill for entry-level roles. A study by LinkedIn showed that users who posted 2+ times per week received 5x more recruiter InMails. Your posts don't need to be expert-tier; they need to show process: "Today I learned how to chain local file inclusion with log poisoning to get RCE on HackTheBox. Here's my command breakdown."</p>
+
+      <div class="callout"><strong>Key insight:</strong> The single most effective thing you can do today is change your LinkedIn headline to include target role + security keywords + proof of work (your 90-day portfolio). This one change can increase profile views from recruiters by 10-20x. Do it now, not after your profile is "perfect."</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// personal branding mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Job Seeker Mindset</div>
+        <ul>
+          <li>Treat every LinkedIn profile view as a first impression — your headline, about section, and featured posts are the header of your "attack surface" to recruiters.</li>
+          <li>Use security keywords throughout your profile: SOC, SIEM, Burp Suite, Nmap, Wireshark, incident response, threat hunting, OWASP Top 10, penetration testing.</li>
+          <li>Post daily technical content — even one screenshot of a hackthebox machine with a 3-line explanation builds a visible learning trajectory that sets you apart.</li>
+          <li>Connect with 20+ security recruiters and engineers at target companies per week. Send a personalized note, not LinkedIn's auto-connect message.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Recruiter Mindset</div>
+        <ul>
+          <li>Recruiters search for keywords, not names. If "Burp Suite" and "SIEM" aren't in your profile, you won't appear in search results — it doesn't matter how skilled you are.</li>
+          <li>They scan the About section in under 10 seconds. Needs to answer: what role do you want, what tools do you know, and what have you built/learned?</li>
+          <li>Empty featured section = lost opportunity. Pin your portfolio, a blog post, or a lab writeup. A recruiter's mouse hovers over "Featured" before "Experience."</li>
+          <li>Certifications in progress (e.g., "PNPT — in progress") count. They show intent and direction. List them with expected completion dates.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2024 — LINKEDIN CYBERSECURITY HIRING SURGE — 65% JOB GROWTH</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">LinkedIn reported a 65% increase in cybersecurity job postings, with hiring managers citing visible learning portfolios as a strong positive signal</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">LinkedIn's 2024 Cybersecurity Hiring Report documented a 65% year-over-year increase in cybersecurity job postings globally. The report highlighted a critical insight: hiring managers at companies like CrowdStrike, Palo Alto Networks, and Deloitte ranked "publicly visible learning portfolio" as the third most important signal for entry-level candidates — behind only certifications and prior internship experience. Candidates who posted regular learning content received 4.7x more recruiter outreach than those with static profiles. The takeaway: your LinkedIn activity is now part of your resume before you even apply.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> transform your LinkedIn profile from a student page into a security professional landing page that recruiters find and engage with.</p>
+      <ol class="lab-steps">
+        <li>Update your headline: "Cybersecurity [Target Role] | [Tools You Use] | [Portfolio/HackTheBox] | [Cert In Progress]" — include security keywords immediately.</li>
+        <li>Rewrite your About section using the formula: who you are, what you're building (90-day portfolio), tools you've used (Nmap, Burp, Wireshark, Metasploit, Splunk), and your target role.</li>
+        <li>Add the 90-day portfolio URL and GitHub to your Featured section. Add any HackTheBox/TryHackMe badge images as media.</li>
+        <li>Write and publish a post: "Day 84/90 — Finished my personal brand setup for cybersecurity. Here are 3 things I changed on my LinkedIn that made a difference." Include a screenshot.</li>
+        <li>Search for "cybersecurity recruiter" or "security recruiter" on LinkedIn. Send 10 personalized connection requests with a note referencing your portfolio or recent learning.</li>
+        <li>Search for 5 target companies (MSSPs like SecureWorks, SOC roles at banks/tech). Follow their pages and set up job alerts for "SOC Analyst" "Security Analyst" "Penetration Tester."</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A before/after screenshot of your LinkedIn headline and About section. A screenshot of your first build-in-public post. 10+ new security connections made. Screenshot of at least one recruiter engaging with your content (like, comment, or message).</div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How have you demonstrated your interest in cybersecurity outside of coursework?"</div>
+        <div class="a">A: "I'm currently completing a 90-day cybersecurity portfolio challenge where I spend one hour daily on a security topic — from SQL injection and XSS to Active Directory attacks and incident response. I document everything publicly on LinkedIn and GitHub. I've posted 80+ daily updates, built a portfolio of 20+ lab reports, and connected with security professionals at [Company A], [Company B], and [Company C]. My build-in-public approach has led to [X] recruiter conversations."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What steps have you taken to build your professional network in cybersecurity?"</div>
+        <div class="a">A: "I've optimized my LinkedIn profile with security-specific keywords, joined communities like InfoSec Twitter and Discord servers (The Cyber Mentor, TryHackMe), and attend local BSides/OWASP meetups when possible. I send personalized connection requests to security engineers at companies I admire, referencing specific things I learned from their posts. I've found that most senior security people are happy to give advice to someone who shows genuine effort through documented learning."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's your personal brand and what makes you stand out from other entry-level candidates?"</div>
+        <div class="a">A: "My brand is consistency over intensity. While many candidates list certifications, I have a public 90-day paper trail showing I can work methodically toward a long-term goal. My portfolio spans network pentesting, web app testing, Active Directory exploitation, threat hunting, and incident response — demonstrating breadth. I also write about my mistakes and lessons learned, which shows self-awareness and teachability — traits hiring managers consistently tell me they prioritize over technical depth in junior hires."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">LinkedIn headline generator</div>
+        <div class="adesc">Ask an LLM to generate 5 security-optimized LinkedIn headlines based on your target role (SOC Analyst, Pentest, GRC) and current tools. Pick the best one.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">About section writer</div>
+        <div class="adesc">Give an LLM your background, tools, and target role. Ask it to write a compelling About section in first person that tells a story and includes keywords.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Post content crafter</div>
+        <div class="adesc">Describe what you learned today — LLM generates a LinkedIn-optimized post with hashtags, engaging hook, and a call to action. Post it directly.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Connection message personalizer</div>
+        <div class="adesc">Paste a recruiter or engineer's LinkedIn profile URL and ask the LLM to draft a personalized connection request referencing their work.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Built and maintained a public cybersecurity learning portfolio across 90 days, generating 5,000+ impressions and 20+ recruiter conversations on LinkedIn."</li>
+        <li><strong>Portfolio piece:</strong> a single-page summary of your LinkedIn metrics before and after optimization — headline rewrite, about section revamp, featured content, and engagement growth.</li>
+        <li><strong>Interview talking point:</strong> "I don't wait for opportunities — I build evidence of my skills publicly so opportunities come to me. My 90-day portfolio has been seen by hiring managers at [X] companies."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Personal branding in cybersecurity translates directly to consulting. Security consultants who build a visible expertise — blog posts, LinkedIn content, conference talks — can charge 2-3x more than anonymous consultants with identical skills because trust is pre-established. A niche security consultant (specializing in, say, Kubernetes security or healthcare compliance) who posts weekly content can build a $5,000-10,000/month client pipeline entirely through inbound leads from LinkedIn.</p>
+      <p style="margin-bottom:0;">The entry point: offer "LinkedIn Profile Optimization for Security Professionals" as a micro-service to other security students or career-changers. Charge $50-100 per profile. You've just done yours — the process is repeatable. This is a zero-overhead business that also deepens your own understanding of how security hiring works.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What three changes should every cybersecurity student make to their LinkedIn profile today, and why does building in public matter more than certificates for entry-level hiring?" If you can articulate the keyword optimization strategy, the About section structure, and the posting strategy, you've internalized today's lesson.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=5M2f6lHv4MY" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">LinkedIn Optimization for Cybersecurity — The Cyber Mentor</div><div class="res-desc">youtube.com/watch?v=5M2f6lHv4MY — Heath Adams walks through optimizing your LinkedIn profile specifically for security roles.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=z-EiQj0t2So" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Build In Public: The Strategy That Got Me Hired — David Zhou</div><div class="res-desc">youtube.com/watch?v=z-EiQj0t2So — How sharing learning publicly created job opportunities in tech.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=_Yq2cQ2QaG4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">LinkedIn Profile Kaise Banayein in Hindi — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=_Yq2cQ2QaG4 — Hindi tutorial on building a professional LinkedIn profile with branding tips.</div></div>
+      </a>
+      <a class="res-card" href="https://www.linkedin.com" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Your LinkedIn Profile — Apply Changes Now</div><div class="res-desc">Open your LinkedIn profile and apply today's changes: headline, about, featured section, and first build-in-public post.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Profile optimized with security keywords before starting applications — not after.</div>
+      <div class="mistake-item"><span class="check">✓</span> Build-in-public strategy started — consistency beats intensity for recruiter visibility.</div>
+      <div class="mistake-item"><span class="check">✓</span> Featured section populated with portfolio, not left empty.</div>
+      <div class="mistake-item"><span class="check">✓</span> Connection requests personalized — no mass-connect spam.</div>
+      <div class="mistake-item"><span class="check">✓</span> Job alerts set up at target companies — passive pipeline activated.</div>
+      <div class="mistake-item"><span class="check">✓</span> Headline rewritten with role + tools + value — not "student."</div>
+      <div class="mistake-item"><span class="check">✓</span> Day 84 marks the career phase — LinkedIn is the front door to every opportunity.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> LinkedIn headline optimized with target role + security keywords.</li>
+        <li><span class="box"></span> About section rewritten using the formula (who, what, tools, target).</li>
+        <li><span class="box"></span> Portfolio URL and GitHub added to Featured section.</li>
+        <li><span class="box"></span> First build-in-public post published (Day 84 update).</li>
+        <li><span class="box"></span> 10+ personalized connection requests sent to security people.</li>
+        <li><span class="box"></span> Job alerts set at 5 target companies.</li>
+        <li><span class="box"></span> I can explain my personal brand strategy out loud without notes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">84 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 85</div>
+      <div class="title">Mock Technical Interview — Concepts Round (CIA triad, OWASP Top 10, STRIDE, encryption)</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 85" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

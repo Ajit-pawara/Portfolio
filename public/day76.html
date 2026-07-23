@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 76 — Choosing Your Path: Red/Blue/Cloud/AppSec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:84.4%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px;}
+  .path-card{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:16px;border-left:3px solid var(--cyan);}
+  .path-card .pname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;margin-bottom:6px;}
+  .path-card .psalary{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-bottom:6px;color:var(--green);}
+  .path-card .pdetail{font-size:12px;color:var(--muted);}
+  .path-card.red{border-color:var(--red);}
+  .path-card.blue{border-color:var(--cyan);}
+  .path-card.cloud{border-color:var(--purple);}
+  .path-card.appsec{border-color:var(--amber);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day76$ cat choose-your-path.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 76/90 — Phase 4 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 76 OF 90 — PHASE 4: DEFENSIVE SECURITY & SOC</div>
+  <h1>Choosing Your Path <span class="accent">Red/Blue/Cloud/AppSec</span></h1>
+  <p class="subtitle">Generalists get entry-level roles. Specialists get senior roles. Today you evaluate each cybersecurity career path and pick your specialization.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The four major cybersecurity career paths:</strong> Each path has distinct day-to-day work, required skills, certifications, and earning potential. The generalist route (SOC analyst or junior pentester) is where most people start — but specialization is what drives career growth and salary progression.</p>
+
+      <div class="path-grid">
+        <div class="path-card red"><div class="pname" style="color:var(--red);">🔴 Offensive Security (Red Team)</div><div class="psalary">$150K avg • Pentester • Red Team • Exploit Dev</div><div class="pdetail">Skills: Web app pentesting, network pentesting, social engineering, exploit development, Python/Bash/Go scripting. Certs: OSCP (entry), OSED, OSEP. Day-to-day: Breaking into systems, writing reports, retesting fixes. Personality: You enjoy breaking things, puzzles, and adversarial thinking.</div></div>
+        <div class="path-card blue"><div class="pname" style="color:var(--cyan);">🔵 Defensive Security (Blue Team)</div><div class="psalary">$95K avg • SOC Analyst • Incident Responder • Threat Hunter</div><div class="pdetail">Skills: SIEM/Splunk, Wireshark, log analysis, EDR tools, forensics, threat intelligence. Certs: Security+, CySA+, GCIA, GNFA. Day-to-day: Monitoring alerts, triaging incidents, hunting threats, analyzing malware. Personality: You enjoy investigation, pattern recognition, and protecting systems.</div></div>
+        <div class="path-card cloud"><div class="pname" style="color:var(--purple);">☁️ Cloud Security</div><div class="psalary">$180K avg • Cloud Security Architect • AWS/Azure/GCP Security</div><div class="pdetail">Skills: Cloud IAM, network security groups, container security, CSPM tools, Terraform, Kubernetes security. Certs: AWS Security Specialty, CCSP, CCSK. Day-to-day: Designing secure cloud architectures, reviewing cloud configs, automating cloud security policies. Personality: You enjoy infrastructure, automation, and large-scale systems.</div></div>
+        <div class="path-card appsec"><div class="pname" style="color:var(--amber);">🟡 Application Security (AppSec)</div><div class="psalary">$165K avg • AppSec Engineer • Security Champion • SSDLC Manager</div><div class="pdetail">Skills: SAST/DAST tools, threat modeling, secure code review, CI/CD security, developer collaboration. Certs: GWAPT, CSSLP, DevSecOps certifications. Day-to-day: Reviewing code for vulnerabilities, training developers, integrating security tools into pipelines. Personality: You enjoy coding, working with developers, and building secure-by-default systems.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Self-assessment exercise — score each path:</strong></p>
+      <div class="code-block">
+<span class="req">Rate each on a scale of 1-5 for YOU personally:</span>
+<span class="cmt">   Enjoyment (do you find it fun?)</span>
+<span class="cmt">   Skill Fit (do you have relevant skills already?)</span>
+<span class="cmt">   Market Demand (are jobs available?)</span>
+<span class="cmt">   Income Goal (does the salary match your needs?)</span>
+
+<span class="req">Example:</span>
+<span class="val">Path:       Enj  Skill  Demand  Income  TOTAL</span>
+<span class="val">Red Team:   5    3      4       4       16</span>
+<span class="val">Blue Team:  3    5      5       3       16</span>
+<span class="val">Cloud Sec:  4    2      5       5       16</span>
+<span class="val">AppSec:     4    4      4       4       16</span>
+
+<span class="cmt">The path with the highest total is your starting point.</span>
+<span class="cmt">You can always pivot later — most senior roles blend 2+ paths.</span></div>
+
+      <div class="callout"><strong>Key insight:</strong> Entry-level roles rarely let you specialize immediately. Most security careers start in a SOC (blue team) or as a junior pentester (red team). Cloud security and AppSec are typically 3-5 year career targets, not day-one roles. Choose your starting path, not your forever path.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Red teamers think in kill chains — every action moves toward a specific objective (data exfiltration, ransomware deployment, credential theft). The path is never linear.</li>
+          <li>A good pentester doesn't just find vulnerabilities — they understand business impact. "This SQLi can dump the entire customer database" beats "We found SQLi."</li>
+          <li>Specialization matters for attackers too — web app, mobile, cloud, network, social engineering, hardware. The best specialize in 1-2 areas and understand the rest.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Blue teamers protect by understanding the attacker's mindset — "if I were an attacker, where would I look?" Purple team exercises bridge this gap.</li>
+          <li>Cloud security defenders think about shared responsibility — "what is AWS responsible for and what am I responsible for?" Most breaches happen on the customer side.</li>
+          <li>AppSec defenders don't just find bugs — they change how developers write code. "We went from 200 SQLi findings/year to 2/year by adding parameterized query linting to the IDE."</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2024 — CAREER PATH SALARIES — CLOUD $180K, APPSEC $165K, PENTEST $150K, SOC $95K</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Specialization significantly impacts earning potential — cloud security architects earn 2x what SOC analysts do</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">According to multiple 2024 cybersecurity salary surveys (Burning Glass, LinkedIn, Glassdoor), cloud security architects average $180K, AppSec engineers $165K, penetration testers $150K, and SOC analysts $95K. However, entry-level positions in every path start in the $60-85K range — specialization premium kicks in at the 3-5 year mark. The fastest salary growth path: start in a SOC for 1-2 years, earn Security+ and CySA+, then pivot into a specialty. SOC experience is the most common entry point for all four paths because it builds foundational knowledge of attacks, defenses, and business operations.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Complete a multi-path self-assessment and create a 14-day specialization roadmap for the remaining Phase 5 (Days 77-90).</p>
+      <ol class="lab-steps">
+        <li>Score each of the 4 paths (Red/Blue/Cloud/AppSec) on Enjoyment, Skill Fit, Market Demand, and Income Goal (1-5 each). Total each column.</li>
+        <li>Research job postings on LinkedIn for your top 2 paths — find 3 job descriptions each and note the required skills, certifications, and years of experience.</li>
+        <li>Identify your skill gaps for your chosen path — for each required skill in the job postings, rate yourself: None / Aware / Can Do / Can Teach.</li>
+        <li>Create a 14-day roadmap (Days 77-90) focused on your chosen path — include certifications, labs, and portfolio projects aligned to that path.</li>
+        <li>For bonus: if you chose Red Team, run <code>nmap -sV -sC target</code> and attempt to find 3 open ports. If Blue Team, run <code>sudo tcpdump -i any port 80</code> and capture 10 HTTP packets. If Cloud, install AWS CLI and run <code>aws s3 ls</code>. If AppSec, run a Semgrep scan on any project.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A career path decision document with your scores for all 4 paths, your chosen specialization, the skill gaps you've identified, and a 14-day roadmap for Days 77-90. This becomes your North Star for the final phase of the 90-day program.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Career path self-assessment script</span>
+<span class="cmd">cat > career_assessment.sh << 'SCRIPT'</span>
+<span class="out">#!/bin/bash</span>
+<span class="out">echo "=== CYBERSECURITY CAREER PATH ASSESSMENT ==="</span>
+<span class="out">echo ""</span>
+<span class="out">for path in "Red Team" "Blue Team" "Cloud Security" "AppSec"; do</span>
+<span class="out">  echo "Evaluating: $path"</span>
+<span class="out">  read -p "  Enjoyment (1-5): " enjoyment</span>
+<span class="out">  read -p "  Skill Fit (1-5): " skill</span>
+<span class="out">  read -p "  Demand (1-5): " demand</span>
+<span class="out">  read -p "  Income (1-5): " income</span>
+<span class="out">  total=$((enjoyment + skill + demand + income))</span>
+<span class="out">  echo "  TOTAL: $total/20"</span>
+<span class="out">  echo ""</span>
+<span class="out">done</span>
+<span class="cmd">SCRIPT</span>
+<span class="cmd">chmod +x career_assessment.sh && bash career_assessment.sh</span>
+
+<span class="c"># Research job postings via curl (example)</span>
+<span class="cmd">curl -s "https://www.linkedin.com/jobs/search?keywords=security+analyst" \</span>
+<span class="cmd">  | grep -oP '"title":"[^"]*"' | head -10</span>
+
+<span class="c"># Create your 14-day roadmap</span>
+<span class="cmd">cat > roadmap_77_90.md << 'EOF'</span>
+<span class="out">## My Specialization: [Chosen Path]</span>
+<span class="out">### Days 77-80: Security+ Certification</span>
+<span class="out">### Days 81-83: [Path-specific labs]</span>
+<span class="out">### Days 84-87: [Path-specific projects]</span>
+<span class="out">### Days 88-90: Portfolio & Job Applications</span>
+<span class="cmd">EOF</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Why do you want to work in cybersecurity and specifically in [role]?"</div>
+        <div class="a">A: "I've always been drawn to problem-solving and adversarial thinking. After completing a structured 76-day training program covering both offensive and defensive security, I found my passion in [chosen path]. For [role], I enjoy [specific aspect — e.g., 'breaking into systems and helping organizations fix their weaknesses before real attackers exploit them' for pentesting or 'investigating how incidents happen and building better detection mechanisms' for SOC]. I've already built [specific lab/portfolio] demonstrating this interest."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "Where do you see yourself in 5 years?"</div>
+        <div class="a">A: "In 5 years, I see myself as a subject matter expert in [chosen path]. My plan is: first 1-2 years mastering entry-level skills and earning foundational certs (Security+, CySA+, or OSCP depending on path). Years 2-3 transitioning into a senior role with a specialty certification. Years 3-5 either moving into a lead/architect role or starting a consulting practice. I'm committed to continuous learning — this field changes fast and I enjoy that challenge."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you stay current with cybersecurity developments?"</div>
+        <div class="a">A: "I follow several sources daily: The CyberWire newsletter for news, Krebs on Security for deep dives, and Reddit r/netsec for community discussions. I subscribe to CVE notification feeds and watch the SANS ISC podcast. For hands-on practice, I use TryHackMe and Hack The Box. I also have a home lab where I test new tools and techniques. I believe the best way to learn is by doing — articles and news give context, but labs build skills."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">LinkedIn job skills extractor</div>
+        <div class="adesc">Paste a job description into an LLM and ask: "What are the top 5 skills required, and which certifications are mentioned?" Get a structured skill gap analysis instantly.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Career path advisor</div>
+        <div class="adesc">Describe your background, certifications, and interests to an LLM and ask for a personalized cybersecurity career roadmap with milestones at 6, 12, and 24 months.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Salary benchmark agent</div>
+        <div class="adesc">Ask for cybersecurity salary ranges by role, location, and experience level. "What does a Cloud Security Engineer with 3 years experience earn in Bangalore vs San Francisco?"</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Skill gap analyzer</div>
+        <div class="adesc">List the skills from your chosen path's job postings and ask "what's the fastest way to learn [skill] for a beginner?" Get learning path recommendations.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet (general):</strong> "Completed comprehensive 76-day cybersecurity training program spanning offensive security, defensive operations, cloud security, and application security — chose [path] specialization for focused career development."</li>
+        <li><strong>Portfolio piece:</strong> Your career path decision document with path scores, skill gap analysis, and 14-day roadmap. This shows hiring managers you're intentional about your career, not just randomly collecting certs.</li>
+        <li><strong>Interview talking point:</strong> "I chose [path] because [reason grounded in your self-assessment]. I've already identified my skill gaps and created a structured plan to address them. Here's my roadmap." — demonstrates maturity and self-awareness.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Your specialization determines the kind of security business you can build. Red team skills = pentesting consultancy ($2,000-15,000/engagement). Blue team skills = managed SOC services ($500-3,000/month per client). Cloud security = cloud architecture review ($5,000-20,000/engagement). AppSec = secure code review + training ($3,000-10,000/engagement).</p>
+      <p style="margin-bottom:0;">The path you choose now shapes your business options in the future. Cloud and AppSec skills create the highest-margin consulting practices because they require the deepest expertise and have the fewest practitioners. A cloud security architect reviewing AWS configurations can charge $300-500/hour with minimal competition compared to $100-150/hour for general pentesting.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What are the 4 main cybersecurity career paths, what does each do, what's the average salary, and which one did you choose and why?" If you can articulate your decision with specific reasoning about your skills, interests, and market demand, you're ready to explain it in interviews too.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=S7Y9hqH1TlA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Red Team vs Blue Team — Which Career Path? — Cyberspatial</div><div class="res-desc">youtube.com/watch?v=S7Y9hqH1TlA — honest breakdown of offensive vs defensive careers, salaries, day-to-day work, and which personality fits each path.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=rN7t0BmYdQs" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Start a Cybersecurity Career (No Degree) — TCM Security</div><div class="res-desc">youtube.com/watch?v=rN7t0BmYdQs — practical advice for entry-level: which certs to get, what skills to build, and how to get your first job without a CS degree.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=S5B-kdKTcsc" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cyber Security Career Path in Hindi — Vivek Teotia</div><div class="res-desc">youtube.com/watch?v=S5B-kdKTcsc — Hindi guide to cybersecurity career paths, required skills, and job opportunities in India.</div></div>
+      </a>
+      <a class="res-card" href="https://www.linkedin.com/jobs/cybersecurity-jobs/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">LinkedIn Cybersecurity Job Search — research real job postings</div><div class="res-desc">linkedin.com/jobs/cybersecurity-jobs/ — search for 3 real job descriptions in your chosen path and note the required skills and certifications.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Four paths evaluated with objective scoring rubric — not just "I like hacking."</div>
+      <div class="mistake-item"><span class="check">✓</span> Salary data from 2024 — cloud $180K, AppSec $165K, pentest $150K, SOC $95K.</div>
+      <div class="mistake-item"><span class="check">✓</span> Realistic entry expectations — most careers start in SOC or junior pentest.</div>
+      <div class="mistake-item"><span class="check">✓</span> Skill gaps identified before choosing — know what you need to learn.</div>
+      <div class="mistake-item"><span class="check">✓</span> 14-day roadmap created to align remaining 14 days with chosen path.</div>
+      <div class="mistake-item"><span class="check">✓</span> Interview "5-year plan" answer prepared — shows intentionality.</div>
+      <div class="mistake-item"><span class="check">✓</span> Entrepreneur angle mapped to each path's earning potential.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I scored all 4 career paths on my personal criteria.</li>
+        <li><span class="box"></span> I chose my specialization path with written reasoning.</li>
+        <li><span class="box"></span> I researched 3 real job postings in my chosen path.</li>
+        <li><span class="box"></span> I identified my top 3 skill gaps for that path.</li>
+        <li><span class="box"></span> I created a 14-day roadmap for Days 77-90.</li>
+        <li><span class="box"></span> I rehearsed the "why this path" interview answer.</li>
+        <li><span class="box"></span> I can explain all 4 paths and their salary ranges.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">76 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 77</div>
+      <div class="title">CompTIA Security+ — Exam Overview — domains, PBQs, study plan.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 77" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

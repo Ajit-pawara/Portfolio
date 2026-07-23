@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 80 — Security+ Domain 5 + Practice Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:88.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .reg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:14px;}
+  .reg-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--pink);}
+  .reg-card .rname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:4px;color:var(--pink);}
+  .reg-card .rdesc{font-size:12px;color:var(--muted);}
+
+  .score-card{background:rgba(57,255,136,0.04);border:2px solid var(--green);border-radius:14px;padding:20px;text-align:center;margin:14px 0;}
+  .score-card .big{font-family:'IBM Plex Mono',monospace;font-size:42px;font-weight:700;color:var(--green);}
+  .score-card .label{font-size:14px;color:var(--muted);margin-top:4px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day80$ cat secplus-domain5-practice.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 80/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 80 OF 90 — PHASE 5: CERTIFICATION & PORTFOLIO</div>
+  <h1>Security+ Domain 5 <span class="accent">+ Practice Test</span></h1>
+  <p class="subtitle">Domain 5 covers governance, risk, and compliance. Today you master policies, risk management, and privacy concepts, then take a full-length practice test.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Domain 5 — Governance, Risk & Compliance (14%):</strong> The smallest domain on the exam but critically important for real-world security roles. Topics include: security policies (acceptable use, data handling, password, change management), risk management types (qualitative vs quantitative, risk register, risk matrix), risk responses (accept, transfer, mitigate, avoid), business continuity planning (BCP, RTO, RPO, MTBF, MTTR), compliance frameworks (GDPR, HIPAA, PCI DSS, FISMA, SOX, GLBA), data privacy (PII, PHI, data sovereignty, data retention/destruction), vendor due diligence (third-party risk, SLA review), and security awareness training (phishing simulations, annual training, role-based training).</p>
+
+      <div class="reg-grid">
+        <div class="reg-card"><div class="rname">GDPR (EU)</div><div class="rdesc">General Data Protection Regulation — applies to any organization handling EU citizen data. Fines up to 4% of global annual revenue or €20M. Requires breach notification within 72 hours, DPO appointment, data subject access rights.</div></div>
+        <div class="reg-card"><div class="rname">HIPAA (US Healthcare)</div><div class="rdesc">Health Insurance Portability and Accountability Act — protects PHI (Protected Health Information). Requires BAA agreements, access controls, audit logs, encryption, and breach notification. Fines up to $1.5M per violation category.</div></div>
+        <div class="reg-card"><div class="rname">PCI DSS (Payment Cards)</div><div class="rdesc">Payment Card Industry Data Security Standard — 12 requirements including firewall config, encryption of cardholder data, access control, monitoring, and regular testing. Required for any organization processing credit cards.</div></div>
+        <div class="reg-card"><div class="rname">FISMA (US Government)</div><div class="rdesc">Federal Information Security Modernization Act — requires federal agencies to implement security programs, categorize data by FIPS 199, and undergo annual NIST RMF assessments.</div></div>
+        <div class="reg-card"><div class="rname">SOX (Public Companies)</div><div class="rdesc">Sarbanes-Oxley Act — requires public companies to maintain internal controls over financial reporting. IT controls (access, change management, backup) must be documented and audited.</div></div>
+        <div class="reg-card"><div class="rname">Risk Management</div><div class="rdesc">ALE = SLE × ARO (Annualized Loss Expectancy). Qualitative uses High/Medium/Low. Quantitative uses monetary values. Risk = Likelihood × Impact. Risk register tracks all identified risks.</div></div>
+      </div>
+
+      <p><strong>Risk calculation example:</strong></p>
+      <div class="code-block">
+<span class="req">A server has an Asset Value (AV) of $50,000</span>
+<span class="req">Exposure Factor (EF) = 40% (estimated damage if exploited)</span>
+<span class="req">Single Loss Expectancy (SLE) = AV × EF = $50,000 × 0.4 = $20,000</span>
+<span class="req">Annual Rate of Occurrence (ARO) = 0.2 (once every 5 years)</span>
+<span class="req">Annualized Loss Expectancy (ALE) = SLE × ARO = $20,000 × 0.2 = $4,000</span>
+
+<span class="req">If the cost of the security control is $3,000/year and reduces ARO to 0.05:</span>
+<span class="req">New ALE = $20,000 × 0.05 = $1,000</span>
+<span class="req">Saving = $4,000 - $1,000 - $3,000 = $0/year — still worth it for non-monetary factors</span></div>
+
+      <div class="callout"><strong>Key exam tip:</strong> Domain 5 questions often ask you to identify the correct risk response strategy. If a risk is low-likelihood and low-impact, you might accept it. If it's high-impact, you mitigate (reduce likelihood/impact). If a third party has better expertise, you transfer (insurance). If it can't be managed, you avoid (shut down the activity).</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Attackers target the gap between policy and practice — an organization may have a data retention policy, but if they don't enforce it, years of sensitive data accumulate on unmonitored servers.</li>
+          <li>Third-party vendors are a favorite attack vector (Target 2013, SolarWinds 2020). Attackers exploit vendor due diligence gaps — if the vendor is secure but the client doesn't audit them, the attacker uses the vendor as an entry point.</li>
+          <li>Compliance-driven security often creates check-the-box behavior — meeting minimum requirements without actually being secure. Attackers exploit checkbox security.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Document everything — policies, procedures, risk assessments, incident reports. In a breach, your documentation (or lack of it) determines regulatory penalties.</li>
+          <li>Perform business impact analysis (BIA) to identify critical systems and their maximum tolerable downtime (MTD). This drives RTO and RPO requirements.</li>
+          <li>Don't just meet compliance minimums — use frameworks as a baseline, not a target. PCI DSS compliance doesn't mean you're secure; it means you've met 12 minimum requirements.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2024 — SECURITY+ EXAM PASSING SCORE — DOMAIN WEIGHTING ANALYSIS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">The Security+ exam requires 750/900. Domain weighting: 24% attacks, 21% architecture, 25% implementation, 16% operations, 14% governance</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Understanding passing score mechanics is crucial for exam strategy. The Security+ SY0-701 exam has a scaled scoring range of 100-900 with a passing score of 750. This isn't a percentage — it's a scaled score adjusted for exam difficulty. You can miss approximately 15-18 questions and still pass, assuming you answer PBQs well (they're weighted highest). Domain 5 at 14% means you can afford to be weakest on governance content if you're strong on Domains 1-4, but don't ignore it entirely — 14% is still ~13 questions. Study tip: Domain 5 concepts (risk assessment types, compliance frameworks, data privacy) are memorization-heavy and low-complexity. They're the easiest points on the exam if you study them. Spend 1-2 hours on Domain 5 for high ROI on exam score.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Master Domain 5 and complete a full-length Security+ practice test with timed conditions.</p>
+      <ol class="lab-steps">
+        <li>Create a risk register spreadsheet with 10 common IT risks (ransomware, phishing, insider threat, cloud misconfiguration, DDoS, data breach, hardware failure, power outage, vendor failure, compliance violation). For each: likelihood, impact, risk level, and response strategy.</li>
+        <li>Draft a security policy template: write a 1-page Acceptable Use Policy covering email, internet, social media, and device usage. Use the Security+ policy framework.</li>
+        <li>Calculate ALE for a real scenario: if a database server has AV=$100,000, EF=60%, ARO=0.5 (once every 2 years), what's the ALE? Try different control cost scenarios.</li>
+        <li>Take a FULL-LENGTH Security+ practice test (80-90 questions) with a timer set to 90 minutes. Simulate real exam conditions — no phone, no notes, no breaks.</li>
+        <li>After the test, review EVERY wrong answer. Create a "missed concepts" list and write the correct answer and reasoning for each.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Your full-length practice test score (750+ = exam-ready), risk register with 10 entries, and a "missed concepts" review document with at least 5 entries. If you score below 750, identify your weakest domains and create a 3-day review plan before taking the actual exam.</div>
+    </div>
+
+    <div class="score-card">
+      <div>Practice Test Score</div>
+      <div class="big">___ / 900</div>
+      <div class="label">Target: 750+  |  Domain gaps to review: _____</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Risk register template (CSV format)</span>
+<span class="cmd">cat > risk_register.csv << 'EOF'</span>
+<span class="out">Risk, Likelihood, Impact, Level, Response, Control</span>
+<span class="out">Ransomware, 3 (High), 5 (Critical), Critical, Mitigate, Offline backups + EDR</span>
+<span class="out">Phishing, 4 (Very High), 4 (High), Critical, Mitigate, MFA + training + email filter</span>
+<span class="out">Insider Threat, 2 (Medium), 4 (High), High, Mitigate, DLP + access reviews</span>
+<span class="out">Cloud Misconfig, 3 (High), 4 (High), High, Mitigate, CSPM + IaC scanning</span>
+<span class="out">DDoS, 3 (High), 3 (Medium), High, Transfer, Cloudflare/anti-DDoS service</span>
+<span class="out">Hardware Failure, 2 (Medium), 3 (Medium), Medium, Mitigate, RAID + redundancy</span>
+<span class="out">Power Outage, 2 (Medium), 3 (Medium), Medium, Mitigate, UPS + generator</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># ALE calculation</span>
+<span class="cmd">python3 -c "</span>
+<span class="out">AV=100000; EF=0.6; SLE=AV*EF</span>
+<span class="out">ARO=0.5; ALE=SLE*ARO</span>
+<span class="out">print(f'SLE=\${SLE}, ARO={ARO}, ALE=\${ALE}')</span>
+<span class="cmd">"</span>
+
+<span class="c"># Full practice test — Professor Messer or ExamCompass</span>
+<span class="hi"># https://www.examcompass.com/comptia/security-plus-practice-test</span>
+<span class="hi"># Take SY0-701 practice test, 90 mins, no breaks, no notes</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a policy, a standard, a procedure, and a guideline?"</div>
+        <div class="a">A: "A policy is a high-level statement of management intent — 'All data must be encrypted at rest.' A standard defines specific technologies or configurations — 'Use AES-256 encryption.' A procedure is the step-by-step how-to — 'Navigate to Settings → Encryption → Enable BitLocker.' A guideline is a recommendation, not mandatory — 'Consider using hardware-backed encryption for improved performance.' Policies and standards are mandatory. Guidelines are optional best practices."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "Your company experiences a data breach involving EU customer data. What regulations apply and what must you do?"</div>
+        <div class="a">A: "If EU customer PII is involved, GDPR applies. Under GDPR, we must notify the supervisory authority within 72 hours of becoming aware of the breach. If the breach poses a high risk to data subjects' rights and freedoms, we must also notify affected individuals without undue delay. We'd need to document the breach, its effects, and remediation steps. We might also have PCI DSS obligations if payment data was involved. Failure to notify within 72 hours risks fines up to €20M or 4% of global revenue."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you decide whether to accept, transfer, mitigate, or avoid a risk?"</div>
+        <div class="a">A: "I evaluate the risk level (likelihood × impact) against the organization's risk appetite. If the cost of mitigation exceeds the potential loss and the risk is within appetite, I recommend acceptance (documented approval required). If a third party can manage the risk better, I recommend transfer — typically through cyber insurance or vendor management. If the risk exceeds appetite, I recommend mitigation — reducing likelihood or impact through controls. Avoidance is for risks that can't be managed — we shut down the activity entirely."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Policy template generator</div>
+        <div class="adesc">Ask: "Generate an Acceptable Use Policy template following Security+ Domain 5 guidelines. Include sections for email, internet, mobile devices, and enforcement."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Risk calculator</div>
+        <div class="adesc">Describe a risk scenario and get the ALE calculated: "Server costs $80K, 30% damage if exploited, happens every 3 years. What's the ALE?"</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Compliance framework matcher</div>
+        <div class="adesc">Describe your organization type and location and ask: "Which compliance frameworks apply to us?" Get a tailored list of regulatory requirements.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Practice test grader</div>
+        <div class="adesc">Paste your missed practice test questions into an LLM and ask: "Explain why the correct answer is right and why my wrong answer was wrong."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Completed comprehensive Security+ preparation across all 5 domains; achieved [score] on full-length practice exam; created risk register, security policy templates, and ALE calculations documenting enterprise risk management capabilities."</li>
+        <li><strong>Portfolio piece:</strong> Your risk register spreadsheet, Acceptable Use Policy draft, and practice test score with gap analysis. Shows employers you understand governance and compliance in addition to technical security.</li>
+        <li><strong>Interview talking point:</strong> "Security+ Domain 5 covers the governance layer that many technical candidates overlook. Understanding risk management, compliance, and policy is what separates a security technician from a security professional who can communicate with management and make business-aligned recommendations."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Compliance consulting is one of the most profitable and recession-proof security niches. Every regulated business needs compliance help. You can start with "GDPR Readiness Assessments" — review a small business's data handling practices against GDPR requirements — for $2,000-5,000. Or offer "PCI DSS Self-Assessment Questionnaire (SAQ) Assistance" for $1,000-3,000 per assessment.</p>
+      <p style="margin-bottom:0;">The best productized model: "Security Policy Pack" — a complete set of editable security policy templates (Acceptable Use, Password, Data Classification, Incident Response, BCP, Vendor Management) based on NIST and ISO frameworks. Sell it for $97-197. Every new MSP, startup, and small business needs these and most don't have them. Create once, sell infinite times.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Name 4 risk response strategies and give an example of each. What's the difference between GDPR and HIPAA? What does ALE = SLE × ARO mean?" If you can answer all three clearly, Domain 5 and Security+ exam prep are complete.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=wPEJpOZ3Gqw" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Security+ Domain 5 — Governance, Risk & Compliance — Professor Messer</div><div class="res-desc">youtube.com/watch?v=wPEJpOZ3Gqw — full Domain 5 breakdown with policies, risk management, compliance frameworks, and data privacy.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=W0PwUAMQjvE" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How I Passed Security+ (SY0-701) — Study Strategy + Resources</div><div class="res-desc">youtube.com/watch?v=W0PwUAMQjvE — exam day tips, time management strategy, and last-minute review techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=HL_yGHyRyOc" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Security+ Domain 5 in Hindi — Kaushal Bhardwaj</div><div class="res-desc">youtube.com/watch?v=HL_yGHyRyOc — Hindi explanation of risk management types, compliance requirements, and data privacy concepts.</div></div>
+      </a>
+      <a class="res-card" href="https://www.examcompass.com/comptia/security-plus-practice-test" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">ExamCompass Security+ Full Practice Test — free, timed, 90 questions</div><div class="res-desc">examcompass.com — free full-length Security+ practice test with instant scoring. Simulates real exam conditions.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Risk register created with 10 real risks — not theoretical.</div>
+      <div class="mistake-item"><span class="check">✓</span> ALE calculation practiced with real numbers and control cost analysis.</div>
+      <div class="mistake-item"><span class="check">✓</span> Full-length practice test under timed conditions — simulates exam reality.</div>
+      <div class="mistake-item"><span class="check">✓</span> Missed concepts reviewed and documented — not just scored and forgotten.</div>
+      <div class="mistake-item"><span class="check">✓</span> Compliance frameworks compared (GDPR, HIPAA, PCI DSS, SOX, FISMA).</div>
+      <div class="mistake-item"><span class="check">✓</span> Policy template drafted — turning governance theory into documentation.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I understand all 4 risk response strategies with examples.</li>
+        <li><span class="box"></span> I calculated ALE from a scenario.</li>
+        <li><span class="box"></span> I created a risk register with 10 entries.</li>
+        <li><span class="box"></span> I drafted an Acceptable Use Policy.</li>
+        <li><span class="box"></span> I took a full-length Security+ practice test (90 min, timed).</li>
+        <li><span class="box"></span> I reviewed all wrong answers and noted gaps.</li>
+        <li><span class="box"></span> I scored 750+ or created a review plan to get there.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">80 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 81</div>
+      <div class="title">Intro to Bug Bounty Hunting — vulnerability disclosure, choosing programs, writing your first report.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 81" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

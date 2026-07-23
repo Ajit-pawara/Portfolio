@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 54 — CTF Strategy Crypto & Forensics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:60%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'\25CF';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day54$ cat ctf-crypto-forensics.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 54/90 — Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 54 OF 90 — PHASE 3</div>
+  <h1>CTF Strategy <span class="accent">Crypto & Forensics</span></h1>
+  <p class="subtitle">CTFs force you to apply cryptographic and forensic concepts under time pressure. Today you solve crypto challenges and analyze forensic evidence dumps.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Crypto in CTFs:</strong> Capture The Flag competitions test your ability to break cryptographic implementations under time pressure. Classical ciphers — Caesar, ROT13, Vigen&egrave;re, Atbash — appear in beginner challenges and are trivially breakable with frequency analysis. Modern crypto challenges target weak implementations: ECB mode (no diffusion between blocks), repeated nonces in AES-CTR, low-entropy RSA keys (factoring via Fermat or Pollard's p-1), and hash length extension attacks against SHA-256/MD5. The skill is recognizing the cipher type from the output format and applying the correct solver.</p>
+<p style="margin-top:16px;"><strong>Forensics in CTFs:</strong> Forensics challenges give you a binary artifact — a PCAP, disk image, memory dump, or log file — and ask you to find the flag hidden within. Common techniques: carving files from disk images with foremost or binwalk, extracting HTTP objects from PCAPs with Wireshark or tshark, analyzing memory dumps with Volatility (pslist, netscan, cmdscan), and recovering deleted files from filesystem metadata. The flag might be in base64 in a PNG EXIF tag, a DNS TXT query response, or a process command line in a memory dump.</p>
+<p style="margin-top:16px;"><strong>Practical crypto solver pattern:</strong></p>
+<div class="code-block">
+<span class="req">#!/usr/bin/env python3</span>
+<span class="cmt"># Caesar cipher brute-force solver</span>
+<span class="req">ciphertext = "khoorzruog"</span>
+<span class="body">for shift in range(26):</span>
+<span class="body">    plain = "".join(</span>
+<span class="body">        chr((ord(c) - 97 + shift) %% 26 + 97)</span>
+<span class="body">        if c.isalpha() and c.islower() else c</span>
+<span class="body">        for c in ciphertext</span>
+<span class="body">    )</span>
+<span class="body">    print(f"Shift {shift}: {plain}")</span>
+<span class="cmt"># Output: Shift 3: "helloworld"</span></div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">&#9876; Attacker</div>
+        <ul>
+          <li>Identify the cipher type from the challenge output — base64 padding (==) suggests AES, hex strings of varying length suggest block ciphers, single-byte XOR patterns reveal classical ciphers.</li>
+          <li>Automate frequency analysis with Python to break substitution ciphers: count letter frequencies and map against English/French/German distribution.</li>
+          <li>Use binwalk/foremost to carve hidden files from disk images — flags are often embedded in PNG, ZIP, or PDF appended to legitimate files.</li>
+          <li>Extract HTTP objects from PCAPs with tshark: <code>tshark -r capture.pcap --export-objects http,/tmp/out</code> — flags hidden in transferred files.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">&#9937; Defender</div>
+        <ul>
+          <li>Apply cryptographic hashing (SHA-256) for file integrity monitoring — any modification to critical binaries changes the hash and triggers an alert.</li>
+          <li>Use forensic tools proactively — run Volatility on a known-clean memory dump to establish a baseline of normal process lists and network connections.</li>
+          <li>Enable full-packet capture retention — having the PCAP means you can always go back and apply new detection rules to historical traffic.</li>
+          <li>Log all cryptographic operations performed by userland processes — unexpected crypto API calls (CryptEncrypt, BCryptEncrypt) may signal ransomware.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">CTF TECHNIQUES IN REAL FORENSICS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">XOR analysis and frequency analysis — the same CTF crypto skills used to decrypt ransomware</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">In 2019, the REvil ransomware used a hybrid encryption scheme: a hardcoded AES-128 key encrypted each victim's files, while the AES key itself was encrypted with an RSA public key. Forensic analysts applied the same XOR analysis techniques used in CTF crypto challenges to recover decryption keys from memory dumps. They searched for high-entropy byte sequences adjacent to known plaintext headers (e.g., PDF/JPEG headers) and XOR'd against the encrypted output to recover keystreams. The exact same approach — XOR two files, analyze frequency distributions, identify repeating XOR key length — is practiced in thousands of CTF crypto challenges worldwide.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> solve a series of CTF crypto and forensics challenges using Python, frequency analysis, and forensic carving tools.</p>
+      <ol class="lab-steps">
+        <li>Set up your CTF environment: install Python3 pwntools <code>pip install pwntools</code>, and forensic tools <code>sudo apt install binwalk foremost tshark xxd</code>.</li>
+        <li>Create a Python script that brute-forces ROT/Caesar ciphers automatically — read input, try all 26 shifts, print readable output.</li>
+        <li>Build a multi-byte XOR cracker: given an encrypted binary, brute-force the XOR key length from 1-32 bytes, compute Hamming distance, and decrypt with the most likely key.</li>
+        <li>Download a sample PCAP from <strong>malware-traffic-analysis.net</strong> (any recent year). Use tshark to list all HTTP objects: <code>tshark -r sample.pcap --export-objects http,/tmp/objects</code>.</li>
+        <li>Carve files from a disk image: <code>foremost -i disk_image.raw -o /tmp/carved</code>. Examine the output directory for embedded flag files.</li>
+        <li>Combine skills: a PCAP contains encrypted traffic; the key is XOR-encoded in the same PCAP's DNS queries. Extract and decrypt the flag.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a working Caesar brute-force script, a multi-byte XOR decryption script, and at least one file carved from a sample PCAP or disk image. Document the flag extraction process for each challenge.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body">
+<span class="c"># Caesar cipher brute-force</span>
+<span class="cmd">python3 -c '</span>
+<span class="cmd">import sys; ct=sys.argv[1]</span>
+<span class="cmd">for s in range(26):</span>
+<span class="cmd">  print(s, "".join(chr((ord(c)-97+s)%%26+97) if c.isalpha() and c.islower() else c for c in ct))</span>
+<span class="cmd">' "khoorzruog"</span>
+
+<span class="c"># XOR decryption (single-byte key brute-force)</span>
+<span class="cmd">python3 -c '</span>
+<span class="cmd">data = bytes.fromhex("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")</span>
+<span class="cmd">for key in range(256):</span>
+<span class="cmd">  dec = bytes([b ^ key for b in data])</span>
+<span class="cmd">  if all(32 <= c < 127 for c in dec):</span>
+<span class="cmd">    print(f"Key {key}: {dec.decode()}")</span>
+<span class="cmd">'</span>
+
+<span class="c"># Carve files from disk image</span>
+<span class="cmd">foremost -i evidence.raw -o /tmp/carved_out</span>
+
+<span class="c"># Extract HTTP objects from PCAP</span>
+<span class="cmd">tshark -r capture.pcap --export-objects http,/tmp/objects -q</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How would you approach a CTF crypto challenge that gives you an encrypted file with no key?"</div>
+        <div class="a">A: "First, identify the cipher type from the output format: hex, base64, raw binary. For classical ciphers (Caesar, Vigen&egrave;re), run frequency analysis and brute-force. For XOR, determine key length using Hamming distance, then brute-force each key byte independently. For modern ciphers (AES, RSA), look for implementation weaknesses — ECB mode (repeating blocks), small RSA exponent (cube root attack), or known plaintext headers. I always start with the simplest attack first: single-byte XOR brute-force takes microseconds."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What forensic artifacts would you look for in a memory dump after a suspected ransomware infection?"</div>
+        <div class="a">A: "Run Volatility's pslist and psscan to identify malicious processes — look for processes with suspicious names, no parent, or running from Temp directories. Use cmdscan and consoles to extract command-line history. Use netscan to find C2 connections. Use memdump on suspicious processes, then extract and analyze the memory regions for encryption keys or ransom note strings. Also check for process injection — malfind shows processes with executable memory regions that weren't mapped from disk."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you distinguish a repeating-key XOR from a single-key XOR cipher?"</div>
+        <div class="a">A: "Calculate the Hamming distance between blocks of increasing key lengths. For a correct key length, the average normalized Hamming distance per block will be lowest — same-byte positions encrypted with the same key byte produce similar distances. Single-byte XOR (key length=1) won't show this variance. After finding the probable key length, split the ciphertext into columns (each column encrypted with one key byte), and brute-force each column independently using English letter frequency scoring."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card"><div class="aname">CyberChef (GCHQ)</div><div class="adesc">gchq.github.io/CyberChef — drag-and-drop recipe builder for decoding, decrypting, and parsing data. The Swiss Army knife for CTF crypto.</div></div>
+      <div class="ai-card"><div class="aname">Volatility Plugin Generator</div><div class="adesc">Ask an LLM to generate a Volatility plugin for a custom memory structure — describe the OS version and what you're looking for, get a ready-to-run Python plugin.</div></div>
+      <div class="ai-card"><div class="aname">PCAP Analysis with AI</div><div class="adesc">Upload a PCAP summary to an LLM and ask it to identify suspicious patterns, unusual protocols, or common C2 frameworks based on traffic characteristics.</div></div>
+      <div class="ai-card"><div class="aname">Crypto Attack Recommender</div><div class="adesc">Describe the encrypted output format (length, characters, padding) and ask which attack is most likely — frequency analysis, ECB byte-at-a-time, padding oracle, or ROCA.</div></div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Solved CTF cryptography challenges using Python (Caesar, multi-byte XOR, frequency analysis) and performed forensic analysis including file carving and PCAP object extraction."</li>
+        <li><strong>Portfolio piece:</strong> a write-up of one crypto and one forensics challenge with code, methodology, and flag extraction — demonstrates analytical thinking under time pressure.</li>
+        <li><strong>Interview talking point:</strong> "CTF challenges teach you to approach problems systematically — identify the cipher/artifact type, apply the right tools, and iterate when the first approach fails. This maps directly to incident response methodology."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Cryptography and forensics skills are marketable as specialized consulting services. Digital forensics consultants charge $200-400/hour for incident response, data recovery, and litigation support. CTF-honed skills — recognizing cipher types, carving files, extracting evidence from PCAPs — are exactly what DFIR teams need during ransomware incidents. A productized "Incident Response Retainer" service ($1,000-2,500/month) that guarantees 24-hour forensic analysis would serve small businesses that can't afford full-time DFIR staff.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Walk through how you'd solve a CTF crypto challenge from start to finish — from identifying the cipher type to extracting the flag. Then explain how the same techniques apply in real-world ransomware forensics." If you can articulate both, you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=GWTTLm2EFKQ" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">CTF Crypto Challenges — LiveOverflow</div><div class="res-desc">youtube.com/watch?v=GWTTLm2EFKQ — Walkthrough of common CTF crypto challenges and solving methodology.</div></div></a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=SyxJ5JMsRmA" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">Forensics CTF — John Hammond</div><div class="res-desc">youtube.com/watch?v=SyxJ5JMsRmA — PCAP and disk image analysis techniques for CTF forensics challenges.</div></div></a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=3wqtz2sZb4E" target="_blank"><span class="res-icon hi">HI</span><div><div class="res-title">CTF Crypto in Hindi — HackWithRohit</div><div class="res-desc">youtube.com/watch?v=3wqtz2sZb4E — Hindi walkthrough of basic crypto challenges in CTF competitions.</div></div></a>
+      <a class="res-card" href="https://cryptopals.com/" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">Cryptopals Crypto Challenges</div><div class="res-desc">cryptopals.com — The definitive set of crypto CTF-style challenges, from single-byte XOR to AES CBC padding oracle.</div></div></a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">&#10003;</span> Crypto and forensics treated as separate skills — they converge in real DFIR.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Classical cipher solvers built from scratch — not just using online tools.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Multi-byte XOR analysis with Hamming distance — not guessing key length.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Forensic carving with foremost/binwalk — flags hide in appended data.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> PCAP object extraction as standard procedure — every CTF examiner does this.</div>
+      <div class="mistake-item"><span class="check">&#10003;</span> Direct link to real REvil ransomware decryption — same techniques.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can write a Caesar cipher brute-forcer in Python.</li>
+        <li><span class="box"></span> I can crack single-byte XOR cipher using frequency analysis.</li>
+        <li><span class="box"></span> I can determine XOR key length using Hamming distance.</li>
+        <li><span class="box"></span> I carved a file from a disk image using foremost.</li>
+        <li><span class="box"></span> I extracted HTTP objects from a PCAP using tshark.</li>
+        <li><span class="box"></span> I can explain how CTF crypto maps to ransomware forensics.</li>
+        <li><span class="box"></span> I can teach my CTF methodology out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">54 / 90</div><div class="l3">Verified &#10003;</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 55</div>
+      <div class="title">Phase 3 Complete — Review &amp; Mini Quiz</div>
+    </div>
+    <div class="arrow">&rarr;</div>
+  </div>
+
+  <footer>say "Day 55" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

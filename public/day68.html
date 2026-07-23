@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 68 — Malware Analysis: Static Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:76%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .pe-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .pe-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .pe-grid .pe-label{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day68$ cat static-analysis.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 68/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 68 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Malware Analysis <span class="accent">Static Basics</span></h1>
+  <p class="subtitle">Before you run a suspicious file, you analyze it statically. Today you inspect PE headers, strings, hashes, and imports to determine malicious intent without execution.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Static Analysis vs Dynamic Analysis:</strong> Static analysis examines a file without executing it. You inspect the binary's structure, metadata, embedded strings, imported functions, and compiled artifacts. It's safe (the malware never runs) and fast (seconds to minutes). Dynamic analysis executes the sample in an isolated sandbox and observes behavior — but it requires containment and takes longer. The rule: always start with static analysis. If you can determine the file is malware through static means, you avoid the risk of execution entirely.</p>
+
+      <p style="margin-top:16px;"><strong>The PE File Format:</strong> Most Windows malware ships as PE (Portable Executable) files — .exe, .dll, .sys. The PE structure contains:</p>
+      <div class="pe-grid">
+        <div><div class="pe-label" style="color:var(--cyan);">DOS Header</div><div class="adesc" style="font-size:12px;color:var(--muted);">Starts with "MZ" (4D 5A). Contains e_lfanew offset pointing to the PE header.</div></div>
+        <div><div class="pe-label" style="color:var(--green);">PE Header</div><div class="adesc" style="font-size:12px;color:var(--muted);">Signature "PE\0\0" followed by File Header (machine type, sections, timestamp) and Optional Header.</div></div>
+        <div><div class="pe-label" style="color:var(--amber);">Section Table</div><div class="adesc" style="font-size:12px;color:var(--muted);">Lists .text (code), .data (global vars), .rdata (read-only), .rsrc (resources). Section names and entropy flags are key indicators.</div></div>
+        <div><div class="pe-label" style="color:var(--purple);">Import Table</div><div class="adesc" style="font-size:12px;color:var(--muted);">Lists DLLs and functions the binary imports. VirtualAlloc, WriteProcessMemory, CreateRemoteThread = process injection.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Key static analysis signals:</strong></p>
+      <div class="code-block">
+<span class="cmt"># 1. File Hash — check against VirusTotal / known malware databases</span>
+<span class="cmd">sha256sum sample.exe</span>
+<span class="out">d4e5f6a7b8c9...  sample.exe</span>
+
+<span class="cmt"># 2. Strings analysis — extract embedded text</span>
+<span class="cmd">strings -n 8 sample.exe | head -30</span>
+<span class="out">http://malicious-c2.com/beacon</span>
+<span class="out">C:\Windows\System32\cmd.exe</span>
+<span class="out">Mozilla/5.0 (Windows NT 10.0; Win64; x64)</span>
+<span class="out">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span>
+
+<span class="cmt"># 3. Import analysis — what APIs does it call?</span>
+<span class="cmt"># Suspicious imports: VirtualAlloc, WriteProcessMemory, CreateRemoteThread,</span>
+<span class="cmt"># CryptDecrypt, URLDownloadToFile, WinExec, RegSetValueEx</span></div>
+
+      <p><strong>Entropy Analysis:</strong> Entropy measures randomness in a file section. Normal code has entropy around 5.0-6.5. Packed or encrypted sections have entropy >7.0 (near maximum 8.0). High entropy in .text section means the code is packed/obfuscated — a strong indicator of malware. Tools like Detect It Easy (DIE) can identify the specific packer (UPX, Themida, VMProtect) from signatures.</p>
+
+      <div class="callout"><strong>Key insight:</strong> Static analysis alone can classify 70-80% of malware samples. If the imports include process injection APIs, the strings contain C2 URLs, and the entropy is suspicious, you have enough evidence to block the file without ever running it. This is the first filter in every malware analysis pipeline.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Pack the malware with custom packers (not UPX — AV signatures detect UPX) to increase entropy and evade static signature detection entirely.</li>
+          <li>Obfuscate strings at rest — encrypt them with XOR or RC4 and decrypt only at runtime. Static string analysis can't find encrypted strings.</li>
+          <li>Use API hashing — instead of importing VirtualAlloc by name, compute a hash and resolve the API at runtime by walking the PEB. The import table looks clean.</li>
+          <li>Patch the PE timestamp to a false value — set it to a date when the compiler was legitimate (e.g., 2019) to evade time-based heuristics.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Always compute the SHA256 hash first and check VirusTotal — if the hash is known, you have an immediate classification without deeper analysis.</li>
+          <li>Run strings with different minimum lengths — short strings (4 chars) catch commands, longer strings (15+) catch URLs and registry paths.</li>
+          <li>Check the import table against known malicious API patterns: process injection (VirtualAlloc, WriteProcessMemory), persistence (RegSetValueEx), C2 (InternetOpen, WinHttpOpen).</li>
+          <li>Use Detect It Easy to identify packers — an unknown packer with high entropy is suspicious. Flag anything >7.0 entropy for dynamic analysis.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2010 — STUXNET — 5 COUNTRIES, 1,000+ CENTRIFUGES DESTROYED</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Static analysis first identified Stuxnet as a sophisticated cyberweapon through PE header and certificate analysis</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">In June 2010, VirusTotal received a sample from Belarus that raised immediate flags during static analysis. The PE file contained two stolen digital certificates (JMicron and RealTek), multiple zero-day exploits (including the LNK vulnerability CVE-2010-2568 and the Print Spooler vulnerability CVE-2010-2729), and Siemens SCADA-specific strings referencing Step 7 software. The import table showed unusual API combinations for a standard driver — including functions to manipulate PLC (Programmable Logic Controller) frequency converters. The PE timestamp was set to January 2010, but the compiled code referenced dates after the certificate expiration, a clear sign of timestamp forgery. These static indicators — stolen certs, zero-day exploits, SCADA-specific strings — told researchers this was not ordinary malware before anyone had seen it run.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> perform static analysis on a safe test file using command-line tools and Detect It Easy to identify suspicious PE characteristics.</p>
+      <ol class="lab-steps">
+        <li>Create a harmless PE file for analysis: <code>cp /bin/ls /tmp/analysis/benign.exe</code> — this is a legitimate Linux binary. For Windows PE analysis, download a known-safe PE (e.g., notepad.exe from a Windows VM) or use a sample from <code>github.com/ytisf/theZoo</code> (password-protected malware zoo for educational use).</li>
+        <li>Compute file hashes: <code>sha256sum /tmp/analysis/sample.exe > sample.hash; md5sum /tmp/analysis/sample.exe >> sample.hash</code>.</li>
+        <li>Extract strings: <code>strings /tmp/analysis/sample.exe | sort | uniq > sample_strings.txt</code>. Inspect for URLs, file paths, registry keys, and API calls.</li>
+        <li>Analyze PE headers using <code>readpe</code> (from pev package): <code>readpe /tmp/analysis/sample.exe | head -50</code> to see DOS header, PE header, sections, and imports.</li>
+        <li>Install and run Detect It Easy (DIE): <code>diec /tmp/analysis/sample.exe</code> to detect packers, entropy, and compiler info.</li>
+        <li>Write a one-page analysis report documenting: hash, suspicious strings identified, imported APIs flagged, entropy score, and your verdict (malicious/benign/suspicious).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a static analysis report (one page) with the hash, strings output snippet, import analysis, entropy assessment, and final verdict. This is the exact format used in professional malware analysis workflows.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Compute file hashes</span>
+<span class="cmd">sha256sum sample.exe</span>
+<span class="cmd">md5sum sample.exe</span>
+<span class="c"># Always check these hashes on VirusTotal first</span>
+
+<span class="c"># Step 2 — Extract strings (minimum length 8)</span>
+<span class="cmd">strings -n 8 sample.exe | sort -u > strings_output.txt</span>
+<span class="cmd">grep -iE "http|https|www\.|ftp|\.com|\.exe|\.dll|reg|run|cmd|powershell" strings_output.txt</span>
+<span class="out">&gt; http://evil-c2.example.com/beacon       ← C2 URL</span>
+<span class="out">&gt; SOFTWARE\Microsoft\Windows\Run          ← Persistence</span>
+<span class="out">&gt; cmd.exe /c powershell ...               ← Command execution</span>
+
+<span class="c"># Step 3 — PE header analysis with readpe</span>
+<span class="cmd">readpe sample.exe</span>
+<span class="out">&gt; DOS Header: MZ (valid)</span>
+<span class="out">&gt; PE Header: machine=0x14C (i386)</span>
+<span class="out">&gt; Sections: .text .rdata .data .rsrc</span>
+<span class="out">&gt; Import: kernel32.dll (VirtualAlloc, WriteProcessMemory, CreateThread)</span>
+<span class="out">&gt; Import: wininet.dll (InternetOpen, InternetOpenUrl)</span>
+
+<span class="c"># Step 4 — Detect packers with DIE</span>
+<span class="cmd">diec sample.exe</span>
+<span class="out">&gt; Entropy: .text = 7.82 (HIGH — likely packed)</span>
+<span class="out">&gt; Packer: UPX 3.96 detected</span>
+<span class="c"># High entropy + known packer = likely packed malicious binary</span>
+
+<span class="c"># Step 5 — Check compile timestamp</span>
+<span class="cmd">peinfo sample.exe | grep "TimeDateStamp"</span>
+<span class="out">&gt; 0x5D4E5F3A = Tue Aug  6 12:34:02 2019</span>
+<span class="c"># Suspicious: timestamp from 2019 but file was submitted last week</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through how you'd statically analyze a suspicious EXE file."</div>
+        <div class="a">A: "First, compute the SHA256 hash and check VirusTotal for known classifications. Second, extract strings with a minimum length of 8 — look for URLs, IP addresses, file paths, registry keys, and API names. Strings like 'CreateRemoteThread' or 'http://' in a calculator app are red flags. Third, analyze the PE headers — check the import table for suspicious API combinations: VirtualAlloc + WriteProcessMemory + CreateRemoteThread is a classic process injection pattern. Fourth, check entropy per section — .text entropy above 7.0 suggests packing. Use Detect It Easy to identify the packer. Finally, check the compile timestamp — if it claims to be from 2019 but the file was discovered last week, it's likely forged. Document everything in a one-page report."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What strings would make you immediately suspicious in a static analysis?"</div>
+        <div class="a">A: "C2 URLs or IP addresses that resolve to known malicious hosts, registry run keys (Run, RunOnce) that suggest persistence, PowerShell or cmd.exe invocation for command execution, CreateRemoteThread for process injection, VirtualAlloc for memory allocation in another process, InternetOpen/URLDownloadToFile for download capabilities, and any reference to disabling security products (net stop, sc stop, Set-MpPreference). Also suspicious: hardcoded encryption keys, mutex names (often unique per malware family), and file paths in temporary directories."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is entropy and how is it used in malware analysis?"</div>
+        <div class="a">A: "Entropy measures the randomness of data on a scale of 0 to 8. Normal compiled code has entropy between 5.0 and 6.5. Packed or encrypted binaries have entropy above 7.0 because compressed or encrypted data appears more random. A .text section with entropy of 7.8 strongly indicates the code has been packed to evade signature detection. We use tools like Detect It Easy to identify which packer was used (UPX, Themida, VMProtect). High entropy alone isn't proof of malware — some legitimate software uses packing — but combined with other indicators like suspicious imports and unknown strings, it's a strong signal."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">String analyzer</div>
+        <div class="adesc">Paste extracted strings into an LLM and ask it to classify each: C2 indicators, persistence mechanisms, anti-analysis techniques, encryption routines.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">API import explainer</div>
+        <div class="adesc">Paste the import table (DLL + function names) and ask the LLM to explain what the binary is capable of based on its API combination.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">YARA rule writer</div>
+        <div class="adesc">Describe the malware's static characteristics (sections, strings, imports) and get a candidate YARA rule to detect similar samples.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">VirusTotal automation</div>
+        <div class="adesc">Use the VirusTotal API (free) to automate hash lookups — write a Python script that submits hashes and returns detection ratios.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Performed static analysis on malware samples using PE-bear, Detect It Easy, and strings analysis; identified packed binaries via entropy scoring and suspicious API import patterns."</li>
+        <li><strong>Portfolio piece:</strong> a static analysis report for one sample — hash, strings, imports, entropy, verdict. Show you can produce the same deliverable a SOC malware analyst would.</li>
+        <li><strong>Talking point:</strong> explaining the PE file format and static analysis workflow in an interview demonstrates you understand the low-level mechanics of Windows malware — a skill gap many entry-level candidates have.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Malware analysis as a service is a niche but lucrative consulting offering. Small businesses and law firms frequently receive suspicious files and have no way to classify them. A "File Triage Service" — email us the file, get a one-page static analysis report within 4 hours — can be priced at $100-300 per sample. At 3-5 samples per week, this is a viable side business.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Is This File Safe?" — a web form where users upload suspicious files (up to 50MB), your backend runs automated static analysis (hash lookup, strings, PE analysis, entropy), and returns a verdict within 5 minutes. Subscription model: $50/month for 25 analyses. The technical barrier is low — all the tools are free and open-source. The value is the turnaround time and interpretation, not the tooling itself.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "How do you statically analyze a suspicious .exe file without running it?" Cover: hash lookup, strings extraction, PE import analysis, entropy/packer detection, and your verdict process. If you can describe the workflow start-to-finish, you're ready for entry-level malware analysis interview questions.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=uhyf_M9tCJQ" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Malware Analysis: Static Analysis — OALabs</div><div class="res-desc">youtube.com/watch?v=uhyf_M9tCJQ — in-depth static analysis walkthrough covering PE structure, strings, imports, and entropy.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=V0kR8bIe8rI" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">PE File Format Explained — Ange Albertini</div><div class="res-desc">youtube.com/watch?v=V0kR8bIe8rI — deep dive into the PE file format structure from a leading reverse engineering expert.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=8Z0r4X3iU18" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Malware Static Analysis Hindi — Cyber Warriors</div><div class="res-desc">youtube.com/watch?v=8Z0r4X3iU18 — Hindi tutorial on static analysis using pestudio, DIE, and PE-bear.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/malmalintroductory" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Malware Analysis Introductory</div><div class="res-desc">tryhackme.com/room/malmalintroductory — free room covering static analysis fundamentals with practical PE file exercises.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Static analysis performed before any execution — safe, fast, non-destructive.</div>
+      <div class="mistake-item"><span class="check">✓</span> PE file format (DOS header, PE header, sections, imports) understood at structural level.</div>
+      <div class="mistake-item"><span class="check">✓</span> Entropy analysis for packer detection — .text >7.0 = likely packed.</div>
+      <div class="mistake-item"><span class="check">✓</span> String analysis targeting C2 URLs, registry keys, and API calls specifically.</div>
+      <div class="mistake-item"><span class="check">✓</span> Import table analyzed for process injection patterns (VirtualAlloc + WriteProcessMemory + CreateRemoteThread).</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Stuxnet case — static analysis revealed stolen certs and zero-days before dynamic execution.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 69 (Dynamic Analysis) — static first, dynamic second.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I understand the PE file format (DOS header, PE header, sections, imports).</li>
+        <li><span class="box"></span> I can compute file hashes and check VirusTotal for known classifications.</li>
+        <li><span class="box"></span> I extracted and analyzed strings from a PE file for suspicious indicators.</li>
+        <li><span class="box"></span> I identified suspicious API imports (process injection, persistence, C2).</li>
+        <li><span class="box"></span> I measured entropy per section and detected packers with DIE.</li>
+        <li><span class="box"></span> I produced a one-page static analysis report with a verdict.</li>
+        <li><span class="box"></span> I can teach the static analysis workflow out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">68 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 69</div>
+      <div class="title">Malware Analysis — Dynamic/Sandbox Basics — executing samples in isolated environments.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 69" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

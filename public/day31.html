@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 31 — Malware Types: Virus, Worm, Trojan, Ransomware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:34.4%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .malware-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:14px;}
+  .malware-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid;}
+  .malware-card .stype{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:5px;}
+  .malware-card .sdesc{font-size:12px;color:var(--muted);}
+  .virus{border-color:var(--red);}.virus .stype{color:var(--red);}
+  .worm{border-color:var(--amber);}.worm .stype{color:var(--amber);}
+  .trojan{border-color:var(--purple);}.trojan .stype{color:var(--purple);}
+  .ransom{border-color:var(--pink);}.ransom .stype{color:var(--pink);}
+  .rootkit{border-color:var(--cyan);}.rootkit .stype{color:var(--cyan);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day31$ cat malware-types.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 31/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 31 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Malware Types <span class="accent">Virus, Worm, Trojan, Ransomware</span></h1>
+  <p class="subtitle">Malware is not one thing. Each type spreads, hides, and executes differently. Today you catalog every major malware family and how they operate.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Classifying malware by behavior:</strong> Malware is categorized by how it infects, how it spreads, what it does, and how it hides. Understanding these categories is essential for both defense (choosing the right detection tool) and analysis (knowing what to look for in a sample).</p>
+
+      <p style="margin-top:16px;"><strong>Major malware families:</strong></p>
+      <div class="malware-grid">
+        <div class="malware-card virus"><div class="stype">Virus</div><div class="sdesc">Attaches to a legitimate file or program. Requires human action to spread (opening a file, running a program). Infects hosts one by one. Classic: CIH (Chernobyl), Melissa, ILOVEYOU.</div></div>
+        <div class="malware-card worm"><div class="stype">Worm</div><div class="sdesc">Self-propagating. Spreads automatically across networks without human action. Exploits network services and vulnerabilities. Classic: Morris, Conficker, WannaCry, NotPetya.</div></div>
+        <div class="malware-card trojan"><div class="stype">Trojan</div><div class="sdesc">Disguised as legitimate software. Doesn't self-replicate — relies on social engineering to trick users into installing. Creates backdoors, steals data, or drops other malware. Classic: Zeus, Emotet, NanoCore RAT.</div></div>
+        <div class="malware-card ransome"><div class="stype">Ransomware</div><div class="sdesc">Encrypts victim's files and demands payment for the decryption key. Modern variants also exfiltrate data (double extortion). Classic: CryptoLocker, Ryuk, REvil, LockBit.</div></div>
+        <div class="malware-card rootkit"><div class="stype">Rootkit</div><div class="sdesc">Designed to hide its presence and other malware from detection tools. Operates at kernel level (ring 0) or below (bootkits, hypervisor). Extremely difficult to detect without offline analysis.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>YARA rule for malware classification:</strong></p>
+      <div class="code-block">
+<span class="cmt"># YARA — pattern-matching tool for malware identification</span>
+<span class="req">rule NotPetya_Ransomware {</span>
+<span class="req">    strings:</span>
+<span class="req">        $mbr = { 33 C0 8E D0 BC 00 7C 8B F4 50 07 50 1F FB FC BF 00 06 }</span>
+<span class="req">        $msg = "CRITICAL_PROCESS_DIED" wide ascii</span>
+<span class="req">    condition:</span>
+<span class="req">        $mbr at 0 or $msg</span>
+<span class="req">}</span>
+<span class="cmt"># Run: yara notpetya.yara suspect-file.exe</span></div>
+
+      <div class="callout"><strong>The blur line:</strong> Modern malware rarely fits one category. Emotet started as a banking trojan, evolved into a botnet, and then became a dropper for ransomware. WannaCry is a worm (self-propagating via EternalBlue) that delivered ransomware. Classification helps with analysis but don't expect clean boundaries in real samples.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Use trojans for initial access — craft a phishing email with a malicious Office document or ISO file that drops a RAT (Remote Access Trojan).</li>
+          <li>Deploy ransomware as the payload of last resort — encrypt everything, demand payment. Double extortion (exfiltrate + encrypt) increases pressure.</li>
+          <li>Use rootkits to maintain persistence — hide processes, files, registry keys, and network connections from EDR tools.</li>
+          <li>Develop polymorphic malware that changes its signature on each infection to evade signature-based AV detection.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Use behavior-based detection (EDR) rather than signature-only AV — EDR detects process injection, unusual file encryption, and C2 beaconing regardless of hash.</li>
+          <li>Implement application whitelisting — only allow known, approved executables. Blocks trojans and unknown malware by default.</li>
+          <li>Run YARA rules on critical systems — custom rules detect specific malware families based on strings, patterns, and behavior.</li>
+          <li>Maintain offline backups with immutable copies — the only reliable defense against ransomware. Test the restoration process regularly.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2017 — NOTPETYA RANSOMWARE — $10 BILLION IN DAMAGES</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">A Russian military cyberweapon disguised as ransomware destroyed systems globally</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">NotPetya was a wiper disguised as ransomware — it permanently destroyed the Master Boot Record (MBR) and encrypted files with a key that couldn't be recovered even if the ransom was paid. It spread using the EternalBlue exploit (leaked NSA tool) to propagate across networks without user interaction. The worm infected Maersk (shipping giant lost $300M in a week), Merck (pharma, $870M loss), FedEx ($400M loss), and countless other organizations. Total damages exceeded $10 billion, making it the most destructive cyberattack in history. Though initially attributed to the Russian military as an attack on Ukraine, it spread globally and caused collateral damage on an unprecedented scale.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> classify malware families, write YARA rules, and perform static analysis on a sample (in sandbox).</p>
+      <ol class="lab-steps">
+        <li>Download a known malware sample from a malware repository (TheZoo, VirusShare) into an isolated VM or sandbox. <strong>Never run on your host.</strong></li>
+        <li>Use <code>file</code> and <code>strings</code> to identify the file type and extract readable strings: <code>file suspect.exe && strings suspect.exe | head -50</code>.</li>
+        <li>Check VirusTotal hash (if sample is known) to see AV detection rates and classification labels.</li>
+        <li>Write a YARA rule to detect the sample based on unique strings or byte patterns. Use <code>yara rule.yara suspect.exe</code> to test.</li>
+        <li>Use pestudio or pecheck to analyze the PE header: imported functions, suspicious sections, timestamps, and compilation artifacts.</li>
+        <li>Classify the sample: is it a virus, worm, trojan, or ransomware? Justify based on behavior and characteristics.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A written malware analysis report with file type, strings, YARA rule, PE analysis, and classification with justification.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Basic file identification (in sandbox VM)</span>
+<span class="cmd">file suspect.exe</span>
+<span class="out">PE32 executable (GUI) Intel 80386, for MS Windows</span>
+
+<span class="c"># Step 2 — Extract readable strings</span>
+<span class="cmd">strings suspect.exe | grep -iE 'http|https|cmd|run|encrypt|decrypt'</span>
+<span class="out">http://malicious-c2.example.com/gate.php</span>
+<span class="out">cmd.exe /c del %s</span>
+
+<span class="c"># Step 3 — Check VirusTotal (use the SHA256 hash)</span>
+<span class="cmd">sha256sum suspect.exe</span>
+<span class="cmd"># Submit hash to virustotal.com to see detection rates</span>
+
+<span class="c"># Step 4 — Write a YARA rule</span>
+<span class="cmd">cat &gt; detect.yara &lt;&lt; 'EOF'</span>
+<span class="out">rule SuspectSample {</span>
+<span class="out">    strings:</span>
+<span class="out">        $c2 = "malicious-c2.example.com"</span>
+<span class="out">        $cmd = "cmd.exe /c del"</span>
+<span class="out">    condition:</span>
+<span class="out">        $c2 or $cmd</span>
+<span class="out">}</span>
+<span class="cmd">EOF</span>
+<span class="cmd">yara detect.yara suspect.exe</span>
+<span class="out">SuspectSample suspect.exe  &lt;-- matched!</span>
+
+<span class="c"># Step 5 — PE analysis with pestudio or pecheck</span>
+<span class="cmd">pecheck suspect.exe | grep -i 'suspicious\|import\|section'</span>
+<span class="out">Sections: .text .rdata .data .rsrc  &lt;-- unusual section names</span>
+<span class="out">Imports: CreateProcess, WriteProcessMemory, VirtualAllocEx</span>
+<span class="out">         &lt;-- classic process injection imports</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a virus and a worm?"</div>
+        <div class="a">A: "A virus attaches itself to a legitimate file or program and requires user action (opening a file, running a program) to spread. A worm is self-propagating — it spreads automatically across networks by exploiting vulnerabilities or using network protocols, without requiring any user interaction. Worms spread much faster and wider than viruses. NotPetya and WannaCry were worms that delivered ransomware payloads."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How does a trojan differ from a virus?"</div>
+        <div class="a">A: "A trojan masquerades as legitimate software — the user voluntarily installs it thinking it's useful. It doesn't self-replicate like a virus or worm. Trojans are commonly delivered through phishing emails, fake download pages, or pirated software. Once installed, they can steal data, create backdoors, or act as a downloader for other malware like ransomware."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is a rootkit and why is it dangerous?"</div>
+        <div class="a">A: "A rootkit is designed to hide its presence (and other malware) from the operating system and security tools. It operates at kernel level, intercepting system calls and filtering out its own files, processes, registry keys, and network connections. Rootkits are extremely difficult to detect because the OS itself can't be trusted once a rootkit is installed. Detection usually requires booting from an external forensic environment and analyzing memory dumps or disk images offline."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">YARA rule generator</div>
+        <div class="adesc">Describe a malware family (strings, behaviors, IOC patterns) — an LLM can generate a YARA rule with appropriate strings, conditions, and metadata tags.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Malware behavior explainer</div>
+        <div class="adesc">Paste a strings output or API call list into an LLM — ask what the malware does and how to classify it. Useful for quick triage of unknown samples.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Static analysis assistant</div>
+        <div class="adesc">Ask for help interpreting PE header fields: "What does it mean if the compile timestamp is 0x0?" or "Why would packed sections have high entropy?"</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">VirusTotal API analyzer</div>
+        <div class="adesc">Use an LLM to help interpret VirusTotal results — ask it to break down the classification tags from multiple AV vendors into a simple malware family name.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Classified malware families (virus, worm, trojan, ransomware, rootkit) by infection vector and payload behavior; wrote YARA detection rules for sample identification."</li>
+        <li><strong>Portfolio piece:</strong> A malware analysis report with file type identification, strings extraction, PE header analysis, YARA rule, and family classification. Shows SOC-ready analysis skills.</li>
+        <li><strong>Interview talking point:</strong> explaining the NotPetya attack chain (EternalBlue worm propagation → MBR destruction → $10B damages) and distinguishing it from typical ransomware shows real threat intelligence knowledge.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Malware analysis and detection rule creation is a specialized skill in high demand. Organizations need custom YARA rules for their specific threat landscape — detecting malware targeting their industry, technology stack, or supply chain.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Custom YARA Rule Development" — a $500-2,000 engagement where you analyze a client's threat intel feed and write 10-20 custom YARA rules targeting the specific malware families their industry faces (fintech → banking trojans, healthcare → ransomware). Deliver the rules with test samples and a deployment guide for their SIEM/EDR. This is a service you can build once and sell repeatedly across clients in the same vertical.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What are the five main malware types, how do they spread, and what's the difference between a virus and a worm?" If you can also describe NotPetya's classification as a worm + ransomware + wiper in one sentence, you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=8E0TXgDYEbA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Malware Types Explained — Computerphile</div><div class="res-desc">youtube.com/watch?v=8E0TXgDYEbA — Dr. Steve Bagley explains virus, worm, trojan, and ransomware classifications with real examples.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=mw0W7J9QpYQ" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Malware Types in Hindi — Technical Sagar</div><div class="res-desc">youtube.com/watch?v=mw0W7J9QpYQ — Hindi overview of malware families and their behavior with demonstrations.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/malmalintroductory" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Intro to Malware Analysis</div><div class="res-desc">tryhackme.com/room/malmalintroductory — Free room covering static and dynamic analysis of malware samples.</div></div>
+      </a>
+      <a class="res-card" href="https://github.com/Yara-Rules/rules" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">YARA Rules GitHub Repository</div><div class="res-desc">github.com/Yara-Rules/rules — Community-maintained YARA rules repository covering APT groups, malware families, and indicators.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Five malware categories clearly distinguished with examples.</div>
+      <div class="mistake-item"><span class="check">✓</span> Virus vs worm self-propagation difference emphasized.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real NotPetya incident — $10B damages, worm + ransomware + wiper.</div>
+      <div class="mistake-item"><span class="check">✓</span> YARA rule written and tested against real sample pattern.</div>
+      <div class="mistake-item"><span class="check">✓</span> Static analysis workflow demonstrated with tools.</div>
+      <div class="mistake-item"><span class="check">✓</span> EDR vs signature AV distinction — behavioral vs hash-based detection.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can classify malware into 5+ families by behavior.</li>
+        <li><span class="box"></span> I understand virus vs worm propagation differences.</li>
+        <li><span class="box"></span> I wrote a YARA rule and tested it on a sample.</li>
+        <li><span class="box"></span> I performed basic static analysis on a PE file.</li>
+        <li><span class="box"></span> I can explain rootkits and how they hide.</li>
+        <li><span class="box"></span> I understand the NotPetya attack chain.</li>
+        <li><span class="box"></span> I can teach malware types out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">31 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 32</div>
+      <div class="title">Social Engineering & Phishing — The Human Vulnerability.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 32" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

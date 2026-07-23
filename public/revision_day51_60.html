@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 51 to Day 60</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day51_to_day60.md</span>
+    <span style="color:var(--green);">Phase 3 → Phase 4 — CTF to SOC</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 51 TO DAY 60</div>
+    <h1>CTF Platforms, SOC Operations & Detection. <span>From hacking boxes to hunting threats.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 51–60 into one reference. If any section feels fuzzy, revisit that day's HTML before continuing to Day 61.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">9</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 51 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">51</div>
+      <div class="day-meta">
+        <div class="day-title">Intro to TryHackMe / HackTheBox</div>
+        <span class="day-incident">TryHackMe's Role in Security Training</span>
+      </div>
+    </div>
+
+    <div class="section-label">// platform comparison</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">TryHackMe</div><div class="cdesc">Browser-based, guided rooms with step-by-step tasks. Best for beginners — virtual machines run in-browser. 1M+ users.</div></div>
+      <div class="concept"><div class="ctitle">HackTheBox</div><div class="cdesc">VPN-based, no handholding. You get an IP and a free-form challenge. Harder, more realistic. Active machines rotate weekly.</div></div>
+      <div class="concept"><div class="ctitle">Room Difficulty</div><div class="cdesc">Easy/Medium/Hard/Insane. Start with THM Pre-Security → THM Jr. Pentester → HTB Starting Point → HTB Easy boxes.</div></div>
+      <div class="concept"><div class="ctitle">Methodology Docs</div><div class="cdesc">Every box solved without a walkthrough = documented methodology. Your notes become your playbook.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sC -sV -p- &lt;target&gt;</code><div class="cdesc">First command on any THM room or HTB box — full scan before anything else.</div></div>
+      <div class="cmd-row"><code>gobuster dir -u http://target -w /usr/share/wordlists/dirb/common.txt</code><div class="cdesc">Directory brute-forcing for web-based rooms — find hidden endpoints.</div></div>
+      <div class="cmd-row"><code>whatweb http://target</code><div class="cdesc">Technology fingerprinting — CMS, framework versions, JavaScript libraries in use.</div></div>
+      <div class="cmd-row"><code>curl -v http://target</code><div class="cdesc">Verbose HTTP request — see headers, cookies, and response body manually.</div></div>
+      <div class="cmd-row"><code>enum4linux &lt;target&gt;</code><div class="cdesc">SMB/Linux enumeration — users, shares, system info via SMB protocol.</div></div>
+      <div class="cmd-row"><code>smbclient -L //target -N</code><div class="cdesc">List SMB shares with null session — anonymous access is a common misconfiguration.</div></div>
+      <div class="cmd-row"><code>hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://target</code><div class="cdesc">Brute-force SSH login — when you have a username but no password.</div></div>
+    </div>
+
+    <div class="section-label">// key rule</div>
+    <p style="font-size:13.5px;color:#cdd6da;">THM teaches you what to look for. HTB teaches you how to look. Both are necessary. The biggest skill: knowing when to run a walkthrough vs. when to persist. If you haven't touched a tool in 2 hours, read one hint — then continue on your own.</p>
+  </div>
+
+  <!-- DAY 52 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">52</div>
+      <div class="day-meta">
+        <div class="day-title">Solve Your First Easy HTB/THM Box</div>
+        <span class="day-incident">HTB Blue — EternalBlue in Practice</span>
+      </div>
+    </div>
+
+    <div class="section-label">// independent solving methodology</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">1. Enumeration</div><div class="cdesc">nmap -sC -sV -p- target. Every port, every service, every version. Write everything down.</div></div>
+      <div class="concept"><div class="ctitle">2. Vulnerability Search</div><div class="cdesc">Search service versions against public exploits. "SMB 3.1.1 exploit" → MS17-010 EternalBlue.</div></div>
+      <div class="concept"><div class="ctitle">3. Exploit Matching</div><div class="cdesc">searchsploit ms17-010 or search ms17-010 in msfconsole. Match exploit to service.</div></div>
+      <div class="concept"><div class="ctitle">4. Privilege Escalation</div><div class="cdesc">After initial shell, check privesc vectors. HTB Blue: exploit gives SYSTEM directly — no privesc needed.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -p 445 --script smb-vuln-ms17-010 &lt;target&gt;</div><div class="cdesc">Nmap script to check if target is vulnerable to EternalBlue — safe check before exploiting.</div></div>
+      <div class="cmd-row"><code>use exploit/windows/smb/ms17_010_eternalblue</code><div class="cdesc">Metasploit module for EternalBlue — targets SMBv1 buffer overflow in Windows.</div></div>
+      <div class="cmd-row"><code>set PAYLOAD windows/x64/meterpreter/reverse_tcp</code><div class="cdesc">Set 64-bit reverse Meterpreter payload — modern Windows targets are 64-bit.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>EternalBlue (MS17-010, Mar 2017):</strong> a buffer overflow in SMBv1 leaked by the Shadow Brokers from the NSA's exploit arsenal. Weaponized into WannaCry (May 2017 — 200k+ machines, 150 countries) and NotPetya (Jun 2017 — $10B+ damages). The HTB "Blue" machine gives you a safe sandbox to practice the exact same exploit chain that caused billions in damages.</p>
+  </div>
+
+  <!-- DAY 53 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">53</div>
+      <div class="day-meta">
+        <div class="day-title">CTF Strategy — Web Category</div>
+        <span class="day-incident">DEF CON CTF Web Challenges</span>
+      </div>
+    </div>
+
+    <div class="section-label">// web CTF categories</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">PHP Type Juggling</div><div class="cdesc">$key == 0 vs $key === 0. Loose comparison: "admin" == 0 is TRUE. md5("240610708") == md5("QNKCDZO") bypasses.</div></div>
+      <div class="concept"><div class="ctitle">JWT Manipulation</div><div class="cdesc">Change alg from RS256 to HS256 with public key as secret. Set alg: none with empty signature. Bypass verification.</div></div>
+      <div class="concept"><div class="ctitle">SSTI</div><div class="cdesc">Server-Side Template Injection. Twig: {{7*7}}, Jinja2: {{config}}, Flask: {{''.__class__.__mro__}}. Template context leaks.</div></div>
+      <div class="concept"><div class="ctitle">GraphQL Introspection</div><div class="cdesc">POST {__schema{types{name,fields{name}}}}. If introspection is on, the entire data schema is readable.</div></div>
+      <div class="concept"><div class="ctitle">SSRF</div><div class="cdesc">Server-Side Request Forgery. Manipulate url parameter to point at internal services: http://127.0.0.1:6379 (Redis) or file:///etc/passwd.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>curl -v -c cookies.txt -b cookies.txt http://target</code><div class="cdesc">Preserve session cookies across requests — essential for authenticated web challenges.</div></div>
+      <div class="cmd-row"><code>sqlmap -u "http://target/page?id=1" --batch</code><div class="cdesc">Automated SQL injection testing — batch mode auto-answers prompts for speed.</div></div>
+      <div class="cmd-row"><code>gobuster dir -w /usr/share/wordlists/dirb/common.txt -x php,txt,html,backup</code><div class="cdesc">Directory fuzzing with extension filtering — find backup files and hidden pages.</div></div>
+      <div class="cmd-row"><code>jwt.io (debugger)</code><div class="cdesc">Decode JWTs without server interaction. Copy token, paste, inspect header/payload, modify and re-encode.</div></div>
+      <div class="cmd-row"><code>{{config}} / {{7*7}} / {{''.__class__}}</code><div class="cdesc">SSTI test payloads. {7*7} returns 49 = template injection confirmed. Escalate to RCE from here.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;">DEF CON CTF finals feature web challenges mirroring real-world flaws — past challenges replicated Facebook Graph API flaws and Google App Engine misconfigurations. The same SSTI bugs that win CTF flags have been found in Uber, Twitter, and Shopify production systems via bug bounty programs.</p>
+  </div>
+
+  <!-- DAY 54 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">54</div>
+      <div class="day-meta">
+        <div class="day-title">CTF Strategy — Cryptography & Forensics</div>
+        <span class="day-incident">Crypto CTF in Real Forensics</span>
+      </div>
+    </div>
+
+    <div class="section-label">// crypto challenge types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Classical Ciphers</div><div class="cdesc">Caesar (rot13), Vigenère, Atbash. Frequency analysis cracks these in seconds with Python.</div></div>
+      <div class="concept"><div class="ctitle">XOR Analysis</div><div class="cdesc">Single-byte XOR: brute-force 0-255 and check English frequency. Repeating-key XOR: crib dragging and Hamming distance.</div></div>
+      <div class="concept"><div class="ctitle">AES Decryption</div><div class="cdesc">Given key + IV: openssl enc -aes-256-cbc -d -in enc -out dec -K hexkey -iv hexiv. Missing one piece = dead end.</div></div>
+      <div class="concept"><div class="ctitle">Steganography</div><div class="cdesc">Strings, binwalk, zsteg, steghide, exiftool. Data hidden in images, audio, or file metadata — always check LSB.</div></div>
+      <div class="concept"><div class="ctitle">PCAP Analysis</div><div class="cdesc">tshark -r capture.pcap -Y "http.request" -T fields -e http.host. Reconstruct files with wireshark "follow stream".</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>python3 -c "import codecs; print(codecs.decode('uryyb', 'rot13'))"</div><div class="cdesc">Quick ROT13 decode in Python — class cipher CTF basics.</div></div>
+      <div class="cmd-row"><code>for i in range(256): print(i, ''.join(chr(ord(c)^i) for c in ciphertext))</code><div class="cdesc">Single-byte XOR brute-force — check output for English text to identify the key byte.</div></div>
+      <div class="cmd-row"><code>openssl enc -aes-256-cbc -d -in flag.enc -out flag.txt -K ... -iv ...</code><div class="cdesc">Decrypt AES-256-CBC with hex key and IV — one wrong byte = garbage output.</div></div>
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "http" -T fields -e http.request.uri</code><div class="cdesc">Extract all HTTP request URIs from a pcap — find exfiltrated data in web requests.</div></div>
+      <div class="cmd-row"><code>zsteg -a image.png</code><div class="cdesc">Automated LSB steganography detection — checks all bit planes and color channels for hidden data.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;">The same XOR analysis and frequency analysis techniques used in CTF crypto challenges are applied by forensics analysts when decrypting ransomware-encrypted files. In 2021, the REvil ransomware decryptor was built using XOR key recovery — the same skill you practice on CTF crypto challenges.</p>
+  </div>
+
+  <!-- DAY 55 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">55</div>
+      <div class="day-meta">
+        <div class="day-title">Phase 3 Complete: Review & Mini Quiz</div>
+        <span class="day-incident">Full Phase 3 Coverage</span>
+      </div>
+    </div>
+
+    <div class="section-label">// phase 3 consolidated topics</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Pentesting Lifecycle</div><div class="cdesc">Recon → Scanning → Exploitation → Pivoting → Reporting. Each phase has dedicated tools and methodology.</div></div>
+      <div class="concept"><div class="ctitle">Nmap Mastery</div><div class="cdesc">Scan types (-sS, -sT, -sV), NSE scripts (-sC, --script vuln), output formats (-oA, -oX, -oG).</div></div>
+      <div class="concept"><div class="ctitle">Metasploit & Burp</div><div class="cdesc">Two most important exploitation frameworks. Metasploit for network/service vulns, Burp for web app testing.</div></div>
+      <div class="concept"><div class="ctitle">Privesc + Cracking</div><div class="cdesc">Linux/Windows privilege escalation + Hashcat/John password cracking. Get root, get hashes, get access.</div></div>
+      <div class="concept"><div class="ctitle">CTF Methodology</div><div class="cdesc">THM for guided learning, HTB for independent solving. Room/box types: web, crypto, forensics, binary.</div></div>
+      <div class="concept"><div class="ctitle">Reporting</div><div class="cdesc">Executive summary + findings + CVSS + remediation. Without the report, the test didn't happen.</div></div>
+    </div>
+
+    <div class="section-label">// key command</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sC -sV -p- &lt;target&gt; -oA pentest</code><div class="cdesc">The one command that summarizes Phase 3 recon — full scan, versions, scripts, all outputs.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 56 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">56</div>
+      <div class="day-meta">
+        <div class="day-title">SOC Structure — Tier 1/2/3 Analyst Roles</div>
+        <span class="day-incident">SOC Tier Model at Microsoft</span>
+      </div>
+    </div>
+
+    <div class="section-label">// tier responsibilities</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Tier 1 — Triage</div><div class="cdesc">Monitor SIEM dashboards. Ack/Categorize alerts. Escalate confirmed positives to Tier 2. Entry-level — SOC analysts start here.</div></div>
+      <div class="concept"><div class="ctitle">Tier 2 — Investigation</div><div class="cdesc">Deep-dive into escalated incidents. Log analysis, containment, evidence collection. Determines scope and impact.</div></div>
+      <div class="concept"><div class="ctitle">Tier 3 — Threat Hunting</div><div class="cdesc">Proactive search for threats before alerts trigger. Write detection rules. Reverse-engineer malware. Most senior.</div></div>
+      <div class="concept"><div class="ctitle">Escalation Path</div><div class="cdesc">Tier 1: <15 min per alert. Tier 2: hours to days per incident. Tier 3: weeks-long threat hunts and rule development.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>tail -f /var/log/auth.log | grep "Failed password"</code><div class="cdesc">Real-time monitoring of authentication failures — Tier 1 watching for brute-force attacks.</div></div>
+      <div class="cmd-row"><code>grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr</code><div class="cdesc">Top IPs with most failed logins — quickly identify brute-force sources.</div></div>
+      <div class="cmd-row"><code>journalctl -u ssh.service --since "1 hour ago"</code><div class="cdesc">Filter systemd logs for SSH service — recent event timeline for incident investigation.</div></div>
+      <div class="cmd-row"><code>lsof -i :22</code><div class="cdesc">Check which process is listening on SSH port — detect port redirection or backdoor listeners.</div></div>
+      <div class="cmd-row"><code>cat /var/log/syslog | grep -i error | tail -50</code><div class="cdesc">Last 50 system errors — quick health check before diving deeper into an alert.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Microsoft's SOC processes over 24 trillion signals daily across enterprise and cloud platforms. Tier 1 analysts triage millions of alerts per day. Tier 3 threat hunters discovered SolarWinds SUNBURST — not from an alert, but from proactive query correlation. The best SOC finds threats before any rule fires.</p>
+  </div>
+
+  <!-- DAY 57 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">57</div>
+      <div class="day-meta">
+        <div class="day-title">Log Analysis Fundamentals</div>
+        <span class="day-incident">Uber Breach 2022 — Log Evidence</span>
+      </div>
+    </div>
+
+    <div class="section-label">// critical log sources</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">auth.log / secure</div><div class="cdesc">Authentication events — successful logins (Accepted), failures (Failed password), sudo commands. Primary brute-force detection source.</div></div>
+      <div class="concept"><div class="ctitle">Apache/Nginx Access Log</div><div class="cdesc">Every HTTP request: IP, method, path, status code, user-agent. Detect directory traversal (../), SQLi (SELECT), XSS (&lt;script&gt;).</div></div>
+      <div class="concept"><div class="ctitle">Windows Event Logs</div><div class="cdesc">Security.evtx: 4624 (logon), 4625 (failed), 4688 (process create), 1102 (log cleared). System.evtx: service installs, driver loads.</div></div>
+      <div class="concept"><div class="ctitle">Firewall Logs</div><div class="cdesc">Allowed/Denied connections. Outbound connections to known-bad IPs indicate C2 callbacks. Port scans appear as burst blocks.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>cat /var/log/apache2/access.log | cut -d' ' -f1 | sort | uniq -c | sort -nr</code><div class="cdesc">Top IPs by request count — find web scrapers, DoS sources, or a single IP hitting many endpoints.</div></div>
+      <div class="cmd-row"><code>grep "401\|403" /var/log/apache2/access.log</code><div class="cdesc">Filter for unauthorized/forbidden responses — directory traversal attempts return 403/401.</div></div>
+      <div class="cmd-row"><code>grep "Accepted" /var/log/auth.log | awk '{print $9" "$11}'</code><div class="cdesc">Extract successful SSH logins — user and IP address. Detect unauthorized access.</div></div>
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[EventID=4625]]" /c:10 /f:text</code><div class="cdesc">Windows: query last 10 failed logon events (Event ID 4625) from Security log.</div></div>
+      <div class="cmd-row"><code>tail -f /var/log/syslog | grep -E "error|fail|denied"</code><div class="cdesc">Real-time syslog monitoring — filter critical keywords for live incident tracking.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Uber Breach (Sep 2022):</strong> an attacker social-engineered a contractor through MFA fatigue, accessed Uber's internal systems, and posted proof on HackerOne. Post-breach log analysis revealed evidence in VPN authentication logs — but the attack was detected by EDR, not log review. Lesson: logs tell the story, but detection tools catch it first.</p>
+  </div>
+
+  <!-- DAY 58 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">58</div>
+      <div class="day-meta">
+        <div class="day-title">Intro to SIEM — Splunk / ELK Basics</div>
+        <span class="day-incident">Splunk in the SolarWinds Investigation</span>
+      </div>
+    </div>
+
+    <div class="section-label">// SIEM components</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">ELK Stack</div><div class="cdesc">Elasticsearch (index/store), Logstash (ingest/parse), Kibana (visualize/query). Free, open-source, self-hosted.</div></div>
+      <div class="concept"><div class="ctitle">Splunk</div><div class="cdesc">Enterprise SIEM. SPL (Search Processing Language) queries. Index-based, role-based access. Expensive but industry standard.</div></div>
+      <div class="concept"><div class="ctitle">Data Ingestion</div><div class="cdesc">Forwarders (Splunk Universal Forwarder, Filebeat) ship logs from endpoints to SIEM. Parsing extracts fields from raw logs.</div></div>
+      <div class="concept"><div class="ctitle">KQL / SPL</div><div class="cdesc">Kibana Query Language: source.ip: "10.0.0.0/8" AND event.action: "user_login". Splunk SPL: index=* sourcetype=* Failed password.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>sudo systemctl start elasticsearch && sudo systemctl start kibana</code><div class="cdesc">Start the ELK stack locally — Elasticsearch must start before Kibana.</div></div>
+      <div class="cmd-row"><code>curl -X GET "localhost:9200/_cat/indices?v"</code><div class="cdesc">List all Elasticsearch indices — view ingested data sources and document counts.</div></div>
+      <div class="cmd-row"><code>curl -X POST "localhost:9200/_search" -H 'Content-Type: application/json' -d '{"query":{"match":{"event":"login"}}}'</code><div class="cdesc">Elasticsearch JSON query — search all indices for documents matching "login" in the event field.</div></div>
+      <div class="cmd-row"><code>index=windows EventCode=4625 user=admin | stats count by source_ip</code><div class="cdesc">Splunk SPL: count failed logins for admin user grouped by source IP.</div></div>
+      <div class="cmd-row"><code>event.action: "user_login" AND user.name: "admin" AND source.ip: 10.*</code><div class="cdesc">KQL: admin logins from private IP range — filter for normal vs. anomalous login patterns.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>SolarWinds SUNBURST (Dec 2020):</strong> the investigation relied heavily on Splunk queries identifying compromised Orion servers. A single SPL query — search index=* ImagePath=*solws* — helped thousands of organizations determine if they were affected. In a widespread supply chain attack, SIEM queries are the difference between "maybe" and "confirmed."</p>
+  </div>
+
+  <!-- DAY 59 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">59</div>
+      <div class="day-meta">
+        <div class="day-title">Writing Detection Queries</div>
+        <span class="day-incident">Sigma Rules at NATO Cyber Range</span>
+      </div>
+    </div>
+
+    <div class="section-label">// detection rule formats</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Sigma</div><div class="cdesc">YAML-based, SIEM-agnostic detection format. Write once, convert to Splunk/Elasticsearch/QRadar with sigmac. Open standard.</div></div>
+      <div class="concept"><div class="ctitle">Splunk SPL</div><div class="cdesc">index=* EventCode=4688 ProcessName=*mimikatz*. Proprietary to Splunk. Pipeline syntax: search → filter → transform → output.</div></div>
+      <div class="concept"><div class="ctitle">KQL (Kibana)</div><div class="cdesc">event.code: 4688 AND process.name: mimikatz.exe. Field:value syntax. Used in Elastic Security and Kibana.</div></div>
+      <div class="concept"><div class="ctitle">Sigma → Platform</div><div class="cdesc">sigmac -t splunk rule.yml converts Sigma YAML to Splunk SPL. Write Sigma, deploy anywhere.</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>title: Mimikatz Detection<br>logsource: category: process_creation<br>detection: selection: EventID: [20, 10]</code><div class="cdesc">Sigma rule skeleton — YAML title, log source, detection selection for mimikatz events.</div></div>
+      <div class="cmd-row"><code>sigmac -t splunk -c tools/config/generic/splunk-windows.yml rule.yml</code><div class="cdesc">Convert Sigma YAML to Splunk SPL query using Windows config mapping.</div></div>
+      <div class="cmd-row"><code>index=windows EventCode=4688 Process_Name=*mimikatz* OR Process_Name=*Invoke-Mimikatz*</code><div class="cdesc">Splunk SPL detecting mimikatz execution via process creation event.</div></div>
+      <div class="cmd-row"><code>event.code: 4688 AND process.name: (mimikatz.exe OR Invoke-Mimikatz.ps1)</code><div class="cdesc">KQL equivalent — detects mimikatz process creation in Elastic Security.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;">NATO's Cooperative Cyber Defence Centre of Excellence (CCDCOE) uses Sigma as the standard detection rule format, enabling cross-platform threat detection across heterogeneous SIEM deployments in its member nations. Sigma is the closest thing to a universal detection language — learning it means your rules work on any platform.</p>
+  </div>
+
+  <!-- DAY 60 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">60</div>
+      <div class="day-meta">
+        <div class="day-title">Windows Event Logs Deep Dive</div>
+        <span class="day-incident">NotPetya — Event Log Tampering</span>
+      </div>
+    </div>
+
+    <div class="section-label">// critical event IDs</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">4624 — Logon Success</div><div class="cdesc">Every successful login. Logon type 2 (interactive), 3 (network), 10 (remote interactive/RDP). Track who logged in from where.</div></div>
+      <div class="concept"><div class="ctitle">4625 — Logon Failure</div><div class="cdesc">Failed login attempt. Source IP + username + failure code (0xC000006D = bad password, 0xC0000064 = bad username).</div></div>
+      <div class="concept"><div class="ctitle">4688 — Process Creation</div><div class="cdesc">Every process launched. Command line arguments included. Detect powershell.exe -enc, mimikatz, net user, whoami execution.</div></div>
+      <div class="concept"><div class="ctitle">4648 — Explicit Credentials</div><div class="cdesc">A process ran using alternate credentials. Pass-the-hash and runas operations log here.</div></div>
+      <div class="concept"><div class="ctitle">1102 — Log Cleared</div><div class="cdesc">Security log was cleared. No event is more suspicious than no events — attacker wipe attempt.</div></div>
+      <div class="concept"><div class="ctitle">4697/7045 — Service Install</div><div class="cdesc">A new service was installed. Attackers often install persistence via services (AlwaysInstallElevated, malicious drivers).</div></div>
+    </div>
+
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[(EventID=4624)]]" /c:20 /rd:true /f:text</code><div class="cdesc">Query last 20 successful logon events in reverse chronological order.</div></div>
+      <div class="cmd-row"><code>Get-WinEvent -FilterHashtable @{LogName='Security';ID=4688} | Select-Object -First 10</code><div class="cdesc">PowerShell: last 10 process creation events with full command line details.</div></div>
+      <div class="cmd-row"><code>wevtutil cl Security</code><div class="cdesc">Clear the Security event log — executed by attackers (and NotPetya) to destroy forensic evidence.</div></div>
+      <div class="cmd-row"><code>Get-WinEvent -FilterHashtable @{LogName='Security';ID=4648} | Format-List</code><div class="cdesc">Detect explicit credential usage — identify pass-the-hash and secondary logon activity.</div></div>
+    </div>
+
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>NotPetya (Jun 2017):</strong> the 'mischa' component executed wevtutil cl commands to clear Windows Event Logs across 80% of infected systems, destroying forensic evidence of its execution timeline. Combined with EternalBlue for propagation and Mimikatz for credential theft, NotPetya caused over $10B in damages — the most costly cyberattack in history. The log clearing itself became a detection signal in later attacks.</p>
+
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: If you see Event ID 1102 in the Security log, what's your immediate next step?</div>
+      <div class="a">1102 means someone cleared the Security event log. First: check other logs (System, Application, PowerShell operational) — they may still have evidence. Second: check Event ID 1100 (log service shutdown) before the clear — the service was stopped, then the log was wiped, suggesting an attacker. Third: correlate with 4688 events from before the clear to see what was running. The absence of logs is still data.</div>
+    </div>
+  </div>
+
+  <!-- ALL REAL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — they appear in every interview</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2017</div><div class="incident">EternalBlue (MS17-010)</div><div class="detail">NSA exploit leaked → WannaCry + NotPetya. SMBv1 buffer overflow, 200k+ machines, $10B+ damages.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">NotPetya</div><div class="detail">wevtutil cl used to clear event logs across 80% of infections. $10B+ damages. Log clearing = detection signal.</div></div>
+      <div class="bt-row"><div class="year">2020</div><div class="incident">SolarWinds SUNBURST</div><div class="detail">Supply chain attack. Splunk query ImagePath=*solws* identified compromise. SIEM queries as forensic tools.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">REvil Ransomware</div><div class="detail">XOR key recovery used in decryptor — same crypto techniques practiced in CTF challenges.</div></div>
+      <div class="bt-row"><div class="year">2022</div><div class="incident">Uber Breach</div><div class="detail">MFA fatigue attack on contractor. VPN auth logs contained evidence post-breach. Social engineering > technical.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">TryHackMe Platform</div><div class="detail">1M+ users, gamified learning improves practical skill retention by 40% vs traditional courses.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">HTB Blue Box</div><div class="detail">Safe EternalBlue practice environment. Same exploit chain as WannaCry/NotPetya in a legal sandbox.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">DEF CON CTF</div><div class="detail">Web challenges mirror real Facebook/Google bugs. SSTI, JWT, GraphQL flaws from CTF → bounty.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Microsoft SOC</div><div class="detail">24T signals/day. Tier 1/2/3 model. Tier 3 found SolarWinds proactively — not from an alert.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">NATO Sigma Rules</div><div class="detail">CCDCOE uses Sigma as standard detection format. Write-once, deploy on any SIEM.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS QUICK REF -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 51–60</div>
+        <span class="day-incident">Run these until they're muscle memory</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>nmap -sC -sV -p- target</code><div class="cdesc">First command on every THM room and HTB box.</div></div>
+      <div class="cmd-row"><code>gobuster dir -u http://target -w common.txt</code><div class="cdesc">Directory brute-force for web discovery.</div></div>
+      <div class="cmd-row"><code>hydra -l user -P rockyou.txt ssh://target</code><div class="cdesc">SSH brute-force with known username.</div></div>
+      <div class="cmd-row"><code>sqlmap -u "http://target?id=1" --batch</code><div class="cdesc">Automated SQL injection testing.</div></div>
+      <div class="cmd-row"><code>{{config}} / {{7*7}}</code><div class="cdesc">SSTI test payloads — 49 = template injection confirmed.</div></div>
+      <div class="cmd-row"><code>python3 XOR brute-force loop</code><div class="cdesc">Single-byte XOR brute-force (0-255), check for English plaintext.</div></div>
+      <div class="cmd-row"><code>tshark -r capture.pcap -Y "http"</code><div class="cdesc">Extract HTTP traffic from pcap for forensic analysis.</div></div>
+      <div class="cmd-row"><code>zsteg -a image.png</code><div class="cdesc">Automated LSB stego detection in images.</div></div>
+      <div class="cmd-row"><code>grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr</code><div class="cdesc">Top brute-force IPs from auth.log.</div></div>
+      <div class="cmd-row"><code>wevtutil qe Security /q:"*[System[(EventID=4625)]]" /c:10 /f:text</code><div class="cdesc">Windows: query last 10 failed logon events.</div></div>
+      <div class="cmd-row"><code>curl -X GET "localhost:9200/_cat/indices?v"</code><div class="cdesc">List all Elasticsearch indices.</div></div>
+      <div class="cmd-row"><code>index=* EventCode=4625 | stats count by src_ip</code><div class="cdesc">Splunk SPL: count failed logons by source IP.</div></div>
+      <div class="cmd-row"><code>sigmac -t splunk rule.yml</code><div class="cdesc">Convert Sigma YAML to Splunk SPL query.</div></div>
+      <div class="cmd-row"><code>Get-WinEvent -FilterHashtable @{LogName='Security';ID=4688}</code><div class="cdesc">PowerShell: query process creation events.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS ACROSS DAYS 51-60 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 51–60</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT / Claude</div><div class="adesc">Explain CTF challenge steps when stuck, convert Sigma rules to SIEM formats, debug ELK stack config errors.</div></div>
+      <div class="ai-pill"><div class="aname">Copilot / Cursor</div><div class="adesc">Write Python crypto solvers and log analysis scripts faster. Auto-complete regex patterns for log parsing.</div></div>
+      <div class="ai-pill"><div class="aname">Burp + AI (APIs)</div><div class="adesc">Auto-generate Intruder payloads for specific CTF web challenge scenarios (SQLi, XSS, SSTI test vectors).</div></div>
+      <div class="ai-pill"><div class="aname">Elastic AI Assistant</div><div class="adesc">Natural language → KQL translation. "Show me all failed logins from external IPs in the last hour" generates the query.</div></div>
+      <div class="ai-pill"><div class="aname">Splunk AI / ML Toolkit</div><div class="adesc">Baseline user behavior and detect anomalous logon patterns. AI-driven anomaly detection for SOC Tier 2/3.</div></div>
+      <div class="ai-pill"><div class="aname">Sigma AI Generators</div><div class="adesc">Describe an attack pattern in plain English, get a Sigma rule skeleton. Speeds up detection engineering by 10x.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 51–60</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 51-52</div><div class="bullet">"Independently enumerated, exploited, and escalated privileges on HackTheBox 'Blue' machine practicing EternalBlue (MS17-010) exploit chain without walkthrough assistance."</div></div>
+      <div class="job-box"><div class="day-ref">Day 53</div><div class="bullet">"Solved 5+ CTF web challenges covering PHP type juggling, JWT manipulation, SSTI, and GraphQL introspection; created reusable web CTF methodology checklist."</div></div>
+      <div class="job-box"><div class="day-ref">Day 54</div><div class="bullet">"Decrypted classical and modern cipher CTF challenges (Caesar, Vigenère, XOR, AES); analyzed PCAP captures and file system images for hidden evidence using forensic tools."</div></div>
+      <div class="job-box"><div class="day-ref">Day 56-57</div><div class="bullet">"Mapped SOC Tier 1/2/3 analyst roles and escalation paths; performed log analysis across syslog, Apache access logs, and Windows Event Logs to identify brute-force and unauthorized access patterns."</div></div>
+      <div class="job-box"><div class="day-ref">Day 58</div><div class="bullet">"Deployed ELK stack (Elasticsearch, Logstash, Kibana) locally; wrote KQL queries to filter failed authentications and port scan events; indexed and queried syslog data in Elasticsearch."</div></div>
+      <div class="job-box"><div class="day-ref">Day 59</div><div class="bullet">"Authored Sigma detection rules for common attack patterns (mimikatz, suspicious scheduled tasks, pass-the-hash); converted Sigma to Splunk and Elasticsearch query formats using sigmac."</div></div>
+      <div class="job-box"><div class="day-ref">Day 60</div><div class="bullet">"Analyzed Windows Event Logs for logon events (4624/4625), process creation (4688), and log clearing (1102); detected credential theft and service installation indicators in enterprise environments."</div></div>
+    </div>
+  </div>
+
+  <!-- QUICK QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What is the difference between TryHackMe and HackTheBox in terms of learning approach?</div>
+      <div class="ans">TryHackMe is guided — browser-based rooms with step-by-step tasks, best for beginners. HackTheBox is free-form — you get an IP, no instructions, must enumerate and solve independently. Both are necessary: THM teaches what to look for, HTB teaches how to look.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">What is EternalBlue, and what major attacks used it?</div>
+      <div class="ans">MS17-010 — a buffer overflow in SMBv1. Used by WannaCry (May 2017, 200k+ machines, 150 countries) and NotPetya (Jun 2017, $10B+ damages). Exploit leaked from NSA. Safe practice on HTB "Blue" machine.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">How does a JWT algorithm confusion attack work?</div>
+      <div class="ans">Change the JWT header from RS256 (asymmetric) to HS256 (symmetric). Some libraries use the public key as the HMAC secret. Since the public key is often exposed, you can forge tokens by signing with the leaked public key.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">You see {{7*7}} rendered as 49 in a web page. What have you found?</div>
+      <div class="ans">Server-Side Template Injection (SSTI). 49 confirms the template engine evaluated your input. From here, escalate to read config ({{config}} in Flask), list class hierarchy ({{''.__class__.__mro__}}), and achieve RCE.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What are the three SOC tiers, and what does each do?</div>
+      <div class="ans">Tier 1: triage — monitor SIEM, ack/categorize alerts, escalate confirmed positives. Tier 2: investigation — deep log analysis, containment, scope determination. Tier 3: threat hunting — proactive searches, detection rule writing, reverse engineering.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">How would you identify a brute-force attack using auth.log?</div>
+      <div class="ans">grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr. Multiple failed logins from a single IP in quick succession = brute-force. Pair with Accepted entries from the same IP to identify successful breaches.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">What is the purpose of Sigma rules, and why does NATO use them?</div>
+      <div class="ans">Sigma is a YAML-based, SIEM-agnostic detection rule format. Write once in Sigma, convert to Splunk SPL, KQL, QRadar AQL, etc. with sigmac. NATO's CCDCOE uses them because member nations run different SIEMs — Sigma ensures cross-platform threat detection.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What does Event ID 1102 mean, and what should you do if you find it?</div>
+      <div class="ans">1102 = Security log was cleared. Immediately check other logs (System, Application, PowerShell) for remaining evidence. Check for Event ID 1100 (log service shutdown) before 1102. Correlate with 4688 events from before the clear. The absence of logs is itself a detection signal.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">How did Splunk queries help in the SolarWinds investigation?</div>
+      <div class="ans">Security teams ran the query "index=* ImagePath=*solws*" to identify compromised Orion servers. Since SUNBURST was a supply chain attack affecting thousands of organizations, this single SPL query became the fastest way to determine infection status across different environments with Splunk.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">How did NotPetya destroy forensic evidence, and what was the detection irony?</div>
+      <div class="ans">NotPetya's 'mischa' component ran "wevtutil cl" to clear Windows Security Event Logs across 80% of infected systems. The irony: after NotPetya, security teams began monitoring for mass Event ID 1102 events as a detection signal — so the log clearing itself became a way to detect attacks.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 61</div>
+      <div class="title">Phase 4 — Defensive Operations: IDS/IPS, Firewalls & Detection Engineering</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — say "Day 61" when you're ready to continue.</footer>
+
+</div>
+</body>
+</html>

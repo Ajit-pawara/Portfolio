@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 25 — CSRF & Session Attacks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:27.7%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .diagram{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:18px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;margin:10px 0;overflow-x:auto;}
+  .diagram .arrow{color:var(--green);}
+  .diagram .label{color:var(--muted);}
+  .diagram .hl{color:var(--cyan);}
+  .diagram .danger{color:var(--red);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .tok{color:var(--pink);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+  .term-body .tok{color:var(--pink);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day25$ cat csrf-session-attacks.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 25/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 25 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>CSRF &amp; Session <span class="accent">Attacks</span></h1>
+  <p class="subtitle">Modern web apps use cookies and tokens to remember who you are. Today you learn how attackers forge requests and steal sessions — and how to prevent both.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Cross-Site Request Forgery (CSRF):</strong> CSRF tricks an authenticated user into performing an unintended action. The attacker crafts a malicious page that — when visited by a victim who is already logged into a target site — automatically submits a request that the target site interprets as legitimate. The key enabler: browsers automatically attach cookies to every request sent to a domain, regardless of where the request originated.</p>
+
+      <p style="margin-top:16px;"><strong>Classic CSRF attack flow:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Victim is logged into bank.com (session cookie in browser)</span>
+<span class="cmt"># Attacker crafts a page with this image tag:</span>
+<span class="danger">&lt;img src="https://bank.com/transfer?amount=5000&amp;to=attacker-account"</span>
+<span class="danger">     width="0" height="0" /&gt;</span>
+<span class="cmt"># Browser loads the "image" → GET request with cookies attached</span>
+<span class="cmt"># Bank processes the transfer — it has no way to know the request</span>
+<span class="cmt"># was forged because the session cookie is valid.</span></div>
+
+      <p style="margin-top:16px;"><strong>Session hijacking:</strong> An attacker steals a valid session identifier (session cookie, JWT, access token) and uses it to impersonate the victim. Methods include: XSS to read document.cookie, network sniffing over unencrypted connections, session fixation (setting the victim's session to a known value), or predictable session token generation.</p>
+
+      <p><strong>SameSite cookies — the modern CSRF defense:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Set-Cookie with SameSite attribute:</span>
+<span class="hdr">Set-Cookie:</span><span class="val"> session=abc123; HttpOnly; Secure; SameSite=Lax</span>
+<span class="cmt"># Lax (default in modern browsers): cookie sent only for top-level</span>
+<span class="cmt">#   navigations (GET requests from clicking a link).</span>
+<span class="cmt"># Strict: cookie never sent on cross-site requests.</span>
+<span class="cmt"># None: cookie sent on all cross-site requests (requires Secure flag).</span></div>
+
+      <div class="callout"><strong>Anti-CSRF tokens:</strong> The server embeds a unique, unpredictable token in each form (typically in a hidden field). When the form is submitted, the server validates the token matches what was issued. Since an attacker's page cannot read the victim's token (same-origin policy), forged requests fail. This is the traditional defense; SameSite cookies are the modern evolution.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Craft a CSRF PoC HTML file — an auto-submitting form with hidden inputs that POSTs to the target site. If there's no CSRF token, the request is accepted.</li>
+          <li>Check for missing SameSite cookie attributes — cookies without SameSite default to Lax in Chrome but some browsers still allow None behavior.</li>
+          <li>Steal session cookies via XSS — <code>document.cookie</code> returns session tokens if HttpOnly flag is absent. Use a fetch to exfiltrate.</li>
+          <li>Test for session fixation — see if the server accepts a session ID you provide in the URL or cookie before login.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Implement anti-CSRF tokens on every state-changing endpoint (POST, PUT, DELETE). Use framework-native CSRF protection (Rails, Django, Spring Security).</li>
+          <li>Set SameSite=Strict or Lax on all session cookies. This prevents most CSRF attacks at the browser level without application changes.</li>
+          <li>Set HttpOnly and Secure flags on all cookies containing session tokens — prevents JavaScript access and transmission over HTTP.</li>
+          <li>Use Origin and Referer header validation on the server side — verify the request originated from your own domain.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2013 — FACEBOOK CSRF TOKEN FLAW — UNATTENDED POSTS ON MILLIONS OF TIMELINES</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">CSRF allowed attackers to post on victim timelines via malicious image tags</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">A security researcher discovered that Facebook's "Like" button and status update endpoints lacked CSRF protection for certain image-loaded contexts. An attacker could embed a crafted image tag on any website that, when loaded by a logged-in Facebook user, would POST a status update on their behalf. The vulnerability was amplified by Facebook's widely used social plugins — millions of sites embedded Facebook widgets, giving attackers countless delivery vectors. Facebook patched by adding CSRF tokens to all state-changing endpoints and implementing OAuth 2.0 state parameters for their APIs.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> craft a CSRF proof-of-concept, test SameSite cookie behavior, and simulate a session hijacking attack.</p>
+      <ol class="lab-steps">
+        <li>Set up Juice Shop — <code>docker run -d -p 3000:3000 bkimminich/juice-shop</code>. Log in and capture the session cookie from DevTools → Application → Cookies.</li>
+        <li>Create a local HTML file with an auto-submitting form targeting the Juice Shop change-password or feedback endpoint. Open it in the same browser session.</li>
+        <li>Check the SameSite attribute on the Juice Shop session cookie — note whether it's Lax, Strict, or None.</li>
+        <li>Simulate session hijacking: extract the session cookie via DevTools, then use curl to make an authenticated request from another terminal: <code>curl -b "token=STOLEN_COOKIE" http://localhost:3000/profile</code>.</li>
+        <li>Add SameSite=Strict to the server's cookie configuration and repeat the CSRF test. Observe the attack fails.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A CSRF PoC HTML file that triggers a state change in Juice Shop, plus a screenshot of the successful authenticated curl request using a stolen session cookie.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — CSRF PoC HTML (auto-submitting form)</span>
+<span class="cmd">cat &gt; csrf-poc.html &lt; 'EOF'</span>
+<span class="out">&lt;html&gt;&lt;body&gt;</span>
+<span class="out">&lt;h1&gt;Click this link for a surprise!&lt;/h1&gt;</span>
+<span class="out">&lt;form id="csrf" action="http://localhost:3000/api/Feedback" method="POST"&gt;</span>
+<span class="out">  &lt;input type="hidden" name="comment" value="HACKED by CSRF"&gt;</span>
+<span class="out">  &lt;input type="hidden" name="rating" value="1"&gt;</span>
+<span class="out">&lt;/form&gt;</span>
+<span class="out">&lt;script&gt;document.getElementById('csrf').submit();&lt;/script&gt;</span>
+<span class="out">&lt;/body&gt;&lt;/html&gt;</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 2 — Open csrf-poc.html in browser while logged into Juice Shop</span>
+<span class="c"># Check if the feedback was submitted (it will if no CSRF protection)</span>
+
+<span class="c"># Step 3 — Session hijacking simulation</span>
+<span class="c"># Extract cookie from DevTools, then use it remotely:</span>
+<span class="cmd">curl -v -b "token=COPY_TOKEN_HERE" \</span>
+<span class="cmd">  http://localhost:3000/rest/user/whoami</span>
+<span class="hi"># If the server returns the logged-in user's profile,</span>
+<span class="hi"># you've successfully hijacked the session.</span>
+
+<span class="c"># Step 4 — Check SameSite attribute</span>
+<span class="cmd">curl -s -D - http://localhost:3000 | grep -i set-cookie</span>
+<span class="out"># Look for SameSite=None, SameSite=Lax, or SameSite=Strict</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is CSRF and how do you prevent it?"</div>
+        <div class="a">A: "CSRF forces an authenticated user to execute unintended actions by crafting a page that sends a cross-origin request with the user's cookies automatically attached. Prevention: anti-CSRF tokens embedded in every form (validated server-side), SameSite=Strict cookie attribute, Origin/Referer header validation, and requiring re-authentication for sensitive actions like password changes."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How does SameSite cookie attribute prevent CSRF?"</div>
+        <div class="a">A: "SameSite tells the browser when to send cookies in cross-site requests. SameSite=Strict never sends the cookie cross-site — a forged request from another site has no session token, so the server rejects it. SameSite=Lax sends cookies on top-level navigations via GET but not on POST from other origins. Both are effective CSRF defenses because the attacker's page can't trigger authenticated state-changing requests without the victim's session cookie."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between session hijacking and session fixation?"</div>
+        <div class="a">A: "Session hijacking is stealing an already-established session token. Session fixation is forcing the victim's session ID to a value the attacker knows before login. In a fixation attack, the attacker sends the victim a link with a specific session ID, the victim logs in with that session ID, and the attacker now has a valid authenticated session. Prevention: regenerate the session ID after successful login."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">CSRF PoC generator</div>
+        <div class="adesc">Describe the target endpoint and parameters — an LLM can generate the complete CSRF PoC HTML page with auto-submitting form, hidden inputs, and script-based triggers.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Cookie security audit</div>
+        <div class="adesc">Paste a raw Set-Cookie header into an LLM and ask it to evaluate: is the cookie vulnerable to CSRF or session hijacking? It will flag missing SameSite, Secure, or HttpOnly flags.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Session management review</div>
+        <div class="adesc">Describe your application's session flow (login, token format, expiry) and ask the LLM to identify session management weaknesses — predictable tokens, long expiry, missing regeneration.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">OWASP CSRF cheatsheet assistant</div>
+        <div class="adesc">Ask for a summarized version of OWASP's CSRF prevention cheatsheet tailored to your tech stack (Django, Express, Spring) — get framework-specific configuration snippets.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Crafted CSRF proof-of-concept exploits against Juice Shop; evaluated SameSite cookie policies and anti-CSRF token implementations for security weaknesses."</li>
+        <li><strong>Portfolio piece:</strong> a CSRF PoC HTML file with documentation of which defenses blocked it and which didn't. Includes SameSite cookie analysis and session hijacking proof.</li>
+        <li><strong>Interview talking point:</strong> explaining the evolution of CSRF defense — from anti-CSRF tokens to SameSite cookies to Fetch metadata headers — shows you understand web security as a progression, not a static checklist.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Session management flaws are among the highest-impact findings in a pentest report. CSRF alone can lead to account takeover, data modification, and privilege escalation. As a consultant, every web application assessment includes a full session management review — cookie configuration, token generation randomness, logout behavior, concurrent session handling.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Session Security Audit" — a $1,000-2,000 engagement where you audit a client's authentication and session management implementation. You check cookie flags, CSRF protection, session regeneration, token entropy, and session expiry. Deliver a report with proof-of-concept attacks and remediation code. Most startups and SaaS platforms neglect session security until they're breached — you're offering the audit before the incident.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is CSRF, how does an attacker execute it, and what are three defenses?" If you can draw the CSRF attack flow — victim browser → attacker page → forged request → target server with cookies — you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=3Y7bBg94AZY" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">CSRF Explained — PwnFunction</div><div class="res-desc">youtube.com/watch?v=3Y7bBg94AZY — Animated explanation of CSRF with clear demonstration of attack and defense mechanisms.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=J3S5gB4w5ZM" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">CSRF and Session Hijacking in Hindi — Hacker Bhai</div><div class="res-desc">youtube.com/watch?v=J3S5gB4w5ZM — Hindi-language walkthrough of CSRF and session hijacking with practical demonstrations.</div></div>
+      </a>
+      <a class="res-card" href="https://portswigger.net/web-security/csrf" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PortSwigger CSRF Labs</div><div class="res-desc">portswigger.net/web-security/csrf — Free interactive labs covering CSRF token bypass, SameSite bypass, and referer validation flaws.</div></div>
+      </a>
+      <a class="res-card" href="https://owasp.org/www-community/attacks/csrf" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">OWASP CSRF Attack & Prevention Cheatsheet</div><div class="res-desc">OWASP's comprehensive guide to CSRF attacks and prevention strategies with code examples for all major frameworks.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> CSRF attack flow explained with auto-submitting form example.</div>
+      <div class="mistake-item"><span class="check">✓</span> SameSite cookies taught as the modern browser-native defense.</div>
+      <div class="mistake-item"><span class="check">✓</span> Session hijacking distinguished from session fixation clearly.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Facebook incident — CSRF allowed unauthorized timeline posts.</div>
+      <div class="mistake-item"><span class="check">✓</span> Anti-CSRF tokens + SameSite + header validation = defense in depth.</div>
+      <div class="mistake-item"><span class="check">✓</span> HttpOnly and Secure flags covered — the bare minimum cookie security.</div>
+      <div class="mistake-item"><span class="check">✓</span> Direct prerequisite for Day 26 (Broken Auth) — session = auth foundation.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain CSRF attack flow and why cookies auto-attach.</li>
+        <li><span class="box"></span> I crafted a CSRF PoC HTML file and tested it.</li>
+        <li><span class="box"></span> I understand SameSite cookie attribute values and their trade-offs.</li>
+        <li><span class="box"></span> I simulated a session hijacking attack with curl.</li>
+        <li><span class="box"></span> I can explain session fixation vs session hijacking.</li>
+        <li><span class="box"></span> I know the three main CSRF defenses.</li>
+        <li><span class="box"></span> I can teach CSRF out loud in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">25 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 26</div>
+      <div class="title">Broken Authentication & Access Control — JWT, RBAC, MFA Fatigue.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 26" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 49 — Post-Exploitation & Pivoting Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:54.4%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day49$ cat post-exploitation.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 49/90 — Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 49 OF 90 — PHASE 3: WEB & NETWORK EXPLOITATION</div>
+  <h1>Post-Exploitation <span class="accent">& Pivoting Basics</span></h1>
+  <p class="subtitle">You're inside the first system. The real target is behind another firewall. Today you use Meterpreter, SSH tunneling, and SOCKS proxying to move laterally.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Post-exploitation defined:</strong> You have a shell. Now what? Post-exploitation is everything that happens after initial access — privilege escalation, lateral movement, persistence, data exfiltration, and covering tracks. The most critical skill is pivoting: using the compromised host as a relay point to reach networks that were previously inaccessible. If the web server is the only system exposed to the internet, and the database server is on an internal 10.x.x.x network, the only way to reach the database is through the web server.</p>
+
+      <p style="margin-top:16px;"><strong>Three tunneling techniques:</strong></p>
+      <div class="code-block">
+<span class="cmt"># SSH Local Port Forward — expose remote service on your local port</span>
+<span class="req">ssh -L 8080:10.0.0.5:80 user@compromised-host</span>
+<span class="cmt"># Now http://localhost:8080 reaches 10.0.0.5:80 through the tunnel</span>
+
+<span class="cmt"># SSH Dynamic Port Forward — SOCKS proxy through the target</span>
+<span class="req">ssh -D 9050 user@compromised-host</span>
+<span class="cmt"># Configure proxychains to use localhost:9050</span>
+<span class="req">proxychains nmap -sT 10.0.0.0/24</span>
+
+<span class="cmt"># Meterpreter pivot — autoroute adds routes through the compromised host</span>
+<span class="req">meterpreter > run autoroute -s 10.0.0.0/24</span>
+<span class="req">meterpreter > run auxiliary/server/socks_proxy</span></div>
+
+      <p><strong>The lateral movement mindset:</strong> Every compromised host is a stepping stone. You're not looking for a single straight path to the domain controller — you're mapping the network graph, collecting credentials at each hop, and using the accumulated access to reach deeper. On Windows, use Mimikatz to dump LSASS credentials from memory. On Linux, check <code>.ssh/authorized_keys</code>, <code>~/.bash_history</code> for passwords, and <code>/etc/shadow</code>. Each new credential set expands your reachable network. The goal is to reach the "crown jewel" — domain controller, database server, source code repository, or backup server — while maintaining access to every system along the path.</p>
+
+      <div class="callout"><strong>Key insight:</strong> Pivoting is not about exploiting new vulnerabilities. It's about using the trust relationships and network access you already have. Once you're inside the perimeter, the internal network typically has minimal segmentation and monitoring. Most breaches that make headlines involved an attacker sitting on a single low-privilege box for weeks, collecting credentials, and slowly mapping the internal network before striking.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>After gaining initial access, immediately run local enumeration (users, network interfaces, routing tables, listening ports) to understand where you are in the network topology.</li>
+          <li>Dump credentials from memory first — Mimikatz on Windows, /etc/shadow and bash history on Linux. Credential reuse is the #1 lateral movement enabler.</li>
+          <li>Set up multiple egress paths — if SSH outbound is blocked, try HTTP/HTTPS tunnels (Chisel, Ligolo-ng) or DNS tunneling (dnscat2). Always have a backup C2 channel.</li>
+          <li>Use proxychains with the SOCKS proxy to run tools (nmap, rdesktop, sqlcmd) through the compromised host as if you were on the internal network.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Implement network micro-segmentation — each tier (web, app, db) should be in separate VLANs with firewall rules that only allow specific traffic between specific ports.</li>
+          <li>Use jump boxes / bastion hosts for administrative access — no direct SSH/RDP to internal servers. Log and audit all jump box sessions.</li>
+          <li>Deploy EDR on all endpoints with lateral movement detection — unexpected RDP, SMB, or WinRM connections between hosts are the primary signal of an active breach.</li>
+          <li>Rotate local administrator passwords frequently using LAPS (Windows) or similar tools — this limits credential reuse after LSASS dump.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2021 — COLONIAL PIPELINE — DARKSIDE RANSOMWARE</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Attackers used compromised VPN credentials to pivot from the IT network to operational technology (OT) systems</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The DarkSide ransomware group gained initial access through a compromised VPN account that was no longer in active use but still had access to the corporate IT network. From there, they pivoted laterally across the IT network for weeks, collecting credentials and mapping internal systems. The critical pivot was from IT to OT — the pipeline's operational technology network that controlled the actual fuel flow. The attackers moved through a poorly segmented network where the IT and OT environments shared authentication infrastructure. When they deployed ransomware on the OT systems, Colonial Pipeline was forced to shut down the entire pipeline — 5,500 miles of fuel transport serving the US East Coast — for six days. The company paid a $4.4M ransom. The FBI later recovered approximately $2.3M of the payment. The root cause wasn't a sophisticated zero-day; it was a single compromised VPN credential and insufficient network segmentation between IT and OT.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> establish a foothold on a compromised host, set up a SOCKS proxy, and use it to scan and access an internal network segment.</p>
+      <ol class="lab-steps">
+        <li>Set up the lab: deploy two Docker containers — one "public" (exposed on port 22) and one "internal" (only reachable from the first). Use Docker networking with a custom bridge.</li>
+        <li>SSH into the public container from your Kali machine. Run <code>ip route</code> and <code>ip addr</code> to discover the internal network subnet (e.g., 172.17.0.0/16).</li>
+        <li>Set up SSH dynamic port forwarding: <code>ssh -D 9050 user@public-container -N</code>. Test it: <code>curl --socks5 localhost:9050 http://internal-container</code>.</li>
+        <li>Configure proxychains: edit <code>/etc/proxychains4.conf</code> to add <code>socks5 127.0.0.1 9050</code>. Run: <code>proxychains nmap -sT -Pn 172.17.0.0/24</code>.</li>
+        <li>Use Meterpreter (Metasploit) if available: generate a payload with msfvenom, get a reverse shell, then use the autoroute module and socks_proxy auxiliary module.</li>
+        <li>Document every route, port forward, and discovery command. The deliverable is a network map showing the target topology and the pivot path.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A network topology map showing the relationship between the public host, internal hosts, and the pivot path. Include the commands used for SSH tunneling and proxychains scanning.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># 1 — SSH dynamic port forwarding (SOCKS proxy)</span>
+<span class="cmd">ssh -D 9050 user@public-container -N</span>
+<span class="hi"># -D = dynamic port forward (SOCKS), -N = no remote command</span>
+
+<span class="c"># 2 — Configure proxychains</span>
+<span class="cmd">echo 'socks5 127.0.0.1 9050' >> /etc/proxychains4.conf</span>
+
+<span class="c"># 3 — Scan internal network through proxy</span>
+<span class="cmd">proxychains nmap -sT -Pn 172.17.0.0/24</span>
+<span class="out">|S-chain|-&lt;&gt;-127.0.0.1:9050-&lt;&gt;-&lt;&gt;-172.17.0.2:22-open</span>
+
+<span class="c"># 4 — SSH local port forward (expose internal service locally)</span>
+<span class="cmd">ssh -L 8080:172.17.0.2:80 user@public-container -N</span>
+<span class="hi"># Access internal web app: http://localhost:8080</span>
+
+<span class="c"># 5 — Meterpreter route + socks proxy</span>
+<span class="cmd">meterpreter > run autoroute -s 172.17.0.0/24</span>
+<span class="cmd">meterpreter > run auxiliary/server/socks_proxy</span>
+<span class="cmd"># Then proxychains to route through MSF</span>
+
+<span class="c"># 6 — Verify tunnel</span>
+<span class="cmd">proxychains curl http://172.17.0.2/</span>
+<span class="out">&lt;html&gt;Internal Web App&lt;/html&gt;</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Explain the difference between SSH local port forwarding, remote port forwarding, and dynamic port forwarding."</div>
+        <div class="a">A: "Local port forwarding (-L) forwards traffic from your local machine through the SSH connection to a destination reachable from the remote host. Remote port forwarding (-R) does the reverse — forwards traffic from the remote host back to a destination reachable from your local machine. Dynamic port forwarding (-D) creates a SOCKS proxy on your local machine, allowing any application configured to use the proxy to route traffic through the remote host to any destination."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is a pivot and when would you need one in a penetration test?"</div>
+        <div class="a">A: "A pivot is using a compromised host as a relay to reach otherwise inaccessible network segments. I need a pivot when the target has network segmentation — for example, the web server is in a DMZ accessible from the internet, but the database server is on an internal 10.x.x.x network with no direct internet route. I compromise the web server first, then use it as a pivot to reach the database server. Without pivoting, I'd never reach the database."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you maintain access while pivoting? What happens if the pivot host goes down?"</div>
+        <div class="a">A: "I always establish redundant access. Multiple C2 callbacks through different egress channels (HTTP, DNS, ICMP) from the pivot host. For the downstream targets I reach through pivoting, I deploy separate persistence mechanisms so I don't lose access if the pivot fails. I also document the full access chain so if one link breaks, I can rebuild it quickly. In real engagements, I never rely on a single pivot point — I always try to establish at least two independent paths into the target environment."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">SSH tunnel cheat sheet generator</div>
+        <div class="adesc">Describe your network topology (local/remote IPs, services, blocked ports) and have an LLM generate the exact SSH commands for the necessary tunnels.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Proxychains config assistant</div>
+        <div class="adesc">Ask which proxychains mode (dynamic, strict, random) to use for your specific scenario — some tools need strict, others work with dynamic.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Meterpreter post-exploitation planner</div>
+        <div class="adesc">Describe your post-exploitation goals and the LLM generates a Meterpreter module execution plan with the correct commands in order.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">C2 egress strategist</div>
+        <div class="adesc">Ask which C2 framework and egress technique works best for your scenario — HTTP(S), DNS, ICMP, or domain fronting — based on the target's filtering.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Performed lateral movement through SSH tunneling and SOCKS proxying from a compromised internet-facing host to reach and assess internal network segments."</li>
+        <li><strong>Portfolio piece:</strong> a "Multi-Host Pivoting Lab" writeup showing a network topology with at least 3 hosts, the pivot path, and the tools/commands used at each hop.</li>
+        <li><strong>Talking point:</strong> explaining the Colonial Pipeline breach in terms of lateral movement and network segmentation failure shows you understand the real operational impact of pivoting — not just the technical mechanics.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Post-exploitation and pivoting skills are what separate red team assessments from simple vulnerability scans. Companies pay premium rates for full-scope adversary simulations that test their detection and response across multiple network segments. A purple team engagement (red + blue working together) that specifically tests lateral movement detection runs $20,000-50,000 for a week-long assessment.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Internal Network Segmentation Audit" — you test whether an attacker who breaches one system can reach other network segments. Use the exact pivoting techniques from today's lesson to demonstrate the blast radius of a single compromised host. Deliver a report with a visual network map showing every accessible system. Charge $3,000-7,000 per engagement. Most compliance frameworks (PCI DSS, HIPAA, SOC 2) require segmentation validation — this is a recurring revenue service.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is network pivoting, how does SSH dynamic port forwarding work, and why was it critical in the Colonial Pipeline attack?" If you can describe the three SSH forwarding modes and when to use each, you've internalized the fundamentals of post-exploitation networking.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=W3sLgN3ZQ9s" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Pivoting and Port Forwarding — John Hammond</div><div class="res-desc">youtube.com/watch?v=W3sLgN3ZQ9s — walkthrough of SSH tunneling, Meterpreter pivoting, and proxychains.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=2M9oJFIPhQo" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Lateral Movement with Metasploit — IppSec</div><div class="res-desc">youtube.com/watch?v=2M9oJFIPhQo — Metasploit post-exploitation, autoroute, and socks proxy walkthrough.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=7GJFxrUY8jw" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">SSH Tunneling & Pivoting in Hindi — Hacker Vlogs</div><div class="res-desc">youtube.com/watch?v=7GJFxrUY8jw — Hindi explanation of SSH local, remote, and dynamic forwarding.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/wreath" target="_blank">
+        <ul>
+          <span class="res-icon lab">LAB</span>
+          <div><div class="res-title">TryHackMe — Wreath Network</div><div class="res-desc">tryhackme.com/room/wreath — free room focused entirely on pivoting through multiple network layers with SSH and Metasploit.</div></div>
+        </ul>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Three SSH forwarding modes understood (local, remote, dynamic).</div>
+      <div class="mistake-item"><span class="check">✓</span> Proxychains configured and tested through SOCKS tunnel.</div>
+      <div class="mistake-item"><span class="check">✓</span> Colonial Pipeline analyzed as a lateral movement failure case.</div>
+      <div class="mistake-item"><span class="check">✓</span> Meterpreter autoroute + socks_proxy used for MSF-based pivoting.</div>
+      <div class="mistake-item"><span class="check">✓</span> Multiple egress paths considered (not just SSH).</div>
+      <div class="mistake-item"><span class="check">✓</span> Network segmentation understood as the primary defense.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I understand the three SSH port forwarding modes (-L, -R, -D).</li>
+        <li><span class="box"></span> I configured a SOCKS proxy with SSH dynamic forwarding.</li>
+        <li><span class="box"></span> I used proxychains to scan an internal network through a pivot.</li>
+        <li><span class="box"></span> I set up Meterpreter autoroute for routing through a session.</li>
+        <li><span class="box"></span> I documented a full pivot chain from initial host to internal targets.</li>
+        <li><span class="box"></span> I can explain why network segmentation is critical for defense.</li>
+        <li><span class="box"></span> I can teach pivoting out loud in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">49 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 50</div>
+      <div class="title">Writing Your First Pentest Report — PTES/OWASP standards.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 50" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

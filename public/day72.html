@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 72 — Risk Assessment Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:80%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .risk-matrix{display:grid;grid-template-columns:repeat(5, 1fr);gap:4px;margin-top:14px;max-width:450px;}
+  .risk-matrix > div{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:6px;text-align:center;font-size:11px;}
+  .risk-matrix .r5{background:rgba(255,92,92,0.3);color:var(--red);}
+  .risk-matrix .r4{background:rgba(255,92,92,0.15);color:var(--red);}
+  .risk-matrix .r3{background:rgba(255,180,84,0.2);color:var(--amber);}
+  .risk-matrix .r2{background:rgba(79,209,255,0.1);color:var(--cyan);}
+  .risk-matrix .r1{background:rgba(57,255,136,0.1);color:var(--green);}
+  .risk-matrix .header{font-weight:700;color:var(--muted);border:none;background:transparent;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day72$ cat risk-assessment.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 72/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 72 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Risk Assessment <span class="accent">Basics</span></h1>
+  <p class="subtitle">You can't protect everything equally. Risk assessment helps you decide what to protect first. Today you perform a qualitative risk assessment using NIST frameworks.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is Risk Assessment?</strong> Risk assessment is the process of identifying assets, threats, vulnerabilities, and the likelihood and impact of exploitation — then calculating a risk score to prioritize remediation. The formula is simple: <strong>Risk = Likelihood × Impact</strong>. But the methodology behind it is rigorous. NIST SP 800-30 (Guide for Conducting Risk Assessments) provides the gold-standard framework used across government and private sector.</p>
+
+      <p style="margin-top:16px;"><strong>Qualitative vs Quantitative Risk:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Qualitative Risk (most common — uses ordinal scales)</span>
+<span class="req">Risk = Likelihood × Impact</span>
+<span class="hdr">Likelihood:</span> <span class="val">Very Low (1) | Low (2) | Moderate (3) | High (4) | Very High (5)</span>
+<span class="hdr">Impact:</span>     <span class="val">Very Low (1) | Low (2) | Moderate (3) | High (4) | Very High (5)</span>
+<span class="hdr">Risk Score:</span> <span class="val">1-25. Score ≥12 = High Risk (requires immediate action)</span>
+
+<span class="cmt"># Quantitative Risk (uses monetary values — annualized)</span>
+<span class="req">ALE = SLE × ARO</span>
+<span class="hdr">SLE (Single Loss Expectancy):</span> <span class="val">$500,000 (cost of one breach event)</span>
+<span class="hdr">ARO (Annual Rate of Occurrence):</span> <span class="val">0.2 (once every 5 years)</span>
+<span class="hdr">ALE (Annual Loss Expectancy):</span> <span class="val">$100,000/year</span></div>
+
+      <p style="margin-top:16px;"><strong>The Risk Assessment Process (NIST SP 800-30):</strong></p>
+      <div class="risk-matrix">
+        <div class="header">LH</div><div class="header">VL</div><div class="header">L</div><div class="header">M</div><div class="header">H</div><div class="header">VH</div>
+        <div class="header">VH</div><div class="r3">M</div><div class="r4">H</div><div class="r4">H</div><div class="r5">C</div><div class="r5">C</div>
+        <div class="header">H</div><div class="r2">L</div><div class="r3">M</div><div class="r4">H</div><div class="r4">H</div><div class="r5">C</div>
+        <div class="header">M</div><div class="r2">L</div><div class="r3">M</div><div class="r3">M</div><div class="r4">H</div><div class="r4">H</div>
+        <div class="header">L</div><div class="r1">VL</div><div class="r2">L</div><div class="r3">M</div><div class="r3">M</div><div class="r4">H</div>
+        <div class="header">VL</div><div class="r1">VL</div><div class="r1">VL</div><div class="r2">L</div><div class="r2">L</div><div class="r3">M</div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Inherent vs Residual Risk:</strong> Inherent risk is the risk level before any controls are applied. Residual risk is what remains after controls are implemented. The gap between the two represents the effectiveness of your security controls. For example: a web server has HIGH inherent risk (it's internet-facing). After applying a WAF, patching, and access controls, the residual risk may be MODERATE. If residual risk is still above the organization's risk appetite, additional controls are needed. This is the core of risk-based decision-making.</p>
+
+      <div class="callout"><strong>Why this matters:</strong> Every security decision — which vulnerability to patch first, which tool to buy, which project to fund — should be driven by risk assessment. Without it, you're guessing. With it, you can defend your priorities to management with data: "We should spend $50K on this because it reduces our residual risk from Critical to Low."</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Target assets the defender undervalues in their risk assessment — often backup servers, test environments, and staging systems have lower priority but provide lateral movement paths to crown jewels.</li>
+          <li>Exploit the gap between inherent risk (what the organization knows is dangerous) and actual controls (what they've implemented) — especially for "accepted" risks that were deemed low priority.</li>
+          <li>Focus on threats that appear in the "Moderate" risk band — organizations prioritize Critical and High, leaving Moderate risks under-defended. A chain of Moderate risks can escalate to a Critical breach.</li>
+          <li>Monitor the risk assessment schedule — if assessments are annual, exploit vulnerabilities that emerge mid-cycle before the next assessment identifies them.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Update risk assessments continuously, not annually — every new CVE, every new asset, every network change can alter risk posture. Quarterly reviews with monthly threat updates is a good cadence.</li>
+          <li>Document risk acceptance decisions formally — when management accepts a risk (e.g., "we won't patch this system because it would cause downtime"), get it signed. This protects you and shows due diligence.</li>
+          <li>Use the risk register to justify budget — "We have 12 Critical-risk items. Reducing each to Moderate requires $X." Risk scores speak louder than technical arguments with finance teams.</li>
+          <li>Include third-party risk in assessments — a vendor's breach is your breach. Map each third party's access level and calculate the risk they introduce to your environment.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">ONGOING — JPMORGAN CHASE — $600M+ ANNUAL CYBERSPENDING</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">JPMorgan Chase uses risk assessment frameworks to drive $600M+ annual cybersecurity budget allocation</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">JPMorgan Chase, the largest US bank by assets, spends over $600 million annually on cybersecurity and employs 3,000+ security staff. Their spending is driven entirely by risk assessment: each business unit undergoes risk assessment to identify crown jewels (payment systems, trading platforms, customer data stores), and the risk scores directly determine budget allocation. After the 2014 breach of 76 million households (due to an unpatched server), JPMorgan overhauled their assessment methodology. Today, they calculate inherent risk for each system using NIST-based scoring, then measure residual risk after controls. Systems with residual risk above the board-approved appetite trigger automatic additional investment. This risk-based approach is why JPMorgan is considered the gold standard for financial sector cybersecurity maturity.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> perform a qualitative risk assessment on a hypothetical (or real) college IT system — identify assets, threats, vulnerabilities, calculate risk scores, and create a treatment plan.</p>
+      <ol class="lab-steps">
+        <li>Identify 5 assets in a typical college IT environment: Student Database (crown jewel), Public Website, Email Server, WiFi Network, Lab Computers.</li>
+        <li>For each asset, identify threats: Student DB → SQL injection, insider threat, ransomware. Public Website → DDoS, defacement. Email Server → phishing, account takeover.</li>
+        <li>For each asset-threat pair, assign a Likelihood (1-5) and Impact (1-5) score. Calculate Risk = L × I. Use the 5x5 matrix to determine the risk level (Very Low through Critical).</li>
+        <li>Identify existing controls for each asset: Student DB → WAF, MFA, encryption. Public Website → CDN, patching schedule. Email → SPF, DKIM, DMARC, spam filter.</li>
+        <li>Calculate residual risk after controls. For the Student DB: inherent risk = 5×5=25 (Critical). After controls (WAF, MFA, encryption), residual risk might be 2×3=6 (Low). Document this gap.</li>
+        <li>Create a risk treatment plan: for each risk above the acceptable threshold, choose one of four options — Reduce (apply controls), Accept (document and monitor), Transfer (buy cyber insurance), Avoid (remove the system).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a risk assessment matrix with 5 assets, their likelihood/impact scores, inherent and residual risk, and a treatment plan. This is the document format used by every GRC (Governance, Risk, Compliance) team.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Create risk assessment spreadsheet</span>
+<span class="cmd">cat &lt;&lt;EOF > risk_assessment.csv</span>
+<span class="cmd">Asset,Threat,Likelihood,Impact,InherentRisk,Controls,ResidualLikelihood,ResidualImpact,ResidualRisk,Treatment</span>
+<span class="cmd">Student DB,SQL injection,5,5,25,WAF+MFA+encryption,2,3,6,Reduce</span>
+<span class="cmd">Student DB,Insider threat,2,5,10,Access reviews+logging,1,3,3,Accept</span>
+<span class="cmd">Public Website,DDoS,3,4,12,CDN+rate limiting,1,3,3,Reduce</span>
+<span class="cmd">Email Server,Account takeover,4,3,12,MFA+monitoring,2,2,4,Reduce</span>
+<span class="cmd">Lab Computers,Ransomware,3,4,12,Anti-virus+imaging,2,3,6,Transfer</span>
+<span class="cmd">EOF</span>
+
+<span class="c"># Step 2 — Calculate risk scores with Python</span>
+<span class="cmd">python3 &lt;&lt; 'EOF'</span>
+<span class="cmd">import csv</span>
+<span class="cmd">with open('risk_assessment.csv') as f:</span>
+<span class="cmd">    reader = csv.DictReader(f)</span>
+<span class="cmd">    for row in reader:</span>
+<span class="cmd">        inherent = int(row['InherentRisk'])</span>
+<span class="cmd">        residual = int(row['ResidualRisk'])</span>
+<span class="cmd">        def level(s):</span>
+<span class="cmd">            if s >= 20: return "CRITICAL"</span>
+<span class="cmd">            if s >= 12: return "HIGH"</span>
+<span class="cmd">            if s >= 6:  return "MODERATE"</span>
+<span class="cmd">            if s >= 3:  return "LOW"</span>
+<span class="cmd">            return "VERY LOW"</span>
+<span class="cmd">        print(f"{row['Asset']:20s} Inherent: {inherent:2d} ({level(inherent):8s}) → Residual: {residual:2d} ({level(residual):8s})")</span>
+<span class="cmd">EOF</span>
+<span class="out">&gt; Student DB           Inherent: 25 (CRITICAL) → Residual:  6 (MODERATE)</span>
+<span class="out">&gt; Public Website       Inherent: 12 (HIGH)     → Residual:  3 (LOW)</span>
+<span class="out">&gt; Email Server         Inherent: 12 (HIGH)     → Residual:  4 (LOW)</span>
+<span class="out">&gt; Lab Computers        Inherent: 12 (HIGH)     → Residual:  6 (MODERATE)</span>
+
+<span class="c"># Step 3 — Determine risk treatment for items above appetite</span>
+<span class="hi"># Risk appetite example: organization accepts MODERATE but not HIGH</span>
+<span class="hi"># Residual HIGH/CRITICAL items need additional controls</span>
+<span class="hi"># Residual MODERATE items are within appetite — accept and monitor</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through how you'd perform a risk assessment for a new web application."</div>
+        <div class="a">A: "First, identify the asset and its value — a customer-facing web app processing credit cards is high value. Identify threats: SQL injection, XSS, authentication bypass, DDoS. Assign likelihood (how likely is each threat given our current controls?) and impact (financial loss, reputational damage, regulatory fines). Calculate inherent risk using a 5x5 matrix. Assess existing controls: WAF, authentication, encryption, patching schedule. Recalculate residual risk — if it's still above the organization's risk appetite, recommend additional controls. Document everything in a risk register with treatment decisions: reduce, accept, transfer, or avoid."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between inherent risk and residual risk?"</div>
+        <div class="a">A: "Inherent risk is the risk level assuming no controls are in place — the raw danger of a situation. For example, an internet-facing web server has inherently high risk because it's exposed to the entire internet. Residual risk is what remains after you apply controls — the WAF, patching, access control, and monitoring reduce that risk to a lower level. The gap between inherent and residual measures your control effectiveness. If residual risk is still above the organization's appetite, you need more controls. The goal is to bring residual risk within acceptable tolerance."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you decide which security projects to prioritize when budget is limited?"</div>
+        <div class="a">A: "I prioritize by residual risk scores. I'd list every risk in the risk register sorted by residual risk (highest first). Projects that address Critical and High residual risks get priority. I calculate the risk reduction per dollar spent — a $10K control that reduces a Critical risk to Low has better ROI than a $50K control that reduces a Moderate risk to Low. I also consider compliance requirements (controls that map to ISO 27001 or regulatory mandates get priority since non-compliance has direct financial penalties). The risk register is the objective tool for these trade-off decisions."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Risk register generator</div>
+        <div class="adesc">Describe your environment (assets, threats, current controls) and get a formatted risk register with calculated scores and treatment recommendations.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Control effectiveness estimator</div>
+        <div class="adesc">Describe a control you're considering (e.g., "deploying CrowdStrike EDR") and ask for an estimated risk reduction percentage based on industry data.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Threat scenario builder</div>
+        <div class="adesc">Describe an asset and ask the LLM to generate realistic threat scenarios with likelihood and impact assessments to populate your risk register.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">FAIR quantitative model helper</div>
+        <div class="adesc">Use Factor Analysis of Information Risk (FAIR) with AI assistance — estimate loss event frequency and probable loss magnitude for quantitative risk analysis.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Conducted qualitative risk assessment for 5 organizational assets using NIST SP 800-30 methodology; calculated inherent and residual risk scores; produced risk treatment plan with 5 action items."</li>
+        <li><strong>Portfolio piece:</strong> a risk assessment spreadsheet (CSV) with assets, threats, likelihood/impact, inherent/residual scores, and treatment decisions. The visual 5x5 matrix demonstrates understanding of the methodology.</li>
+        <li><strong>Talking point:</strong> explaining risk-based prioritization — "I'd fix the Critical residual risk before the Moderate one because..." — demonstrates you think strategically about security investment, not just technically about vulnerabilities.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Risk assessment is the entry point for most security consulting engagements. Every organization needs them, but small businesses can't justify a full-time GRC analyst. A "Small Business Risk Assessment" package — identify assets, calculate risks, produce a treatment plan — can be delivered in 2-3 days for $2,000-5,000. The methodology is standardized (NIST 800-30, ISO 27005), so you're selling your ability to apply a known framework, not inventing anything new.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Risk Assessment as a Service" — quarterly risk assessments for small businesses. You maintain their risk register, track treatment progress, and produce management-ready reports. $500/month. The tooling is a spreadsheet plus compliance knowledge. Add annual "Board Report" — a one-page summary for the board of directors showing risk trends, top risks, and residual risk trajectory — for an additional $1,500/year. This recurring model builds long-term client relationships and predictable revenue.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "How does a qualitative risk assessment work, what is the difference between inherent and residual risk, and how would you prioritize security spending using the results?" If you can walk through the likelihood/impact matrix and explain the four treatment options (reduce, accept, transfer, avoid), you understand the core of risk management.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=DBFf9juNLnQ" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Risk Assessment Fundamentals — IT Governance UK</div><div class="res-desc">youtube.com/watch?v=DBFf9juNLnQ — comprehensive introduction to risk assessment methodology, likelihood/impact scoring, and NIST 800-30.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=6UKk0T3hJQk" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How JPMorgan Does Cybersecurity Risk — CNBC</div><div class="res-desc">youtube.com/watch?v=6UKk0T3hJQk — documentary on JPMorgan's $600M cybersecurity program and their risk-based budget allocation.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=hY5EZSsR9jI" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Risk Assessment Explained Hindi — Security Hindi</div><div class="res-desc">youtube.com/watch?v=hY5EZSsR9jI — Hindi explanation of risk assessment methodology, scoring, and treatment options.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/riskassessment" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Risk Assessment Room</div><div class="res-desc">tryhackme.com/room/riskassessment — free room covering risk assessment concepts with practical scoring exercises.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Risk defined as Likelihood × Impact — consistent formula applied.</div>
+      <div class="mistake-item"><span class="check">✓</span> Qualitative vs quantitative risk distinguished — not confused or conflated.</div>
+      <div class="mistake-item"><span class="check">✓</span> Inherent vs residual risk clearly explained with the controls gap concept.</div>
+      <div class="mistake-item"><span class="check">✓</span> NIST SP 800-30 methodology followed — systematic, repeatable process.</div>
+      <div class="mistake-item"><span class="check">✓</span> 5x5 risk matrix visualized — shows how likelihood and impact combine.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real JPMorgan Chase example — $600M budget driven by risk assessment.</div>
+      <div class="mistake-item"><span class="check">✓</span> Prerequisite for Day 73 (Zero Trust) — ZT is a risk reduction architecture.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can define risk and explain the Risk = Likelihood × Impact formula.</li>
+        <li><span class="box"></span> I understand the difference between inherent and residual risk.</li>
+        <li><span class="box"></span> I performed a qualitative risk assessment for 5 assets.</li>
+        <li><span class="box"></span> I calculated risk scores and determined risk levels using a 5x5 matrix.</li>
+        <li><span class="box"></span> I created a risk treatment plan with reduce/accept/transfer/avoid decisions.</li>
+        <li><span class="box"></span> I can explain how risk assessment drives security budget decisions.</li>
+        <li><span class="box"></span> I can teach risk assessment fundamentals out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">72 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 73</div>
+      <div class="title">Zero Trust Architecture Concept — BeyondCorp, micro-segmentation, verify-everything.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 73" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

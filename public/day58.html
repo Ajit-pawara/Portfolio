@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 58 — Intro to SIEM — Splunk / ELK Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:25.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+  .code-block .sql{color:var(--purple);}
+  .code-block .sq{color:var(--pink);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sql{color:var(--purple);}
+  .term-body .sq{color:var(--pink);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day58$ cat siem-splunk-elk.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 58/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 58 OF 90 — PHASE 7: BLUE TEAM & DEFENSE</div>
+  <h1>Intro to SIEM — <span class="accent">Splunk / ELK Basics</span></h1>
+  <p class="subtitle">Security Information and Event Management (SIEM) aggregates logs from every corner of your infrastructure and makes them searchable at scale. Today you learn the architecture of Splunk and the ELK stack, write SPL and KQL queries, and understand how SIEM drove the SolarWinds investigation.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is SIEM?</strong> SIEM (Security Information and Event Management) is a centralized platform that collects, normalizes, and analyzes log data from across an enterprise — servers, firewalls, endpoints, cloud services, applications. It correlates events from disparate sources to detect patterns that no single log source would reveal.</p>
+
+      <p style="margin-top:16px;"><strong>Splunk architecture:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Core Splunk components:</span>
+<span class="req">Forwarder</span>  → collects logs from sources (agents on endpoints, syslog, API)
+<span class="req">Indexer</span>     → ingests, parses, and stores data in indexed buckets
+<span class="req">Search Head</span> → provides the search interface (web UI / REST API) across indexers
+<span class="cmt"># Splunk Search Processing Language (SPL):</span>
+<span class="body">source="/var/log/auth.log" | stats count by src_ip | where count > 10</span>
+<span class="body">index=windows EventCode=4625 | top 10 Account_Name</span>
+<span class="cmt"># SPL pipeline: search → filter → transform → aggregate → output</span></div>
+
+      <p style="margin-top:16px;"><strong>ELK stack architecture:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Elasticsearch + Logstash + Kibana (ELK):</span>
+<span class="req">Logstash</span>       → ingests, transforms, and ships logs (input → filter → output)
+<span class="req">Elasticsearch</span>  → distributed search and analytics engine (stores & indexes logs)
+<span class="req">Kibana</span>         → visualization and dashboard layer (charts, maps, alerts)
+<span class="cmt"># Common ingestion pipeline:</span>
+<span class="body">Beats (Filebeat/Winlogbeat) → Logstash → Elasticsearch → Kibana</span>
+<span class="cmt"># KQL (Kibana Query Language) example:</span>
+<span class="body">event.dataset: "system.auth" and event.outcome: "failure"</span>
+<span class="body">NOT source.ip: 10.0.0.0/8 and event.action: "user_login"</span></div>
+
+      <p><strong>SIEM data sources:</strong> Windows Event Logs (Security, System, Application), Linux syslog (auth.log, messages), firewall logs (iptables, pfSense), web server access logs (Apache, Nginx), cloud trail logs (AWS CloudTrail, Azure Monitor), endpoint detection (EDR telemetry).</p>
+
+      <div class="callout"><strong>Key insight:</strong> SIEMs don't stop attacks — they <em>detect</em> them. The value comes from the queries and correlation rules you write. A misconfigured SIEM with no tuned detections is an expensive log storage system. Splunk is the industry leader but expensive; the ELK stack is open-source and widely adopted in startups and mid-market.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// analyst vs engineer mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Analyst</div>
+        <ul>
+          <li>Write time-bounded searches: <code>earliest=-7d latest=now</code> — always scope your query to avoid scanning the entire index.</li>
+          <li>Chain SPL commands with the pipe operator: <code>search index=* | where status=failed | stats count by user</code> — each pipe filters or transforms.</li>
+          <li>Use <code>top</code> and <code>rare</code> to find outliers: <code>top src_ip</code> shows frequent sources; <code>rare src_ip</code> shows the one-hit wonders that might be scanning.</li>
+          <li>Bookmarked dashboards for common incident types (brute force, malware beacon, phishing) save hours during an active investigation.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Engineer</div>
+        <ul>
+          <li>Deploy forwarders with <code>inputs.conf</code> — configure which log files to monitor, what sourcetype to assign, and any filtering at the source.</li>
+          <li>Set index retention policies — hot (SSD, 7d), warm (HDD, 30d), cold (archive, 1y), frozen (deleted). Storage is the #1 cost in Splunk.</li>
+          <li>Use Logstash <code>grok</code> filters to parse unstructured logs into structured fields — a poorly parsed log is almost useless for correlation.</li>
+          <li>Deploy Filebeat on all Linux endpoints for a zero-agent-cost ELK pipeline. Centralised logging must never rely on agents staying healthy — build redundancy.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2020 — SOLARWINDS ORION SUPPLY-CHAIN ATTACK — 18,000 ORGANIZATIONS</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:7px;">FireEye's Splunk team ran 'search index=* ImagePath=*solws*' and found the backdoor in minutes</div>
+      <div style="font-size:13px;color:#b8c2c6;line-height:1.6;">In December 2020, attackers (widely attributed to APT29 / Cozy Bear) compromised SolarWinds' build pipeline and inserted a backdoor called SUNBURST into Orion software updates. The backdoor was distributed to 18,000 organizations. FireEye's internal IR team used Splunk to search across their entire log corpus with a single SPL query: <code>search index=* ImagePath=*solws*</code> — this identified every host running the compromised Orion agent. The breadth of the search — across all indexes, on every endpoint — highlighted the power of a well-maintained SIEM. Without centralised logging, detecting the scale of the compromise would have taken weeks instead of hours. FireEye then pivoted to DNS logs and found beaconing to attacker C2 infrastructure, enabling them to identify and notify affected customers before the backdoor was publicly disclosed.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> deploy the ELK stack locally, ingest sample syslog data, and write KQL queries to detect failed authentications.</p>
+      <ol class="lab-steps">
+        <li>Run ELK via Docker: <code>docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 --name elk sebp/elk</code>. Wait ~2 minutes for all services to start.</li>
+        <li>Access Kibana at <code>http://localhost:5601</code>. Create the default index pattern (<code>logstash-*</code>) under Stack Management → Index Patterns.</li>
+        <li>Generate sample syslog data: <code>logger -n localhost -P 5044 "Failed password for root from 192.168.1.100 port 22 ssh2"</code>. Repeat with varied IPs and usernames.</li>
+        <li>In Kibana Discover, write KQL queries: <code>message: "Failed password"</code> and <code>message: "Failed password" and NOT source.ip: 10.0.0.*</code>.</li>
+        <li>Create a dashboard: add a bar chart of failed logins by source IP over the last 15 minutes. Save as "Failed Auth Monitor."</li>
+        <li>Delete the index (<code>DELETE /logstash-*</code> via Dev Tools) and confirm the data disappears — SIEM data lifecycle management.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A Kibana screenshot showing your "Failed Auth Monitor" dashboard with at least three distinct source IPs. Document each KQL query and what it filters for. This is the core analyst workflow — build a query, visualize it, save it as a reusable dashboard.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div style="display:flex;align-items:center;gap:8px;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Start ELK stack</span>
+<span class="cmd">docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 \</span>
+<span class="cmd">  --name elk sebp/elk</span>
+<span class="out">&gt; Kibana: http://localhost:5601</span>
+<span class="out">&gt; Elasticsearch: http://localhost:9200</span>
+
+<span class="c"># Step 2 — Create index pattern in Kibana</span>
+<span class="c"># Stack Management → Index Patterns → Create</span>
+<span class="c"># Pattern: logstash-*  →  Time field: @timestamp</span>
+
+<span class="c"># Step 3 — Inject sample syslog data</span>
+<span class="cmd">logger -n localhost -P 5044 \</span>
+<span class="cmd">  "Failed password for root from 192.168.1.100 port 22 ssh2"</span>
+<span class="cmd">logger -n localhost -P 5044 \</span>
+<span class="cmd">  "Failed password for admin from 10.0.0.55 port 22 ssh2"</span>
+<span class="cmd">logger -n localhost -P 5044 \</span>
+<span class="cmd">  "Accepted password for ubuntu from 192.168.1.50 port 22 ssh2"</span>
+
+<span class="c"># Step 4 — KQL queries in Kibana Discover</span>
+<span class="c"># Filter for all failed auths:</span>
+<span class="sq">message: "Failed password"</span>
+<span class="c"># Exclude internal IPs:</span>
+<span class="sq">message: "Failed password" and NOT message: "10.0.0.*"</span>
+<span class="c"># Count by source IP:</span>
+<span class="sq">message: "Failed password"</span>
+<span class="c"># → then use Lens to create bar chart → bucket: source_ip</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between Splunk and the ELK stack?"</div>
+        <div class="a">A: "Splunk is a commercial SIEM with a powerful search language (SPL), enterprise features like RBAC and data replication built in, and higher per-GB licensing costs. ELK is open-source — Elasticsearch for storage and search, Logstash for ingestion and parsing, Kibana for dashboards. ELK requires more hands-on configuration but is free at scale. Splunk's strength is its ecosystem and ease of use; ELK's strength is its flexibility and cost."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you build a SIEM detection rule for brute-force SSH attempts?"</div>
+        <div class="a">A: "I'd search for <code>Failed password</code> events grouped by source IP and destination IP over a 10-minute window. In SPL: <code>index=linux source="/var/log/auth.log" "Failed password" | bucket _time span=5m | stats dc(source_ip) as unique_ips by _time, dest_ip | where unique_ips > 5</code>. The threshold depends on the baseline — for a web server, 5 unique IPs in 5 minutes might be normal. For an internal jump box, 2 is suspicious. I'd also exclude known admin subnets."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is a SIEM correlation rule and give an example?"</div>
+        <div class="a">A: "A correlation rule combines events from different sources to identify a multi-stage attack. Example: correlate a Windows Event ID 4625 (failed logon) followed shortly by 4624 (successful logon) from the same IP — this indicates a successful brute force. The rule would fire an alert when both events occur from the same source IP to the same target within 60 seconds. This is more meaningful than either event alone."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">SPL query generator</div>
+        <div class="adesc">Describe your detection need in plain English — "show me failed logins grouped by user over the last hour" — and get a ready-to-run SPL query with time range and stats commands.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Grok pattern helper</div>
+        <div class="adesc">Paste a raw log line into an LLM and ask it to generate the Logstash grok filter pattern. For unstructured logs (firewalls, custom apps), this saves 30 minutes of manual regex construction.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ELK deployment debugger</div>
+        <div class="adesc">Describe your ELK error — "Kibana says 'no alive nodes'," "Logstash won't start," "Elasticsearch cluster health is yellow" — and get targeted diagnostic commands and config fixes.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">KQL translator</div>
+        <div class="adesc">Ask an LLM to translate between SPL and KQL: "Give me the KQL equivalent of <code>index=* | stats count by sourcetype</code>" — useful when switching between Splunk and Kibana environments.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Deployed the ELK stack (Elasticsearch, Logstash, Kibana) via Docker; ingested syslog data; built a failed-authentication dashboard with KQL filtering and visualization."</li>
+        <li><strong>Portfolio piece:</strong> screenshots of your Kibana dashboard showing failed logins by source IP, plus the Logstash grok filter you wrote to parse the syslog data. Include your SPL queries as a reference table.</li>
+        <li><strong>Interview talking point:</strong> explaining the SolarWinds SPL query <code>search index=* ImagePath=*solws*</code> and what it reveals about the importance of full-index search capability during incident response.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Every mid-sized business that handles PCI-DSS, HIPAA, or SOC 2 data needs a SIEM — but most can't afford a dedicated Splunk engineer at $150k+/year. The opportunity: "ELK-as-a-Service" for small businesses. Deploy a managed ELK stack for $500-1,000/month that includes pre-built dashboards for compliance requirements (failed logins, admin access, firewall changes).</p>
+      <p style="margin-bottom:0;">Most MSPs (Managed Service Providers) charge $50-100/endpoint/month for SIEM. With ELK, your cost is nearly zero after the initial setup. If you onboard five small clinics that each need HIPAA log monitoring at $800/month, that's $48k/year in recurring revenue with minimal infrastructure cost. The differentiation: you send them a weekly compliance summary generated from their Kibana dashboards.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Teach someone in 90 seconds: "What's the difference between a SIEM forwarder, indexer, and search head?" Draw the data flow: log source → forwarder (agent) → indexer (storage + parsing) → search head (query interface). Then explain how SPL pipes work like shell pipes — each stage passes the results to the next. If you can draw the ELK pipeline (Beats → Logstash → Elasticsearch → Kibana) on a whiteboard and explain what each component does, you've internalised today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.elastic.co/guide/en/kibana/current/kuery-query.html" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Kibana Query Language (KQL) — official reference</div><div class="res-desc">elastic.co/guide/en/kibana/current/kuery-query.html — full syntax reference with examples for filtering.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=Dhvp1_Ock1Q" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">SIEM for Beginners — Splunk vs ELK — John Hammond</div><div class="res-desc">youtube.com/watch?v=Dhvp1_Ock1Q — practical walkthrough comparing both platforms.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=_Mn4HmsoCew" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">ELK Stack Setup in Hindi — Technical Adan</div><div class="res-desc">youtube.com/watch?v=_Mn4HmsoCew — full Hindi walkthrough of installing and configuring ELK.</div></div>
+      </a>
+      <a class="res-card" href="https://www.splunk.com/en_us/blog/security/deep-dive-solarwinds-supply-chain-compromise.html" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Splunk's SolarWinds Investigation — Official Blog</div><div class="res-desc">splunk.com — detailed technical writeup of how Splunk queries traced the SUNBURST backdoor.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> SIEM architecture explained with concrete Splunk and ELK components.</div>
+      <div class="mistake-item"><span class="check">✓</span> SPL and KQL queries shown with live examples you can test.</div>
+      <div class="mistake-item"><span class="check">✓</span> SolarWinds incident mapped to an actual SPL query — not abstract "SIEM helps."</div>
+      <div class="mistake-item"><span class="check">✓</span> Logstash grok parsing covered as the critical skill for unstructured logs.</div>
+      <div class="mistake-item"><span class="check">✓</span> SIEM compared to log storage — the value is in the queries, not the storage.</div>
+      <div class="mistake-item"><span class="check">✓</span> ELK deployed via Docker with syslog ingestion — immediate hands-on feedback.</div>
+      <div class="mistake-item"><span class="check">✓</span> Dashboard building (Lens) practiced as the core analyst deliverable.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I understand the difference between Splunk and ELK architecture.</li>
+        <li><span class="box"></span> I can write a basic SPL query with search, where, stats, and top commands.</li>
+        <li><span class="box"></span> I can write a KQL query filtering by field and value.</li>
+        <li><span class="box"></span> I deployed ELK stack via Docker and ingested syslog data.</li>
+        <li><span class="box"></span> I built a failed-authentication dashboard in Kibana Lens.</li>
+        <li><span class="box"></span> I can explain the SolarWinds SPL search and its significance.</li>
+        <li><span class="box"></span> I can teach the SIEM data pipeline (forwarder → indexer → search head).</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">58 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 59</div>
+      <div class="title">Wireshark Deep Dive — Packet Analysis & Network Forensics.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 59" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

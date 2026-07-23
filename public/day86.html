@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 86 — Mock Technical Interview — Practical Round</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:95.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .practical-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+  .practical-steps > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .practical-steps .plabel{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .practical-steps .plabel.recon{color:var(--cyan);}
+  .practical-steps .plabel.exploit{color:var(--red);}
+  .practical-steps .plabel.analyze{color:var(--amber);}
+  .practical-steps .plabel.report{color:var(--green);}
+  .practical-steps code{font-size:11.5px;display:block;margin-bottom:3px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.practical-steps{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day86$ cat practical-interview.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 86/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 86 OF 90 — PHASE 5: CAREER & CAPSTONE</div>
+  <h1>Mock Technical Interview <span class="accent">Practical Round</span></h1>
+  <p class="subtitle">The second interview tests tool skills. Today you perform a timed practical assessment — Nmap scan, SQLi exploitation, Wireshark analysis, and incident triage.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The practical interview format:</strong> Unlike the concepts round (Day 85), the practical round gives you a target and a time limit. The interviewer watches how you work — not just whether you get the flag, but your methodology, tool proficiency, note-taking discipline, and reaction to roadblocks. Common formats include: a vulnerable VM you must compromise (Metasploitable, HackTheBox), a PCAP file you must analyze for C2 traffic, a SOC ticket you must triage from log data, or a web app you must test against OWASP Top 10 within a time window.</p>
+
+      <p><strong>What interviewers evaluate during practical rounds:</strong> Company Mandiant (now part of Google Cloud) is known for its 2-hour practical assessment where candidates analyze a real malware sample and write an intrusion analysis report. They evaluate four dimensions: (1) Technical proficiency — can you use the tools without hand-holding? (2) Methodology — do you work systematically or jump around? (3) Documentation — do you take notes and timestamp findings as you go? (4) Communication — can you explain what you're doing while you do it? The most common reason candidates fail isn't lack of skill — it's freezing under time pressure or failing to communicate their thought process.</p>
+
+      <div class="callout"><strong>Key insight:</strong> The practical round is the most important because it's the hardest to prepare for by memorization. The only way to prepare is to practice timed assessments repeatedly. Today's lab recreates the structure of a Mandiant-style practical round using free tools and a home lab target. Treat this as a real interview — set a timer, take notes as if they'll be reviewed, and practice thinking aloud.</div>
+
+      <p><strong>The four practical tasks:</strong></p>
+      <div class="practical-steps">
+        <div>
+          <div class="plabel recon">Task 1 — Nmap & Recon</div>
+          <code>nmap -sV -sC -p- target</code>
+          <code>Find open ports, services,</code>
+          <code>and OS. Identify at least</code>
+          <code>3 potential vulnerabilities.</code>
+        </div>
+        <div>
+          <div class="plabel exploit">Task 2 — Exploit</div>
+          <code>Use Metasploit or manual</code>
+          <code>exploit to gain initial</code>
+          <code>access. Document the</code>
+          <code>exploit chain step by step.</code>
+        </div>
+        <div>
+          <div class="plabel analyze">Task 3 — Wireshark Analysis</div>
+          <code>Open a sample PCAP,</code>
+          <code>identify the attacker IP,</code>
+          <code>the technique used, and</code>
+          <code>the data exfiltrated.</code>
+        </div>
+        <div>
+          <div class="plabel report">Task 4 — Triage & Report</div>
+          <code>Write a 1-page intrusion</code>
+          <code>analysis report with</code>
+          <code>executive summary, IOC,</code>
+          <code>timeline, and remediation.</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// practical assessment mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Candidate Mindset</div>
+        <ul>
+          <li>Talk through everything — interviewers can't evaluate your thinking if you're silent. Say "I'm running an SYN scan first because it's faster, then I'll do version detection on discovered ports."</li>
+          <li>Take timestamped notes — every command, every output, every finding. If you get stuck, review your notes. The notes also become your report deliverable at the end.</li>
+          <li>When stuck, try the next thing. Don't spend 15 minutes on one dead end. Move to another service, another port, another approach. Interviewers note adaptability.</li>
+          <li>Time management: allocate your time before starting. 25% recon, 35% exploitation, 20% analysis, 20% reporting. Set a visible timer.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Interviewer Mindset</div>
+        <ul>
+          <li>They don't expect you to compromise everything — they want to see how you handle the target that fights back. Getting stuck and recovering is worth more than a clean compromise.</li>
+          <li>They watch for tool over-reliance — a candidate who only runs sqlmap and can't interpret the output manually scores lower than one who runs a manual injection first, then uses sqlmap.</li>
+          <li>They check for OPSEC awareness — if you run dangerous exploits without understanding what they do, that's a red flag even if you get root.</li>
+          <li>Report quality is often the deciding factor between two candidates with similar technical performance. Clean, structured documentation beats messy but complete exploitation.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">MANDIANT (GOOGLE CLOUD) PRACTICAL INTERVIEW — 2-HOUR INTRUSION ANALYSIS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Mandiant's practical round requires analyzing a real malware sample and writing an intrusion analysis report within 2 hours</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Mandiant's practical interview has become a benchmark in the industry. Candidates receive a PCAP file and a malware sample (often based on real APT campaigns). They must determine the initial infection vector, identify C2 infrastructure from PCAP analysis, extract IOCs (IPs, domains, registry keys), understand the malware's capabilities, and write a structured intrusion analysis report. The evaluation focuses on methodology: did they check VirusTotal? Did they use YARA rules? Did they run the malware in a sandbox? Did they timestamp everything? Mandiant reports that fewer than 30% of candidates pass this round on the first attempt, with the most common failure being incomplete documentation rather than technical inability.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Complete a timed 2-hour practical assessment against Metasploitable 2 with Wireshark PCAP analysis and incident report writing.</p>
+      <ol class="lab-steps">
+        <li>Start Metasploitable 2 (VM or Docker: <code>docker run -d tleemcjr/metasploitable2</code>) and identify its IP on your network. Set a 2-hour timer.</li>
+        <li>Run Nmap recon: <code>nmap -sV -sC -p- [target_ip]</code>. Document all open ports, services, versions, and at least 3 potential vulnerabilities based on version numbers.</li>
+        <li>Exploit at least one service: try the vsftpd 2.3.4 backdoor (port 21), or the UnrealIRCd backdoor (port 6667), or the Tomcat manager default creds (port 8180). Document your full exploit chain with commands and output.</li>
+        <li>Open this sample PCAP (download from <code>wget https://wiki.wireshark.org/SampleCaptures/attack.pcap</code>) in Wireshark. Identify the attacker IP, the attack type, and the exfiltrated data.</li>
+        <li>Write a 1-page intrusion analysis report with: Executive Summary, Timeline of Events, IOCs (IPs, ports, signatures), Indicators of Compromise, Exploit Chain, and Remediation Recommendations.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Your timestamped command log from the entire 2-hour session. A 1-page intrusion analysis report in PDF or Markdown. Screenshot of the compromised machine or Wireshark findings. A 2-minute video or written self-assessment of what you did well and what you'd improve.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Practical Interview Simulation — Command Log</span>
+<span class="c"># Timestamp: 2026-07-23 10:00:00</span>
+
+<span class="c"># Phase 1: Recon (25 min)</span>
+<span class="cmd">nmap -sV -sC -p- 192.168.1.101</span>
+<span class="hi"># Results: port 21 (vsftpd 2.3.4), port 22 (SSH),</span>
+<span class="hi"># port 80 (Apache), port 445 (Samba), port 6667 (UnrealIRCd)</span>
+
+<span class="c"># Phase 2: Exploitation (45 min)</span>
+<span class="c"># Target: vsftpd 2.3.4 backdoor (CVE-2011-2523)</span>
+<span class="cmd">msfconsole -q</span>
+<span class="cmd">use exploit/unix/ftp/vsftpd_234_backdoor</span>
+<span class="cmd">set RHOSTS 192.168.1.101</span>
+<span class="cmd">run</span>
+<span class="hi"># Got root shell on target!</span>
+
+<span class="c"># Phase 3: PCAP Analysis (30 min)</span>
+<span class="cmd">wireshark attack.pcap</span>
+<span class="hi"># Filter: http.request — found SQL injection attempt</span>
+<span class="hi"># Attacker IP: 10.0.0.5, Target: /products?id=1 UNION SELECT...</span>
+
+<span class="c"># Phase 4: Report Writing (20 min)</span>
+<span class="cmd">cat intrusion-report.md</span>
+<span class="out"># Executive Summary: A successful SQL injection</span>
+<span class="out"># exploitation led to data exfiltration of 1,200 records.</span>
+<span class="out"># IOCs: 10.0.0.5, /products endpoint, UNION SELECT payload</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through how you'd approach a practical penetration test against an unknown target with a 2-hour time limit."</div>
+        <div class="a">A: "First, I allocate my time — 30 min recon, 45 min exploitation, 30 min analysis, 15 min reporting. I start with an Nmap full port scan and service version detection in parallel. While that runs, I check if there's a web server and run a quick directory scan. I prioritize low-hanging fruit — default credentials, known vulnerable versions (vsftpd, UnrealIRCd), and unauthenticated services. I timestamp and document every command so my report writes itself. If one approach fails after 15 minutes, I pivot to another service."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "You find an open port with an unknown service running. What do you do?"</div>
+        <div class="a">A: "I use netcat or telnet to connect and read the banner: <code>nc -v [IP] [port]</code>. If that returns nothing useful, I capture traffic to it with tcpdump while I interact, then analyze the protocol format. I search for the banner string in Exploit-DB or searchsploit. I also try common protocol defaults — HTTP methods, SSH identification, FTP anonymous login. If it's truly unknown, I write a Python script to interact with it systematically and document the behavior."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "You just got a root shell on a target during a practical test. What next?"</div>
+        <div class="a">A: "First, I collect evidence: hostname, IP config, logged-in users, running processes, listening ports, and key files (<code>/etc/passwd</code>, web configs, <code>.bash_history</code>). I take screenshots with timestamps. I attempt to retrieve the flag or sensitive data specified in the test scope. I check for persistence mechanisms. Then I document the full exploit chain from initial foothold to privilege escalation with command outputs. I do NOT run cleanup or destructive actions unless instructed."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Practical test scenario generator</div>
+        <div class="adesc">Ask an LLM to create a mock practical test scenario: "Generate a 2-hour pentest scenario with a Linux target running Apache, MySQL, and Samba with at least 3 real vulnerabilities."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Wireshark filter assistant</div>
+        <div class="adesc">Describe what you're looking for in a PCAP — "all traffic to 10.0.0.5 on port 443" — and get the exact Wireshark display filter string.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Report template generator</div>
+        <div class="adesc">Ask for a pentest report template in Markdown with sections: Executive Summary, Scope, Methodology, Findings, Exploit Chains, IOCs, Remediation. Customize per engagement.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Metasploit command builder</div>
+        <div class="adesc">Describe your target (OS, service, port) and ask for the exact msfconsole commands to exploit it. Great for interview prep when you're stuck on syntax.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Completed a 2-hour timed practical security assessment against Metasploitable 2, achieving root access via vsftpd backdoor exploitation and documenting findings in a professional intrusion analysis report."</li>
+        <li><strong>Portfolio piece:</strong> your timestamped command log, intrusion analysis report PDF, and a screenshot of the compromised target. This is the single most impressive item in your portfolio — it proves you can perform under time pressure.</li>
+        <li><strong>Interview talking point:</strong> "I practice timed practical assessments regularly. My methodology is 25% recon, 35% exploitation, 20% analysis, 20% reporting. I timestamp everything and write my report as I work so it doesn't become a scramble at the end."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>The practical security assessment is a service you can offer directly — small businesses and startups need their web apps and networks tested but can't afford $10,000+ pentest firms. A single-page web app pentest with a 4-hour scope can be delivered for $500-1,000. The template you built today — Nmap recon, service exploitation, Wireshark analysis, structured reporting — is exactly the workflow you'd use for a paid engagement.</p>
+      <p style="margin-bottom:0;">Pair this with a "Security Assessment Starter Pack" — a Notion or Google Docs template that includes a methodology checklist, report template, and common exploit commands. Sell it for $25-50 on Gumroad. You've already done the work; packaging it for others is pure margin.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What's your methodology for a 2-hour practical pentest assessment — walk through the phases and how you allocate time." If you can describe your recon-exploit-analyze-report pipeline confidently, you're ready for the practical round of any senior-level internship or entry-level pentest interview.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=sP1_1YmvP3s" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Practical Pentest Interview — IppSec Walkthrough</div><div class="res-desc">youtube.com/watch?v=sP1_1YmvP3s — IppSec demonstrates real pentest methodology with HackTheBox machines.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=2xS7ABF61-U" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Wireshark PCAP Analysis for Interviews — Chris Greer</div><div class="res-desc">youtube.com/watch?v=2xS7ABF61-U — Practical PCAP analysis walkthrough for security interview preparation.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=8n2qN6OQ-7M" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Metasploit Practical Tutorial in Hindi — Hacker Interrupt</div><div class="res-desc">youtube.com/watch?v=8n2qN6OQ-7M — Hindi walkthrough of Metasploit exploitation with real targets.</div></div>
+      </a>
+      <a class="res-card" href="https://www.hackthebox.com" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">HackTheBox — Practical Labs for Interview Practice</div><div class="res-desc">hackthebox.com — Free and paid machines that simulate real pentest scenarios. Timed mode available for interview practice.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Timed practice completed under real conditions — no pauses, no looking up answers.</div>
+      <div class="mistake-item"><span class="check">✓</span> Thinking-out-loud practiced — interviewers need to hear your methodology, not results.</div>
+      <div class="mistake-item"><span class="check">✓</span> Timestamped command log kept — documentation is a tested skill, not an afterthought.</div>
+      <div class="mistake-item"><span class="check">✓</span> Time allocation used (recon 25%, exploit 35%, analysis 20%, report 20%) — prevents getting stuck.</div>
+      <div class="mistake-item"><span class="check">✓</span> Stopped to try a different service when stuck — adaptability is scored.</div>
+      <div class="mistake-item"><span class="check">✓</span> Professional report written — the deliverable is often worth more than the compromise.</div>
+      <div class="mistake-item"><span class="check">✓</span> Day 86 builds on Day 85 — concepts + practical = interview ready.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I completed a 2-hour timed practical assessment.</li>
+        <li><span class="box"></span> I ran Nmap recon and identified 3+ potential vulnerabilities.</li>
+        <li><span class="box"></span> I successfully exploited at least one service.</li>
+        <li><span class="box"></span> I analyzed a PCAP in Wireshark and identified attacker activity.</li>
+        <li><span class="box"></span> I wrote a 1-page intrusion analysis report.</li>
+        <li><span class="box"></span> I recorded myself thinking aloud during the assessment.</li>
+        <li><span class="box"></span> I can explain my practical methodology out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">86 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 87</div>
+      <div class="title">Internship & Entry-Role Hunting Strategy — target companies, applications, cover letters</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 87" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

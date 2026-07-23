@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 78 — Security+ Domains 1 & 2 Deep Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:86.6%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .attack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:14px;}
+  .attack-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--red);}
+  .attack-card .atype{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:4px;color:var(--red);}
+  .attack-card .adesc{font-size:12px;color:var(--muted);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day78$ cat secplus-domains-1-2.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 78/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 78 OF 90 — PHASE 5: CERTIFICATION & PORTFOLIO</div>
+  <h1>Security+ Domains 1 & 2 <span class="accent">Deep Review</span></h1>
+  <p class="subtitle">Domain 1 covers threats and attacks. Domain 2 covers architecture and design. Today you deep-dive into indicators of compromise, threat actors, and secure network design.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Domain 1 — Attacks, Threats & Vulnerabilities (24%):</strong> This is the largest domain on the exam. You need to understand malware types (virus, worm, Trojan, ransomware, rootkit, spyware, adware), social engineering (phishing, spear-phishing, whaling, vishing, smishing, tailgating, pretexting, quid pro quo), application attacks (SQLi, XSS, CSRF, buffer overflow, race conditions), network attacks (DDoS, man-in-the-middle, DNS poisoning, ARP spoofing), wireless attacks (evil twin, deauthentication, jamming, KRACK), cryptographic attacks (birthday, rainbow table, brute force, dictionary, downgrade), and threat actors (APT, hacktivist, insider threat, script kiddie, organized crime).</p>
+
+      <div class="attack-grid">
+        <div class="attack-card"><div class="atype">Malware Types</div><div class="adesc">Virus (file infector), Worm (self-propagating), Trojan (disguised), Ransomware (encrypts + extorts), Rootkit (kernel-level stealth), Spyware (data theft), Adware (forced ads).</div></div>
+        <div class="attack-card"><div class="atype">Social Engineering</div><div class="adesc">Phishing (mass email), Spear-phishing (targeted), Whaling (CEO), Vishing (voice), Smishing (SMS), Tailgating (physical follow), Pretexting (false scenario), Baiting (USB drop).</div></div>
+        <div class="attack-card"><div class="atype">Application Attacks</div><div class="adesc">SQLi (database injection), XSS (script injection), CSRF (forged request), Buffer Overflow (memory corruption), Race Condition (timing), Directory Traversal (path escape).</div></div>
+        <div class="attack-card"><div class="atype">Network Attacks</div><div class="adesc">DDoS (traffic flood), MITM (interception), DNS Poisoning (cache corrupt), ARP Spoofing (MAC impersonation), On-Path Attack (inline interception), Replay (capture + resend).</div></div>
+        <div class="attack-card"><div class="atype">Cryptographic Attacks</div><div class="adesc">Brute Force (try all keys), Dictionary (common passwords), Rainbow Table (precomputed hashes), Birthday (hash collision), Downgrade (force weaker protocol), Known Plaintext.</div></div>
+        <div class="attack-card"><div class="atype">Threat Actor Types</div><div class="adesc">APT (state-sponsored), Hacktivist (political), Insider (employee), Script Kiddie (low-skill), Organized Crime (financial), Shadow IT (rogue solutions).</div></div>
+      </div>
+
+      <p><strong>Domain 2 — Architecture & Design (21%):</strong> Covers defense-in-depth, secure network design (DMZ, VLAN segmentation, VPN, NAC), virtualization and cloud (hypervisor, containers, IaaS/PaaS/SaaS, cloud deployment models), embedded and IoT systems (SCADA, PLC, IoT), secure facility design (mantraps, locks, biometrics, CCTV), and fundamental security concepts (CIA triad, non-repudiation, AAA, least privilege, separation of duties, defense-in-depth).</p>
+
+      <p><strong>Sample PBQ scenario — configure a DMZ:</strong></p>
+      <div class="code-block">
+<span class="req">Scenario: Design a three-tier network architecture</span>
+<span class="cmt">- Internet → Firewall → DMZ (web servers)</span>
+<span class="cmt">- DMZ → Firewall → Internal (application servers)</span>
+<span class="cmt">- Internal → Firewall → Private (database servers)</span>
+
+<span class="req">Rules:</span>
+<span class="val">1. Allow HTTP/HTTPS from Internet → DMZ web servers (80/443)</span>
+<span class="val">2. Allow traffic from DMZ → Internal app servers only (8080)</span>
+<span class="val">3. Allow traffic from Internal → Private database (3306/5432)</span>
+<span class="val">4. Block all traffic from Private → Internet (no outbound)</span>
+<span class="val">5. Allow SSH management access from internal admin VLAN</span></div>
+
+      <div class="callout"><strong>Key exam tip:</strong> Domain 1 and Domain 2 test heavily on scenario-based questions. You'll see "An employee receives an email from their CEO asking them to wire money. What type of attack is this?" (Whaling). Or "A company wants to ensure data remains accessible even during a natural disaster. What should they implement?" (Redundancy + offsite backups).</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Phishing is the #1 initial access vector — 91% of attacks start with email. Attackers research targets on LinkedIn to craft convincing spear-phishing and whaling emails.</li>
+          <li>DNS poisoning and evil twin attacks target the trust at the protocol level. Setting up a fake Wi-Fi access point with a captive portal can capture credentials from anyone who connects.</li>
+          <li>Buffer overflow and race condition exploits require deep technical knowledge — most attackers use automated tools (Metasploit, Canvas) rather than writing exploits from scratch.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Defense-in-depth means never relying on a single control. Firewalls, IDS/IPS, endpoint protection, access controls, and security awareness training must work together.</li>
+          <li>Network segmentation (DMZ, VLANs) limits blast radius — an attacker who compromises a web server in the DMZ shouldn't have direct access to the database server.</li>
+          <li>Security awareness training is the most effective control against social engineering. Simulated phishing campaigns reduce click rates from 30% to under 5% over time.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2023 — MGM RESORTS RANSOMWARE — SOCIAL ENGINEERING + RAGNAR LOCKER</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Attackers used vishing (phone call) to trick the help desk into resetting an employee's MFA — classic social engineering from Domain 1</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The MGM Resorts ransomware attack perfectly illustrates Domain 1 social engineering and Domain 2 architecture failures. The attackers called MGM's help desk, impersonated a senior employee, and convinced the help desk to reset the employee's MFA registration. Once they had access, they moved laterally across the network — including into cloud infrastructure (Azure). The ransomware deployment (Ragnar Locker variant) encrypted 100+ ESXi hypervisors, forcing MGM to shut down hotel operations, casino floors, and reservation systems for over a week. The cost: estimated $100M in lost revenue. Multiple Domain 2 controls failed: no separation of IT and OT networks, lack of proper access controls for help desk password resets, and MFA bypass procedures that relied solely on caller identity verification.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Practice attack classification, configure a DMZ in a virtual environment, and take a Domain 1-2 focused practice test.</p>
+      <ol class="lab-steps">
+        <li>Create attack flashcards: write 20 attack types on cards with name, description, and prevention on the back. Shuffle and test yourself until you get all 20 right.</li>
+        <li>Configure a DMZ in VirtualBox: create 3 VMs (web server, app server, database). Use iptables on a Linux VM as the firewall — allow HTTP/HTTPS to web, block direct DB access from internet.</li>
+        <li>Run a simulated phishing attack using Gophish or SET (Social Engineering Toolkit): <code>sudo setoolkit</code> → Social Engineering Attacks → Credential Harvester → Site Cloner.</li>
+        <li>Take a Domain 1-focused practice test (minimum 25 questions) from examcompass.com — score yourself and review wrong answers.</li>
+        <li>Map 5 attack types from the news to Security+ Domain 1 categories — for each, write which threat actor type, which attack technique, and which control would prevent it.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Attack classification cheat sheet with all 20 attack types organized by Security+ category, screenshots of your DMZ iptables rules, and your Domain 1 practice test score with 3 wrong-answer reviews.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># DMZ firewall rules with iptables</span>
+<span class="cmd"># Allow HTTP/HTTPS from anywhere to web server (10.0.1.10)</span>
+<span class="cmd">sudo iptables -A FORWARD -i eth0 -d 10.0.1.10 \</span>
+<span class="cmd">  -p tcp --dport 80 -j ACCEPT</span>
+<span class="cmd">sudo iptables -A FORWARD -i eth0 -d 10.0.1.10 \</span>
+<span class="cmd">  -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="c"># Allow web server to talk to app server (10.0.2.10) only on port 8080</span>
+<span class="cmd">sudo iptables -A FORWARD -s 10.0.1.10 -d 10.0.2.10 \</span>
+<span class="cmd">  -p tcp --dport 8080 -j ACCEPT</span>
+
+<span class="c"># Block all direct DB access from DMZ</span>
+<span class="cmd">sudo iptables -A FORWARD -s 10.0.1.0/24 -d 10.0.3.0/24 \</span>
+<span class="cmd">  -p tcp --dport 3306 -j DROP</span>
+
+<span class="c"># Default deny all other traffic</span>
+<span class="cmd">sudo iptables -P FORWARD DROP</span>
+
+<span class="c"># View rules</span>
+<span class="cmd">sudo iptables -L -n -v</span>
+
+<span class="c"># Launch SET for phishing simulation</span>
+<span class="cmd">sudo setoolkit</span>
+<span class="hi"># Select: 1) Social Engineering Attacks → 2) Credential Harvester</span>
+<span class="hi"># → 3) Site Cloner → enter target URL → start listener</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between a virus and a worm?"</div>
+        <div class="a">A: "A virus requires human action to spread — it attaches to a file or program and needs someone to execute it. A worm is self-propagating — it exploits network vulnerabilities to spread without human interaction. Examples: viruses spread via email attachments, worms like Stuxnet and WannaCry spread automatically across networks. Viruses infect files, worms infect networks."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is defense-in-depth and why is it important?"</div>
+        <div class="a">A: "Defense-in-depth is a layered security approach where multiple controls protect the same asset. If one control fails, others still provide protection. It's like layers of an onion — the outer layer might be a firewall, then an IDS, then access controls, then encryption, then application security. No single control is perfect — defense-in-depth ensures you're protected even when one layer is breached. It's the fundamental principle behind Domain 2's architecture and design objectives."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between an IPS and an IDS?"</div>
+        <div class="a">A: "IDS (Intrusion Detection System) monitors traffic and alerts when suspicious patterns are detected — it's passive. IPS (Intrusion Prevention System) sits inline and actively blocks malicious traffic in real-time. IDS gives you a report after detection; IPS stops the attack immediately. IPS can have false positives that block legitimate traffic, which is why some organizations use IDS for monitoring and manual response."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Attack type classifier</div>
+        <div class="adesc">Paste a news article about a breach into an LLM and ask: "Classify this attack using Security+ terminology — what type of attack, what threat actor, and what controls would prevent it?"</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">PBQ generator</div>
+        <div class="adesc">Ask an LLM: "Generate 3 Security+ PBQ-style questions for Domain 2 — network architecture design, firewall rule configuration, and secure facility design."</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Flashcard creator</div>
+        <div class="adesc">Ask: "Create 20 flashcards for Security+ Domain 1 — one for each attack type with definition, example, and prevention." Paste output into Anki.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ExamSim</div>
+        <div class="adesc">examcompass.com — free domain-specific Security+ practice tests. Take Domain 1 and Domain 2 tests separately, review incorrect answers thoroughly.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Classified and documented 20+ attack types including malware, social engineering, and network attacks using Security+ Domain 1 framework; configured DMZ network segmentation with iptables firewall rules for defense-in-depth."</li>
+        <li><strong>Portfolio piece:</strong> Attack classification cheat sheet (20 types, categorized) and DMZ iptables configuration output. These demonstrate both theory and hands-on application of Security+ Domains 1 & 2.</li>
+        <li><strong>Interview talking point:</strong> "Understanding attack types (Domain 1) informs how I build defenses (Domain 2). If I know how phishing works, I can design awareness training and email filtering. If I know network segmentation, I can limit an attacker's lateral movement."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Attack classification and network architecture are the two most requested consulting topics for small businesses. Most SMBs can't tell the difference between a virus and a worm or understand why they need a DMZ. You can offer a "Security Architecture Review" — evaluate a client's network design against Domain 2 principles (segmentation, DMZ, access control) — for $1,500-3,000.</p>
+      <p style="margin-bottom:0;">A recurring revenue model: "Security Awareness Training as a Service" — monthly simulated phishing campaigns using Gophish/SET, employee training on attack identification, and quarterly reports. Charge $500-1,000/month per client. Every organization with employees is a potential client, and many cybersecurity regulations (PCI DSS, HIPAA) require security awareness programs.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Name 5 types of social engineering attacks with examples. What's the difference between defense-in-depth and a single security control? What's the difference between a virus and a worm?" If you can answer all three without pausing, Domains 1 & 2 are solid.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=lQZQRh3rGlo" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Security+ Domain 1 — Threats, Attacks & Vulnerabilities — Professor Messer</div><div class="res-desc">youtube.com/watch?v=lQZQRh3rGlo — full Domain 1 breakdown covering malware types, social engineering, application/network/cryptographic attacks.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=6hFP2eA3aAM" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Security+ Domain 2 — Architecture & Design — Professor Messer</div><div class="res-desc">youtube.com/watch?v=6hFP2eA3aAM — defense-in-depth, network segmentation, cloud architecture, and secure facility design.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=2hP12SfO_hI" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Security+ Domain 1 in Hindi — Network Kings</div><div class="res-desc">youtube.com/watch?v=2hP12SfO_hI — Hindi explanation of Domain 1 attack types and threat actors.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=Zk-p4zLkHls" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Build a DMZ Lab with VirtualBox + iptables — follow along</div><div class="res-desc">youtube.com/watch?v=Zk-p4zLkHls — step-by-step guide to setting up a three-tier DMZ network in VirtualBox for hands-on Domain 2 practice.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> All 20 attack types classified and organized — not just listed.</div>
+      <div class="mistake-item"><span class="check">✓</span> DMZ configured with actual iptables rules — not just theory.</div>
+      <div class="mistake-item"><span class="check">✓</span> MGM breach analyzed through Domain 1 (social engineering) and Domain 2 (architecture failure).</div>
+      <div class="mistake-item"><span class="check">✓</span> Phishing simulation run with SET — real experience with actual tool.</div>
+      <div class="mistake-item"><span class="check">✓</span> Domain 1 practice test taken and wrong answers reviewed.</div>
+      <div class="mistake-item"><span class="check">✓</span> Attack-to-news mapping grounds theory in current events.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name 20 attack types and classify them by category.</li>
+        <li><span class="box"></span> I understand defense-in-depth and can explain it.</li>
+        <li><span class="box"></span> I configured a DMZ with iptables firewall rules.</li>
+        <li><span class="box"></span> I ran a simulated phishing attack with SET or Gophish.</li>
+        <li><span class="box"></span> I passed a Domain 1 practice test (reviewing wrong answers).</li>
+        <li><span class="box"></span> I mapped 5 real-world news attacks to Security+ categories.</li>
+        <li><span class="box"></span> I can explain virus vs worm and IDS vs IPS.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">78 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 79</div>
+      <div class="title">Security+ Domains 3 & 4 Deep Review — implementation, operations, and incident response.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 79" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

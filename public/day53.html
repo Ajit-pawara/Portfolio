@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 53 — CTF Strategy — Web Category</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:58.8%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .sq{color:var(--pink);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .sq{color:var(--pink);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day53$ cat ctf-web-strategy.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 53/90 — Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 53 OF 90 — PHASE 3: WEB & NETWORK EXPLOITATION</div>
+  <h1>CTF Strategy <span class="accent">Web Category</span></h1>
+  <p class="subtitle">Web challenges in CTFs reward methodical enumeration over brute force. Today you learn to read source code, manipulate cookies, and bypass filters systematically.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Why web challenges are the most common CTF category:</strong> In any CTF competition, 40-60% of challenges are web-based. They test the same skills as real-world pentesting — reading source code, understanding HTTP mechanics, manipulating parameters, and exploiting logic flaws. Unlike binary exploitation (which requires assembly knowledge) or cryptography (which requires math), web challenges are accessible to anyone who understands how web applications work. The best CTF web players are methodical problem-solvers who read everything on the page before touching a tool.</p>
+
+      <p style="margin-top:16px;"><strong>Four critical web CTF techniques:</strong></p>
+      <div class="code-block">
+<span class="cmt">// 1. PHP Type Juggling — loose comparison exploits</span>
+<span class="req">if ($_GET['pass'] == "admin123") { echo $flag; }</span>
+<span class="sq">// Input: pass=true → true == "admin123"? No, but:</span>
+<span class="sq">// Input: pass=0e123 → 0e123 == "0e456"? PHP treats "0e..." as scientific notation = 0</span>
+<span class="sq">// If hash starts with "0e" followed by digits, it equals "0e" + otherdigits == 0 == 0</span>
+
+<span class="cmt">// 2. JWT Manipulation — "none" algorithm attack</span>
+<span class="req">// Original token: header: {"alg":"HS256"}, payload: {"user":"guest"}</span>
+<span class="sq">// Modified token: header: {"alg":"none"}, payload: {"user":"admin"}</span>
+<span class="sq">// Server accepts unsigned tokens if it doesn't validate the "none" algorithm</span>
+
+<span class="cmt">// 3. SSTI (Server-Side Template Injection)</span>
+<span class="req">// Jinja2 (Flask) — test with: {{7*7}}</span>
+<span class="sq">// If you see "49" in the response, SSTI is confirmed</span>
+<span class="sq">// Payload: {{config.__class__.__init__.__globals__['os'].popen('cat flag.txt').read()}}</span>
+
+<span class="cmt">// 4. GraphQL Introspection</span>
+<span class="req">// Most GraphQL endpoints accept introspection queries</span>
+<span class="sq">// Query: {__schema{types{name fields{name}}}}</span>
+<span class="sq">// If the endpoint returns the schema, you can find hidden queries and mutations</span></div>
+
+      <p><strong>The web CTF methodology:</strong> Start by viewing the page source (Ctrl+U). Check the Network tab for hidden API calls. Look at cookies and local storage. Read JavaScript files — commented-out endpoints are common CTF clues. Try path traversal, parameter pollution, and HTTP method override. If there's a form, test it with empty data, special characters, and long strings. If there's a login, try SQLi, NoSQLi, and type juggling. If there's an API endpoint, fuzz it for hidden parameters. The flag is almost never protected by a sophisticated exploit — it's usually behind a simple manipulation you haven't tried yet.</p>
+
+      <div class="callout"><strong>Key insight:</strong> In CTF web challenges, the source code is always the answer. Not the rendered page — the actual HTML source, the JavaScript, the comments, the error messages. CTF creators leave hints in the source that you'd never see just looking at the rendered page. Always view source first.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>View page source immediately — look for HTML comments, hidden inputs, base64-encoded strings, and JavaScript functions that reveal API endpoints.</li>
+          <li>Use the browser's Developer Tools Network tab — intercept every XHR/fetch request. Modern web apps load data via API calls that aren't visible in the HTML.</li>
+          <li>Test PHP type juggling on login forms: send <code>password[]=</code> (array bypass), <code>password=true</code>, <code>password=0e999999</code> (magic hash).</li>
+          <li>For JWT challenges, decode the token on jwt.io — modify the payload, change alg to "none", and re-encode without a signature. If it works, you bypassed authentication.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Use strict comparison (===) in PHP instead of loose (==) — this prevents type juggling where "0e123" == "0e456" because both evaluate to 0 in scientific notation.</li>
+          <li>In JWT libraries, explicitly disable the "none" algorithm and always verify the signature — don't rely on the algorithm in the token header, use a server-side whitelist.</li>
+          <li>For template engines, use sandboxed rendering environments and disable access to dangerous globals like os, subprocess, and eval.</li>
+          <li>Disable GraphQL introspection in production — the playground and schema dump should only be available in development environments.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">ANNUAL — DEF CON CTF WEB CHALLENGES — REAL-WORLD VULNERABILITIES</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">DEF CON CTF web challenges reflect real-world vulnerabilities seen in major platforms</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Since 1996, DEF CON's annual CTF has been the world's most prestigious cybersecurity competition, with web challenges that closely mirror real-world vulnerabilities. Past challenges have recreated Facebook Graph API access control flaws, Google App Engine misconfigurations, and Twitter XSS vectors. The web category at DEF CON CTF is known for requiring contestants to reverse-engineer obfuscated JavaScript, exploit server-side template injection in custom frameworks, and chain multiple low-severity bugs into a full compromise. Many DEF CON CTF web challenge authors are now security engineers at FAANG companies, and their challenges reflect the vulnerability classes they encounter in production. Solving CTF web challenges at this level directly translates to finding real-world bugs — several DEF CON CTF web challenge solutions have been adapted into actual bug bounty submissions.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> solve 3-5 CTF web challenges covering PHP type juggling, JWT manipulation, SSTI, and GraphQL introspection using free online platforms.</p>
+      <ol class="lab-steps">
+        <li>Go to <strong>websec.fr</strong> (free CTF web challenges). Start with the "Easy" level challenges. Read each challenge's PHP source code — identify the vulnerability class.</li>
+        <li>For PHP type juggling: find a challenge where the comparison uses <code>==</code> instead of <code>===</code>. Submit <code>password=0e999999</code> or <code>password[]=</code> to bypass.</li>
+        <li>For JWT: go to <strong>jwt.io</strong> and decode a sample JWT. Modify the payload, change alg to "none", and encode it. Test against a JWT-based challenge on websec.fr or portswigger.net.</li>
+        <li>For SSTI: navigate to a Jinja2/Flask challenge page. Enter <code>{{7*7}}</code> in a form field — if you see "49" in the response, SSTI is confirmed. Extract secrets with <code>{{config}}</code>.</li>
+        <li>For GraphQL: use a public test API like <strong>countries.trevorblades.com</strong>. Send the introspection query <code>{__schema{types{name}}}</code> via the GraphQL playground to see all available types.</li>
+        <li>Document each challenge: vulnerability class, the clue that revealed it, the payload used, and the flag obtained. Create a reusable "Web CTF Checklist" from your experience.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A "Web CTF Strategy Checklist" — a one-page document listing every technique you used, ordered by the sequence you'd try them on any new challenge. Include example payloads for: source review, cookies, JWT, SSTI, type juggling, and GraphQL.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># PHP Type Juggling Test</span>
+<span class="cmd">curl -X POST http://challenge/ --data "password=true"</span>
+<span class="cmd">curl -X POST http://challenge/ --data "password[]=admin"</span>
+<span class="cmd">curl -X POST http://challenge/ --data "password=0e999999"</span>
+
+<span class="c"># JWT None Algorithm Bypass</span>
+<span class="hi"># Original token (decode on jwt.io):</span>
+<span class="sq">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZ3Vlc3QifQ.abc</span>
+<span class="hi"># Modify: {"alg":"none","typ":"JWT"} . {"user":"admin"} . (no signature)</span>
+<span class="sq">eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4ifQ.</span>
+
+<span class="c"># SSTI Detection (Jinja2/Flask)</span>
+<span class="cmd">curl -X POST http://challenge/ --data "name={{7*7}}"</span>
+<span class="out">Hello 49!</span>
+<span class="hi"># Extract config:</span>
+<span class="cmd">curl -X POST http://challenge/ --data "name={{config}}"</span>
+
+<span class="c"># GraphQL Introspection</span>
+<span class="cmd">curl -X POST http://challenge/graphql \</span>
+<span class="cmd">  -H "Content-Type: application/json" \</span>
+<span class="cmd">  -d '{"query":"{__schema{types{name}}}"}'</span>
+<span class="out">{"data":{"__schema":{"types":[{"name":"Query"},{"name":"User"},...</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's your approach when you encounter a web challenge in a CTF?"</div>
+        <div class="a">A: "I follow a systematic checklist: (1) View page source for comments and hidden fields. (2) Check cookies and localStorage. (3) Intercept all API requests in the Network tab. (4) Read JavaScript files for endpoints. (5) Test forms with special characters, long strings, and empty values. (6) Check for SQLi/<NoSQLi/type juggling on login forms. (7) Test JWT tokens on jwt.io. (8) If template engine is suspected, test {{7*7}} for SSTI. (9) If GraphQL is detected, dump the schema. I don't skip steps — each one reveals something."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "Explain PHP type juggling and how attackers exploit it."</div>
+        <div class="a">A: "PHP's loose comparison operator (==) performs type coercion — it converts values to the same type before comparing. This causes many 'magic' behaviors: '0e12345' == '0e67890' because both are interpreted as 0 (scientific notation: 0 × 10^N). An empty array == null. 'abc' == 0 because PHP converts 'abc' to 0. Attackers exploit this by passing inputs like password=0e999999 or password[]= to bypass authentication checks that use == instead of ===."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is Server-Side Template Injection and how do you find it?"</div>
+        <div class="a">A: "SSTI occurs when user input is embedded into a template that's rendered server-side (Jinja2, Twig, Freemarker, Pug). The attacker injects template syntax that gets executed. Detection: enter {{7*7}} in a form field — if the response shows '49', SSTI is confirmed because the server evaluated the expression. After detection, I explore the template's object hierarchy to find ways to execute system commands. In Jinja2, I chain __class__, __mro__, __subclasses__ to reach the os module and execute commands."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">JWT debugger assistant</div>
+        <div class="adesc">Paste a JWT token into an LLM and ask it to decode, explain each claim, and suggest algorithm attacks (none, HMAC -> RS256 confusion, kid injection).</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">SSTI payload generator</div>
+        <div class="adesc">Describe the template engine (Jinja2, Twig, Freemarker, Pug) and objective (RCE, file read, config dump) — get a payload ready to paste.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">CTF hint system</div>
+        <div class="adesc">Describe what you've found in a CTF web challenge (ports, technologies, forms, cookies) without asking for the full solution — get directed to the next enumeration step.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">GraphQL query builder</div>
+        <div class="adesc">Describe the API you're testing and ask for GraphQL introspection queries to dump schema, find hidden mutations, and test for authorization bypasses.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Solved 50+ CTF web challenges covering PHP type juggling, JWT manipulation, SSTI, and GraphQL introspection; developed a reusable web challenge methodology checklist."</li>
+        <li><strong>Portfolio piece:</strong> a "Web CTF Methodology Checklist" (one-page PDF/HTML) that you can share during interviews. It demonstrates systematic thinking — the quality that most interviewers value above raw technical skill.</li>
+        <li><strong>Talking point:</strong> explaining the difference between loose and strict comparison in PHP, and why it matters for authentication, shows language-level understanding that 90% of web developers don't have.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>CTF skills translate directly to bug bounty hunting — the independent contractor model of cybersecurity. Many of the techniques you've learned today (JWT manipulation, SSTI, GraphQL introspection) are the exact vulnerabilities that pay $500-5,000 on HackerOne and Bugcrowd. A dedicated bug bounty hunter with good methodology can earn $50,000-150,000/year part-time, with top earners exceeding $500K.</p>
+      <p style="margin-bottom:0;">Beyond bug bounty, you can productize your CTF methodology as a "Web Security Auditing Checklist" and sell it to development teams. Many startups don't have security teams and their developers don't know where to start looking for vulnerabilities. A $50 downloadable PDF with your systematic approach — source review → cookie analysis → API fuzzing → authentication testing → input validation → GraphQL audit — solves a real problem for cash-constrained startups that can't afford a $15K pentest.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What's your 9-step checklist for approaching a CTF web challenge?" If you can rattle off every step in order and explain which vulnerability each step targets, you've built a repeatable methodology you can use for every challenge going forward.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=IJaCNe7k-BA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">PHP Type Juggling Explained — PwnFunction</div><div class="res-desc">youtube.com/watch?v=IJaCNe7k-BA — deep explanation of PHP loose comparison and magic hash vulnerabilities with demos.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=brfJp8sYr6I" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">SSTI (Server-Side Template Injection) — PwnFunction</div><div class="res-desc">youtube.com/watch?v=brfJp8sYr6I — explanation of SSTI detection and exploitation across multiple template engines.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=u2xscXKN-k4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">CTF Web Challenges in Hindi — Cybertalks</div><div class="res-desc">youtube.com/watch?v=u2xscXKN-k4 — Hindi walkthrough of common CTF web challenge categories and solutions.</div></div>
+      </a>
+      <a class="res-card" href="https://portswigger.net/web-security/ssti" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PortSwigger SSTI Labs — Interactive Web Security Academy</div><div class="res-desc">portswigger.net/web-security/ssti — free interactive labs for SSTI detection and exploitation across multiple template engines.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Page source viewed before doing anything else — source code is always the answer.</div>
+      <div class="mistake-item"><span class="check">✓</span> Type juggling, JWT, SSTI, GraphQL — four distinct classes with specific detection steps.</div>
+      <div class="mistake-item"><span class="check">✓</span> Systematic checklist created — no more guessing which technique to try next.</div>
+      <div class="mistake-item"><span class="check">✓</span> DEF CON CTF connection — real CTF challenges map to real CVE-able bugs.</div>
+      <div class="mistake-item"><span class="check">✓</span> Defensive mitigations covered alongside each attack technique.</div>
+      <div class="mistake-item"><span class="check">✓</span> Reusable methodology checklist produced — use it for every future web challenge.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can list 5+ CTF web challenge categories and how to detect each.</li>
+        <li><span class="box"></span> I understand PHP type juggling and can craft a bypass payload.</li>
+        <li><span class="box"></span> I modified a JWT token to change the alg to "none".</li>
+        <li><span class="box"></span> I detected and exploited SSTI in a template engine.</li>
+        <li><span class="box"></span> I performed GraphQL introspection to discover schema types.</li>
+        <li><span class="box"></span> I created a reusable Web CTF Methodology Checklist.</li>
+        <li><span class="box"></span> I can teach the web challenge approach out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">53 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 54</div>
+      <div class="title">Phase 3 Complete — Review & Capstone: 10-day web & network exploitation reflection.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 54" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

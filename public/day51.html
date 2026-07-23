@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 51 — Intro to TryHackMe / HackTheBox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:56.6%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day51$ cat intro-ctf-platforms.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 51/90 — Phase 3 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 51 OF 90 — PHASE 3: WEB & NETWORK EXPLOITATION</div>
+  <h1>Intro to TryHackMe <span class="accent">& HackTheBox</span></h1>
+  <p class="subtitle">Capture The Flag platforms are where theory meets hands-on practice. Today you create accounts, understand room/box categories, and solve your first challenges.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Why CTF platforms accelerate learning:</strong> Traditional cybersecurity education follows a curriculum — learn X, then learn Y, then maybe practice Z. CTF platforms invert this: here's a vulnerable machine, figure it out. This forces you to apply knowledge immediately, combine techniques across domains, and develop the research muscle (Googling error messages, reading docs, adapting public exploits). The 1M+ users on TryHackMe and 500K+ on HackTheBox aren't wrong — these platforms produce job-ready practitioners faster than most university programs.</p>
+
+      <p style="margin-top:16px;"><strong>Platform comparison:</strong></p>
+      <div class="code-block">
+<span class="req">TryHackMe (THM)</span>
+<span class="body">  — Guided learning paths with step-by-step rooms</span>
+<span class="body">  — Browser-based Kali (no local VM needed)</span>
+<span class="body">  — Best for: beginners, structured learning, SOC/purple team</span>
+<span class="body">  — Subscription: free ($0), premium ($10/mo)</span>
+
+<span class="req">HackTheBox (HTB)</span>
+<span class="body">  — Open-ended vulnerable machines with no handholding</span>
+<span class="body">  — Requires VPN connection to HTB network</span>
+<span class="body">  — Best for: intermediate/advanced, red team, pentest practice</span>
+<span class="body">  — Subscription: free (limited), VIP ($14/mo), VIP+ ($20/mo)</span></div>
+
+      <p><strong>Your first session roadmap:</strong> Create free accounts on both platforms. On THM, start with the "Complete Beginner" learning path — rooms like "Linux Fundamentals," "Nmap," and "Burp Suite" revisit material you already know but add the CTF twist. On HTB, start with "Starting Point" — a curated set of easy machines with walkthroughs. The goal of today is not to root a hard box; it's to understand the platform mechanics, the VPN/network setup, and the rhythm of enumeration → exploitation → flag submission.</p>
+
+      <div class="callout"><strong>Key insight:</strong> The most common mistake beginners make on CTF platforms is spending hours on a box without taking notes. Every command, every finding, every thought process should be logged. Not only does this help you reproduce the solution, but it's a record of your methodology that you can review and improve. After 90 days, your personal CTF notes will be your most valuable study resource.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>On THM, read the room description carefully — it often hints at the technique you need to use. The room is a learning exercise, not a blind pentest.</li>
+          <li>On HTB, the hardest part is the first 10 minutes: find the attack surface. Run nmap with default scripts (-sC) and version detection (-sV) on all ports — then focus on what's unusual.</li>
+          <li>Use the "try harder" mentality — when stuck, enumerate more. Don't look for writeups until you've run full port scans, directory brute-forcing, and vulnerability scanning.</li>
+          <li>Submit flags as you go — both platforms have user flags (low-priv) and root flags (admin). Get the user flag first, then escalate to root. Each flag is a milestone.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>CTF platforms are also learning tools for defenders — THM's "blue team" path (SOC Level 1) teaches log analysis, incident response, and threat hunting.</li>
+          <li>Study the writeups for boxes you couldn't solve — even after you get the flag, reading how others approached it reveals techniques you hadn't considered.</li>
+          <li>Use the platform's discussion forums to ask specific questions. "I enumerated ports X Y Z, found service A, tried exploit B, got error C" — this forces structured thinking.</li>
+          <li>Track your solve times — as you improve, your time-to-root should decrease. This is a measurable metric of skill progression.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">INDUSTRY IMPACT — TRYHACKME'S ROLE IN SECURITY TRAINING</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Over 1M users have joined TryHackMe, with gamified learning shown to improve retention by 40%</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">TryHackMe, founded in 2018 by Ashu Savani and Ben Spring, has grown to over 1 million registered users across 150+ countries. The platform's gamified learning model — combining guided rooms with capture-the-flag challenges — has been shown to improve practical security skill retention by 40% compared to traditional video-based courses. Major companies including Cisco, Airbus, and the UK's National Cyber Security Centre use TryHackMe for internal team training. The platform's "King of the Hill" competitive mode is used in university cybersecurity competitions. The success of both THM and HTB has proven that hands-on, gamified learning is not just a trend — it's the most effective way to develop practical cybersecurity skills.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> create accounts on TryHackMe and HackTheBox, connect to their networks, and complete at least one introductory room/machine on each.</p>
+      <ol class="lab-steps">
+        <li>Create a free account at tryhackme.com. On THM, start the "Linux Fundamentals" room — it has a browser-based Kali instance. Complete the tasks to get your first flag.</li>
+        <li>On THM, use the AttackBox (browser-based Kali) or connect via OpenVPN. Complete the "Nmap" room — practice scanning the target VM with different flags.</li>
+        <li>Create a free account at hackthebox.com. Go to "Starting Point" — download the VPN configuration file and connect: <code>sudo openvpn starting_point.ovpn</code>.</li>
+        <li>In HTB Starting Point, select the "Meow" machine (easiest). Run <code>ping 10.129.x.x</code> to verify connectivity, then scan with nmap and find the open telnet port.</li>
+        <li>Complete the "Meow" box: connect via telnet with default credentials (root:root), find the flag in the root directory, and submit it on the HTB platform.</li>
+        <li>For each challenge, document in your daily log: target IP, open ports, services detected, exploitation steps, and flags obtained with timestamps.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Screenshots or notes showing: (1) Your THM profile with at least one completed room, (2) Your HTB Starting Point progress with at least one rooted machine, (3) A documented methodology for each challenge.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># THM — Connect via OpenVPN (alternative to AttackBox)</span>
+<span class="cmd">sudo openvpn your-config-file.ovpn</span>
+<span class="hi"># Navigate to THM room, start machine, get target IP</span>
+
+<span class="c"># THM — Basic nmap scan on target</span>
+<span class="cmd">nmap -sV 10.10.x.x</span>
+<span class="out">22/tcp open  ssh     OpenSSH 7.6p1</span>
+<span class="out">80/tcp open  http    Apache httpd 2.4.29</span>
+
+<span class="c"># HTB — Connect to Starting Point VPN</span>
+<span class="cmd">sudo openvpn starting_point.ovpn</span>
+
+<span class="c"># HTB — Scan Meow machine (10.129.1.x)</span>
+<span class="cmd">nmap -p- --min-rate=1000 10.129.1.x</span>
+<span class="out">23/tcp open  telnet</span>
+
+<span class="c"># HTB — Connect to Meow via telnet</span>
+<span class="cmd">telnet 10.129.1.x</span>
+<span class="hi"># Login: root / root (default credentials work)</span>
+
+<span class="c"># HTB — Find the flag</span>
+<span class="cmd">ls /</span>
+<span class="cmd">cat /flag.txt</span>
+<span class="out">HTB{...}</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between TryHackMe and HackTheBox, and which one would you recommend to a beginner?"</div>
+        <div class="a">A: "TryHackMe is guided learning with step-by-step rooms, a browser-based attack box, and structured learning paths. It's ideal for beginners because you're never left entirely on your own — rooms tell you what to do and teach as you go. HackTheBox is open-ended — you get an IP address and must figure out everything yourself. I recommend starting with THM for structured learning, then transitioning to HTB once you're comfortable with enumeration methodology. Many professionals use both: THM for learning new techniques, HTB for testing their skills under pressure."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you approach a HackTheBox machine you've never seen before?"</div>
+        <div class="a">A: "I follow a consistent methodology: (1) Full port scan with nmap -p- to find all open ports. (2) Service version detection with -sV on discovered ports. (3) If HTTP is open, directory brute-forcing with gobuster or ffuf. (4) Vulnerability scanning with nikto or searchsploit for the discovered services. (5) If I find an exploit, I test it against the target. (6) After initial access, I immediately run enumeration for privilege escalation. Each step is documented with timestamps so I can identify where I spent too much time."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How many HTB boxes have you solved? Walk me through one you're proud of."</div>
+        <div class="a">A: "I've solved 15+ HTB machines and completed the Complete Beginner path on THM. One box I'm proud of is [name of box] — it required chaining a SQL injection in a web application with a sudo misconfiguration for privilege escalation. The SQL injection was blind boolean-based, so I had to write a Python script to automate the extraction. The privesc was a custom binary with SUID that I hadn't seen before — I had to analyze it with strings and understand its behavior before crafting the exploit."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Writeup analyzer</div>
+        <div class="adesc">After solving a box, paste the writeup into an LLM and ask it to extract the key methodology steps as a checklist — reinforces learning from successful solutions.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Stuck-on-CTF assistant</div>
+        <div class="adesc">Describe what you've enumerated (ports, services, findings) without asking for the direct solution — the LLM can suggest what you might have missed or what to try next.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Note-taking template generator</div>
+        <div class="adesc">Ask for a Markdown template for CTF/HTB note-taking — organized sections for recon, exploitation, privesc, and flags. Use this template for every box going forward.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Box difficulty ranker</div>
+        <div class="adesc">Ask which HTB or THM boxes cover specific techniques — "Which easy boxes involve XSS?" or "Which starting point boxes teach SQL injection?" — plan your learning path.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Active member of TryHackMe (top X%) and HackTheBox platforms; completed [N] machines with documented methodology including recon, exploitation, and privilege escalation."</li>
+        <li><strong>Portfolio piece:</strong> a public TryHackMe or HackTheBox profile link. Many employers now explicitly ask for HTB rank or THM progress in job applications — it's a verifiable credential.</li>
+        <li><strong>Talking point:</strong> being able to discuss specific boxes, techniques learned, and your methodology for approaching unknown targets demonstrates practical experience that coursework alone can't provide.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>CTF platforms are the ultimate portfolio builder for a freelance security career. Your public HTB rank is a credential that's verifiable and trusted — it's worth more on your website than most certifications for certain types of clients (SaaS companies, startups, tech-forward firms). Many HTB top 1% ranked individuals have built consulting careers without any formal degrees.</p>
+      <p style="margin-bottom:0;">Business opportunity: "CTF Coaching" — a service where you guide beginners through their first 10 boxes. Many students try CTF platforms, get stuck, and quit. A weekly 1-hour coaching session where you teach methodology (not give answers) is a $500-1,000/month coaching service. Use your own solve documentation as the curriculum. Target college cybersecurity clubs and career-switchers who need structured guidance.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What are TryHackMe and HackTheBox, how are they different, and what's your methodology for approaching a machine you've never seen before?" If you can describe the enumeration-before-exploitation philosophy, you've understood the core lesson.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=YflWmL3Vq0E" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Getting Started with TryHackMe — The Cyber Mentor</div><div class="res-desc">youtube.com/watch?v=YflWmL3Vq0E — walkthrough of creating an account, connecting, and completing your first room.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=zM3Tu2c5GxQ" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">HackTheBox Starting Point — IppSec</div><div class="res-desc">youtube.com/watch?v=zM3Tu2c5GxQ — IppSec walks through HTB Starting Point with methodology explanations.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=JQKypQ4T7jo" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">TryHackMe & HTB Beginner Guide in Hindi — Cybersploit</div><div class="res-desc">youtube.com/watch?v=JQKypQ4T7jo — Hindi guide to getting started on both platforms.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/linuxfundamentalspart1" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Linux Fundamentals (Free Room)</div><div class="res-desc">tryhackme.com/room/linuxfundamentalspart1 — the perfect starting room for beginners on THM with browser-based Kali.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Accounts created on both THM and HTB — free tiers accessed.</div>
+      <div class="mistake-item"><span class="check">✓</span> VPN connection tested and verified before attempting machines.</div>
+      <div class="mistake-item"><span class="check">✓</span> Methodology documented — not just solving, but learning how to learn.</div>
+      <div class="mistake-item"><span class="check">✓</span> Starting Point (HTB) and beginner path (THM) — appropriate difficulty.</div>
+      <div class="mistake-item"><span class="check">✓</span> Note-taking template prepared for future boxes.</div>
+      <div class="mistake-item"><span class="check">✓</span> Interview talking point prepared — specific boxes and techniques learned.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I created a TryHackMe account and completed at least one room.</li>
+        <li><span class="box"></span> I created a HackTheBox account and connected via OpenVPN.</li>
+        <li><span class="box"></span> I completed at least one Starting Point machine on HTB.</li>
+        <li><span class="box"></span> I understand the difference between THM and HTB learning styles.</li>
+        <li><span class="box"></span> I established a note-taking template for future CTF challenges.</li>
+        <li><span class="box"></span> I can describe my approach to an unknown machine in under 90 seconds.</li>
+        <li><span class="box"></span> I have my THM/HTB profiles ready to share on my resume/portfolio.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">51 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 52</div>
+      <div class="title">Solve Your First Easy HTB/THM Box — Blue / EternalBlue.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 52" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

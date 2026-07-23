@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 67 — Digital Forensics Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:75%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .forensics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .forensics-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .forensics-grid .f-label{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;}
+  .forensics-grid .f-desc{font-size:12px;color:var(--muted);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day67$ cat forensics-basics.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 67/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 67 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Digital Forensics <span class="accent">Basics</span></h1>
+  <p class="subtitle">Forensics is the scientific method applied to incident investigation. Today you create forensic images, recover deleted files, and build a timeline of attacker activity.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The Forensic Methodology:</strong> Digital forensics follows the same scientific principles as physical forensics — preserve the scene, collect evidence systematically, maintain chain of custody, analyze without altering originals. The core principle: never work on the original evidence. Always create a bit-for-bit forensic image (using tools like <code>dd</code> or FTK Imager) and analyze the copy. This preserves the integrity of evidence for potential legal proceedings.</p>
+
+      <p style="margin-top:16px;"><strong>Key forensic disciplines:</strong></p>
+      <div class="forensics-grid">
+        <div><div class="f-label" style="color:var(--cyan);">Disk Forensics</div><div class="f-desc">Imaging hard drives (dd, FTK Imager), analyzing partition tables, file systems (NTFS, ext4, APFS), recovering deleted files, carving unallocated space.</div></div>
+        <div><div class="f-label" style="color:var(--amber);">Memory Forensics</div><div class="f-desc">Capturing RAM (LiME, DumpIt, FTK Imager), analyzing processes, network connections, registry keys in memory — artifacts not written to disk.</div></div>
+        <div><div class="f-label" style="color:var(--green);">Network Forensics</div><div class="f-desc">Capturing and analyzing pcap files (tcpdump, Wireshark), reconstructing TCP streams, identifying C2 patterns, extracting exfiltrated data.</div></div>
+        <div><div class="f-label" style="color:var(--purple);">File Carving</div><div class="f-desc">Extracting files from raw disk images by looking for file headers (magic bytes). Tools: foremost, scalpel, photorec — recover JPEGs, PDFs, archives from unallocated space.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Chain of Custody:</strong> The legal foundation of digital forensics. Every time evidence is collected, transferred, accessed, or analyzed, it must be documented. The chain of custody form records: who collected the evidence, when, where, what tools were used, the hash values (MD5/SHA256) of the evidence at acquisition, and every subsequent person who accessed it. A broken chain of custody makes evidence inadmissible in court.</p>
+
+      <div class="code-block">
+<span class="cmt"># Forensic acquisition workflow</span>
+<span class="hdr">1. IDENTIFY</span> <span class="val">— Locate relevant devices (laptops, servers, USB drives, phones)</span>
+<span class="hdr">2. COLLECT</span> <span class="val">— Create forensic image using write-blocker + dd</span>
+<span class="hdr">3. HASH</span>    <span class="val">— Record SHA256 of original device and image</span>
+<span class="hdr">4. ANALYZE</span> <span class="val">— Work on the copy. Process with Autopsy, X-Ways, or Volatility</span>
+<span class="hdr">5. REPORT</span>  <span class="val">— Document findings with screenshots, timestamps, and methodology</span>
+
+<span class="cmt"># dd imaging command (Linux — use with write-blocker hardware)</span>
+<span class="cmd">sudo dd if=/dev/sda of=/evidence/host1.dd bs=4M conv=noerror,sync status=progress</span>
+
+<span class="cmt"># Verify hash integrity</span>
+<span class="cmd">sha256sum /dev/sda    # hash of original (before imaging)</span>
+<span class="cmd">sha256sum /evidence/host1.dd  # hash of image — should match</span></div>
+
+      <div class="callout"><strong>Why this matters:</strong> Forensic evidence is what separates a security incident report from admissible evidence in court. Every SOC analyst should know how to acquire evidence without altering it, because you never know which incident will end up in litigation. The <code>dd</code> command with the right flags is the foundation.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Use timestomping (e.g., <code>Set-MacAttribute</code> or <code>touch -t</code>) to modify file creation/modification timestamps, complicating timeline reconstruction by placing the malware before the compromise window.</li>
+          <li>Overwrite deleted files with zeros (<code>sdelete</code>, <code>wipe</code>) before they can be carved from unallocated space — file carving only works if the data hasn't been overwritten.</li>
+          <li>Run entirely from memory (fileless malware) to leave minimal disk artifacts — PowerShell payloads that never touch the disk are invisible to traditional disk forensics.</li>
+          <li>Encrypt exfiltrated data before sending it — even if network forensics captures the traffic, the contents are unreadable without the encryption key.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Capture memory before powering off a suspect system — RAM contains running processes, open network connections, and decrypted data that disappears on shutdown. Use LiME or DumpIt.</li>
+          <li>Always use a hardware write-blocker when imaging drives — a software write-blocker is not admissible in court. The write-blocker ensures zero bytes are written to the evidence drive.</li>
+          <li>Document the hash chain: original device hash → image hash → analysis copy hash. Any mismatch breaks the chain and the evidence is compromised.</li>
+          <li>Collect volatile data first (order of volatility): registers → cache → RAM → process table → network connections → disk. Get the most volatile data before it changes.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2014 — SONY PICTURES ENTERTAINMENT — 100 TB EXFILTRATED</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Digital forensics revealed attackers had access to Sony's systems for over a month before data was wiped</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">FBI forensic investigators recovered critical evidence from Sony's compromised systems after the "Guardians of Peace" group wiped 3,000+ workstations and 800 servers. Disk forensics on surviving systems revealed the attackers had maintained access since September 2014 — a full month before the November 24 wipe event. File system timestamps showed data exfiltration through encrypted FTP channels. Memory forensics on servers that hadn't been fully wiped revealed Beacon malware communicating with C2 infrastructure traced to IPs in South Korea and Singapore. The forensic timeline was crucial in attributing the attack to North Korean state-sponsored actors (Lazarus Group), and the chain-of-custody documentation was used in the FBI's criminal complaint.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> create a forensic image, recover deleted files, and build an activity timeline using command-line forensics tools.</p>
+      <ol class="lab-steps">
+        <li>Create a practice target: <code>dd if=/dev/urandom of=/tmp/test_disk.img bs=1M count=100</code> — a 100MB dummy disk image. Then format it: <code>mkfs.ext4 /tmp/test_disk.img</code>.</li>
+        <li>Mount the image, create some files, then delete them: <code>sudo mount -o loop /tmp/test_disk.img /mnt/forensic; echo "secret data" > /mnt/forensic/passwords.txt; rm /mnt/forensic/passwords.txt</code>.</li>
+        <li>Create a forensic image of the loop device (not the file): identify the loop device with <code>losetup -a</code>, then <code>sudo dd if=/dev/loop0 of=/tmp/evidence.dd bs=4M status=progress</code>.</li>
+        <li>Verify hash integrity: <code>sha256sum /tmp/test_disk.img /tmp/evidence.dd</code> — they should match.</li>
+        <li>Recover deleted files using foremost: <code>sudo foremost -i /tmp/evidence.dd -o /tmp/foremost_output</code>. Check the recovered files in <code>/tmp/foremost_output</code>.</li>
+        <li>Build a timeline: use <code>fls</code> (from Sleuth Kit) to list files and their metadata: <code>fls -r -m / -o 0 /tmp/evidence.dd | mactime -b -d > /tmp/timeline.csv</code>. Examine the MAC times (modified, accessed, changed).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a screenshot showing the recovered deleted file from foremost output and the timeline CSV showing the file creation and deletion events. This proves you can acquire forensic images and recover deleted evidence.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Create a practice disk and files</span>
+<span class="cmd">dd if=/dev/urandom of=/tmp/test_disk.img bs=1M count=100</span>
+<span class="cmd">mkfs.ext4 /tmp/test_disk.img</span>
+<span class="cmd">sudo mount -o loop /tmp/test_disk.img /mnt/forensic</span>
+<span class="cmd">echo "admin:password123" > /mnt/forensic/passwords.txt</span>
+<span class="cmd">echo "secret key: abc123" > /mnt/forensic/keys.txt</span>
+<span class="cmd">rm /mnt/forensic/passwords.txt  # simulate deletion</span>
+<span class="cmd">sudo umount /mnt/forensic</span>
+
+<span class="c"># Step 2 — Identify loop device & create forensic image</span>
+<span class="cmd">losetup -a</span>
+<span class="out">&gt; /dev/loop0: [0064]:12345 (/tmp/test_disk.img)</span>
+<span class="cmd">sudo dd if=/dev/loop0 of=/tmp/evidence.dd bs=4M status=progress</span>
+
+<span class="c"># Step 3 — Verify hash integrity</span>
+<span class="cmd">sha256sum /tmp/test_disk.img /tmp/evidence.dd</span>
+<span class="out">&gt; abc123def456...  /tmp/test_disk.img</span>
+<span class="out">&gt; abc123def456...  /tmp/evidence.dd  ← MUST MATCH</span>
+
+<span class="c"># Step 4 — Recover deleted files with foremost</span>
+<span class="cmd">sudo foremost -i /tmp/evidence.dd -o /tmp/foremost_output</span>
+<span class="cmd">ls -la /tmp/foremost_output/</span>
+<span class="cmd">cat /tmp/foremost_output/*/*.txt 2>/dev/null</span>
+<span class="out">&gt; admin:password123  ← Recovered!</span>
+
+<span class="c"># Step 5 — Build timeline with Sleuth Kit</span>
+<span class="cmd">fls -r -m / -o 0 /tmp/evidence.dd | mactime -b -d > /tmp/timeline.csv</span>
+<span class="cmd">cat /tmp/timeline.csv | grep "passwords\|keys"</span>
+<span class="out">&gt; 0|passwords.txt|...|...|MACB|...</span>
+<span class="out">&gt; 0|keys.txt|...|...|MACB|...</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is the order of volatility and why does it matter?"</div>
+        <div class="a">A: "The order of volatility is the sequence in which digital evidence should be collected based on how quickly it changes. From most volatile to least: CPU registers and cache, routing tables, ARP cache, process table, kernel statistics, RAM, temporary files, disk. You collect the most volatile data first because it disappears when the power is cut — RAM contents are lost on shutdown, network connections are lost on disconnect. This is why you capture memory before powering off a system during incident response."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is a forensic image and how is it different from a backup?"</div>
+        <div class="a">A: "A forensic image is a bit-for-bit copy of the entire storage device, including the operating system, deleted files, unallocated space, and file system metadata. A backup only copies active files. The forensic image preserves every byte, including data in unallocated space that may contain deleted files. Forensic images use tools like dd or FTK Imager, are verified with SHA256 hashes, and are acquired through a write-blocker to ensure the original isn't modified."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you recover deleted files from an NTFS drive?"</div>
+        <div class="a">A: "First, create a forensic image of the drive using a write-blocker — never work on the original drive. Then use file carving tools like foremost or scalpel to scan the image for file headers (magic bytes). NTFS Forensics: the MFT (Master File Table) keeps records even after deletion until overwritten. Tools like The Sleuth Kit's fls can list recently deleted files by analyzing the MFT. For deeper recovery, carve the unallocated space looking for known file signatures (JPEG: FF D8 FF, PDF: 25 50 44 46). The key principle: time is critical — the more the drive is used after deletion, the more likely the data is overwritten."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Timeline analyzer</div>
+        <div class="adesc">Paste a timeline CSV (file metadata with timestamps) into an LLM and ask it to identify suspicious patterns — files created before the compromise window, unusual access times.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Forensic report generator</div>
+        <div class="adesc">Describe your analysis process and findings — get a structured forensic report in template format with sections for methodology, findings, and chain of custody.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Volatility command generator</div>
+        <div class="adesc">Describe what you want to extract from a memory dump (e.g., "list processes with network connections from the past 24 hours") and get the exact Volatility command.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Tool selector for artifacts</div>
+        <div class="adesc">Describe the evidence type and question — "I have a Windows 10 memory dump from a possible ransomware infection" — and get a tool selection with specific commands.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Acquired bit-for-bit forensic disk images using dd with write-blocker methodology; recovered deleted files using foremost; built forensic timelines using The Sleuth Kit."</li>
+        <li><strong>Portfolio piece:</strong> a documented forensic acquisition and recovery exercise — original hash, image hash, foremost output showing recovered files, timeline CSV excerpt.</li>
+        <li><strong>Talking point:</strong> understanding chain of custody and the order of volatility demonstrates you comprehend forensics as a legal process, not just a technical exercise — this is what differentiates a DFIR analyst from a general IT admin.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Digital forensics services are in high demand among law firms, insurance companies, and corporations needing evidence preservation for litigation or breach response. Small and mid-sized law firms rarely have in-house forensic capabilities and contract out every case. A basic forensic acquisition and report — imaging a drive, recovering relevant files, documenting chain of custody — can command $2,000-5,000 per engagement.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "First Responder Forensics Kit" — a USB drive with bootable forensic tools (CAINE, Paladin) plus a template chain-of-custody form and acquisition checklist. Sell to IT departments that need to preserve evidence but can't afford full-time forensic analysts. Include a remote analysis service option: "Drop-ship the drive, we image and analyze within 48 hours" — $1,500 flat fee.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is the forensic methodology, what's the order of volatility, and how do you recover a deleted file from a disk image?" If you can describe dd acquisition, hash verification, file carving, and timeline creation in sequence, you have a working mental model of digital forensics.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=izqiXxvbFnE" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Digital Forensics Tutorial — 13Cubed</div><div class="res-desc">youtube.com/watch?v=izqiXxvbFnE — comprehensive introduction to forensic imaging, file carving, and timeline analysis with real tools.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=2YqRHEogYbA" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Sleuth Kit and Autopsy Forensics Tutorial — CyberSecurityTV</div><div class="res-desc">youtube.com/watch?v=2YqRHEogYbA — full walkthrough of The Sleuth Kit commands for forensic analysis and timeline generation.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=G4fD_HYCDmI" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Digital Forensics in Hindi — Deepak Naukri</div><div class="res-desc">youtube.com/watch?v=G4fD_HYCDmI — Hindi explanation of forensic principles, dd imaging, and evidence preservation.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/forensics" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Digital Forensics Room</div><div class="res-desc">tryhackme.com/room/forensics — free room with practical forensic imaging and analysis exercises using The Sleuth Kit.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Forensic methodology based on scientific principles — not "search for bad files."</div>
+      <div class="mistake-item"><span class="check">✓</span> Order of volatility understood — RAM before disk, live acquisition before shutdown.</div>
+      <div class="mistake-item"><span class="check">✓</span> Chain of custody documented with hash verification at each transfer.</div>
+      <div class="mistake-item"><span class="check">✓</span> dd imaging with noerror,sync flags — read errors don't stop the process.</div>
+      <div class="mistake-item"><span class="check">✓</span> File carving with foremost demonstrated against a real image with deleted files.</div>
+      <div class="mistake-item"><span class="check">✓</span> Timeline creation with fls and mactime — MAC times for activity reconstruction.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Sony Pictures forensics example — 1 month dwell time discovered through forensic timeline.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain the forensic methodology and chain of custody.</li>
+        <li><span class="box"></span> I know the order of volatility and why it's important.</li>
+        <li><span class="box"></span> I created a forensic disk image using dd with hash verification.</li>
+        <li><span class="box"></span> I recovered deleted files using foremost file carving.</li>
+        <li><span class="box"></span> I built a forensic timeline using The Sleuth Kit.</li>
+        <li><span class="box"></span> I understand why write-blockers are required for legally admissible evidence.</li>
+        <li><span class="box"></span> I can teach forensic acquisition fundamentals out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">67 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 68</div>
+      <div class="title">Malware Analysis — Static Basics — PE headers, strings, hashes, and imports.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 68" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

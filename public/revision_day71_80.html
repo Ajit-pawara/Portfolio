@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 71 to Day 80</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day71_to_day80.md</span>
+    <span style="color:var(--green);">Phase 4 Finale — GRC, DevSecOps, Career & Cert</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 71 TO DAY 80</div>
+    <h1>Governance, Career Strategy &amp; Security+. <span>Phase 4 complete.</span></h1>
+    <p>Days 71-80 shift from technical defense to governance, risk, compliance, career planning, and certification. You will cover ISO 27001, GDPR, risk assessment, Zero Trust architecture, DevSecOps, career path selection, and the full CompTIA Security+ exam across all five domains.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">16</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">71</div>
+      <div class="day-meta">
+        <div class="day-title">Security Policies &amp; Compliance (ISO 27001, GDPR)</div>
+        <span class="day-incident">Meta GDPR Fine Euro1.2B (2023)</span>
+      </div>
+    </div>
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">ISO 27001 ISMS</div><div class="cdesc">Information Security Management System framework. 93 controls in 2022 revision across 4 domains. Certification requires external audit every 3 years.</div></div>
+      <div class="concept"><div class="ctitle">GDPR Data Subject Rights</div><div class="cdesc">Right to access, rectification, erasure, data portability, object to processing. 72-hour breach notification. Fines up to 4% of global revenue.</div></div>
+      <div class="concept"><div class="ctitle">Annex A Controls (2022)</div><div class="cdesc">93 controls: Organizational (37), People (8), Physical (14), Technological (34). New: threat intelligence, cloud security, physical security monitoring.</div></div>
+      <div class="concept"><div class="ctitle">DPA / DPO</div><div class="cdesc">Data Processing Agreement defines vendor data handling. Data Protection Officer mandated for large-scale personal data processing under GDPR Art. 37.</div></div>
+    </div>
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Meta Euro1.2B GDPR Fine (May 2023):</strong> The Irish Data Protection Commission fined Meta Euro1.2B for violating GDPR data transfer requirements — sending EU user data to the US under Standard Contractual Clauses that the Court of Justice ruled inadequate via the Schrems II decision. This is the largest GDPR fine in history. The fine was not for a data breach but for a compliance failure in cross-border data transfers. Compliance risk can exceed breach risk financially.</p>
+    <div class="section-label">// commands / key docs</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>NIST SP 800-53 Rev. 5</code><div class="cdesc">1,000+ security and privacy controls mapped to ISO 27001. Crosswalk for FedRAMP compliance.</div></div>
+      <div class="cmd-row"><code>GDPR Article 33 — Breach Notification</code><div class="cdesc">Mandatory 72-hour notification. Document everything — delay justification must be provable.</div></div>
+      <div class="cmd-row"><code>ISO 27001:2022 Clause 6.1</code><div class="cdesc">Risk treatment: define acceptance criteria, identify risks, evaluate options (mitigate/accept/transfer/avoid), produce Statement of Applicability.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What is the difference between a security policy and a security control?</div>
+      <div class="a">A policy is a high-level document stating management intent (all data at rest must be encrypted). A control is the specific mechanism that implements it (AES-256 via BitLocker on all laptops). ISO 27001 requires policies AND controls — the policy without a control is just a wish.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">72</div>
+      <div class="day-meta">
+        <div class="day-title">Risk Assessment Basics</div>
+        <span class="day-incident">JPMorgan Chase — $600M+ Annual Budget</span>
+      </div>
+    </div>
+    <div class="section-label">// NIST SP 800-30 methodology</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Asset Identification</div><div class="cdesc">List everything of value: customer data, IP, systems, facilities. Risk assessment starts when you know what you are protecting.</div></div>
+      <div class="concept"><div class="ctitle">Threat + Vulnerability = Risk</div><div class="cdesc">Threat (ransomware group) + Vulnerability (unpatched SMB) = Risk. No vulnerability = no risk regardless of threat.</div></div>
+      <div class="concept"><div class="ctitle">Inherent vs Residual Risk</div><div class="cdesc">Inherent = risk before controls. Residual = risk after controls. Your job is to reduce residual risk to the acceptable level.</div></div>
+      <div class="concept"><div class="ctitle">Risk Treatment Options</div><div class="cdesc">Mitigate (implement control), Accept (management sign-off), Transfer (cyber insurance), Avoid (discontinue activity).</div></div>
+    </div>
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>JPMorgan Chase (2014-Present):</strong> After the 2014 breach affecting 76M households, JPMorgan increased annual cybersecurity spending to $600M+. Risk assessment frameworks drive budget allocation: highest-risk assets (payment systems, customer PII, SWIFT) receive the most investment. The bank calculates Annualized Loss Expectancy (ALE) for each threat scenario to justify spending. This is risk-based budgeting at enterprise scale.</p>
+    <div class="section-label">// commands / risk formulas</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ALE = SLE x ARO</code><div class="cdesc">Annualized Loss Expectancy = Single Loss Expectancy x Annual Rate of Occurrence. Quantitative risk in dollars.</div></div>
+      <div class="cmd-row"><code>SLE = AV x EF</code><div class="cdesc">Single Loss Expectancy = Asset Value x Exposure Factor. If $1M server has 50% exposure, SLE = $500K.</div></div>
+      <div class="cmd-row"><code>NIST SP 800-30 Rev. 1</code><div class="cdesc">Guide for risk assessments. 9-step process from system characterization to monitoring.</div></div>
+      <div class="cmd-row"><code>FAIR Model</code><div class="cdesc">Factor Analysis of Information Risk — decomposes risk into Loss Event Frequency and Loss Magnitude. More granular than NIST qualitative.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Explain qualitative vs quantitative risk assessment.</div>
+      <div class="a">Qualitative uses ordinal scales (Low/Medium/High/Critical) based on expert judgment — faster but subjective. Quantitative uses hard numbers (ALE in dollars, probability percentages) — more defensible but requires data. Most orgs do qualitative for quick decisions and quantitative for major investments. Both are valid under NIST 800-30.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">73</div>
+      <div class="day-meta">
+        <div class="day-title">Zero Trust Architecture Concept</div>
+        <span class="day-incident">Google BeyondCorp Implementation</span>
+      </div>
+    </div>
+    <div class="section-label">// zero trust pillars</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Identity Verification</div><div class="cdesc">Every request authenticated, not just perimeter. MFA required for every access. No implicit trust based on network location.</div></div>
+      <div class="concept"><div class="ctitle">Device Posture Check</div><div class="cdesc">Device must meet baseline (OS patched, AV running, disk encrypted). Non-compliant devices blocked regardless of user identity.</div></div>
+      <div class="concept"><div class="ctitle">Micro-Segmentation</div><div class="cdesc">Network segmented into tiny zones. Lateral movement requires re-authentication at each boundary. Unlike flat networks where one breach = total compromise.</div></div>
+      <div class="concept"><div class="ctitle">Least Privilege Access</div><div class="cdesc">Minimum permissions for minimum time (JIT). No standing admin rights. Every elevated access logged and time-bound.</div></div>
+    </div>
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Google BeyondCorp (2009-2017):</strong> Google eliminated the corporate VPN for 100K+ employees. No more trusted internal network. Access decisions based on device inventory, user identity, and real-time posture — not IP address. Employees access internal apps from any network (office, home, coffee shop) with identical security controls. 100K+ daily authentications, zero VPN infrastructure to attack. Now the industry standard.</p>
+    <div class="section-label">// commands / implementation</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>NIST SP 800-207</code><div class="cdesc">Zero Trust Architecture framework. Defines PDP (Policy Decision Point), PEP (Policy Enforcement Point).</div></div>
+      <div class="cmd-row"><code>iptables -A FORWARD -i eth1 -o eth2 -j DROP</code><div class="cdesc">Micro-segmentation — drop inter-VLAN traffic to prevent lateral movement.</div></div>
+      <div class="cmd-row"><code>OPA rego policy</code><div class="cdesc">Policy-as-code: allow { input.user.role == "admin"; input.device.encrypted == true }</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How does Zero Trust differ from traditional perimeter security?</div>
+      <div class="a">Traditional security trusts everything inside the network (castle-and-moat). Once past the firewall, you are trusted. Zero Trust trusts nothing — every access request, even from inside the building, must authenticate, be authorized, and pass device posture checks. The network is always considered hostile. Google does not trust its own office Wi-Fi.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">74</div>
+      <div class="day-meta">
+        <div class="day-title">DevSecOps &amp; Secure SDLC Intro</div>
+        <span class="day-incident">Etsy — Continuous Security Pipeline</span>
+      </div>
+    </div>
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Shift Left</div><div class="cdesc">Find security issues earlier. A vuln found in production costs 100x more than one caught in IDE. Test at commit, not at deploy.</div></div>
+      <div class="concept"><div class="ctitle">SAST vs DAST</div><div class="cdesc">SAST analyzes source code without running (finds SQLi, XSS, hardcoded secrets). DAST tests the running app (finds runtime issues like misconfigured headers).</div></div>
+      <div class="concept"><div class="ctitle">SCA (Software Composition Analysis)</div><div class="cdesc">Scans open-source dependencies for known CVEs. OWASP Dependency-Check, Snyk, Dependabot. Modern apps are 80%+ open source.</div></div>
+      <div class="concept"><div class="ctitle">Pre-Commit Hooks</div><div class="cdesc">Scan for secrets before code reaches repo. gitleaks, truffleHog, detect-secrets — catch credentials before they hit git history.</div></div>
+    </div>
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Etsy DevSecOps Program:</strong> Etsy automated 23 security checks into their CI/CD pipeline — SAST, SCA, secret scanning, container scanning, IaC validation. Result: vulnerability discovery-to-patch time dropped from weeks to under 24 hours. A developer commits code with a vulnerable library, the pipeline blocks the build, the developer fixes it within hours, and safe code deploys. Security becomes part of velocity, not a bottleneck.</p>
+    <div class="section-label">// commands</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>semgrep --config=auto src/</code><div class="cdesc">Run SAST scan — auto-detect language and apply community rules.</div></div>
+      <div class="cmd-row"><code>dependency-check --scan target/*.war --format HTML</code><div class="cdesc">OWASP Dependency-Check SCA scan — finds CVEs in dependencies.</div></div>
+      <div class="cmd-row"><code>gitleaks detect --source . --verbose</code><div class="cdesc">Scan git repo for hardcoded secrets in commit history.</div></div>
+      <div class="cmd-row"><code>trivy image --severity HIGH,CRITICAL myapp:latest</code><div class="cdesc">Scan container image for high and critical CVEs.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Your DAST finds reflected XSS in staging but SAST missed it. Why?</div>
+      <div class="a">SAST analyzes source code without execution — it can miss vulns introduced at runtime through framework templating, dynamic includes, or server-side rendering. DAST tests the running app and catches issues SAST cannot see. Both are necessary; they find different bug classes. Mature DevSecOps runs SAST on commit, DAST on staging deploy, and SCA on every build.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">75</div>
+      <div class="day-meta">
+        <div class="day-title">Phase 4 Complete: Review &amp; Mini Quiz</div>
+        <span class="day-incident">Full Phase 4 Coverage</span>
+      </div>
+    </div>
+    <div class="section-label">// what phase 4 covered (days 51-75)</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">SOC Operations (Days 51-55)</div><div class="cdesc">SOC tiers, log analysis, SIEM architecture, Splunk SPL, KQL queries, Windows Event Log deep dive.</div></div>
+      <div class="concept"><div class="ctitle">Detection &amp; Response (Days 56-66)</div><div class="cdesc">Event Log analysis, Wireshark traffic, Snort/Suricata IDS, EDR, MISP/STIX threat intel, MITRE ATT&CK, IR lifecycle.</div></div>
+      <div class="concept"><div class="ctitle">Forensics &amp; Malware (Days 67-70)</div><div class="cdesc">Digital forensics (dd, foremost, timelines), static malware analysis (PE headers, strings, IAT), dynamic sandbox analysis (Cuckoo), threat hunting.</div></div>
+      <div class="concept"><div class="ctitle">GRC &amp; Career (Days 71-75)</div><div class="cdesc">ISO 27001/GDPR, risk assessment (NIST 800-30, FAIR), Zero Trust (BeyondCorp), DevSecOps (SAST/DAST/SCA).</div></div>
+    </div>
+    <div class="section-label">// key takeaway</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Phase 4 is the bridge from beginner to SOC-ready. Day 51 you barely understood SIEM. Day 75 you have analyzed malware in a sandbox, written Snort rules, mapped attacks to MITRE ATT&CK, performed forensic imaging, and understood how ISO 27001 drives security programs. This is the foundation every SOC analyst, DFIR specialist, and security engineer builds on.</p>
+    <div class="section-label">// Phase 4 quick stats</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>25 days</code><div class="cdesc">Total days in Phase 4 (Days 51-75)</div></div>
+      <div class="cmd-row"><code>15+ security tools</code><div class="cdesc">Splunk, Wireshark, Snort, Suricata, CrowdStrike, MISP, MITRE ATT&CK, dd, FTK, foremost, pestudio, Cuckoo, Semgrep, Trivy, OWASP DC</div></div>
+      <div class="cmd-row"><code>8 real breach case studies</code><div class="cdesc">Colonial Pipeline, SolarWinds, Hafnium, Sony, Bangladesh Bank, Stuxnet, Kaseya, Dridex</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">76</div>
+      <div class="day-meta">
+        <div class="day-title">Choosing Your Path: Red/Blue/Cloud/AppSec</div>
+        <span class="day-incident">Career Path Salaries 2024</span>
+      </div>
+    </div>
+    <div class="section-label">// career paths compared</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">SOC Analyst (Blue Team)</div><div class="cdesc">$65-95K. Alert triage, log analysis, escalation. High burnout but best foundation. Every senior started here.</div></div>
+      <div class="concept"><div class="ctitle">Penetration Tester (Red Team)</div><div class="cdesc">$150K avg. Deep technical knowledge: web, network, AD, cloud. OSCP is the entry cert.</div></div>
+      <div class="concept"><div class="ctitle">Cloud Security Architect</div><div class="cdesc">$180K avg. Hottest specialization. AWS/Azure/GCP security, IAM, container security, cloud-native controls.</div></div>
+      <div class="concept"><div class="ctitle">AppSec Engineer</div><div class="cdesc">$165K avg. DevSecOps, code review, SAST/DAST pipeline, CI/CD security. Fastest growing due to DevSecOps adoption.</div></div>
+    </div>
+    <div class="section-label">// the 90-day roadmap mindset</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Generalists fill entry-level roles. Specialists fill senior roles at 2x+ compensation. The key is picking one path and committing 90 days of focused learning. Pivoting after 90 days is fine. Flipping every month is career suicide. For SOC: SIEM queries + Windows logs. For pentesting: AD exploitation + web testing. For cloud: AWS/Azure certs + Terraform.</p>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: I am interested in both red and blue team. Which should I pick?</div>
+      <div class="a">Start in a SOC (blue team). SOC experience teaches you how attacks are detected and what defenders look for — this directly makes you a better pentester. Most top pentesters spent 2-3 years in SOC first. Purple team roles exist but are rare and usually senior. Path: SOC (2 years) then specialize based on what energizes you.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">77</div>
+      <div class="day-meta">
+        <div class="day-title">CompTIA Security+ — Exam Overview</div>
+        <span class="day-incident">Security+ in the SOC Hiring Pipeline</span>
+      </div>
+    </div>
+    <div class="section-label">// exam domains &amp; weighting</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Domain 1 — 24%</div><div class="cdesc">Attacks, Threats, Vulnerabilities. Malware types, social engineering, app attacks, wireless, crypto attacks.</div></div>
+      <div class="concept"><div class="ctitle">Domain 2 — 21%</div><div class="cdesc">Architecture &amp; Design. Defense-in-depth, secure network design, virtualization, cloud, IoT security.</div></div>
+      <div class="concept"><div class="ctitle">Domain 3 — 25%</div><div class="cdesc">Implementation. PKI, secure protocols, host/network controls, IAM, mobile device management.</div></div>
+      <div class="concept"><div class="ctitle">Domain 4 — 16%</div><div class="cdesc">Operations &amp; IR. IR process, disaster recovery, forensic procedures, data handling, logging/monitoring.</div></div>
+      <div class="concept"><div class="ctitle">Domain 5 — 14%</div><div class="cdesc">Governance, Risk &amp; Compliance. Policies, risk assessment, BCP, GDPR/HIPAA/FISMA, vendor due diligence.</div></div>
+    </div>
+    <div class="section-label">// key facts</div>
+    <p style="font-size:13.5px;color:#cdd6da;">Exam: 90 questions, 90 minutes, max 900, pass 750. Types: multiple choice (single/multi) + PBQs (drag-and-drop simulations, firewall rules, IR ordering). 60%+ of SOC analyst job postings list Security+ as preferred or required. DoD Directive 8570 mandates Security+ for all DoD information assurance roles.</p>
+    <div class="section-label">// study plan</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>14-day study plan</code><div class="cdesc">Days 1-2: Domain 1 (attacks). Days 3-4: Domain 2 (architecture). Days 5-7: Domain 3 (implementation). Days 8-9: Domain 4 (ops). Days 10-11: Domain 5 (governance). Day 12: PBQ practice. Days 13-14: Full practice tests.</div></div>
+      <div class="cmd-row"><code>PBQ Strategy</code><div class="cdesc">1) Configure firewall after phishing. 2) Order IR steps for malware. 3) Match controls to risk. 4) Drag security controls to architecture diagram.</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">78</div>
+      <div class="day-meta">
+        <div class="day-title">Security+ — Domains 1 &amp; 2 Deep Review</div>
+        <span class="day-incident">Security+ PBQ Case Study Analysis</span>
+      </div>
+    </div>
+    <div class="section-label">// domain 1 — attacks, threats &amp; vulnerabilities</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Phishing Variants</div><div class="cdesc">Spear (targeted), whaling (C-suite), vishing (voice), smishing (SMS). Spear phishing = 65% of initial access in breaches.</div></div>
+      <div class="concept"><div class="ctitle">Malware Types</div><div class="cdesc">Virus (attaches to files), worm (self-propagating, WannaCry), trojan (Dridex), ransomware, rootkit (kernel level), spyware.</div></div>
+      <div class="concept"><div class="ctitle">Application Attacks</div><div class="cdesc">SQLi (injection via input), XSS (stored/reflected/DOM), CSRF (forged requests), buffer overflow (memory overwrite — code execution).</div></div>
+      <div class="concept"><div class="ctitle">Crypto Attacks</div><div class="cdesc">Birthday (hash collision), rainbow tables (pre-computed chains), downgrade (force weaker protocol), collision.</div></div>
+    </div>
+    <div class="section-label">// domain 2 — architecture &amp; design</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Defense in Depth</div><div class="cdesc">Layered: perimeter firewall → network segmentation → endpoint protection → app controls → data encryption. If one layer fails, next catches it.</div></div>
+      <div class="concept"><div class="ctitle">Secure Network Design</div><div class="cdesc">DMZ for public servers, VLAN segmentation, NAT for IP hiding, HSM for cryptographic key storage.</div></div>
+      <div class="concept"><div class="ctitle">Virtualization Security</div><div class="cdesc">Type 1 (bare metal) vs Type 2 (hosted) hypervisor. VM escape, snapshot security, vMotion encryption.</div></div>
+      <div class="concept"><div class="ctitle">Cloud Security Models</div><div class="cdesc">IaaS (you secure OS+), PaaS (you secure app+), SaaS (you secure usage). Shared responsibility model.</div></div>
+    </div>
+    <div class="section-label">// PBQ simulation</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>PBQ Example:</strong> A company suffered a phishing attack. Configure the firewall to: (1) block outbound to C2 IP 203.0.113.5, (2) allow HTTPS, block HTTP outbound, (3) deny inbound from all countries except US. Rule ordering: deny specific before allow general. C2 block first, then country block, then HTTPS allow. iptables: iptables -A OUTPUT -d 203.0.113.5 -j DROP</p>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">79</div>
+      <div class="day-meta">
+        <div class="day-title">Security+ — Domains 3 &amp; 4 Deep Review</div>
+        <span class="day-incident">Real PBQ Scenario — IR Walkthrough</span>
+      </div>
+    </div>
+    <div class="section-label">// domain 3 — implementation</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">PKI &amp; Certificates</div><div class="cdesc">CA issues certs. CRL/OCSP check revocation. Wildcard certs (*.example.com). Certificate pinning for high-security apps.</div></div>
+      <div class="concept"><div class="ctitle">Secure Protocols</div><div class="cdesc">SSH (22, replaces Telnet), TLS 1.3 (443, replaces SSL), SFTP, IPsec (VPN), DNSSEC, SNMPv3 (encrypted).</div></div>
+      <div class="concept"><div class="ctitle">Identity &amp; Access Management</div><div class="cdesc">SSO (SAML/OAuth), MFA (know/have/are), PAM (JIT admin), Kerberos (AD auth), RADIUS (network auth).</div></div>
+      <div class="concept"><div class="ctitle">Host Security Controls</div><div class="cdesc">SELinux (MAC), Windows Defender (AV+EDR), host firewall, CIS benchmarks for secure baselines.</div></div>
+    </div>
+    <div class="section-label">// domain 4 — operations &amp; IR</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>NIST SP 800-61 IR Process</code><div class="cdesc">Preparation → Detection → Containment → Eradication → Recovery → Lessons Learned. Know this order for PBQs.</div></div>
+      <div class="cmd-row"><code>IR PBQ Walkthrough</code><div class="cdesc">Compromised web server: 1) Disable account, 2) Collect memory, 3) Preserve logs, 4) Scan for lateral movement, 5) Patch vuln, 6) Restore from backup.</div></div>
+      <div class="cmd-row"><code>Forensic Procedures</code><div class="cdesc">Order of volatility: register → cache → RAM → process table → disk. Hash verification, chain of custody, write blocker.</div></div>
+      <div class="cmd-row"><code>Data Sovereignty</code><div class="cdesc">Data stays in jurisdiction. Classification: Public, Internal, Confidential, Restricted. Handling procedures per level.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: A PBQ gives you six response steps for a compromised server. How do you order them?</div>
+      <div class="a">Step 1: Disable compromised account (immediate containment). Step 2: Capture memory dump (preserve volatile evidence). Step 3: Preserve logs (copy to external media). Step 4: Scan other servers for lateral movement (scope assessment). Step 5: Patch the exploited vulnerability. Step 6: Restore from clean backup. Always preserve evidence before taking remediation actions.</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">80</div>
+      <div class="day-meta">
+        <div class="day-title">Security+ — Domain 5 + Practice Test</div>
+        <span class="day-incident">Security+ Passing Score Insights</span>
+      </div>
+    </div>
+    <div class="section-label">// domain 5 — governance, risk &amp; compliance</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Security Policies</div><div class="cdesc">AUP (acceptable use), Data Classification, Password Policy, BYOD. Policies define what is allowed; controls enforce it.</div></div>
+      <div class="concept"><div class="ctitle">Risk Management Types</div><div class="cdesc">Qualitative (Low/Med/High), Quantitative (ALE/SLE/ARO), BIA (identifies critical systems, MTD/RTO/RPO).</div></div>
+      <div class="concept"><div class="ctitle">Business Continuity</div><div class="cdesc">RTO (max downtime), RPO (max data loss in time), MTD (max tolerable downtime). Hot site (hours), warm (days), cold (weeks).</div></div>
+      <div class="concept"><div class="ctitle">Compliance Frameworks</div><div class="cdesc">GDPR (EU), HIPAA (US healthcare), PCI-DSS (card data), FISMA (US federal), SOX (financial), SOC 2 (service orgs).</div></div>
+    </div>
+    <div class="section-label">// exam strategy</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Domain Weighting (750/900)</code><div class="cdesc">D1:24% (22q), D2:21% (19q), D3:25% (22q), D4:16% (14q), D5:14% (13q). Study proportional to weight.</div></div>
+      <div class="cmd-row"><code>PBQ Strategy</code><div class="cdesc">Do PBQs LAST. They consume time. Flag and return. MCQs give same points faster — clear all MCQs first.</div></div>
+      <div class="cmd-row"><code>Key Ports for Sec+</code><div class="cdesc">22 SSH, 23 Telnet, 25 SMTP, 53 DNS, 80 HTTP, 110 POP3, 143 IMAP, 389 LDAP, 443 HTTPS, 445 SMB, 3389 RDP.</div></div>
+      <div class="cmd-row"><code>Exam Day Checklist</code><div class="cdesc">Govt ID, no smartwatch, no notes. Pearson Vue webcam monitoring. 90 min, 90 questions. Read each question twice — watch for NOT/EXCEPT/MOST/BEST qualifiers.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What is the difference between RTO and RPO, and why do both matter?</div>
+      <div class="a">RTO (Recovery Time Objective) = how long until systems are back online. RPO (Recovery Point Objective) = how much data loss is acceptable (in time). Example: RTO of 4 hours means restored within 4 hours. RPO of 1 hour means losing up to 1 hour of data is OK. RTO drives infrastructure cost (hot site = expensive). RPO drives backup frequency (hourly backups = more storage).</div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Key References — Quick Timeline</div>
+        <span class="day-incident">Frameworks, incidents &amp; cert facts for interviews</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2009-17</div><div class="incident">Google BeyondCorp</div><div class="detail">Zero Trust pioneer. Eliminated VPNs for 100K+ employees. Industry standard today.</div></div>
+      <div class="bt-row"><div class="year">2010+</div><div class="incident">Etsy DevSecOps</div><div class="detail">23 automated security checks in CI/CD. Patch time: weeks to 24 hours.</div></div>
+      <div class="bt-row"><div class="year">2014+</div><div class="incident">JPMorgan Risk Budget</div><div class="detail">$600M+ annual cybersecurity budget. Risk assessment drives every dollar.</div></div>
+      <div class="bt-row"><div class="year">2018</div><div class="incident">GDPR Enforced</div><div class="detail">EU data protection. 72-hour breach notification. Fines up to 4% of global revenue.</div></div>
+      <div class="bt-row"><div class="year">2020</div><div class="incident">Schrems II Ruling</div><div class="detail">Invalidated EU-US Privacy Shield. Meta Euro1.2B fine was direct consequence.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">Colonial Pipeline (GRC)</div><div class="detail">Lessons: MFA mandate, network segmentation, offline backups became regulatory requirements.</div></div>
+      <div class="bt-row"><div class="year">2022</div><div class="incident">ISO 27001:2022</div><div class="detail">Updated ISMS. 114 to 93 controls. New: threat intelligence, cloud security controls.</div></div>
+      <div class="bt-row"><div class="year">2023</div><div class="incident">Meta Euro1.2B GDPR Fine</div><div class="detail">Largest GDPR fine. Data transfer compliance failure. Compliance risk > breach risk.</div></div>
+      <div class="bt-row"><div class="year">Ongoing</div><div class="incident">Security+ Certification</div><div class="detail">60%+ SOC jobs require it. DoD 8570 mandate. 90 min, 90 questions, 750/900 pass.</div></div>
+      <div class="bt-row"><div class="year">2024</div><div class="incident">Cloud/AppSec Premium</div><div class="detail">Cloud security $180K avg, AppSec $165K. Specialization drives 2x earning vs entry SOC.</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Reference — Days 71-80</div>
+        <span class="day-incident">Frameworks, commands, formulas &amp; exam facts</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>ALE = SLE x ARO</code><div class="cdesc">Annualized Loss Expectancy — quantitative risk formula.</div></div>
+      <div class="cmd-row"><code>SLE = AV x EF</code><div class="cdesc">Single Loss Expectancy = Asset Value x Exposure Factor.</div></div>
+      <div class="cmd-row"><code>ISO 27001:2022 Annex A</code><div class="cdesc">93 controls: Organizational (37), People (8), Physical (14), Technological (34).</div></div>
+      <div class="cmd-row"><code>GDPR Article 33</code><div class="cdesc">72-hour breach notification. Document delay justification.</div></div>
+      <div class="cmd-row"><code>NIST SP 800-207</code><div class="cdesc">Zero Trust Architecture. PDP, PEP, trust algorithm.</div></div>
+      <div class="cmd-row"><code>semgrep --config=auto src/</code><div class="cdesc">SAST scan — injection flaws, hardcoded secrets in source.</div></div>
+      <div class="cmd-row"><code>dependency-check --scan *.war</code><div class="cdesc">SCA scan — CVEs in open-source dependencies.</div></div>
+      <div class="cmd-row"><code>gitleaks detect --source .</code><div class="cdesc">Git secret scanner — catches API keys pre-commit.</div></div>
+      <div class="cmd-row"><code>trivy image --severity HIGH,CRITICAL</code><div class="cdesc">Container image vulnerability scan.</div></div>
+      <div class="cmd-row"><code>iptables -A FORWARD -i eth1 -o eth2 -j DROP</code><div class="cdesc">Micro-segmentation — prevent lateral movement.</div></div>
+      <div class="cmd-row"><code>NIST SP 800-61 Rev. 2</code><div class="cdesc">IR lifecycle: 6 phases in order. Critical for PBQs.</div></div>
+      <div class="cmd-row"><code>Security+ Domain Weighting</code><div class="cdesc">D1:24% D2:21% D3:25% D4:16% D5:14%. Pass: 750/900.</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 71-80</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">ChatGPT for Policy Drafting</div><div class="adesc">Generate ISO 27001 policy templates from natural language prompts.</div></div>
+      <div class="ai-pill"><div class="aname">AI Risk Calculators</div><div class="adesc">Generate risk scenarios and calculate ALE/SLE from natural language descriptions.</div></div>
+      <div class="ai-pill"><div class="aname">Semgrep + AI</div><div class="adesc">Generate custom SAST rules from plain English (catch hardcoded AWS keys).</div></div>
+      <div class="ai-pill"><div class="aname">GPT for PBQ Practice</div><div class="adesc">Generate custom Security+ PBQ scenarios for firewall rules, IR ordering, and risk treatment.</div></div>
+      <div class="ai-pill"><div class="aname">Career Path AI Advisor</div><div class="adesc">LLMs analyze your skills and recommend specialization with 90-day learning plans.</div></div>
+      <div class="ai-pill"><div class="aname">Vanta / Drata (Compliance AI)</div><div class="adesc">Automated SOC 2 / ISO 27001 evidence collection. AI maps controls to evidence.</div></div>
+    </div>
+  </div>
+
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 71-80</div>
+        <span class="day-incident">Lift these directly into your resume</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 71</div><div class="bullet">Mapped ISO 27001 Annex A controls to organizational security domains; created compliance checklists aligned with GDPR breach notification and data subject rights requirements.</div></div>
+      <div class="job-box"><div class="day-ref">Day 72</div><div class="bullet">Performed qualitative and quantitative risk assessments using NIST SP 800-30; calculated ALE/SLE/ARO metrics and produced risk treatment plans with management recommendations.</div></div>
+      <div class="job-box"><div class="day-ref">Day 73</div><div class="bullet">Implemented Zero Trust principles including micro-segmentation and device posture validation; mapped Google BeyondCorp model to organizational access control requirements.</div></div>
+      <div class="job-box"><div class="day-ref">Day 74</div><div class="bullet">Integrated SAST (Semgrep) and SCA (OWASP Dependency-Check) into CI/CD pipeline; implemented pre-commit hooks for secret scanning, reducing vulnerability discovery-to-patch time.</div></div>
+      <div class="job-box"><div class="day-ref">Day 75</div><div class="bullet">Completed Phase 4 review spanning SOC operations, detection engineering, forensics, threat hunting, DevSecOps, and GRC frameworks across 25 training days.</div></div>
+      <div class="job-box"><div class="day-ref">Day 76</div><div class="bullet">Evaluated cybersecurity career paths (SOC, pentesting, cloud, AppSec); performed skills gap analysis with 90-day specialization roadmap aligned to market compensation data.</div></div>
+      <div class="job-box"><div class="day-ref">Days 77-80</div><div class="bullet">Preparing for CompTIA Security+ (SY0-701); mastered all 5 domains covering threats, architecture, implementation, operations, and governance with weighted study plan.</div></div>
+      <div class="job-box"><div class="day-ref">Days 71-75</div><div class="bullet">Developed proficiency in compliance frameworks (ISO 27001, GDPR), risk analysis, Zero Trust architecture, and DevSecOps pipeline security integration.</div></div>
+    </div>
+  </div>
+
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you cannot answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">Why was Meta fined Euro1.2B under GDPR, and what does it teach about compliance risk?</div>
+      <div class="ans">Meta violated GDPR data transfer requirements (sending EU data to US under invalidated mechanisms per Schrems II). The lesson: compliance failure fines can exceed breach-related fines. Compliance risk is financial risk.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">What is the difference between inherent risk and residual risk?</div>
+      <div class="ans">Inherent risk is the risk level before any controls are applied. Residual risk is what remains after controls are implemented. The goal of security is to reduce residual risk to the organization's acceptable level. If residual risk remains above the threshold, additional controls or risk acceptance are needed.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">Google BeyondCorp eliminated VPNs entirely. What replaced them for access control?</div>
+      <div class="ans">Access decisions based on device identity (inventory database), user identity (SSO/MFA), and real-time device posture (OS patch level, AV status, disk encryption). No network location-based trust. Every request authenticated regardless of origin.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">What is the difference between SAST and DAST? When would you use each?</div>
+      <div class="ans">SAST (Static) analyzes source code without execution — finds issues early in IDE/commit. DAST (Dynamic) tests the running application — finds runtime issues. SAST on every commit, DAST on staging deploy. They find complementary bug classes.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">How did Etsy reduce vulnerability discovery-to-patch time from weeks to 24 hours?</div>
+      <div class="ans">Automated 23 security checks into their CI/CD pipeline: SAST, SCA secret scanning, container scanning, IaC validation. Vulnerable builds are blocked automatically. Developers fix before deploy. Security is integrated into velocity, not a manual gate.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">What are the five CompTIA Security+ domains and their percentage weights?</div>
+      <div class="ans">D1 Attacks/Threats 24%, D2 Architecture/Design 21%, D3 Implementation 25%, D4 Operations/IR 16%, D5 Governance/Risk/Compliance 14%. Total 100%. Passing score 750/900.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">A Security+ PBQ asks you to order incident response steps. What is the correct sequence?</div>
+      <div class="ans">1) Disable account (containment). 2) Capture memory (volatile evidence). 3) Preserve logs. 4) Scan for lateral movement. 5) Patch vulnerability. 6) Restore from clean backup. Always preserve evidence before remediation.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What is RTO vs RPO? Give an example.</div>
+      <div class="ans">RTO = Recovery Time Objective (how long to restore — 4 hours). RPO = Recovery Point Objective (acceptable data loss in time — 1 hour). RTO drives DR infrastructure cost. RPO drives backup frequency.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">What four cybersecurity career paths were compared and what were their average salaries?</div>
+      <div class="ans">SOC Analyst ($65-95K), Penetration Tester ($150K), Cloud Security Architect ($180K), AppSec Engineer ($165K). Specialization significantly impacts earning potential.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">What was JPMorgan Chase's 2014 breach impact and how did their response use risk assessment?</div>
+      <div class="ans">76M households affected. Response: $600M+ annual cybersecurity budget driven by risk assessment frameworks. Highest-risk assets (payment systems, PII, SWIFT) get proportional investment. Quantitative risk (ALE/SLE/ARO) calculations justify every dollar.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 81</div>
+      <div class="title">Phase 5 begins: Capture The Flag & Real-World Labs</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — Phase 4 done. Continue to Day 81.</footer>
+
+</div>
+</body>
+</html>

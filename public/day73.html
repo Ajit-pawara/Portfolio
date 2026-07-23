@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 73 — Zero Trust Architecture Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:82%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .zt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:14px;}
+  .zt-grid > div{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day73$ cat zero-trust.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 73/90 — Phase 7 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 73 OF 90 — PHASE 7: OPERATIONS & INTELLIGENCE</div>
+  <h1>Zero Trust <span class="accent">Architecture Concept</span></h1>
+  <p class="subtitle">Trust no one, verify everything. Zero Trust is the dominant security architecture paradigm. Today you understand its principles and how to implement them.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is Zero Trust?</strong> Zero Trust is a security architecture model that eliminates implicit trust from any user, device, network, or application regardless of location. The core principle: "never trust, always verify." Unlike traditional perimeter-based security (where inside the network = trusted), Zero Trust requires authentication and authorization at every access attempt — whether the request comes from the corporate office, a home coffee shop, or the data center itself. The model was formally defined by NIST SP 800-207 (Zero Trust Architecture) in 2020.</p>
+
+      <p style="margin-top:16px;"><strong>The Five Pillars of Zero Trust:</strong></p>
+      <div class="zt-grid">
+        <div><div class="pe-label" style="color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Identity</div><div class="adesc" style="font-size:12px;color:var(--muted);">Every user must authenticate and be authorized for every session. MFA required. Just-in-time privileged access.</div></div>
+        <div><div class="pe-label" style="color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Device</div><div class="adesc" style="font-size:12px;color:var(--muted);">Device health verified before access — patch level, encryption, EDR agent must be present and current.</div></div>
+        <div><div class="pe-label" style="color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Network</div><div class="adesc" style="font-size:12px;color:var(--muted);">Micro-segmentation divides the network into isolated zones. East-west traffic is encrypted and inspected.</div></div>
+        <div><div class="pe-label" style="color:var(--purple);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Application</div><div class="adesc" style="font-size:12px;color:var(--muted);">Applications are hidden from discovery. Access is brokered through a gateway, not directly exposed.</div></div>
+        <div><div class="pe-label" style="color:var(--pink);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;">Data</div><div class="adesc" style="font-size:12px;color:var(--muted);">Data classified, labeled, and encrypted at rest and in transit. Access granted only based on need-to-know.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Traditional Perimeter vs Zero Trust:</strong></p>
+      <div class="code-block">
+<span class="cmt"># Traditional Model (Castle-and-Moat)</span>
+<span class="hdr">User:</span>     <span class="val">Inside VPN = Trusted. Can access most resources.</span>
+<span class="hdr">Network:</span>  <span class="val">Flat network. Once in, you can reach any server.</span>
+<span class="hdr">Auth:</span>     <span class="val">Login once. Session persists. No re-authentication.</span>
+<span class="hdr">Security:</span> <span class="val">Perimeter firewall + VPN. Inside = blind trust.</span>
+
+<span class="cmt"># Zero Trust Model</span>
+<span class="hdr">User:</span>     <span class="val">Never trusted by location. Must authenticate every session.</span>
+<span class="hdr">Network:</span>  <span class="val">Micro-segmented. User can only reach specific app, not the whole subnet.</span>
+<span class="hdr">Auth:</span>     <span class="val">MFA every time. Continuous verification — re-auth if behavior changes.</span>
+<span class="hdr">Security:</span> <span class="val">No implicit trust. Every access request is verified, logged, and inspected.</span></div>
+
+      <p><strong>Micro-segmentation:</strong> The network-level implementation of Zero Trust. Instead of a flat network where any host can reach any other host, micro-segmentation creates isolated zones with granular firewall rules per workload. For example: the web server can only talk to the app server on port 443, the app server can only talk to the database on port 3306, and SSH access is restricted to a bastion host. If an attacker compromises the web server, they cannot pivot to the database because there's no network path — Zero Trust has removed the implicit trust between services.</p>
+
+      <div class="callout"><strong>Why Zero Trust now:</strong> The traditional perimeter died when organizations adopted cloud (SaaS, IaaS), remote work (VPN-less access), and mobile devices. There is no "inside" anymore — the perimeter is every device. Zero Trust is the architectural response to this reality. By 2025, 60% of organizations will have adopted Zero Trust as the primary security model.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">ATTACKER</div>
+        <ul>
+          <li>Target the identity layer — compromised credentials are the #1 vector against Zero Trust. If you can authenticate as a valid user on a valid device, the architecture trusts you.</li>
+          <li>Exploit the transition period — organizations migrating to Zero Trust often leave legacy systems with implicit trust exposed. Attackers find and exploit these gaps.</li>
+          <li>Use MFA fatigue attacks — send dozens of MFA push notifications until the user accepts one out of frustration. Zero Trust without MFA-resistant policies (number matching) is vulnerable.</li>
+          <li>Attack the policy engine — if you can compromise the ZT policy decision point (PDP), you can grant yourself access to any resource in the architecture.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">DEFENDER</div>
+        <ul>
+          <li>Start with identity as the new perimeter — deploy MFA with number matching (not just push), conditional access policies (geo-fencing, device compliance), and just-in-time privileged access.</li>
+          <li>Implement micro-segmentation gradually — start with the highest-risk workloads (PCI, PII databases) and expand. Use cloud-native tools like AWS Security Groups, Azure NSGs.</li>
+          <li>Deploy a ZTNA (Zero Trust Network Access) solution — Zscaler, Cloudflare Access, or open-source alternatives like Pomerium that broker access to applications without exposing them to the network.</li>
+          <li>Log and monitor every access decision — the ZT policy engine generates rich telemetry. Use this to detect anomalous access patterns that indicate compromised credentials.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2010 — GOOGLE BEYONDCORP — 100K+ DAILY AUTHENTICATIONS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Google's BeyondCorp Zero Trust architecture eliminated VPNs entirely, handling 100K+ daily device authentications</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">After the 2010 Operation Aurora attack (where Chinese state-sponsored hackers breached Google via a compromised contractor VPN), Google decided the VPN model was fundamentally broken. They created BeyondCorp — the first large-scale Zero Trust implementation. BeyondCorp fundamentally changed access: no more VPN. Every user and device is authenticated and authorized before accessing any resource, regardless of network location. The system handles 100,000+ device authentications daily across Google's global workforce. Google published the BeyondCorp papers (2014-2018) detailing their architecture, which became the blueprint for the Zero Trust industry. The key innovation: separating access from network location — a device in the Google office is treated identically to a device in a coffee shop. Both must authenticate. Both must be compliant. Both are untrusted until verified.</div>
+    </div>
+  </section>
+
+  <!-- HANDS-ON LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> implement a basic Zero Trust micro-segmentation scenario using iptables/nftables on Linux — create isolated zones with explicit allow rules only.</p>
+      <ol class="lab-steps">
+        <li>Set up a simulation: on a Linux VM, create 3 network namespaces representing 3 tiers: web, app, db. <code>ip netns add web; ip netns add app; ip netns add db</code>.</li>
+        <li>Connect the namespaces with veth pairs: <code>ip link add veth-w type veth peer name veth-w-br</code>. Bridge them into a simulated subnet.</li>
+        <li>Apply Zero Trust micro-segmentation using iptables: <code>iptables -A FORWARD -i veth-w -o veth-a -p tcp --dport 443 -j ACCEPT</code> — only allow web→app on port 443.</li>
+        <li>Deny all other traffic: <code>iptables -P FORWARD DROP</code>. The default policy is DROP — nothing is trusted. Only explicitly allowed traffic flows.</li>
+        <li>Test: from the web namespace, try <code>curl http://app_IP:80</code> (should fail — port 80 not allowed). Then try <code>curl https://app_IP:443</code> (should succeed).</li>
+        <li>Document the rules: for each tier pair (web→app, app→db), list the protocol, port, and direction. This is your Zero Trust segmentation policy.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a Zero Trust micro-segmentation ruleset (iptables/nftables) for a 3-tier web application, with documentation of which ports and protocols are allowed between each tier. This demonstrates you can translate Zero Trust principles into concrete network controls.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Zero Trust Micro-segmentation for 3-Tier App</span>
+<span class="c"># Default policy: DENY ALL — only explicit allows</span>
+
+<span class="c"># Internet → Web tier (port 443 only)</span>
+<span class="cmd">iptables -A FORWARD -i eth0 -o veth-web -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="c"># Web → App tier (port 443 only)</span>
+<span class="cmd">iptables -A FORWARD -i veth-web -o veth-app -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="c"># App → DB tier (port 3306 only)</span>
+<span class="cmd">iptables -A FORWARD -i veth-app -o veth-db -p tcp --dport 3306 -j ACCEPT</span>
+
+<span class="c"># DB → App tier (return traffic — established connections)</span>
+<span class="cmd">iptables -A FORWARD -i veth-db -o veth-app -m state --state ESTABLISHED,RELATED -j ACCEPT</span>
+
+<span class="c"># Management access — bastion host only (port 22)</span>
+<span class="cmd">iptables -A FORWARD -i veth-bastion -o veth-web -p tcp --dport 22 -j ACCEPT</span>
+<span class="cmd">iptables -A FORWARD -i veth-bastion -o veth-app -p tcp --dport 22 -j ACCEPT</span>
+
+<span class="c"># Default: drop everything else</span>
+<span class="cmd">iptables -P FORWARD DROP</span>
+
+<span class="c"># Test rules (from web namespace)</span>
+<span class="cmd">ip netns exec web curl http://10.0.2.10:80</span>
+<span class="out">&gt; Connection refused    ← Correct! Port 80 blocked.</span>
+<span class="cmd">ip netns exec web curl -k https://10.0.2.10:443</span>
+<span class="out">&gt; HTTP/1.1 200 OK       ← Correct! Port 443 allowed.</span>
+
+<span class="c"># Test: can web reach DB directly? Should fail.</span>
+<span class="cmd">ip netns exec web mysql -h 10.0.3.10 -u root -p</span>
+<span class="out">&gt; Connection timed out  ← Correct! No path to DB tier.</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW READY -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is Zero Trust Architecture and why did it become necessary?"</div>
+        <div class="a">A: "Zero Trust is a security model that eliminates implicit trust from any user, device, network, or application — every access request is fully authenticated, authorized, and encrypted regardless of network location. It became necessary because the traditional perimeter model assumes inside the network is safe, but that assumption broke with cloud adoption, remote work, and mobile devices. There is no 'inside' anymore. The 2010 Google Aurora attack demonstrated that a compromised VPN credential gave attackers access to everything inside the perimeter — that was the catalyst for Google's BeyondCorp, which became the Zero Trust blueprint."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is micro-segmentation and how does it support Zero Trust?"</div>
+        <div class="a">A: "Micro-segmentation is dividing the network into isolated zones with granular firewall rules per workload instead of a flat network. For a 3-tier app, the web server can only talk to the app server on port 443, the app server can only talk to the database on port 3306, and there's no path between web and database directly. This supports Zero Trust by removing implicit trust between services — if an attacker compromises the web server, they can't pivot to the database because there's no network path. Micro-segmentation implements the 'never trust, always verify' principle at the network layer."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What are the key implementation steps for adopting Zero Trust in an existing organization?"</div>
+        <div class="a">A: "First, identify the protect surface — the data, applications, and assets that matter most. Start there, not by trying to segment everything at once. Second, map the transaction flows — how do users, devices, and applications currently interact? Third, build a Zero Trust architecture around that protect surface — deploy ZTNA for application access, implement MFA with conditional access, enforce device compliance. Fourth, create micro-segmentation policies starting with high-risk workloads. Fifth, monitor and log every access decision — Zero Trust generates rich telemetry for detection and improvement. Phase the rollout: identity first, then device, then network segmentation."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Zero Trust policy generator</div>
+        <div class="adesc">Describe your application architecture (3-tier, microservices, etc.) and get a draft micro-segmentation policy with specific firewall rules for each tier.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">ZT maturity assessment</div>
+        <div class="adesc">Describe your current security controls and get a Zero Trust maturity assessment with recommended next steps for each pillar (identity, device, network, app, data).</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">BeyondCorp paper summarizer</div>
+        <div class="adesc">Ask an LLM to summarize Google's BeyondCorp papers in plain language with actionable implementation guidance for each design principle described.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Cloudflare Access TM simulator</div>
+        <div class="adesc">Describe an application you'd like to protect and ask for an example Cloudflare Access or Pomerium configuration with identity and device policies.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB/PLACEMENT -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Implemented Zero Trust micro-segmentation rules for a 3-tier application using iptables; restricted east-west traffic to explicit allow rules only with default-deny policy."</li>
+        <li><strong>Portfolio piece:</strong> a documented iptables/nftables ruleset implementing micro-segmentation with a diagram showing the zero-trust traffic flows. Include test results showing blocked vs allowed traffic.</li>
+        <li><strong>Talking point:</strong> explaining Zero Trust as an architectural shift (not a product) and describing BeyondCorp's influence shows you understand the most important security paradigm shift of the decade — a topic that comes up in every senior SOC and architecture interview.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ENTREPRENEUR ANGLE -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Zero Trust consulting is a booming market — Gartner predicts 60% of organizations will adopt Zero Trust by 2026. Most mid-market companies know they need Zero Trust but lack the expertise to plan the migration. A "Zero Trust Roadmap" engagement — assessment, gap analysis, phased migration plan — can command $15,000-40,000. The tools involved (ZTNA, micro-segmentation, device compliance) are complex to configure, creating a natural consulting need.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Zero Trust Quick Start" — a 2-week engagement delivering a micro-segmentation plan for one critical application, including iptables rulesets, a ZTNA configuration (Pomerium or Cloudflare Access), and conditional access policy templates. Fixed price: $7,500. This delivers immediate, measurable risk reduction and builds the case for a broader Zero Trust engagement. The technical skills you've built throughout this portfolio — web, network, cloud, identity — all converge in Zero Trust architecture.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is Zero Trust, what are its five pillars, and how does micro-segmentation work?" If you can draw a before/after diagram showing a flat network vs micro-segmented network and explain why implicit trust is dangerous, you've mastered the most important architectural concept in modern cybersecurity.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=NWFY3sci3_Y" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Zero Trust Architecture Explained — F5 DevCentral</div><div class="res-desc">youtube.com/watch?v=NWFY3sci3_Y — comprehensive explanation of Zero Trust principles, NIST 800-207, and BeyondCorp case study.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=pnaU_T7Pw14" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Google BeyondCorp — Zero Trust at Scale</div><div class="res-desc">youtube.com/watch?v=pnaU_T7Pw14 — Google engineers present their BeyondCorp architecture and lessons learned from 100K+ daily authentications.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=DQK02c3EnjY" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Zero Trust Architecture Hindi — Hindi Cyber Security</div><div class="res-desc">youtube.com/watch?v=DQK02c3EnjY — Hindi explanation of Zero Trust, BeyondCorp, and micro-segmentation concepts.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/zerotrust" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Zero Trust Architecture Room</div><div class="res-desc">tryhackme.com/room/zerotrust — free room covering Zero Trust principles, micro-segmentation, and practical configuration exercises.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Zero Trust defined as architectural principle — not "a firewall you buy."</div>
+      <div class="mistake-item"><span class="check">✓</span> Five ZT pillars (identity, device, network, app, data) understood individually.</div>
+      <div class="mistake-item"><span class="check">✓</span> Traditional perimeter vs Zero Trust compared — implicit trust eliminated.</div>
+      <div class="mistake-item"><span class="check">✓</span> Micro-segmentation implemented with explicit iptables rules and default-deny policy.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Google BeyondCorp case — the original ZT blueprint with 100K+ authentications.</div>
+      <div class="mistake-item"><span class="check">✓</span> NIST SP 800-207 referenced as the ZT standard.</div>
+      <div class="mistake-item"><span class="check">✓</span> ZTNA vs VPN and east-west micro-segmentation clearly distinguished.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can define Zero Trust and explain why it replaced the perimeter model.</li>
+        <li><span class="box"></span> I can name and describe all 5 Zero Trust pillars.</li>
+        <li><span class="box"></span> I understand micro-segmentation and can explain it with a 3-tier example.</li>
+        <li><span class="box"></span> I implemented iptables rules for Zero Trust micro-segmentation.</li>
+        <li><span class="box"></span> I understand Google BeyondCorp and its significance as the ZT blueprint.</li>
+        <li><span class="box"></span> I can explain the difference between ZTNA and traditional VPN.</li>
+        <li><span class="box"></span> I can teach Zero Trust architecture out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">73 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 74</div>
+      <div class="title">Cloud Security Basics (AWS IAM, S3, Security Groups).</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 74" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

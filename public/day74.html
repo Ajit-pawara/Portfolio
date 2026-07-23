@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 74 — DevSecOps & Secure SDLC Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:82%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .sdlc-stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .sdlc-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;border-left:3px solid var(--cyan);}
+  .sdlc-card .sphase{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;margin-bottom:5px;color:var(--cyan);}
+  .sdlc-card .sdesc{font-size:12px;color:var(--muted);}
+  .sdlc-card.plan{border-color:var(--green);}
+  .sdlc-card.code{border-color:var(--amber);}
+  .sdlc-card.test{border-color:var(--red);}
+  .sdlc-card.deploy{border-color:var(--purple);}
+  .sdlc-card.monitor{border-color:var(--pink);}
+  .sdlc-card.build{border-color:var(--cyan);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+  .code-block .danger{color:var(--red);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day74$ cat devsecops-intro.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 74/90 — Phase 4 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 74 OF 90 — PHASE 4: DEFENSIVE SECURITY & SOC</div>
+  <h1>DevSecOps & <span class="accent">Secure SDLC Intro</span></h1>
+  <p class="subtitle">Security can't be bolted on at the end. DevSecOps integrates security testing into every stage of software development. Today you shift left.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>What is DevSecOps?</strong> DevSecOps is the practice of integrating security controls and testing into every phase of the DevOps lifecycle — from planning and coding to building, testing, releasing, and monitoring. The core principle is "shift left" — moving security earlier in the development process where fixes are cheaper, faster, and less disruptive. A vulnerability found in production costs 100x more to fix than one caught during design.</p>
+
+      <p><strong>The Secure SDLC phases:</strong></p>
+      <div class="sdlc-stages">
+        <div class="sdlc-card plan"><div class="sphase">1. Plan</div><div class="sdesc">Threat modeling (STRIDE), security requirements, risk acceptance criteria. Tools: OWASP Threat Dragon.</div></div>
+        <div class="sdlc-card code"><div class="sphase">2. Code</div><div class="sdesc">SAST scanning in IDE (Semgrep, SonarLint), pre-commit hooks for secrets (truffleHog, git-secrets), peer review.</div></div>
+        <div class="sdlc-card build"><div class="sphase">3. Build</div><div class="sdesc">SCA for dependency vulns (OWASP Dependency-Check, Snyk), SAST in CI pipeline, container scanning (Trivy).</div></div>
+        <div class="sdlc-card test"><div class="sphase">4. Test</div><div class="sdesc">DAST (OWASP ZAP), dynamic analysis, fuzz testing, API security testing. Pre-prod environment.</div></div>
+        <div class="sdlc-card deploy"><div class="sphase">5. Deploy</div><div class="sdesc">Infrastructure as Code scanning (Checkov), configuration drift detection, signed artifacts.</div></div>
+        <div class="sdlc-card monitor"><div class="sphase">6. Monitor</div><div class="sdesc">Runtime protection, SIEM alerts, vulnerability management, incident response playbooks.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>SAST vs DAST vs SCA:</strong></p>
+      <div class="code-block">
+<span class="req">SAST  </span><span class="cmt">— Static Application Security Testing (white-box, source code scanning)</span>
+<span class="req">      </span><span class="cmt">  Tools: Semgrep, SonarQube, Fortify, Checkmarx</span>
+<span class="req">      </span><span class="cmt">  Finds: SQLi, XSS, hardcoded secrets, insecure deserialization</span>
+<span class="req">      </span><span class="cmt">  When: During coding (IDE + CI pipeline)</span>
+
+<span class="req">DAST  </span><span class="cmt">— Dynamic Application Security Testing (black-box, running app)</span>
+<span class="req">      </span><span class="cmt">  Tools: OWASP ZAP, Burp Suite, Arachni</span>
+<span class="req">      </span><span class="cmt">  Finds: Runtime vulnerabilities, auth bypass, config issues</span>
+<span class="req">      </span><span class="cmt">  When: After deployment to test/staging</span>
+
+<span class="req">SCA   </span><span class="cmt">— Software Composition Analysis (open-source dependency scanning)</span>
+<span class="req">      </span><span class="cmt">  Tools: OWASP Dependency-Check, Snyk, Dependabot</span>
+<span class="req">      </span><span class="cmt">  Finds: Known CVEs in third-party libraries, license violations</span>
+<span class="req">      </span><span class="cmt">  When: During build (CI pipeline)</span></div>
+
+      <p><strong>Sample Semgrep rule for detecting debug endpoints:</strong></p>
+      <div class="code-block">
+<span class="cmt"># semgrep-rule.yaml — detect exposed debug routes</span>
+<span class="req">rules:</span>
+<span class="req">  - id: debug-endpoint-exposed</span>
+<span class="req">    pattern-either:</span>
+<span class="req">      - pattern: |</span>
+<span class="val">          @app.route("/debug", ...)</span>
+<span class="req">      - pattern: |</span>
+<span class="val">          @app.route("/admin", ...)</span>
+<span class="req">    message: "Debug or admin endpoint exposed in production"</span>
+<span class="req">    severity: ERROR</span>
+<span class="req">    languages: [python]</span></div>
+
+      <div class="callout"><strong>Shift left principle:</strong> Finding and fixing a vulnerability during the coding phase costs ~$80. The same vulnerability found in production costs ~$8,000. DevSecOps is about catching issues where they're cheapest to fix, not where they're easiest to notice.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Scan for exposed CI/CD pipelines — misconfigured Jenkins, GitLab CI, or GitHub Actions runners can give you code access, secret exposure, or RCE through build scripts.</li>
+          <li>Look for hardcoded secrets in public repos — pre-commit hooks catch them, but many teams don't use them. TruffleHog across an org's GitHub org finds API keys, DB creds, and cloud tokens.</li>
+          <li>Target dependency confusion — if open-source packages aren't validated, you can upload a malicious package with the same name to a public registry and get it pulled into the build.</li>
+          <li>Exploit infrastructure-as-code misconfigurations — public S3 buckets, overly permissive IAM roles, and open security groups in Terraform/CloudFormation templates.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Implement pre-commit hooks that block secrets, large files, and known vulnerable patterns before they reach the remote repository.</li>
+          <li>Run SAST (Semgrep) and SCA (Dependency-Check) in CI — fail the build on critical or high-severity findings. Gate deployments on scan results.</li>
+          <li>Scan container images with Trivy or Clair before pushing to registry — don't deploy containers with known CVEs even if the code is clean.</li>
+          <li>Use infrastructure-as-code scanning (Checkov, tfsec) to catch misconfigurations before cloud resources are provisioned.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2016 — ETSY DEVSECOPS — CONTINUOUS SECURITY TRANSFORMATION</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Etsy automated 23 security checks into their deployment pipeline, reducing discovery-to-patch from weeks to under 24 hours</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">Etsy's security team realized their manual security review process couldn't keep up with 50+ deployments per day. They embedded security engineers into product teams and automated 23 distinct security checks into their continuous deployment pipeline — including automated XSS scanning, CSRF verification, SQL injection detection, and dependency vulnerability checks. The result: vulnerabilities that previously took weeks to discover and patch were now detected and fixed within a single deployment cycle. Their "blameless postmortem" culture meant developers reported security issues without fear of punishment, creating a continuous improvement feedback loop that reduced mean time to remediation (MTTR) by 95%.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Set up a pre-commit hook for secret scanning, run SAST with Semgrep, and integrate OWASP Dependency-Check into a CI pipeline.</p>
+      <ol class="lab-steps">
+        <li>Install pre-commit and truffleHog: <code>pip install pre-commit trufflehog</code> then create <code>.pre-commit-config.yaml</code> with a secrets scanning hook.</li>
+        <li>Run <code>pre-commit install && pre-commit run --all-files</code> to scan an existing project for accidentally committed secrets.</li>
+        <li>Install Semgrep: <code>pip install semgrep</code> and run <code>semgrep --config=p/python --error main.py</code> against a sample Python file.</li>
+        <li>Write a vulnerable Flask app (a login endpoint with SQLi) and run Semgrep with the OWASP Top 10 rule pack: <code>semgrep --config=p/owasp-top-ten login.py</code>.</li>
+        <li>Install OWASP Dependency-Check: <code>docker run --rm -v $(pwd):/src owasp/dependency-check --scan /src --format HTML --out /src/report.html</code>.</li>
+        <li>Create a GitHub Actions workflow (<code>.github/workflows/security.yml</code>) that runs Semgrep and Dependency-Check on every push and pull request.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> A GitHub repo with working pre-commit hooks, a Semgrep scan output showing at least one finding, and a Dependency-Check HTML report. These demonstrate your DevSecOps pipeline skills in an interview.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — Install pre-commit and truffleHog</span>
+<span class="cmd">pip install pre-commit trufflehog</span>
+
+<span class="c"># Step 2 — .pre-commit-config.yaml</span>
+<span class="cmd">cat > .pre-commit-config.yaml << 'EOF'</span>
+<span class="out">repos:</span>
+<span class="out">  - repo: https://github.com/pre-commit/pre-commit-hooks</span>
+<span class="out">    rev: v4.5.0</span>
+<span class="out">    hooks:</span>
+<span class="out">      - id: detect-private-key</span>
+<span class="out">      - id: check-added-large-files</span>
+<span class="out">  - repo: https://github.com/truffleHog/truffleHog</span>
+<span class="out">    rev: v3.80.1</span>
+<span class="out">    hooks:</span>
+<span class="out">      - id: trufflehog</span>
+<span class="cmd">EOF</span>
+<span class="cmd">pre-commit install && pre-commit run --all-files</span>
+
+<span class="c"># Step 3 — Semgrep SAST scan</span>
+<span class="cmd">semgrep --config=p/owasp-top-ten --error login.py</span>
+
+<span class="c"># Step 4 — Dependency-Check</span>
+<span class="cmd">docker run --rm -v $(pwd):/src owasp/dependency-check \</span>
+<span class="cmd">  --scan /src --format HTML --out /src/report.html</span>
+
+<span class="c"># Step 5 — GitHub Actions workflow (.github/workflows/security.yml)</span>
+<span class="out">name: Security Scan</span>
+<span class="out">on: [push, pull_request]</span>
+<span class="out">jobs:</span>
+<span class="out">  semgrep:</span>
+<span class="out">    runs-on: ubuntu-latest</span>
+<span class="out">    steps:</span>
+<span class="out">      - uses: actions/checkout@v4</span>
+<span class="out">      - run: pip install semgrep && semgrep --config=p/owasp-top-ten .</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "What is 'shifting left' in DevSecOps?"</div>
+        <div class="a">A: "Shifting left means moving security testing earlier in the software development lifecycle. Instead of waiting for a security review before production release, you integrate automated security checks into the IDE, pre-commit hooks, and CI pipeline. A vulnerability caught during coding costs ~$80 to fix; the same issue found in production costs ~$8,000. Shifting left is about economics as much as security."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between SAST and DAST?"</div>
+        <div class="a">A: "SAST is white-box testing — it scans source code statically without running the application. It finds vulnerabilities like SQLi and XSS in code patterns but can produce false positives. DAST is black-box testing — it scans the running application by sending HTTP requests and analyzing responses. It finds runtime issues like auth bypass and config problems but can miss code-level issues. They're complementary — SAST catches things DAST misses and vice versa."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "How would you implement security scanning in a CI/CD pipeline?"</div>
+        <div class="a">A: "I'd add multiple gates: pre-commit hooks for secrets before code reaches the repo, then in CI — run SAST (Semgrep) for code vulnerabilities, SCA (Dependency-Check) for library CVEs, and container scanning (Trivy) for base image issues. I'd fail the build on critical/high findings but allow medium/low as warnings. For the deploy stage, I'd add DAST (OWASP ZAP) against the staging environment. I'd use Infrastructure-as-Code scanning (Checkov) on Terraform files before provisioning."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Semgrep Playground</div>
+        <div class="adesc">semgrep.dev/playground — write and test custom SAST rules instantly in the browser. Paste vulnerable code and see which patterns match. No install needed.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Snyk Advisor</div>
+        <div class="adesc">snyk.io/advisor — AI-powered package health scores for npm, PyPI, and Maven packages. Check dependency security, maintenance, and community before adding to your project.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">GitHub Dependabot</div>
+        <div class="adesc">GitHub-native automated dependency updates and vulnerability alerts. Configure a dependabot.yml to auto-create PRs when CVEs are found in your project's dependencies.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AI-generated CI/CD configs</div>
+        <div class="adesc">Describe your stack (Python/Flask, PostgreSQL, Docker) to an LLM and ask for a complete GitHub Actions workflow with SAST, SCA, and container scanning steps.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Integrated SAST (Semgrep), SCA (OWASP Dependency-Check), and pre-commit secret scanning into a CI/CD pipeline, reducing vulnerability discovery-to-patch time by implementing automated security gates at each build stage."</li>
+        <li><strong>Portfolio piece:</strong> A GitHub repo demonstrating a complete DevSecOps pipeline — pre-commit config, Semgrep rules, Dependency-Check integration, and a GitHub Actions workflow with a README explaining each security gate.</li>
+        <li><strong>Interview talking point:</strong> "DevSecOps is about making security the path of least resistance for developers — if your pipeline rejects insecure code automatically, developers learn to write secure code without needing to become security experts."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>DevSecOps consulting is a rapidly growing niche. Most small-to-mid-size companies have CI/CD pipelines with zero security integration. You can offer a "Pipeline Security Audit" — review their GitHub Actions/Jenkins/GitLab CI configs, identify missing security gates, and implement SAST/SCA/container scanning. Many startups will pay $3,000-8,000 for a weekend's work implementing pre-commit hooks, Semgrep rules, and Dependency-Check workflows because they need to pass SOC 2 or PCI audits.</p>
+      <p style="margin-bottom:0;">Productized opportunity: a "Security-As-Code Starter Pack" — a GitHub template repo with pre-configured pre-commit hooks, Semgrep rule packs, Dependency-Check config, Trivy integration, and a GitHub Actions workflow. Sell it as a one-click setup for $200-500 per company. Every sale is passive income after the initial build.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What is DevSecOps, what does 'shift left' mean, and walk me through the six phases of a secure SDLC with the security tool you'd use at each phase." If you can name SAST, DAST, and SCA, explain when each runs, and describe the Etsy case study, you've mastered today's material.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=nMo_-VfFsl0" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">DevSecOps Explained — IBM Technology</div><div class="res-desc">youtube.com/watch?v=nMo_-VfFsl0 — clear overview of DevSecOps principles, shift-left testing, and toolchain integration.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=Wx0v3N0kE5o" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How Etsy Does DevSecOps — Security Weekly</div><div class="res-desc">youtube.com/watch?v=Wx0v3N0kE5o — Etsy's security team discusses their continuous security automation pipeline and 23 automated checks.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=VqG3q8Ah1BQ" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">DevSecOps in Hindi — TechWithGurpreet</div><div class="res-desc">youtube.com/watch?v=VqG3q8Ah1BQ — Hindi walkthrough of DevSecOps pipeline setup with SAST and SCA tools.</div></div>
+      </a>
+      <a class="res-card" href="https://semgrep.dev/playground" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">Semgrep Playground — interactive SAST testing</div><div class="res-desc">semgrep.dev/playground — write Semgrep rules in the browser and test them against real vulnerable code snippets.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> DevSecOps defined as security integration, not a separate tool category.</div>
+      <div class="mistake-item"><span class="check">✓</span> SAST, DAST, SCA distinguished with tools, timing, and finding types.</div>
+      <div class="mistake-item"><span class="check">✓</span> Shift-left principle grounded in cost data ($80 vs $8,000 fix cost).</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Etsy case shows automated checks reducing MTTR by 95%.</div>
+      <div class="mistake-item"><span class="check">✓</span> Pre-commit hooks, Semgrep, and Dependency-Check all run in lab.</div>
+      <div class="mistake-item"><span class="check">✓</span> CI pipeline security gates explained — fail on critical, warn on medium.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can explain DevSecOps and the "shift left" principle.</li>
+        <li><span class="box"></span> I know the difference between SAST, DAST, and SCA.</li>
+        <li><span class="box"></span> I configured pre-commit hooks with secret scanning.</li>
+        <li><span class="box"></span> I ran Semgrep SAST against Python code.</li>
+        <li><span class="box"></span> I ran OWASP Dependency-Check on a project.</li>
+        <li><span class="box"></span> I created a GitHub Actions workflow for security scanning.</li>
+        <li><span class="box"></span> I can name the Etsy DevSecOps program and its results.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">74 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 75</div>
+      <div class="title">Phase 4 Complete: Review & Mini Quiz — consolidate 20 days of defensive security.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 75" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>

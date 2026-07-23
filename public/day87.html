@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 87 — Internship & Entry-Role Hunting Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:96.6%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  .company-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .company-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:12px;}
+  .company-card .cname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--cyan);margin-bottom:4px;}
+  .company-card .cdesc{font-size:11px;color:var(--muted);}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day87$ cat job-hunting-strategy.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 87/90 — Phase 5 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 87 OF 90 — PHASE 5: CAREER & CAPSTONE</div>
+  <h1>Internship & Entry-Role <span class="accent">Hunting Strategy</span></h1>
+  <p class="subtitle">Finding the first security role is the hardest step. Today you create a job search strategy targeting internships, apprenticeships, and entry-level SOC roles.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The cybersecurity job market for entry-level:</strong> The 2024 (ISC)² Cybersecurity Workforce Study found a global shortage of 4.8 million cybersecurity professionals. However, the paradox is that many job postings require 2-3 years of experience for "entry-level" roles. The key is knowing where entry-level actually exists: Managed Security Service Providers (MSSPs) like SecureWorks, Trustwave, and Arctic Wolf regularly hire analysts with zero experience because they run tier-1 SOCs at scale. Government programs (NSA Apprenticeship, CISA Cyber Student Program) explicitly target candidates with no experience. Large tech companies run rotational security engineer programs (Microsoft Security Academy, Google SRE residency).</p>
+
+      <p><strong>Where entry-level security roles actually are:</strong></p>
+      <div class="company-grid">
+        <div class="company-card"><div class="cname">MSSP SOC Analysts</div><div class="cdesc">SecureWorks, Trustwave, Arctic Wolf, AlertLogic, Expel — hire analysts with minimal experience and train them on their SIEM/EDR stack.</div></div>
+        <div class="company-card"><div class="cname">Government Programs</div><div class="cdesc">NSA Cyber Apprenticeship, CISA Cyber Student, DoD Cyber Scholarship. 0-2 years experience, clearance sponsorship available.</div></div>
+        <div class="company-card"><div class="cname">Big Tech Rotational</div><div class="cdesc">Microsoft Security Academy, Google SRE Residency, Amazon Security Engineer Apprenticeship. Competitive but pay + training are unmatched.</div></div>
+        <div class="company-card"><div class="cname">Consulting Firms</div><div class="cdesc">Deloitte Cyber, PwC Security, EY Cybersecurity — hire junior analysts for compliance, advisory, and light technical work.</div></div>
+        <div class="company-card"><div class="cname">Startups</div><div class="cdesc">Early-stage security startups often hire generalists who can grow with the company. Less structured but faster skill building.</div></div>
+        <div class="company-card"><div class="cname">Local/Regional</div><div class="cdesc">Banks, hospitals, universities, and local government. Often overlooked, many have small security teams and are willing to train.</div></div>
+      </div>
+
+      <div class="callout"><strong>Key insight:</strong> The best strategy is "spray and pray for volume, sniper for quality." Apply to 50+ roles broadly (the spray) but also identify 10 dream companies and target them specifically (the sniper). For the sniper roles, find mutual connections on LinkedIn, research the team, and tailor your portfolio to their tech stack. The spray gets you practice with applications and interviews; the sniper gets you the job you want.</div>
+
+      <p><strong>Application tracking:</strong> The average security job seeker needs 20-40 applications to get one offer. Without a tracking system, you'll lose track of what you applied to, at what stage, with what resume version. Create a spreadsheet with columns: Company, Role, Date Applied, Resume Version, Cover Letter (Y/N), Contact, Status (Applied/Phone/Interview/Rejected/Offer), Notes. This system prevents double-applying, helps you follow up, and identifies patterns in rejections that you can fix.</p>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// job hunting mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Job Seeker Mindset</div>
+        <ul>
+          <li>Treat job hunting as a systematic process, not a reaction. Dedicate 1 hour daily to searching, applying, networking, and skill building — just like any other security task.</li>
+          <li>Apply to roles even if you meet only 60% of the requirements. Postings are wish lists, not minimum criteria. The cybersecurity skills gap means employers compromise on qualifications.</li>
+          <li>Follow up on every application after 7 days with a polite LinkedIn message or email. Most applicants ghost; a follow-up puts you in the top 5% of candidates.</li>
+          <li>Create multiple resume versions tailored to different roles: one for SOC analyst (emphasis on monitoring, triage, SIEM), one for pentest (tools, CTFs, labs), one for GRC (frameworks, compliance, policy).</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Hiring Manager Mindset</div>
+        <ul>
+          <li>They scan a resume in under 10 seconds. If they can't find your skills, certifications, and relevant experience in that time, you're rejected — even if you're qualified.</li>
+          <li>Cover letters matter for entry-level. A tailored 3-paragraph cover letter referencing the specific company and role shows effort that 95% of applicants don't make.</li>
+          <li>They check your LinkedIn before calling you. If your LinkedIn doesn't match your resume, or if there's no portfolio/learning evidence, you drop below candidates who have them.</li>
+          <li>They value candidates who ask smart questions in interviews: "What does your SIEM stack look like?" "How does the team handle after-hours incidents?" "What's the career progression from Tier 1 SOC to Tier 2?"</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">NSA CYBERSECURITY APPRENTICESHIP PROGRAM — 100+ ANALYSTS PER YEAR</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">The NSA's 3-year paid cybersecurity apprenticeship hires 100+ analysts annually with zero experience required</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The National Security Agency's (NSA) Cybersecurity Apprenticeship Program (CAP) is one of the most overlooked entry points into security. It requires no prior experience — only a high school diploma, US citizenship, and the ability to obtain a Top Secret clearance. Apprentices are paid from Day 1, receive three years of structured training covering network defense, reverse engineering, forensics, and incident response, and are placed into security roles within the NSA upon completion. The program has a 90%+ retention rate because by the time apprentices finish, they have skills equivalent to analysts with 5+ years of experience. Many similar programs exist at CISA, FBI, and DoD agencies. The lesson: government cyber programs are hiring aggressively and training from scratch.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> Build your job application infrastructure — target company list, tailored cover letter templates, and application tracking system.</p>
+      <ol class="lab-steps">
+        <li>Create a spreadsheet (Google Sheets, Excel, or Airtable) with columns: Company, Role, Date Applied, Status, Resume Version, Cover Letter, Contact Name, Notes. Save it as "Security Job Tracker."</li>
+        <li>Research and list 20+ target companies across MSSPs (SecureWorks, Arctic Wolf, Trustwave), government (NSA, CISA, DoD), big tech (Microsoft Security, Google SRE), consulting (Deloitte, PwC, EY), and local/regional firms.</li>
+        <li>Write one tailored cover letter template with placeholders [COMPANY], [ROLE], [SKILLS] — then customize it for 3 specific applications today.</li>
+        <li>Search for "SOC Analyst," "Security Analyst," "Cybersecurity Intern," and "Penetration Tester" on LinkedIn, Indeed, and Glassdoor. Apply to at least 5 roles today.</li>
+        <li>For each application, note the required tools/technologies. If you don't know one (e.g., Splunk, QRadar, CrowdStrike), spend 15 minutes learning the basics and add it to your "in progress" notes.</li>
+        <li>Set up daily email alerts for 5 job search keywords on LinkedIn, Indeed, and Glassdoor.</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> Screenshot of your job tracker spreadsheet with 20+ target companies and 5+ applications submitted. One tailored cover letter for a specific role. Screenshot of job alerts configured.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Cover Letter Template (customize per application)</span>
+<span class="hi">Subject: Application for [Role] — [Your Name]</span>
+
+Dear [Hiring Manager Name],
+
+I am applying for the [Role] position at [Company] because 
+I have spent the last 90 days building an intensive 
+cybersecurity portfolio covering network security, web 
+application testing, SIEM operations, and incident response.
+
+My 90-day portfolio includes:
+- Practical lab reports on SQL injection, XSS, and Buffer 
+  Overflow exploitation (OWASP Juice Shop, HackTheBox)
+- Active Directory attack simulations and defenses
+- Splunk SIEM log analysis and correlation rule creation
+- Wireshark packet analysis and intrusion detection
+
+I see that [Company] uses [specific tool from job posting], 
+which I have hands-on experience with through my labs. 
+I would welcome the opportunity to discuss how my 
+self-directed training and passion for security would 
+contribute to [Company]'s security operations.
+
+Best regards,
+[Your Name]
+[Link to Portfolio]
+[LinkedIn Profile]</div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Why do you want to work in cybersecurity, and why at this company specifically?"</div>
+        <div class="a">A: "I want to work in cybersecurity because I enjoy solving puzzles where the stakes are real — every vulnerability I find represents real risk reduction. I chose to apply to [Company] specifically because I saw that you use [technology] in your SOC stack, which aligns with the skills I've built during my 90-day portfolio. I also read that your team [specific accomplishment or news about the company], and I want to contribute to that mission. I've completed 90 days of structured security training covering network pentesting, SIEM operations, and web app testing, and I'm looking for a place where I can apply that foundation and grow."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What do you do if you don't hear back from an application?"</div>
+        <div class="a">A: "I follow up after 7-10 days with a polite email or LinkedIn message expressing continued interest. I keep the message brief — referencing the role I applied for, reiterating my enthusiasm, and offering to answer questions. I find a connection at the company if possible — someone in the security team or a mutual connection — and ask for a 5-minute informational interview to learn more about their work. Even if the original application doesn't work out, the informational interview can open other doors."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's more important — certifications or hands-on experience?"</div>
+        <div class="a">A: "For getting past HR filters, certifications matter more initially. But for passing technical interviews and keeping a job, hands-on experience matters more. My strategy is to pursue both: I'm preparing for the PNPT certification (which is practical, not multiple choice) while building hands-on experience through HackTheBox, TryHackMe, and my 90-day portfolio. The portfolio serves as concrete evidence that I can apply what I've studied — and that's what ultimately convinces hiring managers."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">Cover letter customizer</div>
+        <div class="adesc">Paste the job description and your background. Ask an LLM to draft a tailored cover letter that highlights the specific skills and tools the role requires.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Resume keyword optimizer</div>
+        <div class="adesc">Paste your resume and target job description. Ask the LLM to identify missing keywords and suggest additions to pass ATS filters.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Company research assistant</div>
+        <div class="adesc">Ask an LLM to research a security company: their stack, recent news, competitors, and what interview questions they're known for. Prep before applying.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Interview question predictor</div>
+        <div class="adesc">Paste a job description and ask for the 10 most likely interview questions. Practice your answers. Repeat for each role.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Executed a systematic cybersecurity job search campaign targeting 20+ companies across MSSP, government, and private sectors; submitted 10+ tailored applications with company-specific cover letters."</li>
+        <li><strong>Portfolio piece:</strong> a screenshot of your job tracker spreadsheet showing companies, application dates, and statuses. Demonstrates organization and systematic approach — the same traits that make a good analyst.</li>
+        <li><strong>Interview talking point:</strong> "I treat job hunting like a security operation — I have a target list, I gather intelligence on each company, I tailor my approach per target, and I track progress in a system. I submitted my first 5 applications today and have a pipeline of 20+ targets."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>There is a clear market gap: cybersecurity students need help with resumes, cover letters, job application strategy, and interview prep. A consulting service targeting security students — "Entry-Level Cybersecurity Job Prep" — could charge $100-200 for a resume + cover letter package, $50 for a mock interview, and $300 for a complete job search campaign (target list, resumes for 3 role types, 10 tailored cover letters).</p>
+      <p style="margin-bottom:0;">Digital product opportunity: "The Ultimate Cybersecurity Job Hunt Kit" — a $29 downloadable Notion/Notion template bundle containing an application tracker, cover letter templates for 5 role types, interview question bank with STAR answer templates, and a company research database. You are building this kit for yourself right now; packaging it for others is a zero-extra-effort product.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "Where should an entry-level cybersecurity student look for their first role? Name 5 types of employers and what makes each viable for candidates with zero experience." If you can list MSSPs, government programs, big tech rotational roles, consulting firms, and local/regional opportunities with reasoning for each, you genuinely understand the security job market.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=3v_Wz61oAEM" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">How to Get Your First Cybersecurity Job — David Bombal</div><div class="res-desc">youtube.com/watch?v=3v_Wz61oAEM — Practical advice for landing the first security role with no experience.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=ZxNPSnP_8Wc" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">Getting Into Cybersecurity With No Experience — Mad Hat</div><div class="res-desc">youtube.com/watch?v=ZxNPSnP_8Wc — Step-by-step roadmap from zero experience to first security job.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=3cBC0vR1VRE" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">Cybersecurity Job Kaise Paye in Hindi — Techy Yug</div><div class="res-desc">youtube.com/watch?v=3cBC0vR1VRE — Hindi guide to finding cybersecurity jobs in India and abroad.</div></div>
+      </a>
+      <a class="res-card" href="https://www.linkedin.com" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">LinkedIn Jobs — Apply to 5 Roles Now</div><div class="res-desc">linkedin.com/jobs — Search for "SOC Analyst" "Security Intern" and apply to 5 roles with your tailored profile and cover letter.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Job application tracker created — organization prevents forgotten follow-ups.</div>
+      <div class="mistake-item"><span class="check">✓</span> Target company list built across 6 categories — MSSP, gov, big tech, consulting, startup, local.</div>
+      <div class="mistake-item"><span class="check">✓</span> Tailored cover letters written per company — generic cover letters waste the opportunity.</div>
+      <div class="mistake-item"><span class="check">✓</span> Apps submitted even with 60% match — the skills gap is real, apply anyway.</div>
+      <div class="mistake-item"><span class="check">✓</span> Job alerts set up — passive pipeline activated alongside active applications.</div>
+      <div class="mistake-item"><span class="check">✓</span> Resume versions planned for SOC, pentest, and GRC — one size does not fit all.</div>
+      <div class="mistake-item"><span class="check">✓</span> Day 87 focuses on execution — not just theory, actual applications submitted.</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I created a job application tracker spreadsheet.</li>
+        <li><span class="box"></span> I listed 20+ target companies across multiple categories.</li>
+        <li><span class="box"></span> I wrote one tailored cover letter with placeholders.</li>
+        <li><span class="box"></span> I applied to 5+ roles today.</li>
+        <li><span class="box"></span> I set up daily job alerts for 5 keywords.</li>
+        <li><span class="box"></span> I tailored my resume to at least one specific role type.</li>
+        <li><span class="box"></span> I can explain the entry-level job market out loud in 90 seconds.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">87 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 88</div>
+      <div class="title">Capstone Project — Plan Your Pentest Report (scope, RoE, methodology)</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 88" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>
