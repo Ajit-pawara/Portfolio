@@ -385,13 +385,13 @@
       "incidentName": "Heartland Payment Systems SQLi (2008)",
       "incidentDetail": "Albert Gonzalez used SQL injection to breach Heartland's payment processing systems, inserting malformed SQL queries through web forms to extract 130M credit card numbers.",
       "stats": {
-        "commands": 4,
-        "toolsUsed": 5,
-        "scriptsBuilt": 0,
-        "projects": 2,
-        "labs": 1,
+        "commands": 6,
+        "toolsUsed": 3,
+        "scriptsBuilt": 1,
+        "projects": 1,
+        "labs": 2,
         "notes": 5,
-        "examples": 2
+        "examples": 3
       }
     },
     {

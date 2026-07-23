@@ -5,7 +5,8 @@ import {
   Activity, Layers, Award, GitMerge, Users, FileCheck,
   Printer, EyeOff, Eye, Mail, Send, Copy, Folder, FileCode, KeyRound,
   User, Zap, Download, Plus, Trash2, Save, RefreshCw, ChevronLeft,
-  AtSign, MessageSquare, Menu, X
+  AtSign, MessageSquare, Menu, X, BookOpen, ExternalLink, Globe, Server, Cloud,
+  Lock, BookMarked
 } from 'lucide-react';
 import initialData from './data.json';
 
@@ -400,14 +401,15 @@ function App() {
     setCheckingIframe(true);
     let cancelled = false;
 
-    fetch(iframeUrl, { method: 'HEAD' })
+    const cacheBustUrl = `${iframeUrl}?t=${Date.now()}`
+    fetch(cacheBustUrl, { method: 'HEAD', cache: 'no-store' })
       .then(res => {
         if (cancelled) return;
         setIframeExists(res.ok);
       })
       .catch(() => {
         if (cancelled) return;
-        setIframeExists(false);
+        setIframeExists(true);
       })
       .finally(() => {
         if (!cancelled) setCheckingIframe(false);
@@ -567,7 +569,7 @@ function App() {
 
   // Scrollspy to update active tab based on scroll position
   useEffect(() => {
-    const sections = ['hero', 'challenge', 'skills', 'certifications', 'projects', 'community', 'resume'];
+    const sections = ['hero', 'challenge', 'skills', 'certifications', 'projects', 'community', 'resources', 'resume'];
 
     // IntersectionObserver fallback for scrollspy
     const observerOptions = {
@@ -1007,6 +1009,11 @@ function App() {
               <li>
                 <a href="#community" className={`nav-link ${activeTab === 'community' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'community'); setIsMobileMenuOpen(false); }}>
                   <Share2 /> Find Me
+                </a>
+              </li>
+              <li>
+                <a href="#resources" className={`nav-link ${activeTab === 'resources' ? 'active' : ''}`} onClick={(e) => { handleNavClick(e, 'resources'); setIsMobileMenuOpen(false); }}>
+                  <BookOpen /> Resources
                 </a>
               </li>
               <li>
@@ -2240,6 +2247,87 @@ function App() {
               </div>
             </div>
           </div>
+
+          {/* Learning Resources Section */}
+          <section id="resources" className="content-section">
+            <div className="section-header-block">
+              <h2 className="section-title"><BookOpen /> Cybersecurity Learning Resources</h2>
+              <p className="section-description">Curated platforms and materials to learn cybersecurity — from beginner to advanced. All free or low-cost entry points.</p>
+            </div>
+
+            <div className="resources-grid">
+              <div className="resource-card">
+                <div className="res-icon"><Shield /></div>
+                <h4>TryHackMe</h4>
+                <p>Hands-on cybersecurity training with guided rooms. Start with Pre-Security path, then move to Jr Penetration Tester.</p>
+                <a href="https://tryhackme.com" target="_blank" className="res-link"><ExternalLink /> tryhackme.com</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Globe /></div>
+                <h4>Hack The Box</h4>
+                <p>Advanced penetration testing labs and Capture The Flag (CTF) challenges. Start with Starting Point for beginners.</p>
+                <a href="https://hackthebox.com" target="_blank" className="res-link"><ExternalLink /> hackthebox.com</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Server /></div>
+                <h4>PicoCTF</h4>
+                <p>Free CTF platform by Carnegie Mellon. Great for beginners learning reverse engineering, forensics, and cryptography.</p>
+                <a href="https://picoctf.org" target="_blank" className="res-link"><ExternalLink /> picoctf.org</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Cloud /></div>
+                <h4>OverTheWire</h4>
+                <p>Wargame-style challenges. Bandit is the best starting point for Linux command line and security concepts.</p>
+                <a href="https://overthewire.org" target="_blank" className="res-link"><ExternalLink /> overthewire.org</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Lock /></div>
+                <h4>PortSwigger Web Security</h4>
+                <p>Free web security academy with interactive labs covering all OWASP Top 10 vulnerabilities using Burp Suite.</p>
+                <a href="https://portswigger.net/web-security" target="_blank" className="res-link"><ExternalLink /> portswigger.net</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><BookMarked /></div>
+                <h4>OWASP Top 10</h4>
+                <p>The authoritative guide to web application security risks. Essential reading for every security practitioner.</p>
+                <a href="https://owasp.org/www-project-top-ten/" target="_blank" className="res-link"><ExternalLink /> owasp.org</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Code2 /></div>
+                <h4>Cybrary</h4>
+                <p>Free cybersecurity courses and career paths. Covers CompTIA Security+, CISSP, CEH, and more.</p>
+                <a href="https://cybrary.it" target="_blank" className="res-link"><ExternalLink /> cybrary.it</a>
+              </div>
+              <div className="resource-card">
+                <div className="res-icon"><Award /></div>
+                <h4>Google Cybersecurity Certificate</h4>
+                <p>Professional certificate on Coursera. Covers security fundamentals, SIEM tools, Python, and SQL.</p>
+                <a href="https://grow.google/cybersecurity/" target="_blank" className="res-link"><ExternalLink /> grow.google</a>
+              </div>
+            </div>
+
+            <div className="update-panel" style={{ marginTop: '32px' }}>
+              <h3><RefreshCw /> Application Updates</h3>
+              <div className="update-item">
+                <span className="update-version">v1.1.0</span>
+                <div className="update-desc"><strong>Desktop App Release</strong> — Electron-powered Linux desktop app with AppImage/deb builds. Native window support for Zorin OS / Ubuntu.</div>
+              </div>
+              <div className="update-item">
+                <span className="update-version">v1.0.0</span>
+                <div className="update-desc"><strong>Initial Launch</strong> — Portfolio with 90-day cybersecurity tracker, skills radar, certifications, code inspector, and admin panel.</div>
+              </div>
+              <div className="update-item">
+                <span className="update-version">v0.9.0</span>
+                <div className="update-desc"><strong>Beta</strong> — Added day logging passkey protection, revision intervals, roadmap view, and GitHub Pages deployment.</div>
+              </div>
+              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--border-color)', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <span>GitHub: <a href="https://github.com/Ajit-pawara/Portfolio" target="_blank" style={{ color: 'var(--color-cyan)' }}>Ajit-pawara/Portfolio</a></span>
+                <span>Version: <strong>1.1.0</strong></span>
+                <span>Platform: <strong>Linux (Electron)</strong></span>
+              </div>
+            </div>
+          </section>
+
           {/* Footer */}
           <footer className="main-footer print-hide" style={{ marginTop: '60px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
             <div className="footer-content">

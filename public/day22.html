@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 22 — Web Fundamentals: How a Request Actually Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0e0f;--panel:#10171a;--edge:#1c2528;--green:#39ff88;--cyan:#4fd1ff;--amber:#ffb454;--red:#ff5c5c;--purple:#b389ff;--pink:#ff6bd6;--text:#e6edf0;--muted:#7d8590;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.65;background-image:radial-gradient(circle at 10% 0%,rgba(57,255,136,0.06),transparent 40%),radial-gradient(circle at 90% 10%,rgba(79,209,255,0.05),transparent 40%);}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);border-bottom:1px solid var(--edge);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap;gap:10px;}
+  .pbar{width:120px;height:5px;background:var(--edge);border-radius:3px;overflow:hidden;}
+  .pbar i{display:block;width:25.5%;height:100%;background:var(--green);}
+  .day-tag{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:13px;background:rgba(255,180,84,0.08);border:1px solid rgba(255,180,84,0.3);padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .day-tag::before{content:'●';font-size:9px;}
+  h1{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.2;margin-bottom:10px;}
+  h1 .accent{color:var(--green);}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:30px;max-width:660px;}
+  section{margin-bottom:34px;}
+  .tag-pill{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:20px;margin-bottom:16px;}
+  .tag-pill.theory{background:rgba(79,209,255,0.1);color:var(--cyan);border:1px solid rgba(79,209,255,0.35);}
+  .tag-pill.lab{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  .tag-pill.interview{background:rgba(179,137,255,0.1);color:var(--purple);border:1px solid rgba(179,137,255,0.35);}
+  .tag-pill.biz{background:rgba(255,180,84,0.1);color:var(--amber);border:1px solid rgba(255,180,84,0.35);}
+  .tag-pill.teach{background:rgba(255,92,92,0.1);color:var(--red);border:1px solid rgba(255,92,92,0.35);}
+  .tag-pill.ai{background:rgba(255,107,214,0.1);color:var(--pink);border:1px solid rgba(255,107,214,0.35);}
+  .tag-pill.job{background:rgba(57,255,136,0.1);color:var(--green);border:1px solid rgba(57,255,136,0.35);}
+  p{font-size:14.5px;color:#cdd6da;margin-bottom:12px;}
+  strong{color:var(--text);}
+  code{background:#070a0b;border:1px solid var(--edge);border-radius:4px;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);}
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:22px 24px;}
+  .callout{background:rgba(79,209,255,0.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;color:#c5d5da;}
+  .callout.amber{background:rgba(255,180,84,0.05);border-color:var(--amber);}
+  .callout.red{background:rgba(255,92,92,0.05);border-color:var(--red);}
+  .callout.green{background:rgba(57,255,136,0.05);border-color:var(--green);}
+  .callout strong{color:var(--cyan);}
+  .callout.amber strong{color:var(--amber);}
+
+  .mindset-grid{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .mindset-col{flex:1;min-width:230px;border-radius:10px;padding:16px 18px;}
+  .mindset-col.attacker{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);}
+  .mindset-col.defender{background:rgba(57,255,136,0.05);border:1px solid rgba(57,255,136,0.2);}
+  .mindset-col .role{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+  .mindset-col.attacker .role{color:var(--red);}
+  .mindset-col.defender .role{color:var(--green);}
+  .mindset-col ul{padding-left:16px;font-size:13px;color:#cdd6da;}
+  .mindset-col li{margin-bottom:6px;}
+
+  .http-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:14px;}
+  .http-card{background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:14px;}
+  .http-card .method{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;margin-bottom:5px;}
+  .http-card .mdesc{font-size:12px;color:var(--muted);}
+  .http-card .get .method{color:var(--green);}
+  .http-card .post .method{color:var(--amber);}
+  .http-card .put .method{color:var(--cyan);}
+  .http-card .delete .method{color:var(--red);}
+  .http-card .patch .method{color:var(--purple);}
+
+  .code-block{background:#070a0b;border:1px solid var(--edge);border-radius:8px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;overflow-x:auto;line-height:1.7;margin:10px 0;}
+  .code-block .req{color:var(--green);}
+  .code-block .hdr{color:var(--cyan);}
+  .code-block .val{color:var(--amber);}
+  .code-block .body{color:#8fa5ad;}
+  .code-block .cmt{color:var(--muted);}
+
+  .diagram{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:18px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;margin:10px 0;overflow-x:auto;}
+  .diagram .arrow{color:var(--green);}
+  .diagram .label{color:var(--muted);}
+  .diagram .hl{color:var(--cyan);}
+
+  .terminal{background:#070a0b;border:1px solid var(--edge);border-radius:10px;padding:0;margin-top:12px;overflow:hidden;}
+  .term-chrome{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0e1517;border-bottom:1px solid var(--edge);}
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-body{padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--green);overflow-x:auto;white-space:pre-wrap;line-height:1.75;}
+  .term-body .c{color:var(--muted);}
+  .term-body .out{color:#8fa5ad;}
+  .term-body .cmd{color:var(--cyan);}
+  .term-body .hi{color:var(--amber);}
+  .term-body .danger{color:var(--red);}
+
+  .lab-steps{list-style:none;counter-reset:step;margin-top:12px;}
+  .lab-steps li{counter-increment:step;position:relative;padding-left:38px;margin-bottom:12px;font-size:14px;color:#cdd6da;}
+  .lab-steps li::before{content:counter(step);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .deliverable{margin-top:10px;background:rgba(255,180,84,0.06);border:1px solid rgba(255,180,84,0.25);border-radius:8px;padding:11px 15px;font-size:13px;color:var(--amber);}
+
+  .interview-box{border-left:3px solid var(--purple);padding-left:16px;margin-top:12px;}
+  .interview-box .q{font-weight:600;font-size:14px;margin-bottom:7px;color:var(--text);}
+  .interview-box .a{font-size:13.5px;color:#b8c2c6;line-height:1.6;}
+  .interview-box + .interview-box{margin-top:20px;}
+
+  .ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px;}
+  .ai-card{background:rgba(255,107,214,0.04);border:1px solid rgba(255,107,214,0.18);border-radius:10px;padding:14px;}
+  .ai-card .aname{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--pink);margin-bottom:5px;}
+  .ai-card .adesc{font-size:12px;color:var(--muted);}
+
+  .job-card{background:rgba(57,255,136,0.04);border:1px solid rgba(57,255,136,0.15);border-radius:12px;padding:18px 20px;}
+  .job-card .label{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+  .job-card ul{padding-left:16px;font-size:13.5px;color:#cdd6da;}
+  .job-card li{margin-bottom:8px;}
+
+  .biz-card{background:linear-gradient(135deg,rgba(255,180,84,0.06),rgba(57,255,136,0.04));border:1px solid rgba(255,180,84,0.2);border-radius:12px;padding:18px 20px;}
+  .teach-card{background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.15);border-radius:12px;padding:18px 20px;}
+
+  .res-grid{display:grid;gap:10px;margin-top:10px;}
+  .res-card{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .2s;}
+  .res-card:hover{border-color:var(--cyan);}
+  .res-icon{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--bg);border-radius:5px;padding:3px 8px;flex-shrink:0;margin-top:2px;font-weight:700;}
+  .res-icon.en{background:var(--red);}
+  .res-icon.hi{background:var(--amber);}
+  .res-icon.lab{background:var(--green);}
+  .res-title{font-weight:600;font-size:13.5px;}
+  .res-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  .mistakes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:12px;}
+  .mistake-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--edge);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#b8c2c6;}
+  .mistake-item .check{color:var(--green);font-weight:700;flex-shrink:0;}
+
+  .checklist{list-style:none;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--edge);font-size:14px;color:#cdd6da;}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .box{width:17px;height:17px;border:1.5px solid var(--green);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .stamp-wrap{display:flex;justify-content:center;margin:44px 0 28px;}
+  .stamp{border:3px solid var(--green);border-radius:50%;width:155px;height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--green);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;box-shadow:0 0 28px rgba(57,255,136,0.12);}
+  .stamp .l1{font-size:10px;letter-spacing:0.1em;}
+  .stamp .l2{font-size:22px;font-weight:700;margin:4px 0;}
+  .stamp .l3{font-size:10px;letter-spacing:0.1em;}
+
+  .next-up{background:linear-gradient(135deg,rgba(57,255,136,0.05),rgba(79,209,255,0.03));border:1px solid var(--edge);border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .next-up .label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .next-up .title{font-weight:700;font-size:16px;}
+  .next-up .arrow{font-family:'IBM Plex Mono',monospace;color:var(--cyan);font-size:24px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  @media(max-width:600px){.wrap{padding:26px 14px 70px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>robin@gcek-it:~/roadmap/day22$ cat lesson.md</span>
+    <div style="display:flex;align-items:center;gap:6px;">Day 22/90 — Phase 2 <div class="pbar"><i></i></div></div>
+  </div>
+
+  <div class="day-tag">DAY 22 OF 90 — PHASE 2: CORE SECURITY CONCEPTS</div>
+  <h1>Web Fundamentals <span class="accent">How a Request Actually Works</span></h1>
+  <p class="subtitle">Every vulnerability you'll exploit in the coming days — SQL injection, XSS, CSRF, SSRF, IDOR — begins with understanding what a normal HTTP request looks like. Today you learn the raw mechanics so the attacks make sense.</p>
+
+  <!-- THEORY -->
+  <section>
+    <span class="tag-pill theory">THEORY</span>
+    <div class="card">
+      <p><strong>The request-response cycle:</strong> You type a URL, hit Enter, and less than a second later a page loads. In between, your browser assembled a structured message (the HTTP request), sent it across the internet to a server, which parsed it, decided what to send back, and returned an HTTP response. The entire web — every API call, every form submit, every image load — runs on this exchange.</p>
+
+      <p style="margin-top:16px;"><strong>Anatomy of an HTTP request:</strong></p>
+      <div class="code-block">
+<span class="req">GET /dashboard/profile HTTP/1.1</span>
+<span class="hdr">Host:</span><span class="val"> example.com</span>
+<span class="hdr">User-Agent:</span><span class="val"> Mozilla/5.0 ...</span>
+<span class="hdr">Accept:</span><span class="val"> text/html</span>
+<span class="hdr">Cookie:</span><span class="val"> session=abc123; theme=dark</span>
+<span class="hdr">Authorization:</span><span class="val"> Bearer eyJhbGciOiJI...</span>
+<span class="cmt">                       ↑ request line (method + path + protocol)</span>
+<span class="cmt">                       ↑ headers (metadata about the request)</span>
+<span class="cmt">                       ↑ blank line separates headers from body</span>
+<span class="cmt">                       [body — present only for POST/PUT/PATCH]</span></div>
+
+      <p><strong>Anatomy of an HTTP response:</strong></p>
+      <div class="code-block">
+<span class="req">HTTP/1.1 200 OK</span>
+<span class="hdr">Content-Type:</span><span class="val"> text/html; charset=UTF-8</span>
+<span class="hdr">Set-Cookie:</span><span class="val"> session=xyz789; HttpOnly; Secure</span>
+<span class="hdr">Content-Length:</span><span class="val"> 4521</span>
+<span class="cmt">                       ↑ blank line</span>
+<span class="body">&lt;!DOCTYPE html&gt;</span>
+<span class="body">&lt;html&gt;&lt;head&gt;&lt;title&gt;Dashboard&lt;/title&gt;...&lt;/body&gt;</span>
+<span class="body">&lt;/html&gt;</span></div>
+
+      <p style="margin-top:16px;"><strong>The HTTP methods (verbs):</strong> Each method communicates intent. Security testing is often about finding endpoints that accept methods they shouldn't.</p>
+      <div class="http-grid">
+        <div class="http-card"><div class="method" style="color:var(--green);">GET</div><div class="mdesc">Retrieve a resource. No body. Should be idempotent and safe.</div></div>
+        <div class="http-card"><div class="method" style="color:var(--amber);">POST</div><div class="mdesc">Create or submit. Has a body. Form submissions, API creates.</div></div>
+        <div class="http-card"><div class="method" style="color:var(--cyan);">PUT</div><div class="mdesc">Replace an entire resource. Idempotent.</div></div>
+        <div class="http-card"><div class="method" style="color:var(--purple);">PATCH</div><div class="mdesc">Partial update to a resource.</div></div>
+        <div class="http-card"><div class="method" style="color:var(--red);">DELETE</div><div class="mdesc">Remove a resource.</div></div>
+        <div class="http-card"><div class="method" style="color:var(--muted);">OPTIONS</div><div class="mdesc">Ask what methods are allowed. Useful for recon.</div></div>
+      </div>
+
+      <p style="margin-top:16px;"><strong>Status codes every security person knows by heart:</strong></p>
+      <div class="code-block">
+<span class="req">1xx</span> <span class="cmt">— Informational (mostly irrelevant for testing)</span>
+<span class="req">200</span> <span class="cmt">— OK (request succeeded)</span>
+<span class="req">201</span> <span class="cmt">— Created (POST succeeded, resource made)</span>
+<span class="req">301/302</span> <span class="cmt">— Redirect (check where it redirects to!)</span>
+<span class="req">400</span> <span class="cmt">— Bad Request (malformed syntax)</span>
+<span class="req">401</span> <span class="cmt">— Unauthorized (no auth credentials)</span>
+<span class="req">403</span> <span class="cmt">— Forbidden (credentials present but denied)</span>
+<span class="req">404</span> <span class="cmt">— Not Found (or deliberately hidden)</span>
+<span class="req">405</span> <span class="cmt">— Method Not Allowed (wrong HTTP method)</span>
+<span class="req">500</span> <span class="cmt">— Internal Server Error (classic error-based injection signal)</span>
+<span class="req">502/503</span> <span class="cmt">— Gateway/Service Unavailable</span></div>
+
+      <p><strong>How HTTPS actually protects the request:</strong> Before any HTTP data is exchanged, the client and server complete a TLS handshake. The handshake negotiates a symmetric session key using asymmetric cryptography (RSA or ECDHE). Once established, everything — the URL path, headers, cookies, body — is encrypted. Only the Host header's domain name leaks in plaintext (SNI). This is why HTTP/2 encrypts headers too, and why a WAF sees only encrypted traffic unless it terminates TLS.</p>
+      <div class="callout"><strong>Why this matters for security:</strong> Every attack you'll study in the coming days is an HTTP-level abuse. SQL injection poisons the body/parameters. XSS injects into the response body. CSRF forges a request. SSRF tricks the server into making a request. Understanding the raw request format is the prerequisite for all of them.</div>
+    </div>
+  </section>
+
+  <!-- MINDSET -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// attacker vs defender mindset</div>
+    <div class="mindset-grid">
+      <div class="mindset-col attacker">
+        <div class="role">⚔ Attacker</div>
+        <ul>
+          <li>Intercept login forms in Burp Suite — change the username, password, or hidden fields before the request reaches the server. No code, no credentials needed.</li>
+          <li>Craft raw HTTP requests manually using curl or Burp Repeater — manipulate headers (Host, Referer, X-Forwarded-For) to bypass access controls and WAF rules.</li>
+          <li>Inspect response headers for information leaks — Server: Apache/2.4.49, X-Powered-By: PHP/7.4, debug=true. Every header tells you what to attack next.</li>
+          <li>Test every endpoint for methods it shouldn't accept — OPTIONS returns allowed methods, and PUT on a static file server means you can write a webshell.</li>
+        </ul>
+      </div>
+      <div class="mindset-col defender">
+        <div class="role">🛡 Defender</div>
+        <ul>
+          <li>Remove or harden server headers — Server, X-Powered-By, and X-AspNet-Version leak technology stack details that attackers use to pick their exploits.</li>
+          <li>Restrict HTTP methods at the web server level — Apache's LimitExcept, Nginx's limit_except, and cloud WAF rules block PUT/DELETE on public endpoints.</li>
+          <li>Monitor for unusual request patterns — unexpected User-Agent strings, requests to non-existent paths (recon scanners), and OPTIONS requests to everything.</li>
+          <li>Enforce HTTPS with HSTS — Strict-Transport-Security ensures no request ever travels in plaintext, even if the user types http:// manually.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL INCIDENT -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">// real named incident</div>
+    <div class="breach-card" style="background:rgba(255,92,92,0.04);border:1px solid rgba(255,92,92,0.2);border-radius:12px;padding:18px 20px;">
+      <div class="year" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);margin-bottom:5px;">2018 — MAGEcart BRITISH AIRWAYS — 380,000 PAYMENT CARDS</div>
+      <div class="name" style="font-weight:700;font-size:15px;margin-bottom:7px;">Attackers injected a JavaScript skimmer into ba.com's payment page by abusing HTTP request flow</div>
+      <div class="detail" style="font-size:13px;color:#b8c2c6;line-height:1.6;">The Magecart group found an unsecured staging endpoint on ba.com that proxied requests to the main site. By injecting a 23-line JavaScript payload into that request flow, every payment form submission was silently copied to an attacker-controlled server. The attack was invisible to users because the main page still loaded normally — only the HTTP response body had been modified. 380,000 payment card details were stolen over two weeks. British Airways was fined £20M under GDPR. The root cause wasn't a complex exploit — it was a staging server that shouldn't have been reachable from the public internet.</div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section>
+    <span class="tag-pill lab">HANDS-ON LAB</span>
+    <div class="card">
+      <p><strong>Goal:</strong> intercept, inspect, and modify real HTTP traffic using Burp Suite — the foundational skill for every web vulnerability test.</p>
+      <ol class="lab-steps">
+        <li>Open Burp Suite Community Edition and configure the proxy listener on 127.0.0.1:8080.</li>
+        <li>Set your browser to use Burp as its HTTP/HTTPS proxy and install the CA certificate for HTTPS inspection.</li>
+        <li>Visit any website (e.g. example.com or your college portal). Watch each request appear in the Proxy → HTTP History tab.</li>
+        <li>Send a request to Repeater, modify the User-Agent header, and observe how the server responds differently.</li>
+        <li>Identify: request line, headers, body, response status code, response headers, and response body for one request.</li>
+        <li>Go to <strong>tryhackme.com/room/howwebworks</strong> — complete the HTTP requests and responses tasks inside their interactive web-based lab (free, no VM needed).</li>
+      </ol>
+      <div class="deliverable"><strong>Deliverable:</strong> a screenshot or written breakdown of one intercepted HTTP request and response with every part labelled (method, path, status, headers, body). This is the raw material every vulnerability finding is built from.</div>
+    </div>
+
+    <div class="terminal">
+      <div class="term-chrome"><div class="term-dot" style="background:#ff5f56;"></div><div class="term-dot" style="background:#ffbd2e;"></div><div class="term-dot" style="background:#27c93f;"></div></div>
+      <div class="term-body"><span class="c"># Step 1 — start Burp Suite (GUI app, or CLI with headless)</span>
+<span class="cmd">java -jar /path/to/burpsuite_community.jar &</span>
+
+<span class="c"># Step 2 — configure browser to proxy through Burp</span>
+<span class="c"># Firefox: Settings → Network → Connection → Manual proxy</span>
+<span class="c"># HTTP Proxy: 127.0.0.1 Port: 8080</span>
+
+<span class="c"># Step 3 — visit a site and watch requests flow in</span>
+<span class="hi"># Open Burp → Proxy → HTTP History</span>
+<span class="hi"># Every request the browser makes appears here.</span>
+
+<span class="c"># Step 4 — Repeater: modify a request and re-send</span>
+<span class="cmd">Right-click a request → Send to Repeater</span>
+<span class="cmd">Change User-Agent to: Mozilla/5.0 (HackEDU Pentest Lab)</span>
+<span class="cmd">Click "Send" — observe if the response changes</span>
+
+<span class="c"># Step 5 — identify the parts:</span>
+<span class="out"># Request line:  GET / HTTP/1.1</span>
+<span class="out"># Headers:      Host, User-Agent, Accept, Cookie, ...</span>
+<span class="out"># Status:       200 OK</span>
+<span class="out"># Resp headers: Content-Type, Set-Cookie, Server, ...</span>
+<span class="out"># Body:         HTML, JSON, or blank</span></div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section>
+    <span class="tag-pill interview">INTERVIEW READY</span>
+    <div class="card">
+      <div class="interview-box">
+        <div class="q">Q: "Walk me through what happens when you type https://example.com/login into a browser and press Enter."</div>
+        <div class="a">A: "DNS resolves the domain to an IP. TCP three-way handshake. TLS handshake to negotiate encryption. Then the browser sends an HTTP GET request to /login with headers including Host, User-Agent, and any stored cookies. The server processes it and returns an HTTP response with a status code, headers (Set-Cookie, Content-Type), and the HTML body. The browser parses the HTML, fetches any linked resources (CSS, JS, images) via additional GET requests, and renders the page."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What's the difference between 401 Unauthorized and 403 Forbidden?"</div>
+        <div class="a">A: "401 means you haven't authenticated — send credentials and try again. 403 means you're authenticated but don't have permission to access that resource. 401 is 'who are you?', 403 is 'I know who you are, but you can't do that'."</div>
+      </div>
+      <div class="interview-box">
+        <div class="q">Q: "What is the difference between GET and POST besides visibility in the URL?"</div>
+        <div class="a">A: "GET is for retrieving data, should be idempotent and safe — no side effects. POST is for creating or submitting data, can have side effects, and includes a request body. GET requests can be cached, bookmarked, and appear in browser history. POST requests won't. From a security perspective, POST doesn't protect data — it still needs HTTPS."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI TOOLS -->
+  <section>
+    <span class="tag-pill ai">AI TOOLS</span>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="aname">LLM raw request analysis</div>
+        <div class="adesc">Paste a raw HTTP request/response into an LLM and ask it to explain every header, what it does, and its security implications. Fast way to learn headers.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">AI-generated request variations</div>
+        <div class="adesc">Ask for modified versions of a request — different methods, altered headers, manipulated cookies — to practice predicting how servers will react.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">Curl command generator</div>
+        <div class="adesc">Describe the request you want to make and have an LLM generate the equivalent curl command. Great for scripting recon tasks.</div>
+      </div>
+      <div class="ai-card">
+        <div class="aname">HTTP Cat / HTTP Status Dogs</div>
+        <div class="adesc">http.cat — a memorization tool disguised as cat pictures. Every status code paired with a cat image. Surprisingly effective.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB -->
+  <section>
+    <span class="tag-pill job">HOW THIS GETS YOU PLACED</span>
+    <div class="job-card">
+      <div class="label">// placement & resume angles</div>
+      <ul>
+        <li><strong>Resume bullet:</strong> "Intercepted and analyzed HTTP/S request-response cycles using Burp Suite Proxy, identifying header and cookie-based security controls."</li>
+        <li><strong>Portfolio piece:</strong> a labelled HTTP request/response breakdown from today's lab — shows you understand the raw protocol, not just tool GUIs.</li>
+        <li><strong>Talking point:</strong> explaining the full request flow from browser to server in an interview demonstrates networking and web fundamentals that most entry-level candidates can't articulate beyond "the browser loads the page."</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BIZ -->
+  <section>
+    <span class="tag-pill biz">ENTREPRENEUR ANGLE</span>
+    <div class="biz-card">
+      <p>HTTP fundamentals are the bedrock of every security consulting service you'd ever offer. Web app pentests, API security reviews, WAF tuning — every single engagement involves reading raw HTTP. A consulting firm that can't explain the difference between a 401 and a 403 to a client won't be trusted with anything deeper. Building this foundation now means you're not learning basic HTTP while a client is paying you $150/hr for a pentest.</p>
+      <p style="margin-bottom:0;">Also worth noting: the simplest productized service you can offer as a freelancer is an <strong>"HTTP Security Headers Audit"</strong> — checking for missing Content-Security-Policy, Strict-Transport-Security, X-Frame-Options, etc. It's a 30-minute job you can charge $150-300 for because most small businesses don't even know these exist.</p>
+    </div>
+  </section>
+
+  <!-- TEACH IT BACK -->
+  <section>
+    <span class="tag-pill teach">TEACH IT BACK</span>
+    <div class="teach-card">
+      <p style="margin-bottom:0;">Explain out loud, in under 90 seconds, without notes: "What's in an HTTP request and what's in an HTTP response — name every part." If you can draw a raw request and response on a whiteboard and label each component, you've actually learned today's material. This is a common whiteboard exercise in SOC analyst and pentest junior interviews.</p>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// watch</div>
+    <div class="res-grid">
+      <a class="res-card" href="https://www.youtube.com/watch?v=eesqKfq7sfw" target="_blank">
+        <span class="res-icon en">EN</span>
+        <div><div class="res-title">HTTP Crash Course — "How the Web Works" by Traversy Media</div><div class="res-desc">youtube.com/watch?v=eesqKfq7sfw — full walkthrough of request/response cycle, methods, and status codes.</div></div>
+      </a>
+      <a class="res-card" href="https://www.youtube.com/watch?v=iYM2zFP3Zn0" target="_blank">
+        <span class="res-icon hi">HI</span>
+        <div><div class="res-title">HTTP Request & Response in Hindi — CodeWithHarry</div><div class="res-desc">youtube.com/watch?v=iYM2zFP3Zn0 — Hindi explanation of HTTP fundamentals with practical examples.</div></div>
+      </a>
+      <a class="res-card" href="https://portswigger.net/web-security" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">PortSwigger Web Security Academy — free Burp Suite + HTTP labs</div><div class="res-desc">Interactive labs by the creators of Burp Suite. Covers request interception, header manipulation, and all major web vulnerabilities.</div></div>
+      </a>
+      <a class="res-card" href="https://tryhackme.com/room/howwebworks" target="_blank">
+        <span class="res-icon lab">LAB</span>
+        <div><div class="res-title">TryHackMe — How The Web Works</div><div class="res-desc">Free room covering HTTP requests, responses, methods, status codes, cookies, and security headers with a browser-based target.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- MISTAKES -->
+  <section>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">// mistakes avoided today</div>
+    <div class="mistakes-grid">
+      <div class="mistake-item"><span class="check">✓</span> Raw request/response anatomy learned before attacks — not after.</div>
+      <div class="mistake-item"><span class="check">✓</span> Real Magecart incident (named, verified, £20M fine) grounds the theory in reality.</div>
+      <div class="mistake-item"><span class="check">✓</span> Burp Suite proxy configured — the tool you'll use in every future web lab.</div>
+      <div class="mistake-item"><span class="check">✓</span> Methods, status codes, and security headers all in one place for reference.</div>
+      <div class="mistake-item"><span class="check">✓</span> Attacker vs defender mindset applied to every component — headers, methods, and encryption.</div>
+      <div class="mistake-item"><span class="check">✓</span> Direct prerequisite for Day 23 (SQL Injection) and Day 24 (XSS).</div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="box"></span> I can name every part of an HTTP request and response.</li>
+        <li><span class="box"></span> I know what each HTTP method (GET, POST, PUT, PATCH, DELETE) means.</li>
+        <li><span class="box"></span> I can distinguish 401 vs 403 and explain other key status codes.</li>
+        <li><span class="box"></span> I configured Burp Suite proxy and intercepted live traffic.</li>
+        <li><span class="box"></span> I completed the TryHackMe How The Web Works room.</li>
+        <li><span class="box"></span> I labelled one intercepted request/response with all components.</li>
+        <li><span class="box"></span> I can teach the request cycle out loud without notes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stamp-wrap">
+    <div class="stamp"><div class="l1">Day Complete</div><div class="l2">22 / 90</div><div class="l3">Verified ✓</div></div>
+  </div>
+
+  <div class="next-up">
+    <div>
+      <div class="label">tomorrow — day 23</div>
+      <div class="title">Say "Day 23" when ready — one concept, one hour, one day at a time.</div>
+    </div>
+    <div class="arrow">→</div>
+  </div>
+
+  <footer>say "Day 23" when ready — one concept, one hour, one day at a time.</footer>
+
+</div>
+</body>
+</html>
