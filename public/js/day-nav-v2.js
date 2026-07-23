@@ -1,4 +1,4 @@
-/* HexBounty Day Navigator — left/right/jump navigation for all 90 days + revisions */
+/* HexBounty Day Navigator — left/right/jump + passkey gate for all pages */
 (function(){
   'use strict';
 
@@ -22,6 +22,106 @@
   }
 
   var TOTAL = 90;
+
+  /* ── PASSKEY GATE for standalone day/revision files ── */
+  (function passkeyGate(){
+    var needsPass = false;
+    if (current !== null && current > 10) needsPass = true;
+    if (isRevision && revEnd !== null && revEnd > 10) needsPass = true;
+
+    if (!needsPass) return;
+
+    /* already unlocked this session? */
+    if (sessionStorage.getItem('content_unlocked') === 'true') return;
+
+    var PASS_HASH = '5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c';
+
+    function hashPassword(pwd) {
+      var enc = new TextEncoder();
+      var data = enc.encode(pwd);
+      return window.crypto.subtle.digest('SHA-256', data).then(function(buf){
+        var arr = Array.from(new Uint8Array(buf));
+        return arr.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+      });
+    }
+
+    function buildOverlay() {
+      /* hide body content */
+      var body = document.body;
+      body.style.position = 'relative';
+      body.style.overflow = 'hidden';
+
+      /* inject overlay styles */
+      var os = document.createElement('style');
+      os.textContent =
+        '#hex-gate{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999;' +
+        'background:rgba(10,14,15,0.97);display:flex;align-items:center;justify-content:center;' +
+        'font-family:"IBM Plex Mono",monospace;}' +
+        '#hex-gate-inner{text-align:center;max-width:380px;padding:32px;}' +
+        '#hex-gate-inner .lock-icon{font-size:44px;margin-bottom:16px;}' +
+        '#hex-gate-inner h3{color:#e6edf0;font-size:18px;margin-bottom:6px;}' +
+        '#hex-gate-inner p{color:#7d8590;font-size:12px;margin-bottom:20px;line-height:1.5;}' +
+        '#hex-gate-inner input{width:100%;padding:10px 14px;font-size:14px;' +
+        'background:#070a0b;border:1px solid #1c2528;border-radius:6px;' +
+        'color:#e6edf0;font-family:"IBM Plex Mono",monospace;text-align:center;outline:none;' +
+        'box-sizing:border-box;}' +
+        '#hex-gate-inner input:focus{border-color:#4fd1ff;}' +
+        '#hex-gate-inner .gate-error{color:#ff5c5c;font-size:11px;margin-top:10px;}' +
+        '#hex-gate-inner button{width:100%;padding:10px 14px;margin-top:10px;font-size:13px;' +
+        'background:transparent;border:1px solid #4fd1ff;border-radius:6px;color:#4fd1ff;' +
+        'cursor:pointer;font-family:"IBM Plex Mono",monospace;transition:all 0.15s;}' +
+        '#hex-gate-inner button:hover{background:rgba(79,209,255,0.1);}';
+      document.head.appendChild(os);
+
+      /* build gate div */
+      var gate = document.createElement('div');
+      gate.id = 'hex-gate';
+      gate.innerHTML =
+        '<div id="hex-gate-inner">' +
+          '<div class="lock-icon">&#x1f512;</div>' +
+          '<h3>Content Locked</h3>' +
+          '<p>Day ' + current + ' requires a security passkey to access.<br>Enter the passkey to unlock all protected material for this session.</p>' +
+          '<input type="password" id="hex-gate-input" placeholder="Enter passkey" autofocus>' +
+          '<div id="hex-gate-error" class="gate-error"></div>' +
+          '<button id="hex-gate-btn">Unlock</button>' +
+        '</div>';
+      document.body.appendChild(gate);
+
+      var inp  = document.getElementById('hex-gate-input');
+      var err  = document.getElementById('hex-gate-error');
+      var btn  = document.getElementById('hex-gate-btn');
+
+      function tryUnlock() {
+        var pwd = inp.value;
+        hashPassword(pwd).then(function(hash){
+          if (hash === PASS_HASH) {
+            sessionStorage.setItem('content_unlocked', 'true');
+            /* remove gate and restore scrolling */
+            document.getElementById('hex-gate').remove();
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+          } else {
+            err.textContent = '[ERROR] ACCESS DENIED: INVALID CONTENT PASSWORD.';
+            inp.value = '';
+            inp.focus();
+          }
+        });
+      }
+
+      btn.addEventListener('click', tryUnlock);
+      inp.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') tryUnlock();
+      });
+      setTimeout(function(){ inp.focus(); }, 100);
+    }
+
+    /* wait for DOM ready */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', buildOverlay);
+    } else {
+      buildOverlay();
+    }
+  })();
 
   function dayHref(n) {
     var s = n < 10 ? '0' + n : '' + n;
