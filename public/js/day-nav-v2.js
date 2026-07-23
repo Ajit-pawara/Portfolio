@@ -69,13 +69,11 @@
       'font-family:"IBM Plex Mono",monospace;font-size:13px;' +
       'transition:transform 0.3s ease,opacity 0.3s ease;' +
     '}' +
-    '#hex-nav a{' +
-      'text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center;' +
-    '}' +
     '#hex-nav .hn-arr{' +
       'background:transparent;border:1px solid #1c2528;border-radius:8px;' +
       'color:#7d8590;cursor:pointer;padding:6px 14px;font-size:18px;' +
       'transition:all 0.15s;line-height:1;user-select:none;display:inline-flex;align-items:center;' +
+      'font-family:inherit;outline:none;' +
     '}' +
     '#hex-nav .hn-arr:hover{background:#1c2528;color:#39ff88;border-color:#39ff88;}' +
     '#hex-nav .hn-arr:active{transform:scale(0.88);}' +
@@ -124,13 +122,18 @@
   var container = document.createElement('div');
   container.id = 'hex-nav';
 
+  /* helper: bounce then navigate */
+  function makeNavClick(href) {
+    return "var el=this;el.classList.remove('bounce');void el.offsetWidth;el.classList.add('bounce');setTimeout(function(){window.location.href='" + href + "';},180);";
+  }
+
   var prevHtml = prevHref
-    ? '<a href="' + prevHref + '" class="hn-arr" id="hn-prev" title="Previous (\u2190)">\u25C0</a>'
-    : '<span class="hn-arr hn-disabled">\u25C0</span>';
+    ? '<button class="hn-arr" id="hn-prev" onclick="' + makeNavClick(prevHref) + '" title="Previous (\u2190)">\u25C0</button>'
+    : '<span class="hn-arr hn-disabled" id="hn-prev">\u25C0</span>';
 
   var nextHtml = nextHref
-    ? '<a href="' + nextHref + '" class="hn-arr" id="hn-next" title="Next (\u2192)">\u25B6</a>'
-    : '<span class="hn-arr hn-disabled">\u25B6</span>';
+    ? '<button class="hn-arr" id="hn-next" onclick="' + makeNavClick(nextHref) + '" title="Next (\u2192)">\u25B6</button>'
+    : '<span class="hn-arr hn-disabled" id="hn-next">\u25B6</span>';
 
   container.innerHTML =
     '<span class="hn-spacer"></span>' +
@@ -143,21 +146,6 @@
     '<span class="hn-spacer"></span>';
 
   document.body.appendChild(container);
-
-  /* ── add bounce on click for feedback ── */
-  function bounce(el) {
-    el.classList.remove('bounce');
-    /* force reflow so the animation restarts */
-    void el.offsetWidth;
-    el.classList.add('bounce');
-  }
-
-  document.addEventListener('click', function(e){
-    var target = e.target.closest('.hn-arr');
-    if (target && target.id) {
-      bounce(target);
-    }
-  });
 
   /* ── wire jump input ── */
   var inp = document.getElementById('hn-jump');
