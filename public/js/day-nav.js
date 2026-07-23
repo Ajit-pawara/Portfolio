@@ -138,6 +138,15 @@
   /* ── wire events ── */
   var inp = document.getElementById('hn-jump');
   var go  = document.getElementById('hn-go-btn');
+  var prevBtn = document.getElementById('hn-prev');
+  var nextBtn = document.getElementById('hn-next');
+
+  function navTo(url) {
+    if (url) window.location.href = url;
+  }
+
+  if (prevBtn && prevHref) prevBtn.addEventListener('click', function(){ navTo(prevHref); });
+  if (nextBtn && nextHref) nextBtn.addEventListener('click', function(){ navTo(nextHref); });
 
   function jump() {
     var v = parseInt(inp.value, 10);
