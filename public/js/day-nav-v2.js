@@ -1,10 +1,28 @@
-/* HexBounty Day Navigator v3 — scroll / click / key + passkey gate */
+/* HexBounty Day Navigator v4 — bulletproof passkey gate + nav */
 (function(){
   'use strict';
 
-  /* ═══════ helpers ═══════ */
   var TOTAL = 90;
   var PASS_HASH = '5b8af9e5e961575968f7b58564fdd527b898ca76cf364fe1ca8b3c582753796c';
+
+  /* ═══════ safe sessionStorage (file:// / Safari private / locked-down browsers) ═══════ */
+  function ssGet(k)   { try { return sessionStorage.getItem(k); } catch(e) { return null; } }
+  function ssSet(k,v) { try { sessionStorage.setItem(k, v); }     catch(e) { /* silent */ } }
+
+  function isUnlocked()  { return ssGet('content_unlocked') === 'true'; }
+  function setUnlocked() { ssSet('content_unlocked', 'true'); }
+
+  /* ═══════ crypto detection — fails on file:// and HTTP ═══════ */
+  var hasCrypto = !!(window.crypto && window.crypto.subtle && window.crypto.subtle.digest);
+
+  function hashPwd(pwd) {
+    if (!hasCrypto) return Promise.reject(new Error('crypto.subtle unavailable (use HTTPS)'));
+    return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd))
+      .then(function(buf){
+        return Array.from(new Uint8Array(buf))
+          .map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+      });
+  }
 
   function dayHref(n) {
     var s = n < 10 ? '0' + n : '' + n;
@@ -49,11 +67,6 @@
   }
 
   /* ═══════ passkey gate ═══════ */
-  function isUnlocked() { return sessionStorage.getItem('content_unlocked') === 'true'; }
-
-  /* gateOverlay(mode, cb)
-     mode = 'page' (direct access - Go Back goes to prev page)
-     mode = 'nav'  (mid-navigation - Go Back dismisses gate, stays on current page) */
   function gateOverlay(mode, cb) {
     if (isUnlocked()) { if (cb) setTimeout(cb,10); return; }
 
@@ -65,7 +78,7 @@
     body.style.right = '0';
     body.style.overflow = 'hidden';
 
-    /* styles */
+    /* inject gate styles */
     var os = document.createElement('style');
     os.textContent =
       '#hex-gate{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999;' +
@@ -89,12 +102,6 @@
       '#hex-gate-inner .gate-btn-row .gate-back:hover{background:#1c2528;color:#e6edf0;}';
     document.head.appendChild(os);
 
-    function hashPwd(pwd) {
-      return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd))
-        .then(function(buf){ return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join(''); });
-    }
-
-    /* "Go Back" label depends on mode */
     var backLabel = mode === 'nav' ? 'Cancel' : '\u2190 Go Back';
 
     var gate = document.createElement('div');
@@ -132,9 +139,13 @@
     }
 
     function doUnlock() {
+      if (!hasCrypto) {
+        err.textContent = '[ERROR] Browser crypto not available. Open this page via HTTPS or localhost to unlock.';
+        return;
+      }
       hashPwd(inp.value).then(function(hash){
         if (hash === PASS_HASH) {
-          sessionStorage.setItem('content_unlocked', 'true');
+          setUnlocked();
           closeGate();
           if (cb) setTimeout(cb, 50);
         } else {
@@ -142,16 +153,18 @@
           inp.value = '';
           inp.focus();
         }
+      }).catch(function(e){
+        err.textContent = '[ERROR] ' + e.message;
       });
     }
 
     btn.addEventListener('click', doUnlock);
-    backBtn.addEventListener('click', function(){ closeGate(); });
+    backBtn.addEventListener('click', closeGate);
     inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') doUnlock(); });
     setTimeout(function(){ inp.focus(); }, 150);
   }
 
-  /* ── gate current page if needed (direct/fresh access) ── */
+  /* ── gate current page if needed (fresh direct access) ── */
   if (current !== null && current > 10 && !isUnlocked()) gateOverlay('page', null);
   else if (isRev && revEnd !== null && revEnd > 10 && !isUnlocked()) gateOverlay('page', null);
 
@@ -201,7 +214,6 @@
     '#hex-nav .hn-go:active{transform:scale(0.88);}' +
     '#hex-nav .hn-go:hover{background:#1c2528;color:#4fd1ff;border-color:#4fd1ff;}' +
     '#hex-nav .hn-spacer{flex:1;}' +
-    /* scroll cue at bottom of page */
     '#hex-scroll-cue{position:fixed;bottom:70px;left:0;right:0;text-align:center;z-index:99990;' +
     'pointer-events:none;opacity:0;transition:opacity 0.5s;}' +
     '#hex-scroll-cue.show{opacity:1;}' +
@@ -272,7 +284,6 @@
   /* ═══════ SCROLL NAVIGATION ═══════ */
   var scrollCooldown = false;
 
-  /* scroll cue — shows "scroll to continue" near boundary */
   var cue = document.createElement('div');
   cue.id = 'hex-scroll-cue';
   cue.innerHTML = nextHref ? '<span>\u25BC Scroll for next page \u25BC</span>' : '';
@@ -291,8 +302,7 @@
     if (document.getElementById('hex-gate')) return;
     if (scrollCooldown) return;
 
-    var doc = document.documentElement;
-    var scrollBottom = doc.scrollHeight - window.scrollY - window.innerHeight;
+    var scrollBottom = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
     var scrollTop = window.scrollY;
 
     if (e.deltaY > 0 && scrollBottom < 50 && nextHref) {
