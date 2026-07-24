@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CyberSec Portfolio
+Comment=Cybersecurity Learning Portfolio & 90-Day Tracker
+Exec=bash -c "cd /home/robin/Desktop/Cybersecurity/Portfolio && npx electron ."
+Icon=/home/robin/Desktop/Cybersecurity/Portfolio/public/favicon.svg
+Terminal=false
+Categories=Education;Security;
+StartupWMClass=CyberSec Portfolio

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.ajitpawara.cybersec-portfolio",
+  "productName": "CyberSec Portfolio",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "docs/**/*",
+    "electron/**/*",
+    "package.json"
+  ],
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "category": "Education",
+    "icon": "public/favicon.svg",
+    "synopsis": "Cybersecurity Learning Portfolio",
+    "description": "Interactive cybersecurity portfolio, learning tracker, and 90-day challenge app."
+  },
+  "extraMetadata": {
+    "main": "electron/main.js"
+  }
+}

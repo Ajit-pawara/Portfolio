@@ -756,7 +756,7 @@ function App() {
     const hashed = await hashPassword(certsPassword);
     
     // Offline / Hardcoded fallback check
-    const expectedHash = import.meta.env.VITE_CERTS_PASSWORD_HASH || "c568d0c96043c60f9924afb1c1271325cee7f2fd886d59e30eb829fbdd07516d";
+    const expectedHash = import.meta.env.VITE_CERTS_PASSWORD_HASH || "0cee1cc7c75746ea0145e9fecda14fefe1fc2c56af6c5ac719e6f2607cb707fd";
     if (hashed === expectedHash) {
       sessionStorage.setItem("certs_unlocked", "true");
       setIsCertsUnlocked(true);
