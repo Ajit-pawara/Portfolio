@@ -1757,6 +1757,17 @@ function App() {
                         >
                           <GitBranch /> Repo
                         </a>
+                        {p.demo && (
+                          <a
+                            href={p.demo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary btn-sm"
+                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <ExternalLink /> Live Demo
+                          </a>
+                        )}
                       </div>
                     </div>
                   )}
