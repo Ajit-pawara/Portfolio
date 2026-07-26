@@ -418,12 +418,20 @@
           },
           {
             "day": 20,
-            "title": "Web Recon: Directory Busting & Technology Fingerprinting",
-            "subtitle": "You know a website's front door exists. Today you find every side-door, maintenance hatch, backup stairwell, and forgotten window \u2014 the hidden paths attackers use to bypass logins and inject malware.",
-            "takeaway": "Used gobuster and ffuf for directory enumeration; leveraged WhatWeb and Wappalyzer for passive technology fingerprinting; discovered hidden admin panels and tech stack CVEs.",
-            "incidentName": "British Airways Magecart (2018)",
-            "incidentDetail": "Magecart Group found an unsecured staging admin path on ba.com via directory busting. They injected a 23-line JavaScript skimmer into the payment page, capturing 380,000 payment card details over 2 weeks. BA was fined \u00a320M under GDPR.",
-            "status": "completed"
+            "title": "Password Security & Hashing Attacks",
+            "subtitle": "Hashes are not encryption \u2014 they are one-way mathematical fingerprints. Today you learn to identify them, analyze their strength, and crack them using industry-standard tools like Hashcat and John the Ripper.",
+            "takeaway": "Built RobinCracker \u2014 a full-stack password analysis toolkit with 16 modules. Learned hash identification (MD5, SHA1, bcrypt, Argon2), entropy calculation, password strength analysis, Hashcat/John command generation, dictionary management, and rule-based cracking automation. Day 20 project deployed live on Vercel + Render.",
+            "incidentName": "Bangladesh Bank SWIFT Heist (2016)",
+            "incidentDetail": "Lazarus Group used password hash analysis to compromise SWIFT credentials, then spoofed transfer requests. The password hash of a single bank officer was cracked using a dictionary attack, giving attackers access to the SWIFT payment system. Result: $81M stolen (only $101M of $951M attempt blocked due to a spelling error in \"fandation\" instead of \"foundation\").",
+            "status": "completed",
+            "projects": [
+              {
+                "title": "RobinCracker \u2014 Password Hash Analysis Toolkit",
+                "description": "16-module web app: hash identification, entropy analysis, password strength, Hashcat/John builders, dictionary manager, rule generator, benchmark, learning center, terminal, history, export",
+                "repo": "https://github.com/Ajit-pawara/RobinCracker",
+                "demo": "https://robin-cracker.vercel.app"
+              }
+            ]
           },
           {
             "day": 21,

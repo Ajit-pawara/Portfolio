@@ -2842,6 +2842,43 @@ function App() {
                     </div>
                   </div>
 
+                  {selectedDayLog.projects && selectedDayLog.projects.length > 0 && (
+                    <div className="viewer-section" style={{ marginBottom: '16px' }}>
+                      <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Projects:</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {selectedDayLog.projects.map((proj: any, pidx: number) => (
+                          <div key={pidx} style={{
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '4px',
+                            padding: '10px',
+                            backgroundColor: 'rgba(0, 217, 255, 0.03)',
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>{proj.title}</strong>
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                {proj.demo && (
+                                  <a href={proj.demo} target="_blank" rel="noopener noreferrer"
+                                    style={{ fontSize: '0.7rem', color: 'var(--color-cyan)', textDecoration: 'none', border: '1px solid var(--color-cyan)', padding: '2px 8px', borderRadius: '4px' }}>
+                                    Live Demo
+                                  </a>
+                                )}
+                                {proj.repo && (
+                                  <a href={proj.repo} target="_blank" rel="noopener noreferrer"
+                                    style={{ fontSize: '0.7rem', color: 'var(--color-green)', textDecoration: 'none', border: '1px solid var(--color-green)', padding: '2px 8px', borderRadius: '4px' }}>
+                                    Source
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                            {proj.description && (
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '6px 0 0 0', lineHeight: 1.4 }}>{proj.description}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="viewer-section">
                     <div className="viewer-section-title" style={{ color: 'var(--color-cyan)', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '6px' }}>&gt; Operational Audit Code:</div>
                     <pre style={{
