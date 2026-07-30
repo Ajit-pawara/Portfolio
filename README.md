@@ -19,6 +19,25 @@
 
 ---
 
+### 🚀 Projects Showcase
+
+| # | Project | Link |
+|---|---------|------|
+| 1 | 🔐 **RobinCracker** — Password Hash Analysis Toolkit | [GitHub](https://github.com/Ajit-pawara/RobinCracker) · [Live](https://robin-cracker.vercel.app) |
+| 2 | 🏆 **GC Track** — General Championship Scoreboard | [GitHub](https://github.com/Ajit-pawara/GCTrack) |
+| 3 | 🎪 **TourneyPro** — Tournament Organization Platform | [GitHub](https://github.com/Ajit-pawara/Tourneypro) |
+| 4 | 🌐 **Portfolio Website** — Personal Portfolio | [Live](https://ajit-pawara.github.io/Portfolio/) · [GitHub](https://github.com/Ajit-pawara/Portfolio) |
+| 5 | 🛡️ **Cyber Security 90-Day Challenge** — Learning Tracker | [GitHub](https://github.com/Ajit-pawara/Cyber_Security_90days) |
+| 6 | 📚 **Library Management System** — Book Catalog & Tracking | [GitHub](https://github.com/Ajit-pawara/Library_management_system) |
+| 7 | 📬 **College Resource Sharing Hub** — Study Material Sharing | [GitHub](https://github.com/Ajit-pawara/College_resourse_sharing-) |
+| 8 | 🐶 **BreedSense** — Dog Breed Classifier | [GitHub](https://github.com/Ajit-pawara/BreedSense) |
+| 9 | 🧩 **Breed Sense (ML)** — ML Variant with Python Backend | [GitHub](https://github.com/Ajit-pawara/Breed_sense) |
+| 10 | 🎫 **Fresher Tickets** — Event Ticketing System | [GitHub](https://github.com/Ajit-pawara/Fresher-tickets) |
+| 11 | ⌨️ **TypeMaster** — Typing Speed Test & Analytics | [GitHub](https://github.com/Ajit-pawara/typemaster) |
+| 12 | 📧 **MailGuardian** — Email Security & Phishing Detection | [GitHub](https://github.com/Ajit-pawara/MailGuardian-) |
+
+---
+
 ### 🗺️ 90-Day Cybersecurity Roadmap
 
 | Phase | Days | Theme | Topics |

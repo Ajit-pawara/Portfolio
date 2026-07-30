@@ -228,6 +228,68 @@
       ],
       "link": "https://github.com/Ajit-pawara/DBMS",
       "role": "Solo Developer"
+    },
+    {
+      "title": "TourneyPro — Tournament Organization Platform",
+      "description": "A tournament organization platform for managing brackets, team registrations, match schedules, and live score updates across multiple sports and event types.",
+      "contribution": "Built the full tournament lifecycle management system including bracket generation, team registration workflows, match scheduling, and real-time scoreboard updates.",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Firebase"
+      ],
+      "link": "https://github.com/Ajit-pawara/Tourneypro",
+      "role": "Solo Developer"
+    },
+    {
+      "title": "Breed Sense (ML) — ML Variant with Python Backend",
+      "description": "A machine learning variant of BreedSense with a Python backend for dog breed classification using trained ML models and image processing pipelines.",
+      "contribution": "Designed and implemented the Python ML backend, image preprocessing pipeline, model inference integration, and API endpoints for breed classification.",
+      "tags": [
+        "Python",
+        "Machine Learning",
+        "Flask"
+      ],
+      "link": "https://github.com/Ajit-pawara/Breed_sense",
+      "role": "Solo Developer"
+    },
+    {
+      "title": "Fresher Tickets — Event Ticketing System",
+      "description": "An event ticketing system for managing ticket sales, event registrations, and attendee tracking with a responsive user interface.",
+      "contribution": "Developed the complete ticketing workflow including event listing, ticket booking, registration management, and payment integration layout.",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "link": "https://github.com/Ajit-pawara/Fresher-tickets",
+      "role": "Solo Developer"
+    },
+    {
+      "title": "TypeMaster — Typing Speed Test & Analytics",
+      "description": "A typing speed test application with real-time WPM tracking, accuracy metrics, character-level analytics, and progress visualization over multiple test sessions.",
+      "contribution": "Built the real-time typing engine with WPM/accuracy calculations, keystroke analytics, session history tracking, and interactive performance charts.",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "link": "https://github.com/Ajit-pawara/typemaster",
+      "role": "Solo Developer"
+    },
+    {
+      "title": "MailGuardian — Email Security & Phishing Detection",
+      "description": "An email security tool focused on phishing detection, email header analysis, spam scoring, and sender reputation checking to help identify malicious emails.",
+      "contribution": "Designed the phishing analysis engine, email header parser, spam scoring algorithms, and security reporting dashboard for email threat detection.",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Security"
+      ],
+      "link": "https://github.com/Ajit-pawara/MailGuardian-",
+      "role": "Solo Developer"
     }
   ],
   "achievements": [

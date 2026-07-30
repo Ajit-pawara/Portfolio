@@ -2061,6 +2061,126 @@ function App() {
                       Developed a personal portfolio website to showcase projects and skills. Built with HTML, CSS, and JavaScript, featuring responsive design and modern UI for a professional online presence.
                     </p>
                   </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>RobinCracker — Password Hash Analysis Toolkit</strong>
+                      <a href="https://github.com/Ajit-pawara/RobinCracker" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A professional open-source web application for password security analysis, hash identification, and cracking workflow automation with 16 modules.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>TourneyPro — Tournament Organization Platform</strong>
+                      <a href="https://github.com/Ajit-pawara/Tourneypro" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A tournament organization platform for managing brackets, team registrations, match schedules, and live score updates.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Cybersecurity 90-Day Challenge Tracker</strong>
+                      <a href="https://github.com/Ajit-pawara/Cyber_Security_90days" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A comprehensive public logging repository for tracking daily learning progress, labs, and security concepts during a 90-day security challenge.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Library Management System</strong>
+                      <a href="https://github.com/Ajit-pawara/Library_management_system" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A lightweight web application for managing library catalogues, tracking book issuing, and maintaining member records.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>College Resource Sharing Hub</strong>
+                      <a href="https://github.com/Ajit-pawara/College_resourse_sharing-" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A collaborative student platform for sharing course notes, lecture materials, and academic resources across departments.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>BreedSense — Dog Breed Classifier</strong>
+                      <a href="https://github.com/Ajit-pawara/BreedSense" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      An interactive application utilizing web layouts and algorithms to identify and catalog dog breeds with a focus on CSS animations.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Breed Sense (ML) — ML Variant with Python Backend</strong>
+                      <a href="https://github.com/Ajit-pawara/Breed_sense" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A machine learning variant of BreedSense with a Python backend for dog breed classification using trained ML models and image processing pipelines.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Fresher Tickets — Event Ticketing System</strong>
+                      <a href="https://github.com/Ajit-pawara/Fresher-tickets" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      An event ticketing system for managing ticket sales, event registrations, and attendee tracking with a responsive user interface.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>TypeMaster — Typing Speed Test & Analytics</strong>
+                      <a href="https://github.com/Ajit-pawara/typemaster" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      A typing speed test application with real-time WPM tracking, accuracy metrics, character-level analytics, and progress visualization.
+                    </p>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>MailGuardian — Email Security & Phishing Detection</strong>
+                      <a href="https://github.com/Ajit-pawara/MailGuardian-" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: 'var(--color-cyan)', textDecoration: 'underline' }}>
+                        (link)
+                      </a>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', margin: '4px 0 0 0', lineHeight: '1.4' }}>
+                      An email security tool focused on phishing detection, email header analysis, spam scoring, and sender reputation checking to help identify malicious emails.
+                    </p>
+                  </div>
                 </div>
 
                 {/* CERTIFICATION & PRACTICE */}
