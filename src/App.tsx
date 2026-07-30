@@ -1153,7 +1153,7 @@ function App() {
         <section id="challenge" className="content-section">
           <div className="section-header-block">
             <h2 className="section-title"><Calendar /> Learning Tracker</h2>
-            <p className="section-description">A real-time progress tracker. Select different tracks via the dropdown menu, and click on cells to inspect logs in the Secure Operations log panel.</p>
+            <p className="section-description">{activeTrackId === 'java_dsa' ? 'Quick-access dashboard for the PlacementKit preparation system. Track C++, Python, and DSA progress simultaneously.' : 'A real-time progress tracker. Select different tracks via the dropdown menu, and click on cells to inspect logs in the Secure Operations log panel.'}</p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
@@ -1235,7 +1235,7 @@ function App() {
                 <Compass style={{ width: '14px', height: '14px' }} /> View Interactive Roadmap
               </button>
             )}
-            {activeTrack && activeTrack.repoUrl && (
+            {activeTrack && activeTrack.repoUrl && activeTrackId !== 'java_dsa' && (
               <button
                 onClick={() => {
                   setActiveViewerTab("revision");
@@ -1260,7 +1260,7 @@ function App() {
                 <Zap style={{ width: '14px', height: '14px' }} /> Revision
               </button>
             )}
-            {activeTrack && activeTrack.repoUrl && (
+            {activeTrack && activeTrack.repoUrl && activeTrackId !== 'java_dsa' && (
               <button
                 onClick={() => {
                   if (isContentLocked) {
@@ -1289,88 +1289,116 @@ function App() {
           </div>
 
           <div className="challenge-container">
-            {/* Visual grid card */}
-            <div className="challenge-grid-card card">
-              <div className="card-header-bar">
-                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Grid /> Track Contribution Map
-                  {loadingFiles && (
-                    <span className="terminal-loader" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', opacity: 0.8 }}>
-                      <span className="loader-icon blinking-cursor" style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-cyan)', borderRadius: '50%', display: 'inline-block', animation: 'blink 1s step-end infinite' }}></span>
-                      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>[auto-detecting...]</span>
+            {activeTrackId === 'java_dsa' ? (
+              <div className="challenge-grid-card card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🎯</div>
+                <h3 style={{ marginBottom: '12px', color: 'var(--color-cyan)' }}>PlacementKit Preparation</h3>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '24px', maxWidth: '500px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+                  Track C++, Python, and DSA preparation all in one place. Open the PlacementKit dashboard to access study materials, practice problems, and progress tracking.
+                </p>
+                <a
+                  href="https://ajit-pawara.github.io/PlacementKit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 28px',
+                    fontSize: '1rem',
+                    fontWeight: 600
+                  }}
+                >
+                  <ExternalLink style={{ width: '18px', height: '18px' }} /> Open PlacementKit
+                </a>
+              </div>
+            ) : (
+              <>
+                {/* Visual grid card */}
+                <div className="challenge-grid-card card">
+                  <div className="card-header-bar">
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Grid /> Track Contribution Map
+                      {loadingFiles && (
+                        <span className="terminal-loader" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', opacity: 0.8 }}>
+                          <span className="loader-icon blinking-cursor" style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-cyan)', borderRadius: '50%', display: 'inline-block', animation: 'blink 1s step-end infinite' }}></span>
+                          <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>[auto-detecting...]</span>
+                        </span>
+                      )}
+                    </h3>
+                    <div className="grid-legend">
+                      <span className="legend-item"><span className="legend-cell complete"></span> Completed</span>
+                      <span className="legend-item"><span className="legend-cell active"></span> Active</span>
+                      <span className="legend-item"><span className="legend-cell upcoming"></span> Pending</span>
+                    </div>
+                  </div>
+
+                  <div className="grid-wrapper">
+                    <div className="contribution-grid">
+                      {Array.from({ length: daysManifest?.totalDays || activeTrack.totalDays || 90 }, (_, index) => {
+                        const dayNum = index + 1;
+
+                        let cellClass = "day-cell";
+                        if (dayNum < computedCurrentDay) {
+                          cellClass += " complete";
+                        } else if (dayNum === computedCurrentDay) {
+                          cellClass += " active";
+                        } else {
+                          cellClass += " upcoming";
+                        }
+                        if (dayNum === selectedDayNum) {
+                          cellClass += " selected";
+                        }
+
+                        return (
+                          <div
+                            key={dayNum}
+                            className={cellClass}
+                            onClick={() => {
+                              if (dayNum > 10 && isContentLocked) {
+                                setSelectedDayNum(dayNum);
+                                setIsPasswordPromptOpen(true);
+                              } else {
+                                setSelectedDayNum(dayNum);
+                                setIsDayOptionModalOpen(true);
+                              }
+                            }}
+                          >
+                            {String(dayNum).padStart(2, '0')}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid-summary-footer">
+                    <span id="challenge-stats">
+                      <strong>{computedCurrentDay - 1} / {daysManifest?.totalDays || activeTrack.totalDays} Days Completed</strong>
                     </span>
+                    <span>Active Track: <strong>{activeTrack.name}</strong></span>
+                  </div>
+                  {autoStats && (
+                    <div className="auto-stats-row" style={{
+                      display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px',
+                      paddingTop: '12px', borderTop: '1px solid var(--border-color)',
+                      fontFamily: 'var(--font-mono)', fontSize: '0.72rem'
+                    }}>
+                      <span style={{ color: 'var(--text-muted)', width: '100%', marginBottom: '4px' }}>// auto-tracked statistics</span>
+                      <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Days Done: <strong>{autoStats.daysDone}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Incidents: <strong>{autoStats.incidents}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Tools: <strong>{autoStats.toolsUsed}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Commands: <strong>{autoStats.commands}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Scripts: <strong>{autoStats.scriptsBuilt}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Labs: <strong>{autoStats.labs}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Projects: <strong>{autoStats.projects}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Notes: <strong>{autoStats.notes}</strong></span>
+                      <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Examples: <strong>{autoStats.examples}</strong></span>
+                    </div>
                   )}
-                </h3>
-                <div className="grid-legend">
-                  <span className="legend-item"><span className="legend-cell complete"></span> Completed</span>
-                  <span className="legend-item"><span className="legend-cell active"></span> Active</span>
-                  <span className="legend-item"><span className="legend-cell upcoming"></span> Pending</span>
                 </div>
-              </div>
-
-              <div className="grid-wrapper">
-                <div className="contribution-grid">
-                  {Array.from({ length: daysManifest?.totalDays || activeTrack.totalDays || 90 }, (_, index) => {
-                    const dayNum = index + 1;
-
-                    let cellClass = "day-cell";
-                    if (dayNum < computedCurrentDay) {
-                      cellClass += " complete";
-                    } else if (dayNum === computedCurrentDay) {
-                      cellClass += " active";
-                    } else {
-                      cellClass += " upcoming";
-                    }
-                    if (dayNum === selectedDayNum) {
-                      cellClass += " selected";
-                    }
-
-                    return (
-                      <div
-                        key={dayNum}
-                        className={cellClass}
-                        onClick={() => {
-                          if (dayNum > 10 && isContentLocked) {
-                            setSelectedDayNum(dayNum);
-                            setIsPasswordPromptOpen(true);
-                          } else {
-                            setSelectedDayNum(dayNum);
-                            setIsDayOptionModalOpen(true);
-                          }
-                        }}
-                      >
-                        {String(dayNum).padStart(2, '0')}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="grid-summary-footer">
-                <span id="challenge-stats">
-                  <strong>{computedCurrentDay - 1} / {daysManifest?.totalDays || activeTrack.totalDays} Days Completed</strong>
-                </span>
-                <span>Active Track: <strong>{activeTrack.name}</strong></span>
-              </div>
-              {autoStats && (
-                <div className="auto-stats-row" style={{
-                  display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px',
-                  paddingTop: '12px', borderTop: '1px solid var(--border-color)',
-                  fontFamily: 'var(--font-mono)', fontSize: '0.72rem'
-                }}>
-                  <span style={{ color: 'var(--text-muted)', width: '100%', marginBottom: '4px' }}>// auto-tracked statistics</span>
-                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Days Done: <strong>{autoStats.daysDone}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Incidents: <strong>{autoStats.incidents}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Tools: <strong>{autoStats.toolsUsed}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Commands: <strong>{autoStats.commands}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Scripts: <strong>{autoStats.scriptsBuilt}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Labs: <strong>{autoStats.labs}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-cyan)' }}>Projects: <strong>{autoStats.projects}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-green)' }}>Notes: <strong>{autoStats.notes}</strong></span>
-                  <span className="stat-chip" style={{ color: 'var(--color-amber)' }}>Examples: <strong>{autoStats.examples}</strong></span>
-                </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </section>
 
