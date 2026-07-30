@@ -476,7 +476,7 @@ function App() {
 
   useEffect(() => {
     if (showTrackHint) {
-      const timer = setTimeout(() => setShowTrackHint(false), 3000);
+      const timer = setTimeout(() => setShowTrackHint(false), 15000);
       return () => clearTimeout(timer);
     }
   }, [showTrackHint]);
