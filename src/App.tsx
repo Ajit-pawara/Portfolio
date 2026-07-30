@@ -471,6 +471,16 @@ function App() {
   // Resume layout toggles
   const [isResumeExpanded, setIsResumeExpanded] = useState(false);
 
+  // Track hint popup
+  const [showTrackHint, setShowTrackHint] = useState(true);
+
+  useEffect(() => {
+    if (showTrackHint) {
+      const timer = setTimeout(() => setShowTrackHint(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showTrackHint]);
+
   // Collapsed projects
   const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
 
@@ -1156,12 +1166,33 @@ function App() {
             <p className="section-description">{activeTrackId === 'java_dsa' ? 'Quick-access dashboard for the PlacementKit preparation system. Track C++, Python, and DSA progress simultaneously.' : 'A real-time progress tracker. Select different tracks via the dropdown menu, and click on cells to inspect logs in the Secure Operations log panel.'}</p>
           </div>
 
+          {showTrackHint && (
+            <div style={{
+              padding: '8px 14px',
+              marginBottom: '12px',
+              borderRadius: '6px',
+              border: '1px solid var(--color-cyan)',
+              backgroundColor: 'rgba(0, 217, 255, 0.08)',
+              color: 'var(--color-cyan)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.78rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              animation: 'fadeIn 0.3s ease'
+            }}>
+              <Zap style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+              <span>Try the dropdown below — there's another track available: <strong>C++, Python & DSA — PlacementKit</strong></span>
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
             <select
               value={activeTrackId}
               onChange={(e) => {
                 const updated = { ...db };
                 updated.challenge.activeTrack = e.target.value;
+                setShowTrackHint(false);
                 saveChanges(updated);
               }}
               className="form-control"
